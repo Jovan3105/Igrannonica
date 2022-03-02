@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using backend.Models;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace backend.Controllers
 {
@@ -22,6 +23,7 @@ namespace backend.Controllers
 
         [HttpGet]
         [Route("getCards")]
+        
         public async Task<ActionResult<List<Card>>> getCards(){
 
             return Ok(await this.dataContext.kartice.ToListAsync());
@@ -30,7 +32,7 @@ namespace backend.Controllers
 
         [HttpDelete]
         [Route("deleteCard")]
-        public async Task<ActionResult<List<Card>>> deleteCard(int id){
+        public async Task<ActionResult> deleteCard(int id){
 
             var kartica=await this.dataContext.kartice.FindAsync(id);
             if(kartica==null){
@@ -52,8 +54,12 @@ namespace backend.Controllers
         public async Task<ActionResult<List<Card>>> insertCard(Card c){
                 this.dataContext.kartice.Add(c);
                 await this.dataContext.SaveChangesAsync();
+               
+                var displayUrl = UriHelper.GetEncodedUrl(Request);
+                Console.WriteLine(displayUrl);
+                
 
-            return Ok(await this.dataContext.kartice.ToListAsync());
+            return Ok(c);
         }
 
     }
