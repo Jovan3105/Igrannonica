@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Demo;
 using Demo.Data;
+using Microsoft.AspNetCore.Cors;
 
 namespace Demo.Controllers
 {
+    [EnableCors("MyAllowSpecificOrigins")]
     [Route("api/[controller]")]
     [ApiController]
     public class TasksController : ControllerBase
