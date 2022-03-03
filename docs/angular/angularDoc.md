@@ -23,15 +23,17 @@ Da bi pokrenuli naš web server i otvorili kreirani projekat u pretraživaču, p
 ```
 ng serve
 ```
+
 ## Osnovni elementi
 
  ### Komponenta 
 
- ![Untitled](img/decorator-hover.png)
+<img src="img/decorator-hover.png" alt="drawing" width="550"/>
+
  Komponente su gradivni blokovi koji čine našu aplikaciju. Sadrže TypeScript klasu uz @Component dekorator koji ima osnovne informacije o:
  
  * selektoru - kako će komponenta u html-u biti pozvana
- * tempejtu - html komponente
+ * templejtu - html komponente
  * stilu - css ili neki drugi stil koji će biti primenjen na komponentu
 
 Kreiranje komponente je najjednostavnije pomoću komande:
@@ -44,11 +46,11 @@ U app.component.ts fajlu se nalazi naša root komponenta.
 
 ### Zavisnosti (Dependency injection)
 
-Dependency injection nam dozvoljava da deklarišemo zavisnosti u naše TS klase bez potrebe da ih instanciramo. To radi Angular za nas. 
+Dependency injection nam dozvoljava da deklarišemo zavisnosti u naše TS klase bez potrebe da ih instanciramo. To odradi Angular za nas. 
 
- ![Untitled](img/dependency.png)
+<img src="img/dependency.png" alt="drawing" width="400"/>
 
- ## Uzimanje podataka sa servera
+ ## Preuzimanje podataka sa servera
 
 [HttpClient](https://angular.io/api/common/http/HttpClient) je mehanizam u Angularu pomoću kog komuniciramo sa udaljenim serverom.
 
@@ -78,7 +80,8 @@ Takođe ga dodajemo u NgModule:
 ng create service ime-servisa
 ```
 Kada napravimo servis, bitno je da ga dodamo i u NgModule:
-```
+
+```typescript
 @NgModule({
   providers: [ ImeServisaService ],
 })
@@ -112,7 +115,7 @@ export class ListApiService {
   
 }
 ```
-**listAPIUrl** sadrži informaciju gde na webu se nalazi naš server. Važno je proslediti konstruktoru HttpClient preko koga će se vršiti HTTP zahtevi.
+Promenljiva **listAPIUrl** sadrži informaciju gde na webu se nalazi naš server. Važno je proslediti konstruktoru HttpClient preko koga će se pozivati i vršiti HTTP zahtevi.
 
 Ostaje još da komponente koje će prikazivati podatke importuju servis, dobijaju podatke pozivanjem metoda servisa i vizualizuju ih.
 
