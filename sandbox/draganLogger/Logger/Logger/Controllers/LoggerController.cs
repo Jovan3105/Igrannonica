@@ -14,6 +14,8 @@ namespace Logger.Controllers
     public class LoggerController : ControllerBase
     {
         private readonly ILogger<LoggerController> _logger;
+        static string konekcioni = @"Data Source=(localdb)\logger;Initial Catalog=logger;Integrated Security=True";
+        SqlConnection conn = new SqlConnection(konekcioni);
 
         public LoggerController(ILogger<LoggerController> logger)
         {
@@ -24,10 +26,9 @@ namespace Logger.Controllers
         public JsonResult Get()
         {
             string query = @"select * from logs";
-            DataTable table = new DataTable();
-            string konekcioni = @"Data Source=(localdb)\logger;Initial Catalog=logger;Integrated Security=True";
+            
             SqlDataReader reader;
-            SqlConnection conn = new SqlConnection(konekcioni);
+            
             conn.Open();
             SqlCommand comm = new SqlCommand(query, conn);
             reader = comm.ExecuteReader();
@@ -35,7 +36,7 @@ namespace Logger.Controllers
 
             while(reader.Read())
             {
-                logs.Add(new Log(int.Parse(reader["id"].ToString()), reader["naziv"].ToString(), reader["opis"].ToString(), reader["datum"].ToString()));
+                logs.Add(new Log(reader["id"].ToString(), reader["naziv"].ToString(), reader["opis"].ToString(), reader["datum"].ToString()));
             }
 
             reader.Close();
@@ -48,14 +49,24 @@ namespace Logger.Controllers
         public JsonResult Post(Log log)
         {
             string query = @"insert into logs(naziv,opis,datum) values('"+log.Naziv+"','"+log.Opis+"','"+DateTime.Now+"')";
-            DataTable table = new DataTable();
-            string konekcioni = @"Data Source=(localdb)\logger;Initial Catalog=logger;Integrated Security=True";
-            SqlConnection conn = new SqlConnection(konekcioni);
             conn.Open();
             SqlCommand comm = new SqlCommand(query, conn);
             comm.ExecuteNonQuery();
             conn.Close();
             return new JsonResult("Uspesno ubacen");
+
+        }
+
+
+        [HttpDelete("{id}")]
+        public JsonResult Delete(string id)
+        {
+            string query = @"delete from logs where id="+id;
+            conn.Open();
+            SqlCommand comm = new SqlCommand(query, conn);
+            comm.ExecuteNonQuery();
+            conn.Close();
+            return new JsonResult("Uspesno izbrisan");
 
         }
     }

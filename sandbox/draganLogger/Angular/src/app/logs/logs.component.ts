@@ -40,6 +40,17 @@ export class LogsComponent implements OnInit {
       {
         alert(res.toString());
         this.refreshLogsList();
+        this.naziv="";
+        this.opis="";
       });
+    }
+    deleteClick(value: any){
+      if(confirm("Jeste li sigurni?")){
+
+        this.service.deleteLog(value.id).subscribe(res=>{
+          alert(res.toString());
+          this.refreshLogsList();
+        })
+      }
     }
 }

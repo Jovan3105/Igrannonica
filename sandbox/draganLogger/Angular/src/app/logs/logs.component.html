@@ -1,6 +1,6 @@
-Naziv: <input type="text" [(ngModel)]="naziv"/>
-Opis: <input type="text" [(ngModel)]="opis"/>
-<button (click)="addClick()">Dodaj</button>
+Naziv: <input type="text" [(ngModel)]="naziv"/><br><br>
+Opis: <input type="text" [(ngModel)]="opis"/><br><br>
+<button (click)="addClick()">Dodaj</button><br><br>
 <table>
     <thead>
         <tr>
@@ -14,6 +14,7 @@ Opis: <input type="text" [(ngModel)]="opis"/>
             <td>{{dataItem.naziv}}</td>
             <td>{{dataItem.opis}}</td>
             <td>{{dataItem.date}}</td>
+            <td><button (click)="deleteClick(dataItem)">Izbrisi</button></td>
         </tr>
     </tbody>
 </table>
