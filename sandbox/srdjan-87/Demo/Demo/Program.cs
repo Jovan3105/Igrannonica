@@ -1,7 +1,7 @@
 using Demo.Data;
 using Microsoft.EntityFrameworkCore;
 
-var myAllowSpecificOrigins = "_mymyAllowSpecificOrigins";
+var myAllowSpecificOrigins = "MyAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,16 +18,18 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 
 
+//builder.Services.AddCors();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: myAllowSpecificOrigins,
+    options.AddPolicy(myAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("http://localhost:4200")
+                          builder.WithOrigins("http://localhost:4200", "https://localhost:4200")
                           .AllowAnyMethod()
                           .AllowAnyHeader();
                       });
-});
+});/**/
 
 
 var app = builder.Build();
@@ -41,7 +43,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(myAllowSpecificOrigins);
+app.UseCors();
+//app.UseCors(c=>c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthorization();
 
