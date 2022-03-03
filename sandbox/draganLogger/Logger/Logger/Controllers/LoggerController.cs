@@ -10,14 +10,9 @@ using System.Data;
 namespace Logger.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class LoggerController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<LoggerController> _logger;
 
         public LoggerController(ILogger<LoggerController> logger)

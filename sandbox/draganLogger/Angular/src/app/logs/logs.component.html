@@ -1,0 +1,16 @@
+<table>
+    <thead>
+        <tr>
+            <th>Naziv</th>
+            <th>Opis</th>
+            <th>Datum i vreme</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let dataItem of LogsList">
+            <td>{{dataItem.naziv}}</td>
+            <td>{{dataItem.opis}}</td>
+            <td>{{dataItem.date}}</td>
+        </tr>
+    </tbody>
+</table>
