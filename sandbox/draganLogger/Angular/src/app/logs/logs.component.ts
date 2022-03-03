@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { SharedService } from '../shared.service';
 
@@ -12,10 +12,15 @@ export class LogsComponent implements OnInit {
   constructor(private service:SharedService) { }
 
   LogsList:any=[];
-  log:any;
+
+  @Input() log:any;
+  naziv:string | undefined;
+  opis:string | undefined;
 
   ngOnInit(): void {
     this.refreshLogsList();
+    this.naziv=this.log.naziv;
+    this.opis=this.log.naziv;
   }
 
   refreshLogsList(){
@@ -27,13 +32,14 @@ export class LogsComponent implements OnInit {
   addClick(){
     var log={
       "id":"0",
-      "naziv":"test",
-      "opis":"atatatt",
+      "naziv":this.naziv,
+      "opis":this.opis,
       "datum":""
     }
     this.service.addLog(log).subscribe(res=>
       {
         alert(res.toString());
+        this.refreshLogsList();
       });
-  }
+    }
 }
