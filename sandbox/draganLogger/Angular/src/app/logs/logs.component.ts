@@ -12,6 +12,7 @@ export class LogsComponent implements OnInit {
   constructor(private service:SharedService) { }
 
   LogsList:any=[];
+  log:any;
 
   ngOnInit(): void {
     this.refreshLogsList();
@@ -22,5 +23,17 @@ export class LogsComponent implements OnInit {
       {
         this.LogsList=data;
       })
+  }
+  addClick(){
+    var log={
+      "id":"0",
+      "naziv":"test",
+      "opis":"atatatt",
+      "datum":""
+    }
+    this.service.addLog(log).subscribe(res=>
+      {
+        alert(res.toString());
+      });
   }
 }
