@@ -18,4 +18,8 @@ export class SharedService {
   addLog(val:any){
     return this.http.post(this.APIUrl+"/Logger",val);
   }
+
+  deleteLog(val:any){
+    return this.http.delete(this.APIUrl+"/Logger/"+val)
+  }
 }
