@@ -9,17 +9,19 @@
                      name="username"
                      ngModel
                      required
+                     pattern="([a-zA-Z]){4,}\w+"
                      #username="ngModel"
                      class="form-control"
                      id="registerUsername"
-                     placeholder="Enter username">
+                     placeholder="At least 5 letters">
           </div>
-          <div class="form-group" >
+          <div class="form-group" [class.has.error]="email.invalid && email.touched">
               <label for="registerEmail">Email</label>
               <input type="email"
                      name="email"
                      ngModel
                      required
+                     pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$"
                      #email="ngModel"
                      class="form-control"
                      id="registerEmail"
@@ -32,12 +34,14 @@
                      name="password"
                      ngModel
                      required
+                     pattern="([a-zA-Z0-9]){4,7}\w+"
                      #password="ngModel"
                      class="form-control"
                      id="registerPassword"
-                     placeholder="Enter passwordd">
+                     placeholder="At least 5 letters or numbers">
           </div>
           <button type="submit"
+                  [disabled]="f.invalid"
                   class="btn btn-primary">Register <i class="fas fa-sign-in-alt"></i></button>
       </form>
   </div>
