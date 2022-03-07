@@ -11,7 +11,7 @@ Opis: <input type="text" [(ngModel)]="opis"/><br><br>
     </thead>
     <tbody>
         <tr *ngFor="let dataItem of LogsList">
-            <td>{{dataItem.naziv}}</td>
+            <td>{{dataItem.naziv}</td>
             <td>{{dataItem.opis}}</td>
             <td>{{dataItem.date}}</td>
             <td><button (click)="deleteClick(dataItem)">Izbrisi</button></td>
