@@ -9,10 +9,12 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ShowTableComponent } from './table/show-table/show-table.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ShowTableComponent
   ],
   imports: [
     BrowserModule,
