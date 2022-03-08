@@ -8,7 +8,7 @@
             Message = message;
         }
 
-        private String Code { get; set; }
-        private String Message { get; set; }
+        public String Code { get; set; }
+        public String Message { get; set; }
     }
 }

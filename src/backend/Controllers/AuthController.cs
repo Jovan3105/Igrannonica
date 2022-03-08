@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using Npgsql;
+using System.Text.Json;
 
 namespace backend.Controllers
 {
@@ -30,32 +31,53 @@ namespace backend.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<Response>> Register(userReg register) {
+        public async Task<ActionResult<Response>> Register(userReg register)
+        {
 
             res.Success = true;
+            res.errors.Clear();
             //proveravanje maila
-            
+
             if (!IsValidEmail(register.Email))
             {
                 res.Success = false;
                 res.errors.Add(new Error("incorrect_email", "Incorrect email address!"));
             }
             //proveravanje hasha
-            if(register.HashedPassword.Length!=60)
+            if (register.HashedPassword.Length != 60)
             {
                 res.Success = false;
                 res.errors.Add(new Error("incorrect_hash_length", "Hash length doesn't match!"));
             }
-            if(res.Success==false)
+            if (res.Success == false)
             {
                 return BadRequest(res);
             }
             //proveravanje sql injectiona
+            string query = @"INSERT INTO users(username,email,passwordhashed) 
+                            VALUES(@Username,@Email,@Passwordhashed)";
+            string SqlDataSource = _cofiguraion.GetConnectionString("DefaultConnection");
+            using (NpgsqlConnection conn = new NpgsqlConnection(SqlDataSource))
+            {
+                conn.Open();
+                using (NpgsqlCommand command = new NpgsqlCommand(query, conn))
+                {
+                    command.Parameters.AddWithValue("@Username", register.Username);
+                    command.Parameters.AddWithValue("@Email", register.Email);
+                    command.Parameters.AddWithValue("@Passwordhashed", register.HashedPassword);
+                    int result = command.ExecuteNonQuery();
+                    if (result == 1)
+                        return Ok(res);
+                    else
+                    {
+                        res.Success = false;
+                        res.errors.Add(new Error("database_insert_fail", "Failed to insert registration parameters into database"));
+                        return BadRequest(res);
+                    }
+                }
 
-            
-
-            return Ok(register);
-        }   
+            }
+        }
 
         [HttpGet]
         public JsonResult Get()
