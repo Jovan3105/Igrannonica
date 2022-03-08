@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Papa, ParseResult } from 'ngx-papaparse';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -8,18 +9,33 @@ export class ParsingService {
 
   constructor(private papa: Papa) { }
 
-  test:object[] = [];
+  test:any[] = [];
   parsingFile(files:FileList):any
   {
-    this.test = [];
+    
     var file = files[0];
     var parseResult : ParseResult = this.papa.parse(file,{
       header: true,
-      complete: function(results) 
+      //download:true,
+      complete: (results) =>
       {
-        console.log(results.data);
+        this.getParsedData(results.data);
+        for(let i=0; i<results.data.length; i++)
+        {
+          this.test.push(results.data[i]);
+        }
       }
     });
+  }
 
+  getParsedData(data:any):any 
+  {
+    let tabela = document.getElementById('dataPrepTable') as HTMLElement;
+    let headerNames = Object.getOwnPropertyNames(data[0]);
+    if (tabela) 
+    {
+      //tabela.innerHTML = data;
+    }
+    
   }
 }

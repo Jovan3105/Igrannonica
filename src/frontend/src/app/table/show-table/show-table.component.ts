@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ParsingService } from '../parsing.service';
-import { Papa, ParseResult } from 'ngx-papaparse';
-
 
 @Component({
   selector: 'app-show-table',
@@ -12,7 +10,7 @@ export class ShowTableComponent implements OnInit {
 
   header:any[] = [];
   data:any[] = [];
-  constructor(private parsingService : ParsingService, private papa:Papa) { }
+  constructor(private parsingService : ParsingService) { }
 
   ngOnInit(): void {
   }
@@ -24,7 +22,10 @@ export class ShowTableComponent implements OnInit {
     let fileList: FileList | null = element.files;
     
     if (fileList) {
-      var data = this.parsingService.parsingFile(fileList);;
+      
+      this.parsingService.parsingFile(fileList);
+      
+
     }
     
     
