@@ -31,14 +31,35 @@ namespace backend.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(User user) {
+        public async Task<ActionResult<string>> Register(User user)
+        {
+            //proveravanje maila
 
+            if (!IsValidEmail(user.Email))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_notValid"
+                            }
+                            }
+
+
+
+                    }
+                });
+            }
             user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
             this.userContext.Users.Add(user);
             await this.userContext.SaveChangesAsync();
             return Ok(user);
         }
-
 
 
         [HttpPost("login")]
@@ -161,7 +182,24 @@ namespace backend.Controllers
             return jwt;
         }
 
+        private bool IsValidEmail(string email)
+        {
+            var trimmedEmail = email.Trim();
 
-        
+            if (trimmedEmail.EndsWith("."))
+            {
+                return false; // suggested by @TK-421
+            }
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == trimmedEmail;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
 }
