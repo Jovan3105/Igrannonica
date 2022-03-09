@@ -46,7 +46,7 @@ export class ShowTableComponent implements OnInit {
 
   prepareTable()
   {
-    this.headers = Object.getOwnPropertyNames(this.data[0]); //obezbediti i ako ne postoje podacis
+    if (this.data.length > 0) this.headers = Object.getOwnPropertyNames(this.data[0]); 
     this.columnDefs = [];
     this.rowData = [];
     for(let header of this.headers)
@@ -62,6 +62,7 @@ export class ShowTableComponent implements OnInit {
       }
       this.columnDefs.push(col);
     }
+
     for(let row of this.data)
     {
       this.rowData.push(row);
@@ -75,6 +76,7 @@ export class ShowTableComponent implements OnInit {
   onRemoveSelected() {
     const selectedData = this.gridApi.getSelectedRows();
     const res = this.gridApi.applyTransaction({ remove: selectedData })!;
+    
     for(let sData of selectedData)
     {
       var index = this.data.indexOf(sData,0);
