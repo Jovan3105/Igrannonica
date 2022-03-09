@@ -7,12 +7,19 @@ import { AuthService } from 'src/app/shared/services/auth.service';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
+  confirm_password: any;
+  password: any;
 
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
   }
   onSubmit(f: NgForm) {
+    if(f.controls['email'].value <= 320){
+      console.log("Predugacak email");
+      return;
+    }
+      
     const registerObserver = {
       next: (x:any) => console.log('User created'),
       error: (err: Error) => console.log(err)
@@ -21,4 +28,6 @@ export class RegisterComponent implements OnInit {
     console.log(f.value);  // { first: '', last: '' }
     console.log(f.valid);  // false
   }
+ 
+   
 }
