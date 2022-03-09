@@ -1,9 +1,16 @@
 <div class="mb-3">
     <label for="formFile" class="form-label">Dodaj fajl</label>
-    <input class="form-control" type="file" id="formFile" accept=".csv" (change)="onFileSelected($event)">
+    <input class="form-control" type="file" id="uploadData" accept=".csv" (change)="onFileSelected($event)">
 </div>
 
-<div id="dataPrepTable">
+<div style="width: 800px;" class="grid-wrapper">
+<ag-grid-angular
+    style="height: 520px;"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [pagination]="true"
+    [paginationPageSize]="paginationPageSize"
+    *ngIf = "data">
+</ag-grid-angular>
 </div>
-
-<!-- <div id="myGrid" style="height: 150px; width: 600px" class="ag-theme-alpine"></div> -->
