@@ -31,14 +31,50 @@ namespace backend.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(User user) {
+        public async Task<ActionResult<string>> Register(User user)
+        {
+            //proveravanje maila
 
+            if (!IsValidEmail(user.Email))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_notValid"
+                            }
+                            }
+
+
+
+                    }
+                });
+            }
             user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
             this.userContext.Users.Add(user);
             await this.userContext.SaveChangesAsync();
-            return Ok(user);
-        }
 
+
+
+            string token = CreateJWT(user);
+            return Ok(new
+            {
+                success = true,
+                data = new
+                {
+                    token = token,
+
+
+
+
+                }
+            });
+        }
 
 
         [HttpPost("login")]
@@ -143,8 +179,9 @@ namespace backend.Controllers
                 new Claim(ClaimTypes.Name,user.Username),
                 new Claim(ClaimTypes.Email,user.Email),
                 new Claim("message","Logging in..."),
-             
-                
+                new Claim("access_token", CreateAccessJWT())
+
+
 
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
@@ -160,8 +197,41 @@ namespace backend.Controllers
 
             return jwt;
         }
+        private string CreateAccessJWT()
+        {
+            var key= new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+
+            var token = new JwtSecurityToken(
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512)
 
 
-        
+
+                ) ;
+            
+            
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return jwt;
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            var trimmedEmail = email.Trim();
+
+            if (trimmedEmail.EndsWith("."))
+            {
+                return false; // suggested by @TK-421
+            }
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == trimmedEmail;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
     }
 }
