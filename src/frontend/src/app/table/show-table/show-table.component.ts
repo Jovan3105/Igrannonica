@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Papa, ParseResult } from 'ngx-papaparse';
-import { ColDef } from 'ag-grid-community';
+import { ColDef,GridApi,GridReadyEvent,CellValueChangedEvent } from 'ag-grid-community';
 
 @Component({
   selector: 'app-show-table',
@@ -11,11 +11,13 @@ export class ShowTableComponent implements OnInit {
 
   headers:any[] = [];
   data:any = null;
+  private gridApi!: GridApi;
+
   constructor(private papa:Papa) { }
 
   columnDefs: ColDef[] = [];
   rowData:any = [];
-
+  public rowSelection = 'multiple';
   public paginationPageSize = 10;
 
   ngOnInit(): void {
@@ -26,7 +28,7 @@ export class ShowTableComponent implements OnInit {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     
-    if (fileList) 
+    if (fileList && fileList?.length > 0) 
     {
       var file = fileList[0];
       var parseResult : ParseResult = this.papa.parse(file,{
@@ -44,7 +46,7 @@ export class ShowTableComponent implements OnInit {
 
   prepareTable()
   {
-    this.headers = Object.getOwnPropertyNames(this.data[0]);
+    this.headers = Object.getOwnPropertyNames(this.data[0]); //obezbediti i ako ne postoje podacis
     this.columnDefs = [];
     this.rowData = [];
     for(let header of this.headers)
@@ -63,6 +65,20 @@ export class ShowTableComponent implements OnInit {
     for(let row of this.data)
     {
       this.rowData.push(row);
+    }
+  }
+
+  onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
+  }
+
+  onRemoveSelected() {
+    const selectedData = this.gridApi.getSelectedRows();
+    const res = this.gridApi.applyTransaction({ remove: selectedData })!;
+    for(let sData of selectedData)
+    {
+      var index = this.data.indexOf(sData,0);
+      if (index != -1) this.data.splice(index,1);
     }
   }
 }

@@ -3,7 +3,8 @@
     <input class="form-control" type="file" id="uploadData" accept=".csv" (change)="onFileSelected($event)">
 </div>
 
-<div style="width: 800px;" class="grid-wrapper">
+<div style="width: 800px;" class="grid-wrapper" *ngIf = "data">
+    <button type="button" class="btn btn-danger" (click)="onRemoveSelected()">Obrisi selektovano</button><br>
 <ag-grid-angular
     style="height: 520px;"
     class="ag-theme-alpine"
@@ -11,6 +12,9 @@
     [columnDefs]="columnDefs"
     [pagination]="true"
     [paginationPageSize]="paginationPageSize"
-    *ngIf = "data">
+    [rowSelection]="rowSelection"
+    [animateRows]="true"
+    (gridReady)="onGridReady($event)"
+    >
 </ag-grid-angular>
 </div>
