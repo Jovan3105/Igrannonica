@@ -49,19 +49,62 @@ namespace backend.Controllers
             User user = this.userContext.Users.FirstOrDefault(user => user.Username == request.Username);
             if (user == null)
             {
-                string token = CreateJWT(user, "username");
-                return BadRequest(token);
+                
+                 return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "username_notFound"
+                            }
+                            }
+
+
+
+                    }
+                });
             }
             else
             {
                 if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHashed))
                 {
-                    string token = CreateJWT(user,"login");
-                    return Ok(token);
+                    string token = CreateJWT(user);
+                    return Ok(new
+                    {
+                        success = true,
+                        data = new
+                        {
+                            token = token,
+                           
+
+
+
+                        }
+                    });
                 }
                 else
-                {   string token = CreateJWT(user,"password");
-                    return BadRequest(token);
+                {   
+                    return BadRequest(new
+                    {   
+                        success=false,
+                        data = new
+                        {   
+                            token="",
+                            errors= new[] {
+                            new {
+                                message = "bad request",
+                                code = "incorrect_password"
+                            } 
+                            }
+                            
+                            
+
+                        }
+                    });
                 }
                
             }
@@ -94,48 +137,17 @@ namespace backend.Controllers
 
             }
         }
-        private string CreateJWT(User user,string type)
+        private string CreateJWT(User user)
         {
-            List<Claim> claims;
-            switch (type)
-            {
-                case "login":
-                    claims = new List<Claim>
+            List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name,user.Username),
+                new Claim(ClaimTypes.Email,user.Email),
                 new Claim("message","Logging in..."),
-                new Claim("error","none")
-
-            }; 
-                    break;
-                case "password":
-                    claims = new List<Claim>
-            {
              
-                new Claim("message","Wrong password,please try again"),
-                new Claim("error","password")
-
-            };
-                    break;
-                case "username":
-                    claims = new List<Claim>
-            {
-
-                new Claim("message","Username not found"),
-                new Claim("error","username")
-
-            };
-                    break;
-                default:
-                    claims = new List<Claim>
-            {
                 
-                new Claim("error","none")
 
             };
-                    break;
-            }
-            
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
