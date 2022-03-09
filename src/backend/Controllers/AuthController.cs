@@ -6,105 +6,60 @@ using Microsoft.AspNetCore.Mvc;
 using backend.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using System.Security.Cryptography;
-using Microsoft.Extensions.Configuration;
-using System.Data;
-using Npgsql;
-using System.Text.Json;
+using backend.Data;
+using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace backend.Controllers
 {
-    
+
 
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
 
-         static User u = new User();
-        Response res = new Response();
-
-        private readonly IConfiguration _cofiguraion;
-        
-        public AuthController(IConfiguration configuration)
+        static User u = new User();
+        private readonly UserContext userContext;
+        private readonly IConfiguration _configuration;
+        public AuthController(UserContext userContext,IConfiguration configuration)
         {
-            _cofiguraion = configuration;
+            this.userContext = userContext;
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<Response>> Register(userReg register)
+        public async Task<ActionResult<string>> Register(User user)
         {
-
-            res.Success = true;
-            res.errors.Clear();
             //proveravanje maila
 
-            if (!IsValidEmail(register.Email))
+            if (!IsValidEmail(user.Email))
             {
-                res.Success = false;
-                res.errors.Add(new Error("incorrect_email", "Incorrect email address!"));
-            }
-            //proveravanje hasha
-            if (register.HashedPassword.Length != 60)
-            {
-                res.Success = false;
-                res.errors.Add(new Error("incorrect_hash_length", "Hash length doesn't match!"));
-            }
-            if (res.Success == false)
-            {
-                return BadRequest(res);
-            }
-            //proveravanje sql injectiona
-            string query = @"INSERT INTO users(username,email,passwordhashed) 
-                            VALUES(@Username,@Email,@Passwordhashed)";
-            string SqlDataSource = _cofiguraion.GetConnectionString("DefaultConnection");
-            using (NpgsqlConnection conn = new NpgsqlConnection(SqlDataSource))
-            {
-                conn.Open();
-                using (NpgsqlCommand command = new NpgsqlCommand(query, conn))
+                return BadRequest(new
                 {
-                    command.Parameters.AddWithValue("@Username", register.Username);
-                    command.Parameters.AddWithValue("@Email", register.Email);
-                    command.Parameters.AddWithValue("@Passwordhashed", register.HashedPassword);
-                    int result = command.ExecuteNonQuery();
-                    if (result == 1)
-                        return Ok(res);
-                    else
+                    success = false,
+                    data = new
                     {
-                        res.Success = false;
-                        res.errors.Add(new Error("database_insert_fail", "Failed to insert registration parameters into database"));
-                        return BadRequest(res);
-                    }
-                }
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_notValid"
+                            }
+                            }
 
-            }
-        }
 
-        [HttpGet]
-        public JsonResult Get()
-        {
-            string query = @"select * from users";
-            List<User> users = new List<User>();
-            string SqlDataSource = _cofiguraion.GetConnectionString("DefaultConnection");
-            NpgsqlDataReader reader;
-            using (NpgsqlConnection conn = new NpgsqlConnection(SqlDataSource))
-            {
-                conn.Open();
-                using(NpgsqlCommand command=new NpgsqlCommand(query, conn))
-                {
-                    reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        u.Id=reader.GetInt32("id");
-                        u.Username=reader.GetString("username");
-                        u.Email=reader.GetString("email");
-                        u.PasswordHashed=reader.GetString("passwordhashed");
-                        users.Add(u);
+
                     }
-                    reader.Close();
-                    conn.Close();
-                }
+                });
             }
-            return new JsonResult(users);
+            user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
+            this.userContext.Users.Add(user);
+            await this.userContext.SaveChangesAsync();
+            return Ok(user);
         }
 
 
@@ -112,13 +67,79 @@ namespace backend.Controllers
         public async Task<ActionResult<string>> Login(userDto request)
         {
             //proveravanje da li postoji username
+            User user = this.userContext.Users.FirstOrDefault(user => user.Username == request.Username);
+            if (user == null)
+            {
+                
+                 return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "username_notFound"
+                            }
+                            }
 
 
 
-            //uporedjivanje sifre
+                    }
+                });
+            }
+            else
+            {
+                if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHashed))
+                {
+                    string token = CreateJWT(user);
+                    return Ok(new
+                    {
+                        success = true,
+                        data = new
+                        {
+                            token = token,
+                           
 
-            return Ok("ok");
+
+
+                        }
+                    });
+                }
+                else
+                {   
+                    return BadRequest(new
+                    {   
+                        success=false,
+                        data = new
+                        {   
+                            token="",
+                            errors= new[] {
+                            new {
+                                message = "bad request",
+                                code = "incorrect_password"
+                            } 
+                            }
+                            
+                            
+
+                        }
+                    });
+                }
+               
+            }
+
+
+           
         }
+        [HttpGet("users")]
+        public async Task<ActionResult<List<User>>> getUsers()
+        {
+            return Ok(await this.userContext.Users.ToListAsync());
+        }
+                
+
         private void CreatePasswordHash(string password,out byte[] passwordHash,out byte[] passwordSalt)
         {
             using(var hmac =  new HMACSHA512())
@@ -136,6 +157,30 @@ namespace backend.Controllers
                 return computedHash.SequenceEqual(passwordHash);  
 
             }
+        }
+        private string CreateJWT(User user)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name,user.Username),
+                new Claim(ClaimTypes.Email,user.Email),
+                new Claim("message","Logging in..."),
+             
+                
+
+            };
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires:DateTime.Now.AddDays(1),
+                signingCredentials: creds
+                
+                );
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+
+            return jwt;
         }
 
         private bool IsValidEmail(string email)
