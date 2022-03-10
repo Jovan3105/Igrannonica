@@ -1,9 +1,9 @@
-<div class="row">
+<div class="row" id="blok">
   <div class="col-md-6 offset-md-3 mt-4">
       <h3>Register</h3>
-      <form  #f="ngForm" 
-            (ngSubmit)="onSubmit(f)">
-          <div class="form-group">
+      <form  #forma="ngForm" 
+            (ngSubmit)="onSubmit(forma)">
+          <div class="mb-3">
               <label for="registerUsername">Username</label>
               <input type="text"
                      name="username"
@@ -15,7 +15,7 @@
                      id="registerUsername"
                      placeholder="At least 5 letters">
           </div>
-          <div class="form-group" [class.has.error]="email.invalid && email.touched">
+          <div class="mb-3">
               <label for="registerEmail">Email</label>
               <input type="email"
                      name="email"
@@ -25,7 +25,8 @@
                      #email="ngModel"
                      class="form-control"
                      id="registerEmail"
-                     placeholder="Enter email">
+                     placeholder="Enter email"
+                     maxlength="320">
                      
           </div>
           <div class="mb-3">
@@ -34,15 +35,36 @@
                      name="password"
                      ngModel
                      required
-                     pattern="([a-zA-Z0-9]){4,7}\w+"
+                     pattern="([a-zA-Z0-9_\-]){4,}\w+"
                      #password="ngModel"
                      class="form-control"
                      id="registerPassword"
-                     placeholder="At least 5 letters or numbers">
+                     placeholder="At least 5 letters or numbers"
+                     (ngModelChange)="onPasswordChange(forma)">
           </div>
+          <div class="mb-3">
+            <label for="registerConfirmPassword">Confirm Password</label>
+            <input type="password"
+                   name="registerConfirmPassword"
+                   ngModel
+                   required
+                   pattern={{confirmPattern}}
+                   #confirmpassword="ngModel"
+                   class="form-control"
+                   id="registerConfirmPassword"
+                   placeholder="Enter the password above"
+                   (ngModelChange)="onConfirmPasswordChange(forma)">
+          </div>
+          <!-- <span *ngIf="!validPassword">
+            Password missmatch<br>
+          </span> -->
           <button type="submit"
-                  [disabled]="f.invalid"
+                  [disabled]="forma.invalid"
                   class="btn btn-primary">Register <i class="fas fa-sign-in-alt"></i></button>
       </form>
   </div>
+  
+</div>
+<div class="col-md-6 offset-md-3 mt-4" id="uspesnaRegistracijaMessage" style="display: none;">
+  <p class="alert alert-success text-center" role="alert">Uspesna registracija. Bicete prebaceni na pocetnu stranu...</p>
 </div>
