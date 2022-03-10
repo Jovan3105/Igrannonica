@@ -8,11 +8,14 @@ import { SharedModule } from './shared/shared.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ShowTableComponent } from './table/show-table/show-table.component';
+import { AgGridModule } from 'ag-grid-angular';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ShowTableComponent
   ],
   imports: [
     BrowserModule,
@@ -22,6 +25,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NgbModule,
     HttpClientModule,
     ReactiveFormsModule,
+    AgGridModule.withComponents([]),
     FormsModule
   ],
   providers: [],
