@@ -2,6 +2,7 @@ using backend.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors();
 
 // Add services to the container.
 
@@ -25,6 +26,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(c=>c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+
 
 app.UseAuthorization();
 
