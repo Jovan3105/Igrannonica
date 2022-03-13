@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/shared/services/auth.service';
 @Component({
@@ -7,10 +7,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  confirm_password: any;
-  password: any;
-  validPassword: any;
-  confirmPattern: any;
+
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
@@ -29,29 +26,26 @@ export class RegisterComponent implements OnInit {
     console.log(f.value);  // { first: '', last: '' }
     console.log(f.valid);  // false
   }
-  setRequired() {
-
-    if(this.validPassword) {
-        return [Validators.required];
-    } else {
-        return [];
-    }   
-  }
-  onConfirmPasswordChange(f: NgForm) {
-    
-    if(!f.controls['password'].hasError('required') && f.controls['password'].value == f.controls['registerConfirmPassword'].value){
-      this.validPassword = true;
-      console.log(this.validPassword)
-    }
-
-    else{
-      this.validPassword = false;
-      console.log(this.validPassword);
-    }
-    (f.controls['registerConfirmPassword']).setValidators(this.setRequired());
-  }
   onPasswordChange(f: NgForm) {
-    
-    this.confirmPattern = "^"+f.controls['password'].value+"$";
+    if(!f.controls['password'].hasError('required') && f.controls['password'].value == f.controls['registerConfirmPassword'].value){
+      console.log("password");
+    }
+    else f.controls['registerConfirmPassword'].setErrors({passwordMismatch:true});
   }
+  @ViewChild('passwordInput') passwordInput: any;
+  onPasswordConfirmChange(f: NgForm) {
+    if(!f.controls['registerConfirmPassword'].hasError('required') && f.controls['registerConfirmPassword'].value == f.controls['password'].value){
+      console.log("confirm password");
+    }
+    else{
+      this.passwordInput.nativeElement.value = null;
+      f.controls['registerConfirmPassword'].setErrors({passwordMismatch:true})
+    } 
+
+  }
+  
+  
+
+  
+   
 }

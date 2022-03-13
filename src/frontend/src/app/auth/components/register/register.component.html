@@ -40,7 +40,7 @@
                      class="form-control"
                      id="registerPassword"
                      placeholder="At least 5 letters or numbers"
-                     (ngModelChange)="onPasswordChange(forma)">
+                     (ngModelChange)="onPasswordConfirmChange(forma)">
           </div>
           <div class="mb-3">
             <label for="registerConfirmPassword">Confirm Password</label>
@@ -48,16 +48,15 @@
                    name="registerConfirmPassword"
                    ngModel
                    required
-                   pattern={{confirmPattern}}
+                   pattern="([a-zA-Z0-9]){4,}\w+"
                    #confirmpassword="ngModel"
                    class="form-control"
                    id="registerConfirmPassword"
                    placeholder="Enter the password above"
-                   (ngModelChange)="onConfirmPasswordChange(forma)">
+                   (ngModelChange)="onPasswordChange(forma)"
+                   #passwordInput>
           </div>
-          <!-- <span *ngIf="!validPassword">
-            Password missmatch<br>
-          </span> -->
+          
           <button type="submit"
                   [disabled]="forma.invalid"
                   class="btn btn-primary">Register <i class="fas fa-sign-in-alt"></i></button>
