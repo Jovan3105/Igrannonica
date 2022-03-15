@@ -7,6 +7,10 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
 
+  private readonly JWT_TOKEN = 'JWT_TOKEN';
+  private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
+  private loggedUser!: string;
+  
   /////////url swaggera/////////
   authUrl = "http://localhost:7004/api/login";
   registerUrl = "http://localhost:7004/api/register";
@@ -51,5 +55,19 @@ export class AuthService {
       })
     );
 
+  }
+  refreshToken() 
+  {
+  }
+
+  getJwtToken() {
+    return localStorage.getItem(this.JWT_TOKEN);
+  }
+  private getRefreshToken() {
+    return localStorage.getItem(this.REFRESH_TOKEN);
+  }
+
+  private storeJwtToken(jwt: string) {
+    localStorage.setItem(this.JWT_TOKEN, jwt);
   }
 }
