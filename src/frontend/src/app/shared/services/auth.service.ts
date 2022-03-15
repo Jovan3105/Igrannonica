@@ -21,7 +21,7 @@ export class AuthService {
         const user = response;
         if(user.result.succeeded){
           localStorage.setItem('token',user.token);
-          //ubacuje token u localstorage inpectelement->application->localstorage
+          this.router.navigateByUrl('dashboard');
         }
       })
     )
