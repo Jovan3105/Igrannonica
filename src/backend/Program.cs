@@ -8,9 +8,15 @@ builder.Services.AddCors();
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<UserContext>(options => {
-    // options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    // User
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
      
+});
+
+builder.Services.AddDbContext<DatasetContext>(options => {
+    // Dataset
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
