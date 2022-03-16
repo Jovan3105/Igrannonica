@@ -67,20 +67,71 @@ namespace backend.Controllers
 
             //slanje verifikacionog mejla
 
-            await emailSender.SendEmailAsync("dragan.miljkovic29@gmail.com", "Test", "adwadwadadsawdawdwa dwadw dwa d wa ");
-
+            await resendEmail(user);
 
             return Ok(new
             {
                 success = true,
-                data = new
+            });
+        }
+
+        [HttpGet("checkMail")]
+        public async Task<ActionResult<string>> checkMail(string email,string hash)
+        {
+            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email && user.PasswordHashed==hash);
+            if(user == null)
+            {
+                return BadRequest(new
                 {
-                    token = token,
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "user_notFound"
+                            }
+                            }
 
 
 
+                    }
+                });
+            }
+            else
+            {
+                // za sad se menja user dok ivan ne napravi skroz bazu
+                user.Username = "prosaoCheck";
+                this.userContext.Update(user);
+                await this.userContext.SaveChangesAsync();
+                string token = CreateJWT(user);
+                return Ok(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        token = token,
+                    }
+                }) ;
+            }    
+        }
 
-                }
+        [HttpPost("resendEmail")]
+        public async Task<ActionResult<string>> resendEmail(User user)
+        {
+
+
+            // treba naci bolje resenje umesto password hasha ali nek je ovako za sad
+
+            string poruka = @"Hello, <b>" + user.Username + @"</b>.<br>
+                                Please confirm your email <a href='https://localhost:7220/api/Auth/checkMail?email=" + user.Email + "&hash=" + user.PasswordHashed + @"'>here</a>.";
+
+            await emailSender.SendEmailAsync(user.Email, "Confirm Account", poruka);
+
+            return Ok(new
+            {
+                success = true,
             });
         }
 
