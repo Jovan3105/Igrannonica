@@ -164,6 +164,20 @@ namespace backend.Controllers
             }
 
         }
+        [HttpPut]
+        [Route("update")]
+        public async Task<ActionResult<string>> putDataset(int id,Dataset data)
+        {
+            //var dataset = await this.datasetContext.Datasets.FindAsync(id);
+            data.Id = id;
+            datasetContext.Entry(data).State = EntityState.Modified;
+             await  datasetContext.SaveChangesAsync();
+
+
+
+            return Ok("da");
+        }
+
 
 
     }
