@@ -25,7 +25,7 @@ namespace backend.Controllers
 
         [HttpGet]
         [Route("getAll")]
-        public async Task<ActionResult<List<Dataset>>> getAll(){
+        public async Task<ActionResult<List<Dataset>>> getAll() {
 
             return Ok(await this.datasetContext.Datasets.ToListAsync());
         }
@@ -35,27 +35,27 @@ namespace backend.Controllers
         {
             var lista = await this.datasetContext.Datasets.ToListAsync();
 
-            return Ok(lista.Where(x=>x.Public==true));
+            return Ok(lista.Where(x => x.Public == true));
         }
         [HttpPost]
         [Route("insert")]
-        public async Task<ActionResult<List<Dataset>>> insert(Dataset dataset){
+        public async Task<ActionResult<List<Dataset>>> insert(Dataset dataset) {
 
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
             return Ok(await this.datasetContext.Datasets.ToListAsync());
-        
-        
-        
+
+
+
         }
         [HttpGet]
         [Route("getData")]
         public async Task<ActionResult<string>> getData(int id)
         {
-            var dataset= datasetContext.Datasets.FirstOrDefault(x=>x.Id==id);
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
             string path = dataset.Path;
-            var csv = new List<string[]>(); 
+            var csv = new List<string[]>();
             var lines = System.IO.File.ReadAllLines(@"C:\Users\Pivan\Desktop\ljudi.csv");
             foreach (string line in lines)
                 csv.Add(line.Split(','));
@@ -71,7 +71,7 @@ namespace backend.Controllers
                 listaRecnika.Add(objResult);
             }
 
-                return Ok(JsonConvert.SerializeObject(listaRecnika));
+            return Ok(JsonConvert.SerializeObject(listaRecnika));
 
 
 
@@ -79,9 +79,9 @@ namespace backend.Controllers
         }
         [HttpGet]
         [Route("getPage")]
-        public async Task<ActionResult<string>> getDataPage(int id,int page)
+        public async Task<ActionResult<string>> getDataPage(int id, int page)
         {
-            
+
             var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
             string path = dataset.Path;
             var csv = new List<string[]>();
@@ -89,13 +89,13 @@ namespace backend.Controllers
             foreach (string line in lines)
                 csv.Add(line.Split(','));
             var header = lines[0].Split(',');
-            if ((page-1) * 20 < lines.Length)
+            if ((page - 1) * 20 < lines.Length)
             {
                 return BadRequest("not that many pages");
             }
 
             var listaRecnika = new List<Dictionary<string, string>>();
-            for (int i = (page-1)*20; i < lines.Length; i++)
+            for (int i = (page - 1) * 20; i < lines.Length; i++)
             {
                 var objResult = new Dictionary<string, string>();
                 for (int j = 0; j < header.Length; j++)
@@ -119,19 +119,19 @@ namespace backend.Controllers
                 return BadRequest("bad");
             }
             string fileName = file.FileName;
-            
+
             await using var stream = file.OpenReadStream();
 
 
-            var reader= new StreamReader(stream);
-            var text=await reader.ReadToEndAsync(); 
+            var reader = new StreamReader(stream);
+            var text = await reader.ReadToEndAsync();
 
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
             var filePath = @"C:\Users\Pivan\Documents\";
 
-          
+
 
             try
             {
@@ -139,15 +139,31 @@ namespace backend.Controllers
                 using StreamWriter f = new(path);
                 await f.WriteAsync(text);
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 throw;
             }
-            
+
             return Ok("");
         }
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<ActionResult<string>> deleteDataset(int id)
+        {
+            var dataset = await this.datasetContext.Datasets.FindAsync(id);
+            if (dataset== null)
+            {
+                return BadRequest("not find");
+            }
+            else
+            {
+                this.datasetContext.Datasets.Remove(dataset);
+                await this.datasetContext.SaveChangesAsync();
+                return Ok("Its okey");
+            }
 
+        }
 
 
     }
