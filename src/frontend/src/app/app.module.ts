@@ -7,11 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { SharedModule } from './shared/shared.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { ShowTableComponent } from './table/show-table/show-table.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TokenInterceptor } from './auth/token.interceptor';
 
 
 @NgModule({
@@ -30,9 +29,7 @@ import { TokenInterceptor } from './auth/token.interceptor';
     AgGridModule.withComponents([]),
     FormsModule
   ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
-  ],
+  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule { }
