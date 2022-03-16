@@ -100,9 +100,9 @@ git reset --hard ab12cd34
 
 ## Podešavanje PostgreSQL-a
 
-Kreiranje baze iz NuGet* terminala: ```Update-Database`
+Kreiranje baze iz NuGet terminala: ```Update-Database```
 
-* do njega se može doći na sledeći način: Tools > NuGet Package Manager > Packer Manager Console
+Do NuGet terminala se može doći na sledeći način: Tools > NuGet Package Manager > Packer Manager Console
 
 
 [**Vrati se na vrh ^**](#reference)
@@ -111,24 +111,23 @@ Kreiranje baze iz NuGet* terminala: ```Update-Database`
 
 ### Info
 
-User: `postgres`
-Password: `root`
-Port: `5432`
+User: `postgres`  
+Password: `root`  
+Port: `5432`  
 
 ### Komande
 
-`\du` - prikazuje sve role-ove (korisnike)
-`\l` - prikazuje listu svih baza podataka
-`\c ImeBaze` - povezivanje na bazu `ImeBaze`
-`\dt` - prikaz liste tabela
-`\quit` - izlazam iz PostgreSQL shell-a
+`\du` - prikazuje sve role-ove (korisnike)  
+`\l` - prikazuje listu svih baza podataka  
+`\c ImeBaze` - povezivanje na bazu `ImeBaze`  
+`\dt` - prikaz liste tabela  
+`\quit` - izlazam iz PostgreSQL shell-a  
 
 
 ## Entity Framework
 
-`Update-Database`
-`dotnet-ef migrations add Ime` - Dodavanje nove migracije
-`dotnet-ef migrations remove` - Brisanje poslednje migracije
+`dotnet-ef migrations add Ime` - Dodavanje nove migracije  
+`dotnet-ef migrations remove` - Brisanje poslednje migracije  
 
 
 [**Vrati se na vrh ^**](#reference)
