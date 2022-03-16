@@ -67,7 +67,7 @@ namespace backend.Controllers
 
             //slanje verifikacionog mejla
 
-            await emailSender.SendEmailAsync("dragan.miljkovic29@gmail.com", "Test", "adwadwadadsawdawdwa");
+            await emailSender.SendEmailAsync("dragan.miljkovic29@gmail.com", "Test", "adwadwadadsawdawdwa dwadw dwa d wa ");
 
 
             return Ok(new

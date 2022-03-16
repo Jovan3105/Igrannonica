@@ -17,6 +17,7 @@ namespace backend.Services
             message.To.Add(new MailAddress(email));
             message.Body = "<html><body>" + htmlMessage + "</body></html>";
             message.IsBodyHtml = true;
+            message.BodyEncoding = System.Text.Encoding.GetEncoding("utf-8");
 
             var smtpClient = new SmtpClient("smtp.gmail.com")
             {
