@@ -6,7 +6,8 @@ Sadržaj
     2. [Ispravka greške na lokalnoj grani pomoću remote grane](#ispravka-gre%C5%A1ke-na-lokalnoj-grani-pomo%C4%87u-remote-grane)
     3. [Brisanje poslednjeg commit-a](#brisanje-poslednjeg-commit-a)
     4. [Pomeranje vrha grane na neki prethodni commit](#pomeranje-vrha-grane-na-neki-prethodni-commit)
-
+2. [Angular](#angular)
+3. [PostgreSQL](#postgresql)
 
 ## Git
 
@@ -91,3 +92,43 @@ git reset --hard ab12cd34
 
 [**Vrati se na vrh ^**](#reference)
 
+## Angular
+1. `cd src/frontend`
+2. `npm install .`
+3. `npm install ag-grid-angular ag-grid community`
+4. `ng serve --open`
+
+## Podešavanje PostgreSQL-a
+
+Kreiranje baze iz NuGet* terminala: ```Update-Database`
+
+* do njega se može doći na sledeći način: Tools > NuGet Package Manager > Packer Manager Console
+
+
+[**Vrati se na vrh ^**](#reference)
+
+## PostgreSQL
+
+### Info
+
+User: `postgres`
+Password: `root`
+Port: `5432`
+
+### Komande
+
+`\du` - prikazuje sve role-ove (korisnike)
+`\l` - prikazuje listu svih baza podataka
+`\c ImeBaze` - povezivanje na bazu `ImeBaze`
+`\dt` - prikaz liste tabela
+`\quit` - izlazam iz PostgreSQL shell-a
+
+
+## Entity Framework
+
+`Update-Database`
+`dotnet-ef migrations add Ime` - Dodavanje nove migracije
+`dotnet-ef migrations remove` - Brisanje poslednje migracije
+
+
+[**Vrati se na vrh ^**](#reference)
