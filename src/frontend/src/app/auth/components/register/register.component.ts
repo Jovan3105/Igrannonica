@@ -22,7 +22,9 @@ export class RegisterComponent implements OnInit {
       next: (x:any) => console.log('User created'),
       error: (err: Error) => console.log(err)
     };
-    this.authService.register(f.value).subscribe(registerObserver);
+    // TODO: Naredna linija predstavlja samo trenutno resenje problema.
+    // Potrebno je izbaciti registerConfirmPassword iz forme jer uzrokuje BadRequest (zato sto nije ocekivan na backend-u)
+    this.authService.register({username:f.value.username,email:f.value.email,passwordHashed:f.value.password}).subscribe(registerObserver);
     console.log(f.value);  // { first: '', last: '' }
     console.log(f.valid);  // false
   }

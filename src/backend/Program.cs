@@ -1,8 +1,19 @@
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
 
+
+var MyAllowSpecificOrigins = "MyAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      builder =>
+                      {
+                          builder.WithOrigins("*").AllowAnyHeader()
+                                                  .AllowAnyMethod();
+                      });
+});
 
 // Add services to the container.
 
@@ -16,6 +27,7 @@ builder.Services.AddDbContext<UserContext>(options => {
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,10 +36,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
-app.UseCors(c=>c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 

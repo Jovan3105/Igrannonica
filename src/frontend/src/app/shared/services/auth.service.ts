@@ -8,8 +8,8 @@ import { Router } from '@angular/router';
 export class AuthService {
 
   /////////url swaggera/////////
-  authUrl = "http://localhost:7004/api/login";
-  registerUrl = "http://localhost:7004/api/register";
+  authUrl = "http://localhost:7220/api/auth/login";
+  registerUrl = "http://localhost:7220/api/auth/register";
   confirmEmailUrl = "test.com";
   /////////url swaggera/////////
   constructor(private http: HttpClient, private router: Router) { }
