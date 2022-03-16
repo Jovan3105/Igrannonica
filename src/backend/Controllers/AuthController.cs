@@ -30,6 +30,8 @@ namespace backend.Controllers
             _configuration = configuration;
         }
 
+        Services.EmailSender emailSender = new Services.EmailSender();
+
         [HttpPost("register")]
         public async Task<ActionResult<string>> Register(User user)
         {
@@ -62,6 +64,12 @@ namespace backend.Controllers
 
 
             string token = CreateJWT(user);
+
+            //slanje verifikacionog mejla
+
+            await emailSender.SendEmailAsync("dragan.miljkovic29@gmail.com", "Test", "adwadwadadsawdawdwa");
+
+
             return Ok(new
             {
                 success = true,
