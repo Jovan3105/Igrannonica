@@ -5,6 +5,7 @@ using backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace backend.Controllers
 {
@@ -77,7 +78,7 @@ namespace backend.Controllers
 
         }
         [HttpGet]
-        [Route("getData")]
+        [Route("getPage")]
         public async Task<ActionResult<string>> getDataPage(int id,int page)
         {
             
@@ -108,6 +109,43 @@ namespace backend.Controllers
 
 
 
+        }
+        [HttpPost]
+        [Route("upload")]
+        public async Task<ActionResult<string>> uploadData(IFormFile file)
+        {
+            if (file.Length == 0)
+            {
+                return BadRequest("bad");
+            }
+            string fileName = file.FileName;
+            
+            await using var stream = file.OpenReadStream();
+
+
+            var reader= new StreamReader(stream);
+            var text=await reader.ReadToEndAsync(); 
+
+            Console.WriteLine(text);
+            Console.WriteLine(fileName);
+
+            var filePath = @"C:\Users\Pivan\Documents\";
+
+          
+
+            try
+            {
+                string path = Path.Combine(filePath, fileName);
+                using StreamWriter f = new(path);
+                await f.WriteAsync(text);
+            }
+            catch (Exception ex )
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            
+            return Ok("");
         }
 
 
