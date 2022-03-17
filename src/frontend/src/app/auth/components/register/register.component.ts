@@ -1,17 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  confirm_password: any;
-  password: any;
-  validPassword: any;
-  confirmPattern: any;
-  constructor(private authService: AuthService) { }
+
+  constructor(private authService: AuthService, private router:Router) { }
 
   ngOnInit(): void {
   }
@@ -22,36 +21,37 @@ export class RegisterComponent implements OnInit {
     }
       
     const registerObserver = {
-      next: (x:any) => console.log('User created'),
+      next: (x:any) => {
+        console.log('User created');
+      },
       error: (err: Error) => console.log(err)
     };
-    this.authService.register(f.value).subscribe(registerObserver);
+    // TODO: Naredna linija predstavlja samo trenutno resenje problema.
+    // Potrebno je izbaciti registerConfirmPassword iz forme jer uzrokuje BadRequest (zato sto nije ocekivan na backend-u)
+    this.authService.register({username:f.value.username,email:f.value.email,passwordHashed:f.value.password}).subscribe(registerObserver);
     console.log(f.value);  // { first: '', last: '' }
     console.log(f.valid);  // false
   }
-  setRequired() {
-
-    if(this.validPassword) {
-        return [Validators.required];
-    } else {
-        return [];
-    }   
-  }
-  onConfirmPasswordChange(f: NgForm) {
-    
-    if(!f.controls['password'].hasError('required') && f.controls['password'].value == f.controls['registerConfirmPassword'].value){
-      this.validPassword = true;
-      console.log(this.validPassword)
-    }
-
-    else{
-      this.validPassword = false;
-      console.log(this.validPassword);
-    }
-    (f.controls['registerConfirmPassword']).setValidators(this.setRequired());
-  }
   onPasswordChange(f: NgForm) {
-    
-    this.confirmPattern = "^"+f.controls['password'].value+"$";
+    if(!f.controls['password'].hasError('required') && f.controls['password'].value == f.controls['registerConfirmPassword'].value){
+      console.log("password");
+    }
+    else f.controls['registerConfirmPassword'].setErrors({passwordMismatch:true});
   }
+  @ViewChild('passwordInput') passwordInput: any;
+  onPasswordConfirmChange(f: NgForm) {
+    if(!f.controls['registerConfirmPassword'].hasError('required') && f.controls['registerConfirmPassword'].value == f.controls['password'].value){
+      console.log("confirm password");
+    }
+    else{
+      this.passwordInput.nativeElement.value = null;
+      f.controls['registerConfirmPassword'].setErrors({passwordMismatch:true})
+    } 
+
+  }
+  
+  
+
+  
+   
 }
