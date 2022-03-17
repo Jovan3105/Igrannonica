@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -8,7 +10,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 })
 export class RegisterComponent implements OnInit {
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private router:Router) { }
 
   ngOnInit(): void {
   }
@@ -19,7 +21,9 @@ export class RegisterComponent implements OnInit {
     }
       
     const registerObserver = {
-      next: (x:any) => console.log('User created'),
+      next: (x:any) => {
+        console.log('User created');
+      },
       error: (err: Error) => console.log(err)
     };
     // TODO: Naredna linija predstavlja samo trenutno resenje problema.
