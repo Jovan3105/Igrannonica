@@ -56,7 +56,7 @@ namespace backend.Controllers
             var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
             string path = dataset.Path;
             var csv = new List<string[]>();
-            var lines = System.IO.File.ReadAllLines(@"C:\Users\Pivan\Desktop\ljudi.csv");
+            var lines = System.IO.File.ReadAllLines(path);
             foreach (string line in lines)
                 csv.Add(line.Split(','));
             var header = lines[0].Split(',');
@@ -85,7 +85,7 @@ namespace backend.Controllers
             var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
             string path = dataset.Path;
             var csv = new List<string[]>();
-            var lines = System.IO.File.ReadAllLines(@"C:\Users\Pivan\Desktop\ljudi.csv");
+            var lines = System.IO.File.ReadAllLines(path);
             foreach (string line in lines)
                 csv.Add(line.Split(','));
             var header = lines[0].Split(',');
