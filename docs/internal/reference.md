@@ -129,9 +129,9 @@ Port: `5432`
 ## Entity Framework
 
 `dotnet-ef migrations add Ime` - Dodavanje nove migracije  
-`dotnet-ef migrations add Ime -Context ImeContexta` - Dodavanje nove migracije u okviru nekog konteksta
-`dotnet-ef migrations list` - Prikaz svih migracija (naziv kreće nakon karaktera `_`)
-`dotnet-ef migrations remove` - Brisanje poslednje migracije  
+`dotnet-ef migrations add Ime -Context ImeContexta` - Dodavanje nove migracije u okviru nekog konteksta  
+`dotnet-ef migrations list` - Prikaz svih migracija (naziv kreće nakon karaktera `_`)  
+`dotnet-ef migrations remove` - Brisanje poslednje migracije    
 
 [**Vrati se na vrh ^**](#reference)
 
@@ -144,8 +144,8 @@ Port: `5432`
 5. `pipenv install numpy` - instalira numpy paketa
 6. `pipenv install pandas` - instalira pandas paketa
 7. `pyenv shell` - aktiviranje virtualnog okruženja
-8.	
-	* `pipenv run server` - pokretanje ann servera (prvi nacin)
-	* `python flask_restful .\ann_server.py` - pokretanje ann servera (drugi nacin)
+8.	Pokretanje ann servera, postoje 2 načina:
+	* `pipenv run server`
+	* `python flask_restful .\ann_server.py`
 
 [**Vrati se na vrh ^**](#reference)
