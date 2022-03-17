@@ -8,6 +8,8 @@ Sadržaj
     4. [Pomeranje vrha grane na neki prethodni commit](#pomeranje-vrha-grane-na-neki-prethodni-commit)
 2. [Angular](#angular)
 3. [PostgreSQL](#postgresql)
+4. [Entity Framework](#entity-framework)
+5. [pipenv - mikroservis](#pipenv-mikroservis)
 
 ## Git
 
@@ -127,7 +129,23 @@ Port: `5432`
 ## Entity Framework
 
 `dotnet-ef migrations add Ime` - Dodavanje nove migracije  
+`dotnet-ef migrations add Ime -Context ImeContexta` - Dodavanje nove migracije u okviru nekog konteksta
+`dotnet-ef migrations list` - Prikaz svih migracija (naziv kreće nakon karaktera `_`)
 `dotnet-ef migrations remove` - Brisanje poslednje migracije  
 
+[**Vrati se na vrh ^**](#reference)
+
+## pipenv - mikroservis
+
+1. `pip install pipenv`
+2. `cd .\src\mikroservis`
+3. `pipenv install` - kreira virtuelno okruženje u trenutnom direktorijumu
+4. `pipenv install flask-restful` - instalira flask-restful
+5. `pipenv install numpy` - instalira numpy paketa
+6. `pipenv install pandas` - instalira pandas paketa
+7. `pyenv shell` - aktiviranje virtualnog okruženja
+8.	
+	* `pipenv run server` - pokretanje ann servera (prvi nacin)
+	* `python flask_restful .\ann_server.py` - pokretanje ann servera (drugi nacin)
 
 [**Vrati se na vrh ^**](#reference)
