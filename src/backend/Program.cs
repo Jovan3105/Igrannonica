@@ -1,4 +1,6 @@
 using backend.Data;
+using backend.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -27,6 +29,8 @@ builder.Services.AddDbContext<UserContext>(options => {
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Email sender
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
