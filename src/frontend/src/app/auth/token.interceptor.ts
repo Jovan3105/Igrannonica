@@ -20,23 +20,20 @@ export class TokenInterceptor implements HttpInterceptor
   constructor(public authService: AuthService) {}
 ;
 
+
   intercept(httpRequest: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (this.authService.getJwtToken()) {
       httpRequest = this.addToken(httpRequest, this.authService.getJwtToken());
     }
-
     return next.handle(httpRequest);
-  }
-  /*
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    
-
-    return next.handle(request).pipe(catchError(error => {
+    /*
+    return next.handle(httpRequest).pipe(catchError((error) => 
+    {
       if (error instanceof HttpErrorResponse && error.status === 401) {
-        return this.handle401Error(request, next);
+        return this.handle401Error(httpRequest, next);
       } 
-    }));
-  }*/
+    }));*/
+  }
 
   private addToken(request: HttpRequest<any>, token: string | null) {
     return request.clone({
@@ -47,11 +44,12 @@ export class TokenInterceptor implements HttpInterceptor
   }
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
-      /*
+      
       return this.authService.refreshToken().pipe(
         switchMap((token: any) => {
           this.isRefreshing = false;
@@ -66,10 +64,8 @@ export class TokenInterceptor implements HttpInterceptor
         switchMap(jwt => {
           return next.handle(this.addToken(request, jwt));
         }));
-    }*/
+    }
     
   }
-  return next.handle(request);
 }
 
-}

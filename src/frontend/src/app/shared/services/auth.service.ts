@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Tokens } from 'src/app/auth/models/tokens';
 
@@ -14,8 +14,10 @@ export class AuthService {
   private loggedUser!: string | null;
   
   /////////url swaggera/////////
-  authUrl = "https://localhost:4200/api/login";
-  registerUrl = "https://localhost:4200/api/register";
+  apiUrl = "http://localhost:7220/api";
+  authUrl = "http://localhost:7220/api/auth/login";
+  registerUrl = "http://localhost:7220/api/auth/register";
+
   confirmEmailUrl = "test.com";
   /////////url swaggera/////////
   constructor(private http: HttpClient, private router: Router) { }
@@ -25,8 +27,8 @@ export class AuthService {
     return this.http.post(this.authUrl, model).pipe(
       map((response:any) => {
         const user = response;
-        if(user.result.succeeded){
-          this.doLoginUser(user.username,user.tokens);
+        if(user.success){
+          this.doLoginUser(user.username,user.data.token);
           //ubacuje token u localstorage inpectelement->application->localstorage
         }
       })
@@ -41,7 +43,7 @@ export class AuthService {
     let options = {headers: headers};   
     return this.http.post(this.registerUrl, model, options).pipe(
       map((response:any) => {
-        if(response.result.succeeded){
+        if(response.success){
           var forma = document.getElementById('blok');
           var uspesnaRegistracijaMessage = document.getElementById('uspesnaRegistracijaMessage')
           if(forma) {
@@ -52,11 +54,11 @@ export class AuthService {
             if(uspesnaRegistracijaMessage) {
               const user = response;
               uspesnaRegistracijaMessage.style.display = "none";
-              this.doLoginUser(user.username,user.tokens);
+              this.doLoginUser(user.username,user.data.token);
               this.router.navigateByUrl('/dashboard');
             }
           }
-          setTimeout(hide_button, 4000);
+          setTimeout(hide_button, 2000);
         }
       })
     );
@@ -68,23 +70,25 @@ export class AuthService {
     return false;
   }
 
-  private doLoginUser(username: string, tokens : Tokens) {
+  private doLoginUser(username: string, token : string) {
     this.loggedUser = username;
-    this.storeTokens(tokens);
+    localStorage.setItem(this.JWT_TOKEN, token);
+    //this.storeTokens(tokens);
   }
 
   private doLogoutUser() {
     this.loggedUser = null;
-    this.removeTokens();
+    localStorage.removeItem(this.JWT_TOKEN);
+    //this.removeTokens();
   }
-  /*
+  
   refreshToken() {
-    return this.http.post<any>(`${config.apiUrl}/refresh`, {
+    return this.http.post<any>(`${this.apiUrl}/refresh`, {
       'refreshToken': this.getRefreshToken()
     }).pipe(tap((tokens: Tokens) => {
       this.storeJwtToken(tokens.jwt);
     }));
-  }*/
+  }
 
   getJwtToken() {
     return localStorage.getItem(this.JWT_TOKEN);
