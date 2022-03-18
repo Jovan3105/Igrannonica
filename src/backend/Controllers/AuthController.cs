@@ -58,6 +58,7 @@ namespace backend.Controllers
                 });
             }
             user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
+            user.VerifiedEmail = false;
             this.userContext.Users.Add(user);
             await this.userContext.SaveChangesAsync();
 
@@ -101,8 +102,7 @@ namespace backend.Controllers
             }
             else
             {
-                // za sad se menja user dok ivan ne napravi skroz bazu
-                user.Username = "prosaoCheck";
+                user.VerifiedEmail = true;
                 this.userContext.Update(user);
                 await this.userContext.SaveChangesAsync();
                 string token = CreateJWT(user);

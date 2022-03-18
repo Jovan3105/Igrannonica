@@ -17,7 +17,8 @@ namespace backend.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    PasswordHashed = table.Column<string>(type: "text", nullable: false)
+                    PasswordHashed = table.Column<string>(type: "text", nullable: false),
+                    EmailVerified = table.Column<bool>(type : "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
