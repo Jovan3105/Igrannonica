@@ -1,11 +1,9 @@
-from flask_restful import Resource
-from services.templateservice import *
+from flask_restful import Resource, request
+from services.dataprep_service import *
 
-class DataPreparation(Resource):
-    def get(self):
-        return template_method()
-
+class DatasetParsing(Resource):
     def post(self):
-        body = request.get_json()
+        body = request.files['dataset']
+        parsed_dataset, column_types = parse_dataset(request.files['dataset'].filename, body)
 
-        return {'sent body':body}    
+        return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types }, 200    

@@ -13,8 +13,9 @@ serverPort = 8081
 #################################################################
 # Resources & routes
 
-api.add_resource(DataPreparation, '/dataprep')
+api.add_resource(DatasetParsing, '/datasetparsing')
 api.add_resource(Training, '/training/<int:tid>')
+api.init_app(app)
 
 #################################################################
 
