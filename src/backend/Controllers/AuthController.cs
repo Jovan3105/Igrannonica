@@ -12,6 +12,7 @@ using BCrypt.Net;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace backend.Controllers
 {
@@ -62,24 +63,20 @@ namespace backend.Controllers
             this.userContext.Users.Add(user);
             await this.userContext.SaveChangesAsync();
 
-
-
-            string token = CreateJWT(user);
-
             //slanje verifikacionog mejla
 
             await resendEmail(user);
 
             return Ok(new
             {
-                success = true,
+                success = true
             });
         }
 
         [HttpGet("checkMail")]
-        public async Task<ActionResult<string>> checkMail(string email,string hash)
+        public async Task<ActionResult<string>> checkMail(string email,string token)
         {
-            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email && user.PasswordHashed==hash);
+            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
             if(user == null)
             {
                 return BadRequest(new
@@ -102,18 +99,41 @@ namespace backend.Controllers
             }
             else
             {
-                user.VerifiedEmail = true;
-                this.userContext.Update(user);
-                await this.userContext.SaveChangesAsync();
-                string token = CreateJWT(user);
-                return Ok(new
+                if (IsTokenValid(token, user))
                 {
-                    success = true,
-                    data = new
+                    user.VerifiedEmail = true;
+                    this.userContext.Update(user);
+                    await this.userContext.SaveChangesAsync();
+                    string JWtoken = CreateJWT(user);
+                    return Ok(new
                     {
-                        token = token,
-                    }
-                }) ;
+                        success = true,
+                        data = new
+                        {
+                            token = JWtoken,
+                        }
+                    });
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        data = new
+                        {
+                            token = "",
+                            errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "token_notValid"
+                            }
+                            }
+
+
+
+                        }
+                    });
+                }
             }    
         }
 
@@ -124,8 +144,11 @@ namespace backend.Controllers
 
             // treba naci bolje resenje umesto password hasha ali nek je ovako za sad
 
+            string token = GenerateEmailToken(user.Email,"123456", DateTime.UtcNow.Ticks);
+
             string poruka = @"Hello, <b>" + user.Username + @"</b>.<br>
-                                Please confirm your email <a href='https://localhost:7220/api/Auth/checkMail?email=" + user.Email + "&hash=" + user.PasswordHashed + @"'>here</a>.";
+                                Please confirm your email <a href='https://localhost:7220/api/Auth/checkMail?email="+user.Email+"&token="+ token + @"'>here</a>.<br>
+                                    <b>This link will be valid for 5 minutes!</b>";
 
             await emailSender.SendEmailAsync(user.Email, "Confirm Account", poruka);
 
@@ -279,7 +302,7 @@ namespace backend.Controllers
 
             if (trimmedEmail.EndsWith("."))
             {
-                return false; // suggested by @TK-421
+                return false;
             }
             try
             {
@@ -292,5 +315,67 @@ namespace backend.Controllers
             }
         }
 
+        private string GenerateEmailToken(string email,string password, long ticks)
+        {
+            string hash = string.Join(":", new string[] { email, ticks.ToString() });
+            string hashLeft = "";
+            string hashRight = "";
+
+            using (HMAC hmac = new HMACSHA512())
+            {
+                hmac.Key = Encoding.UTF8.GetBytes(password);
+                hmac.ComputeHash(Encoding.UTF8.GetBytes(hash));
+
+                hashLeft = Convert.ToBase64String(hmac.Hash);
+                hashRight = string.Join(":", new string[] { email, ticks.ToString() });
+            }
+
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Join(":", hashLeft, hashRight)));
+        }
+        private const int _expirationMinutes = 5;
+
+        private bool IsTokenValid(string token,User user)
+        {
+            bool result = false;
+
+            try
+            {
+                string key = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+
+                string[] parts = key.Split(new char[] { ':' });
+                if (parts.Length == 3)
+                {
+                    string hash = parts[0];
+                    string email = parts[1];
+                    long ticks = long.Parse(parts[2]);
+                    DateTime timeStamp = new DateTime(ticks);
+
+                    bool expired = Math.Abs((DateTime.UtcNow - timeStamp).TotalMinutes) > _expirationMinutes;
+                    if (expired == false)
+                    {
+                        if(user.Email==email)
+                        {
+                            string password = "123456";
+
+                            string computedToken = GenerateEmailToken(email,password, ticks);
+
+                            result = (token == computedToken);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return result;
+        }
+
+        [HttpDelete]
+        public void Delete(User user)
+        {
+            this.userContext.Remove(user);
+            this.userContext.SaveChanges();
+        }
     }
 }
