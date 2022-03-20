@@ -18,5 +18,24 @@
           </li> 
         </ul>
       </div>
+      <div class="justify-content-end" [hidden]="!isLoggedIn" *ngIf="user$">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/api/my-profile']" routerLinkActive="active">
+              <img src="{{(user$ | async).image}}" alt="profile-picture" style="height: 40px; width: 40px;">
+               {{(user$ | async).username}}
+            </a>
+          </li>
+        </ul>
+        
+      </div>
+      <div class="justify-content-end" [hidden]="!isLoggedIn" >
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/api/my-profile']" routerLinkActive="active">Logout</a>
+          </li>
+        </ul>
+      </div>
+
     </div>
   </nav>

@@ -19,7 +19,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> getUserByID(int id)
+        public async Task<ActionResult<Object>> getUserByID(int id)
         {
             var user = await userContext.Users.FindAsync(id);
 
@@ -27,8 +27,16 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
+            //Byte[] b = System.IO.File.ReadAllBytes("F:\\Desktop\\regresis\\sandbox\\resource\\"+user.Username+".png");
 
-            return user;
+            var p = new
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                image = "assets\\resources\\" + user.Username + ".png" /* = File(b, "image/png")*/
+            };
+            return p;
         }
         [HttpGet]
         public async Task<ActionResult<List<User>>> getUsers()

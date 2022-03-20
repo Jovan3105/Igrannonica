@@ -3,6 +3,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Tokens } from 'src/app/auth/models/tokens';
+import { Observable } from 'rxjs';
+import { Token } from '@angular/compiler';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import jwt_decode from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +16,8 @@ export class AuthService {
   private readonly JWT_TOKEN = 'JWT_TOKEN';
   private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
   private loggedUser!: string | null;
-  
+  private helper!: JwtHelperService
+
   /////////url swaggera/////////
   apiUrl = "http://localhost:7220/api";
   authUrl = "http://localhost:7220/api/auth/login";
@@ -110,5 +115,18 @@ export class AuthService {
   private removeTokens() {
     localStorage.removeItem(this.JWT_TOKEN);
     localStorage.removeItem(this.REFRESH_TOKEN);
+  }
+
+  getDecodedAccessToken(token: string): any {
+    try {
+      return jwt_decode(token);
+    } catch(Error) {
+      return null;
+    }
+  } 
+
+  getUser(id:number):any{
+    console.log("radi")
+    return this.http.get<any>(this.apiUrl + `/Users/${id}`);
   }
 }
