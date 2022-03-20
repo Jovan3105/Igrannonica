@@ -8,6 +8,9 @@ Sadržaj
     4. [Pomeranje vrha grane na neki prethodni commit](#pomeranje-vrha-grane-na-neki-prethodni-commit)
 2. [Angular](#angular)
 3. [PostgreSQL](#postgresql)
+    1. [Instalacija](#instalacija)
+    2. [Konfiguracija](#konfiguracija)
+    3. [Korisne komande](#korisne-komande)
 4. [Entity Framework](#entity-framework)
 5. [pipenv - mikroservis](#pipenv-mikroservis)
 
@@ -20,7 +23,6 @@ Ono što je bitno napomenuti je da postoje 3 bitna dela na koja treba obratiti p
 **Staging area** predstavlja nešto kao skup u koji se dodaju trenutna stanja nekih fajlova (snapshot) koji će biti deo sledećeg commit-a.
 
 **Working tree** predstavlja lokalni repozitorijum, tj. lokalno stanje git projekta. Na njemu se nalaze sve lokalne promene koje je potrebno dodati u staged area kako bi bile commit-ovane.
-
 
 ### Komande za proveru trenutnog stanja
 
@@ -54,7 +56,6 @@ git reset --hard origin/grana
   
 [**Vrati se na vrh ^**](#reference)
   
-
 ### Brisanje poslednjeg commit-a
 
 Brisanje poslednjeg commit-a sa lokalne i remote grane `grana`:
@@ -69,7 +70,6 @@ Brisanje poslednjeg commit-a sa remote grane `grana` (uz čuvanje commit-a na lo
 git reset HEAD^                 # remove commit locally
 git push origin +HEAD^:grana
 ```
-
 
 ### Pomeranje vrha grane na neki prethodni commit
 
@@ -100,24 +100,39 @@ git reset --hard ab12cd34
 3. `npm install ag-grid-angular ag-grid community`
 4. `ng serve --open`
 
-## Podešavanje PostgreSQL-a
+## PostgreSQL
+### Instalacija
 
-Kreiranje baze iz NuGet terminala: ```Update-Database```
+Za instalaciju PostgreSQL-a je potrebno ispratiti sledeći niz koraka. Koraci koji nisu navedeni se vrše odabirom podrazumevanih vrednosti/akcija.
+
+1. Preuzeti [instalacioni fajl](https://www.postgresql.org/download/) (verzija `14.2`)
+2. Za password odabrati `root`  
+   ![Slika 1](img/ref-postgres-1.png)
+3. Checkbox za launch Stack Builder-a **treba** da ostane čekiran  
+   ![Slika 2](img/ref-postgres-2.png)
+4. Nakon pokretanja Stack Builder-a potrebno je odabrati opciju sa slike  
+   ![Slika 3](img/ref-postgres-3.png)
+5. U kategoriji _Database Drivers_ odabrati opciju **Npgsql v3.2.6-3**
+   ![Slika 4](img/ref-postgres-4.png)
+6. Nakon završetka svih instalacija instalacija PostgreSQL-a je završena, potrebno je samo izvršiti migracije kako bi se formirala šema baze
+
+Kreiranje i ažuriranje baze iz NuGet terminala: 
+```Update-Database```
+
+Ukoliko postoji više context-a (što je već slučaj i trenutku pisanja ovog teksta) koristiti:
+```Update-Database -Context NazivContext```
+(ovo se vrši za svaki context koji je korišćen u okviru projekta)
 
 Do NuGet terminala se može doći na sledeći način: Tools > NuGet Package Manager > Packer Manager Console
 
-
 [**Vrati se na vrh ^**](#reference)
-
-## PostgreSQL
-
-### Info
+### Konfiguracija
 
 User: `postgres`  
 Password: `root`  
 Port: `5432`  
 
-### Komande
+### Korisne komande
 
 `\du` - prikazuje sve role-ove (korisnike)  
 `\l` - prikazuje listu svih baza podataka  
@@ -125,6 +140,7 @@ Port: `5432`
 `\dt` - prikaz liste tabela  
 `\quit` - izlazam iz PostgreSQL shell-a  
 
+[**Vrati se na vrh ^**](#reference)
 
 ## Entity Framework
 
@@ -132,8 +148,6 @@ Port: `5432`
 `dotnet-ef migrations add Ime -Context ImeContexta` - Dodavanje nove migracije u okviru nekog konteksta  
 `dotnet-ef migrations list` - Prikaz svih migracija (naziv kreće nakon karaktera `_`)  
 `dotnet-ef migrations remove` - Brisanje poslednje migracije    
-
-[**Vrati se na vrh ^**](#reference)
 
 ## pipenv - mikroservis
 
