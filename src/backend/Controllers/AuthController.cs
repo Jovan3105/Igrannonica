@@ -60,17 +60,41 @@ namespace backend.Controllers
             }
             user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
             user.VerifiedEmail = false;
-            this.userContext.Users.Add(user);
-            await this.userContext.SaveChangesAsync();
-
-            //slanje verifikacionog mejla
-
-            await resendEmail(user);
-
-            return Ok(new
+            try
             {
-                success = true
-            });
+                this.userContext.Users.Add(user);
+
+                await this.userContext.SaveChangesAsync();
+
+                //slanje verifikacionog mejla
+
+                await resendEmail(user);
+
+                return Ok(new
+                {
+                    success = true
+                });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "userOrEmail_AlreadyExists"
+                            }
+                            }
+
+
+
+                    }
+                });
+            }
         }
 
         [HttpGet("checkMail")]
