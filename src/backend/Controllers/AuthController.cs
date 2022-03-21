@@ -68,7 +68,7 @@ namespace backend.Controllers
 
                 //slanje verifikacionog mejla
 
-                await resendEmail(user);
+                await sendVerificationEmail(user.Email);
 
                 return Ok(new
                 {
@@ -97,8 +97,8 @@ namespace backend.Controllers
             }
         }
 
-        [HttpGet("checkMail")]
-        public async Task<ActionResult<string>> checkMail(string email,string token)
+        [HttpGet("verifyEmail")]
+        public async Task<ActionResult<string>> verifyEmail(string email,string token)
         {
             User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
             if(user == null)
@@ -161,25 +161,47 @@ namespace backend.Controllers
             }    
         }
 
-        [HttpPost("resendEmail")]
-        public async Task<ActionResult<string>> resendEmail(User user)
+        [HttpPost("sendVerificationEmail")]
+        public async Task<ActionResult<string>> sendVerificationEmail(string email)
         {
 
 
             // treba naci bolje resenje umesto password hasha ali nek je ovako za sad
 
-            string token = GenerateEmailToken(user.Email,"123456", DateTime.UtcNow.Ticks);
+            User user = this.userContext.Users.FirstOrDefault(x => x.Email == email);
+            if (user == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_notExists"
+                            }
+                            }
 
-            string poruka = @"Hello, <b>" + user.Username + @"</b>.<br>
-                                Please confirm your email <a href='https://localhost:7220/api/Auth/checkMail?email="+user.Email+"&token="+ token + @"'>here</a>.<br>
+                    }
+                });
+            }
+            else
+            {
+                string token = GenerateEmailToken(user.Email, DateTime.UtcNow.Ticks);
+
+                string message = @"Hello, <b>" + user.Username + @"</b>.<br>
+                                Please confirm your email <a href='https://localhost:7220/api/Auth/verifyEmail?email=" + user.Email + "&token=" + token + @"'>here</a>.<br>
                                     <b>This link will be valid for 5 minutes!</b>";
 
-            await emailSender.SendEmailAsync(user.Email, "Confirm Account", poruka);
+                await emailSender.SendEmailAsync(user.Email, "Confirm Account", message);
 
-            return Ok(new
-            {
-                success = true,
-            });
+                return Ok(new
+                {
+                    success = true,
+                });
+            }
         }
 
 
@@ -213,19 +235,42 @@ namespace backend.Controllers
             {
                 if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHashed))
                 {
-                    string token = CreateJWT(user);
-                    return Ok(new
+                    if (user.VerifiedEmail == false)
                     {
-                        success = true,
-                        data = new
+                        return BadRequest(new
                         {
-                            token = token,
-                           
+                            success = false,
+                            data = new
+                            {
+                                token = "",
+                                errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_notVerified"
+                            }
+                            }
 
 
 
-                        }
-                    });
+                            }
+                        });
+                    }
+                    else
+                    {
+                        string token = CreateJWT(user);
+                        return Ok(new
+                        {
+                            success = true,
+                            data = new
+                            {
+                                token = token,
+
+
+
+
+                            }
+                        });
+                    }
                 }
                 else
                 {   
@@ -339,7 +384,7 @@ namespace backend.Controllers
             }
         }
 
-        private string GenerateEmailToken(string email,string password, long ticks)
+        private string GenerateEmailToken(string email, long ticks)
         {
             string hash = string.Join(":", new string[] { email, ticks.ToString() });
             string hashLeft = "";
@@ -347,7 +392,7 @@ namespace backend.Controllers
 
             using (HMAC hmac = new HMACSHA512())
             {
-                hmac.Key = Encoding.UTF8.GetBytes(password);
+                hmac.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:EmailToken").Value);
                 hmac.ComputeHash(Encoding.UTF8.GetBytes(hash));
 
                 hashLeft = Convert.ToBase64String(hmac.Hash);
@@ -379,9 +424,8 @@ namespace backend.Controllers
                     {
                         if(user.Email==email)
                         {
-                            string password = "123456";
 
-                            string computedToken = GenerateEmailToken(email,password, ticks);
+                            string computedToken = GenerateEmailToken(email, ticks);
 
                             result = (token == computedToken);
                         }
@@ -390,6 +434,7 @@ namespace backend.Controllers
             }
             catch
             {
+                result = false;
             }
 
             return result;
