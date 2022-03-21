@@ -6,6 +6,7 @@ from controllers.training import *
 
 app = Flask(__name__)
 api = Api(app)
+app.config['BUNDLE_ERRORS'] = True
 
 hostName = "localhost"
 serverPort = 8081
@@ -13,8 +14,9 @@ serverPort = 8081
 #################################################################
 # Resources & routes
 
-api.add_resource(DataPreparation, '/dataprep')
+api.add_resource(DatasetParsing, '/dataset/parsing')
 api.add_resource(Training, '/training/<int:tid>')
+api.init_app(app)
 
 #################################################################
 
