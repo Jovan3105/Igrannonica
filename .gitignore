@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+sandbox/Mini-projekat/JovanBrzakovic/ProjekatMini/.vs/ProjekatMini/DesignTimeBuild/.dtbcache.v2
+sandbox/Mini-projekat/JovanBrzakovic/ProjekatMini/.vs/ProjekatMini/v17/.futdcache.v1
+.gitignore
+.gitignore
+.gitignore
+sandbox/Mini-projekat/JovanBrzakovic/ProjekatMini/ProjekatMini/obj/Debug/net6.0/ProjekatMini.assets.cache
+sandbox/Mini-projekat/JovanBrzakovic/ProjekatMini/ProjekatMini/obj/Debug/net6.0/ProjekatMini.GeneratedMSBuildEditorConfig.editorconfig
+sandbox/Mini-projekat/JovanBrzakovic/ProjekatMini/ProjekatMini/obj/ProjekatMini.csproj.nuget.dgspec.json

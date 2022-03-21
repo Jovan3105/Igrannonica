@@ -1,20 +1,60 @@
+
 <div class="mb-3">
     <label for="formFile" class="form-label">Dodaj fajl</label>
     <input class="form-control" type="file" id="uploadData" accept=".csv" (change)="onFileSelected($event)">
 </div>
 
+
 <div style="width: 800px;" class="grid-wrapper" *ngIf = "data">
+    <div class="panel panel-default panel-table" style="width: 800px;">
+        <div class="panel-heading">
+            <div class="tr">
+                <div class="td">Minimum value</div>
+                <div class="td">Maximum value</div>
+                <div class="td">Median</div>
+                <div class="td">Average</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="tr">
+                <div class="td">Number</div>
+                <div class="td">Number</div>
+                <div class="td">Number</div>
+                <div class="td">Number</div>
+            </div>
+            
+        </div>
+    </div>
+    <br>
     <button type="button" class="btn btn-danger" (click)="onRemoveSelected()">Obrisi selektovano</button><br>
-<ag-grid-angular
-    style="height: 520px;"
-    class="ag-theme-alpine"
-    [rowData]="rowData"
-    [columnDefs]="columnDefs"
-    [pagination]="true"
-    [paginationPageSize]="paginationPageSize"
-    [rowSelection]="rowSelection"
-    [animateRows]="true"
-    (gridReady)="onGridReady($event)"
-    >
-</ag-grid-angular>
+    <ag-grid-angular
+        style="height: 520px;"
+        class="ag-theme-alpine"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [pagination]="true"
+        [paginationPageSize]="paginationPageSize"
+        [rowSelection]="rowSelection"
+        [animateRows]="true"
+        (gridReady)="onGridReady($event)"
+        >
+    </ag-grid-angular>
+    <br>
+    <div class="panel panel-default panel-table" style="width: 800px;">
+        <div class="panel-heading">
+            <div class="tr">
+                <div class="td">Number of rows</div>
+                <div class="td">Number of columns</div>
+                <div class="td">Invalid values in by columns</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="tr">
+                <div class="td">Number</div>
+                <div class="td">Number</div>
+                <div class="td">Number</div>
+            </div>
+        </div>
+    </div>
+    <br>
 </div>

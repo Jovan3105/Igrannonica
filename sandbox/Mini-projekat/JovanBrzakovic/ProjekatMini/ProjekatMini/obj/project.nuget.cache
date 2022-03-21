@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dGLwk7RSWHvj8Q2Htim2ru/bKrucb3Xzm0FlkI0+CTMANQfSdOk41NgCBfXpyRRObqT+urdOtksi8rjg518CoQ==",
+  "dgSpecHash": "vsd+K5ovk2MeiYUJiO1+m8IxaGFfLR4RCHvwAQ/hREccmaeqNW2vLc1fCYGqd8SKh8oRP+0A1E4hXJjt6D6MXQ==",
   "success": true,
-  "projectFilePath": "F:\\Desktop\\C#\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj",
+  "projectFilePath": "F:\\Desktop\\regresis\\sandbox\\Mini-projekat\\JovanBrzakovic\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jovan\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\jovan\\.nuget\\packages\\messagepack\\2.1.152\\messagepack.2.1.152.nupkg.sha512",

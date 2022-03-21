@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Desktop\\C#\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj": {}
+    "F:\\Desktop\\regresis\\sandbox\\Mini-projekat\\JovanBrzakovic\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj": {}
   },
   "projects": {
-    "F:\\Desktop\\C#\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj": {
+    "F:\\Desktop\\regresis\\sandbox\\Mini-projekat\\JovanBrzakovic\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Desktop\\C#\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj",
+        "projectUniqueName": "F:\\Desktop\\regresis\\sandbox\\Mini-projekat\\JovanBrzakovic\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj",
         "projectName": "ProjekatMini",
-        "projectPath": "F:\\Desktop\\C#\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj",
+        "projectPath": "F:\\Desktop\\regresis\\sandbox\\Mini-projekat\\JovanBrzakovic\\ProjekatMini\\ProjekatMini\\ProjekatMini.csproj",
         "packagesPath": "C:\\Users\\jovan\\.nuget\\packages\\",
-        "outputPath": "F:\\Desktop\\C#\\ProjekatMini\\ProjekatMini\\obj\\",
+        "outputPath": "F:\\Desktop\\regresis\\sandbox\\Mini-projekat\\JovanBrzakovic\\ProjekatMini\\ProjekatMini\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\jovan\\AppData\\Roaming\\NuGet\\NuGet.Config",
