@@ -129,7 +129,7 @@ namespace backend.Controllers
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
-            var filePath = @"C:\Users\Pivan\Documents\";
+            var filePath = @"C:\Users\Dragan\Documents\";
 
 
 
@@ -178,7 +178,12 @@ namespace backend.Controllers
             return Ok("da");
         }
 
+        [HttpGet]
+        [Route("{id}/stat_indicators")]
+        public async Task<ActionResult<string>> statIndicators(int id)
+        {
 
+        }
 
     }
 }
