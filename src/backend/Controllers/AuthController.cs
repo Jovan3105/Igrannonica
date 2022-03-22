@@ -206,31 +206,8 @@ namespace backend.Controllers
 
            
         }
-        [HttpGet("users")]
-        public async Task<ActionResult<List<User>>> getUsers()
-        {
-            return Ok(await this.userContext.Users.ToListAsync());
-        }
-                
-
-        private void CreatePasswordHash(string password,out byte[] passwordHash,out byte[] passwordSalt)
-        {
-            using(var hmac =  new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash= hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-
-            }
-        }     
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);  
-
-            }
-        }
+        
+   
         private string CreateJWT(User user)
         {
             List<Claim> claims = new List<Claim>
