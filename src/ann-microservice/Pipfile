@@ -16,4 +16,4 @@ chardet = "*"
 server = "python ann_server.py"
 
 [requires]
-python_version = "3.10"
+python_version = "*"
