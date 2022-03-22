@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Papa, ParseResult } from 'ngx-papaparse';
 import { ColDef,GridApi,GridReadyEvent,CellValueChangedEvent } from 'ag-grid-community';
 import { DatasetService } from '../services/dataset.service';
 import { Observable } from 'rxjs';
@@ -14,8 +13,9 @@ export class ShowTableComponent implements OnInit {
   headers:any[] = [];
   data:any = null;
   private gridApi!: GridApi;
+  private insertForm?:FormData;
 
-  constructor(private papa:Papa, private datasetService: DatasetService) { }
+  constructor(private datasetService: DatasetService) { }
 
   dataSetList$!:Observable<any[]>;
 
@@ -24,19 +24,26 @@ export class ShowTableComponent implements OnInit {
   public rowSelection = 'multiple';
   public paginationPageSize = 10;
 
-  ngOnInit(): void 
-  {
-    this.dataSetList$ = this.datasetService.getDatasets();
-  }
+  ngOnInit(): void {}
 
+    
   onFileSelected(event:Event)
   {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     
+
     if (fileList && fileList?.length > 0) 
     {
       var file = fileList[0];
+      var form = new FormData();
+      form.append('file', file);
+
+      this.datasetService.uploadDataset(form).subscribe({
+        error: (e) => console.error(e),
+        complete: () => this.getDataset()
+      });
+      /*
       var parseResult : ParseResult = this.papa.parse(file,{
         header: true,
         skipEmptyLines:true,
@@ -46,13 +53,25 @@ export class ShowTableComponent implements OnInit {
           this.data = results.data
           this.prepareTable()
         }
-      });
+      });*/
     }
   }
 
-  prepareTable()
+  //Hardcodovano za sad, ova metoda ce prihvatati id koji se vraca u responsu upload-a
+  getDataset()
   {
-    if (this.data.length > 0) this.headers = Object.getOwnPropertyNames(this.data[0]); 
+    this.datasetService.getData(10).subscribe(
+      {
+        next: (res) => this.prepareTable(res)
+      }
+    );
+  }
+
+  prepareTable(data:any)
+  {
+    this.data = data;
+
+    if (data.length > 0) this.headers = Object.getOwnPropertyNames(data[0]); 
     this.columnDefs = [];
     this.rowData = [];
     for(let header of this.headers)
@@ -69,10 +88,11 @@ export class ShowTableComponent implements OnInit {
       this.columnDefs.push(col);
     }
 
-    for(let row of this.data)
+    for(let row of data)
     {
       this.rowData.push(row);
     }
+    
   }
 
   onGridReady(params: GridReadyEvent) {
@@ -88,5 +108,6 @@ export class ShowTableComponent implements OnInit {
       var index = this.data.indexOf(sData,0);
       if (index != -1) this.data.splice(index,1);
     }
+    //console.log(this.data)
   }
 }

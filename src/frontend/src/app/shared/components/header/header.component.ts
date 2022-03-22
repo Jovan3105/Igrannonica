@@ -12,12 +12,14 @@ export class HeaderComponent implements OnInit {
   isLoggedIn: any
   constructor(private service: AuthService) { }
   user$!:Observable<any>;
+
   ngOnInit(): void {
+    /*
     var decodedToken = this.service.getDecodedAccessToken(this.service.getJwtToken()!)
     var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
     //console.log(this.service.getUser(id))
     this.isLoggedIn = this.service.isLoggedIn()
-    this.user$ = this.service.getUser(id);
+    this.user$ = this.service.getUser(id);*/
   }
 
 }
