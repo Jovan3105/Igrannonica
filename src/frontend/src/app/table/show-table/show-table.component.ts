@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Papa, ParseResult } from 'ngx-papaparse';
 import { ColDef,GridApi,GridReadyEvent,CellValueChangedEvent } from 'ag-grid-community';
+import { DatasetService } from '../services/dataset.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-show-table',
@@ -13,14 +15,18 @@ export class ShowTableComponent implements OnInit {
   data:any = null;
   private gridApi!: GridApi;
 
-  constructor(private papa:Papa) { }
+  constructor(private papa:Papa, private datasetService: DatasetService) { }
+
+  dataSetList$!:Observable<any[]>;
 
   columnDefs: ColDef[] = [];
   rowData:any = [];
   public rowSelection = 'multiple';
   public paginationPageSize = 10;
 
-  ngOnInit(): void {
+  ngOnInit(): void 
+  {
+    this.dataSetList$ = this.datasetService.getDatasets();
   }
 
   onFileSelected(event:Event)
