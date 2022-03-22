@@ -236,10 +236,9 @@ namespace backend.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name,user.Username),
-                new Claim(ClaimTypes.Email,user.Email),
-                new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
+             
                 new Claim("message","Logging in..."),
-                new Claim("access_token", CreateAccessJWT())
+                new Claim("access_token", CreateAccessJWT(user))
 
 
 
@@ -257,11 +256,23 @@ namespace backend.Controllers
 
             return jwt;
         }
-        private string CreateAccessJWT()
+        private string CreateAccessJWT(User user)
         {
             var key= new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
+            List<Claim> claims = new List<Claim>
+            {
+
+                new Claim(ClaimTypes.Email,user.Email),
+                new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
+                
+
+
+
+            };
+
             var token = new JwtSecurityToken(
+                claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512)
 
