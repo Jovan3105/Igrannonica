@@ -25,11 +25,11 @@ namespace backend.Controllers
 
        
         [HttpGet]
-        [Route("")]
-        public async Task<ActionResult<List<Dataset>>> ges(int pub)
+        [Route("{p}")]
+        public async Task<ActionResult<List<Dataset>>> ges(string p)
         {
             List<Dataset> lista = new List<Dataset>();
-            if (pub == 1)
+            if (p == "1")
             {
                  lista = await this.datasetContext.Datasets.ToListAsync();
                 lista.Where(x => x.Public == true);
@@ -59,66 +59,77 @@ namespace backend.Controllers
 
         }
         [HttpGet]
-        [Route("getData")]
-        public async Task<ActionResult<string>> getData(int id)
+        [Route("data/{id}")]
+        public async Task<ActionResult<string>> getData(int id,int page)
         {
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
-            string path = dataset.Path;
-            var csv = new List<string[]>();
-            var lines = System.IO.File.ReadAllLines(path);
-            foreach (string line in lines)
-                csv.Add(line.Split(','));
-            var header = lines[0].Split(',');
 
-            var listaRecnika = new List<Dictionary<string, string>>();
-            for (int i = 1; i < lines.Length; i++)
+
+            if (page == 0)
             {
-                var objResult = new Dictionary<string, string>();
-                for (int j = 0; j < header.Length; j++)
-                    objResult.Add(header[j], csv[i][j]);
+                var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
+                string path = dataset.Path;
+                var csv = new List<string[]>();
+                var lines = System.IO.File.ReadAllLines(path);
+                foreach (string line in lines)
+                    csv.Add(line.Split(','));
+                var header = lines[0].Split(',');
 
-                listaRecnika.Add(objResult);
+                var listaRecnika = new List<Dictionary<string, string>>();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    var objResult = new Dictionary<string, string>();
+                    for (int j = 0; j < header.Length; j++)
+                        objResult.Add(header[j], csv[i][j]);
+
+                    listaRecnika.Add(objResult);
+                }
+
+                return Ok(JsonConvert.SerializeObject(listaRecnika));
+
             }
+            else
+            {
+                var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
+                string path = dataset.Path;
+                var csv = new List<string[]>();
+                var lines = System.IO.File.ReadAllLines(path);
+                foreach (string line in lines)
+                    csv.Add(line.Split(','));
+                var header = lines[0].Split(',');
+                if ((page - 1) * 20 > lines.Length)
+                {
+                    return BadRequest(page+"dasdas"+lines.Length);
+                }
+                int upper = 0;
+                if((page - 1) * 20> lines.Length)
+                {
+                    upper = lines.Length;
+                }
+                else
+                {
+                    upper = (page ) * 20;
+                }
+               // Console.WriteLine(page+"\n\n\n\n\n\n\n"+upper);
+                var listaRecnika = new List<Dictionary<string, string>>();
+                for (int i = (page - 1) * 20; i < upper; i++)
+                {
+                   // Console.WriteLine(i);
+                    var objResult = new Dictionary<string, string>();
+                    for (int j = 0; j < header.Length; j++)
+                        objResult.Add(header[j], csv[i][j]);
 
-            return Ok(JsonConvert.SerializeObject(listaRecnika));
+
+                    listaRecnika.Add(objResult);
+                }
+
+                return Ok(JsonConvert.SerializeObject(listaRecnika));
+            }
 
 
 
 
         }
-        [HttpGet]
-        [Route("getPage")]
-        public async Task<ActionResult<string>> getDataPage(int id, int page)
-        {
-
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
-            string path = dataset.Path;
-            var csv = new List<string[]>();
-            var lines = System.IO.File.ReadAllLines(path);
-            foreach (string line in lines)
-                csv.Add(line.Split(','));
-            var header = lines[0].Split(',');
-            if ((page - 1) * 20 < lines.Length)
-            {
-                return BadRequest("not that many pages");
-            }
-
-            var listaRecnika = new List<Dictionary<string, string>>();
-            for (int i = (page - 1) * 20; i < lines.Length; i++)
-            {
-                var objResult = new Dictionary<string, string>();
-                for (int j = 0; j < header.Length; j++)
-                    objResult.Add(header[j], csv[i][j]);
-
-                listaRecnika.Add(objResult);
-            }
-
-            return Ok(JsonConvert.SerializeObject(listaRecnika));
-
-
-
-
-        }
+     
         [HttpPost]
         [Route("upload")]
         public async Task<ActionResult<string>> uploadData(IFormFile file)
@@ -157,7 +168,7 @@ namespace backend.Controllers
             return Ok("");
         }
         [HttpDelete]
-        [Route("delete")]
+        [Route("")]
         public async Task<ActionResult<string>> deleteDataset(int id)
         {
             var dataset = await this.datasetContext.Datasets.FindAsync(id);
@@ -174,7 +185,7 @@ namespace backend.Controllers
 
         }
         [HttpPut]
-        [Route("update")]
+        [Route("")]
         public async Task<ActionResult<string>> putDataset(int id,Dataset data)
         {
             //var dataset = await this.datasetContext.Datasets.FindAsync(id);
