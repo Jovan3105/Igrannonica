@@ -53,25 +53,36 @@ namespace backend.Controllers
         [Route("getData")]
         public async Task<ActionResult<string>> getData(int id)
         {
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
-            string path = dataset.Path;
-            var csv = new List<string[]>();
-            var lines = System.IO.File.ReadAllLines(path);
-            foreach (string line in lines)
-                csv.Add(line.Split(','));
-            var header = lines[0].Split(',');
-
-            var listaRecnika = new List<Dictionary<string, string>>();
-            for (int i = 1; i < lines.Length; i++)
+            try
             {
-                var objResult = new Dictionary<string, string>();
-                for (int j = 0; j < header.Length; j++)
-                    objResult.Add(header[j], csv[i][j]);
+                var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
+                string path = dataset.Path;
+                var csv = new List<string[]>();
+                Console.WriteLine("\n\n\n\n\n\n\n\n\n\n" + path);
+                var lines = System.IO.File.ReadAllLines(path);
+                foreach (string line in lines)
+                    csv.Add(line.Split(','));
+                var header = lines[0].Split(',');
 
-                listaRecnika.Add(objResult);
+                var listaRecnika = new List<Dictionary<string, string>>();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    //Console.WriteLine(i+"\n");
+                    var objResult = new Dictionary<string, string>();
+                    for (int j = 0; j < header.Length; j++)
+                        objResult.Add(header[j], csv[i][j]);
+
+                    listaRecnika.Add(objResult);
+                }
+
+                return Ok(JsonConvert.SerializeObject(listaRecnika));
             }
-
-            return Ok(JsonConvert.SerializeObject(listaRecnika));
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            
 
 
 
@@ -170,7 +181,7 @@ namespace backend.Controllers
         {
             //var dataset = await this.datasetContext.Datasets.FindAsync(id);
             data.Id = id;
-            datasetContext.Entry(data).State = EntityState.Modified;
+            datasetContext.Entry(data).State =   EntityState.Modified;
              await  datasetContext.SaveChangesAsync();
 
 
