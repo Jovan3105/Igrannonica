@@ -11,31 +11,40 @@ namespace backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DatasetController : ControllerBase
+    public class DatasetsController : ControllerBase
     {
 
 
         private readonly IConfiguration _configuration;
         private readonly DatasetContext datasetContext;
-        public DatasetController(DatasetContext datasetContext, IConfiguration configuration)
+        public DatasetsController(DatasetContext datasetContext, IConfiguration configuration)
         {
             this.datasetContext = datasetContext;
             _configuration = configuration;
         }
 
+       
         [HttpGet]
-        [Route("getAll")]
-        public async Task<ActionResult<List<Dataset>>> getAll() {
-
-            return Ok(await this.datasetContext.Datasets.ToListAsync());
-        }
-        [HttpGet]
-        [Route("getPublic")]
-        public async Task<ActionResult<List<Dataset>>> getPublic()
+        [Route("")]
+        public async Task<ActionResult<List<Dataset>>> ges(int pub)
         {
-            var lista = await this.datasetContext.Datasets.ToListAsync();
+            List<Dataset> lista = new List<Dataset>();
+            if (pub == 1)
+            {
+                 lista = await this.datasetContext.Datasets.ToListAsync();
+                lista.Where(x => x.Public == true);
+                
+            }
+            else
+            {
+                lista = await this.datasetContext.Datasets.ToListAsync();
+            }
 
-            return Ok(lista.Where(x => x.Public == true));
+            foreach (var item in lista)
+            {
+                item.Path = "";
+            }
+            return Ok(lista);
         }
         [HttpPost]
         [Route("insert")]
