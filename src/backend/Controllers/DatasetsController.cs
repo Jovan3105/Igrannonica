@@ -47,13 +47,42 @@ namespace backend.Controllers
             return Ok(lista);
         }
         [HttpPost]
-        [Route("insert")]
-        public async Task<ActionResult<List<Dataset>>> insert(Dataset dataset) {
+        [Route("addDataset")]
+        public async Task<ActionResult<List<Dataset>>> insert([FromForm]datasetDto dto) {
 
+            Dataset dataset = dto.dataSet;
+            IFormFile file = dto.fajl;
+
+            if (file.Length == 0)
+            {
+                return BadRequest("bad");
+            }
+            string fileName = file.FileName;
+
+            await using var stream = file.OpenReadStream();
+
+             
+            var reader = new StreamReader(stream);
+            var text = await reader.ReadToEndAsync();
+
+            Console.WriteLine(text);
+            Console.WriteLine(fileName);
+
+            var filePath = "C:\\Users\\Pivan\\Documents\\";
+
+            
+
+          
+          
+                string path = Path.Combine(filePath, fileName);
+                using StreamWriter f = new(path);
+                await f.WriteAsync(text);
+            dataset.Path=path;
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
-            return Ok(await this.datasetContext.Datasets.ToListAsync());
+            return Ok("Success");
+
 
 
 
