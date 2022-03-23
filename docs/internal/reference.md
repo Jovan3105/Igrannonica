@@ -6,12 +6,18 @@ Sadržaj
     2. [Ispravka greške na lokalnoj grani pomoću remote grane](#ispravka-gre%C5%A1ke-na-lokalnoj-grani-pomo%C4%87u-remote-grane)
     3. [Brisanje poslednjeg commit-a](#brisanje-poslednjeg-commit-a)
     4. [Pomeranje vrha grane na neki prethodni commit](#pomeranje-vrha-grane-na-neki-prethodni-commit)
+    5. [Prebacivanje lokalnih promena sa jedne grane na drugu](#prebacivanje-lokalnih-promena-sa-jedne-grane-na-drugu)
+    6. [Poređenje dve verzije projekta](#pore%C4%91enje-dve-verzije-projekta)
 2. [Angular](#angular)
+   1. [Instalacija angulara](#instalacija-angular-a)
+   2. [Konfiguracija](#konfiguracija-angular-a)
 3. [PostgreSQL](#postgresql)
-    1. [Instalacija](#instalacija)
-    2. [Konfiguracija](#konfiguracija)
+    1. [Instalacija](#instalacija-postgresql-a)
+    2. [Konfiguracija](#konfiguracija-postgresql-a)
     3. [Korisne komande](#korisne-komande)
-4. [Entity Framework](#entity-framework)
+4. [.NET](#net)
+   1. [Konfiguracija](#konfiguracija-net-a angular-a)
+   2. [Entity Framework](#entity-framework)
 5. [pipenv - mikroservis](#pipenv-mikroservis)
 
 ## Git
@@ -92,16 +98,38 @@ Postavljanje `HEAD`-a na neki commit `ab12cd34` (ne morada bude hash). I lokalne
 git reset --hard ab12cd34
 ```
 
+### Prebacivanje lokalnih promena sa jedne grane na drugu
+
+```
+git stash
+git checkout branch-name
+git stash apply
+```
+
+### Poređenje dve verzije projekta
+
+Poređenje poslednjeg commit-a sa poslednjim commit-om na remote grani `grana`:
+```
+git diff HEAD origin/grana
+```
+
+
+
+
 [**Vrati se na vrh ^**](#reference)
 
 ## Angular
+### Instalacija angular-a
+
 1. `cd src/frontend`
 2. `npm install .`
 3. `npm install ag-grid-angular ag-grid community`
 4. `ng serve --open`
 
+### Konfiguracija angular-a
+Port: 4200
 ## PostgreSQL
-### Instalacija
+### Instalacija postgresql-a
 
 Za instalaciju PostgreSQL-a je potrebno ispratiti sledeći niz koraka. Koraci koji nisu navedeni se vrše odabirom podrazumevanih vrednosti/akcija.
 
@@ -112,7 +140,7 @@ Za instalaciju PostgreSQL-a je potrebno ispratiti sledeći niz koraka. Koraci ko
    ![Slika 2](img/ref-postgres-2.png)
 4. Nakon pokretanja Stack Builder-a potrebno je odabrati opciju sa slike  
    ![Slika 3](img/ref-postgres-3.png)
-5. U kategoriji _Database Drivers_ odabrati opciju **Npgsql v3.2.6-3**
+5. U kategoriji _Database Drivers_ odabrati opciju **Npgsql v3.2.6-3**  
    ![Slika 4](img/ref-postgres-4.png)
 6. Nakon završetka svih instalacija instalacija PostgreSQL-a je završena, potrebno je samo izvršiti migracije kako bi se formirala šema baze
 
@@ -123,10 +151,11 @@ Ukoliko postoji više context-a (što je već slučaj i trenutku pisanja ovog te
 ```Update-Database -Context NazivContext```
 (ovo se vrši za svaki context koji je korišćen u okviru projekta)
 
-Do NuGet terminala se može doći na sledeći način: Tools > NuGet Package Manager > Packer Manager Console
+Do NuGet terminala se može doći na sledeći način:  
+`Tools > NuGet Package Manager > Packer Manager Console`
 
 [**Vrati se na vrh ^**](#reference)
-### Konfiguracija
+### Konfiguracija postgresql-a
 
 User: `postgres`  
 Password: `root`  
@@ -142,7 +171,11 @@ Port: `5432`
 
 [**Vrati se na vrh ^**](#reference)
 
-## Entity Framework
+
+## .NET
+### Konfiguracija .NET-a
+Port: 7220
+### Entity Framework
 
 `dotnet-ef migrations add Ime` - Dodavanje nove migracije  
 `dotnet-ef migrations add Ime -Context ImeContexta` - Dodavanje nove migracije u okviru nekog konteksta  
@@ -157,7 +190,7 @@ Port: `5432`
 4. `pipenv install flask-restful` - instalira flask-restful
 5. `pipenv install numpy` - instalira numpy paketa
 6. `pipenv install pandas` - instalira pandas paketa
-7. `pyenv shell` - aktiviranje virtualnog okruženja
+7. `pipenv shell` - aktiviranje virtualnog okruženja
 8.	Pokretanje ann servera, postoje 2 načina:
 	* `pipenv run server`
 	* `python flask_restful .\ann_server.py`
