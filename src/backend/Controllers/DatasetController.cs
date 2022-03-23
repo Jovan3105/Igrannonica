@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Web;
 using Newtonsoft.Json;
 using System.IO;
+using System.Net;
 
 namespace backend.Controllers
 {
@@ -129,7 +130,7 @@ namespace backend.Controllers
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
-            var filePath = @"C:\Users\jovan\Documents\";
+            var filePath = @"C:\Users\Dragan\Documents\";
 
 
 
@@ -178,7 +179,27 @@ namespace backend.Controllers
             return Ok("da");
         }
 
+        [HttpGet]
+        [Route("{id}/stat_indicators")]
+        public async Task<ActionResult<string>> statIndicators(int id)
+        {
+            var url = "http://localhost:8081/dataset/" + id + "/stat_indicators";
 
+            var httpRequest = (HttpWebRequest)WebRequest.Create(url);
+
+            httpRequest.Accept = "application/json";
+
+
+            var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                var result = streamReader.ReadToEnd();
+
+                return Ok(result);
+            }
+            
+
+        }
 
     }
 }
