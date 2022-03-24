@@ -184,8 +184,9 @@ Port: 7220
 
 ## pipenv - mikroservis
 
+Instalacija mikroservis dela:
 1. `pip install pipenv`
-2. `cd .\src\mikroservis`
+2. `cd .\src\ann-microservice`
 3. `pipenv install` - kreira virtuelno okruženje u trenutnom direktorijumu
 4. `pipenv install flask-restful` - instalira flask-restful
 5. `pipenv install numpy` - instalira numpy paketa
