@@ -42,6 +42,8 @@ export class AuthService {
   logout() {
     this.doLogoutUser();
     this.router.navigateByUrl('/api/login');
+
+    //kada se napravi API za logout
     /*
     return this.http.post<any>(`${this.apiUrl}/auth/logout`, {
       'refreshToken': this.getRefreshToken()
@@ -97,21 +99,21 @@ export class AuthService {
   private doLoginUser(data : any) {
     localStorage.setItem(this.JWT_TOKEN, data.token);
     localStorage.setItem(this.REFRESH_TOKEN, data.refreshToken);
-    //this.storeTokens(tokens);
   }
 
   private doLogoutUser() {
     localStorage.removeItem(this.JWT_TOKEN);
     localStorage.removeItem(this.REFRESH_TOKEN);
-    //this.removeTokens();
   }
   
   refreshToken() {
-    return this.http.post<any>(`${this.apiUrl}/refresh-token`, {
+    return this.http.post<any>(`${this.apiUrl}/auth/refresh-token`, {
+      'accessToken':this.getJwtToken(),
       'refreshToken': this.getRefreshToken()
     }).pipe(
-      tap((tokens: Tokens) => {
-        this.storeJwtToken(tokens.jwt);
+      tap((data: any) => {
+        localStorage.setItem(this.JWT_TOKEN, data.token);
+        localStorage.setItem(this.REFRESH_TOKEN, data.refreshToken);
     }));
   }
 
@@ -121,10 +123,6 @@ export class AuthService {
 
   getRefreshToken() {
     return localStorage.getItem(this.REFRESH_TOKEN);
-  }
-
-  private storeJwtToken(jwt: string) {
-    localStorage.setItem(this.JWT_TOKEN, jwt);
   }
 
   getDecodedAccessToken(token: string): any {
