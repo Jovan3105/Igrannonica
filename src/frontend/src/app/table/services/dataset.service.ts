@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +8,10 @@ import { catchError, Observable, of, tap } from 'rxjs';
 export class DatasetService {
   
   readonly datasetAPIUrl = "http://localhost:7220/api/Dataset";
+  
+  /*
+  httpHeader = new HttpHeaders()
+  .set('Access-Control-Allow-Origin', '*');*/
 
   constructor(private http:HttpClient) { }
 
@@ -44,10 +48,33 @@ export class DatasetService {
   }
 
   uploadDataset(file:any):Observable<any[]>{
-    return this.http.post<any>(this.datasetAPIUrl + '/upload',file).pipe(
-      tap(_ => console.log(`uploaded file`)),
+    return this.http.post<any>(this.datasetAPIUrl + '/upload',file,{
+      //reportProgress: true,
+      //observe: 'events'
+      }).pipe(
+      //map(event => this.getEventMessage(event)),
       catchError(this.handleError<any>('uploadDataset'))
     );
+  }
+
+  private getEventMessage(event: HttpEvent<any>) {
+    switch (event.type) {
+      case HttpEventType.Sent:
+        console.log(`Uploading file.`);
+        return;
+  
+      case HttpEventType.UploadProgress:
+        // Compute and show the % done:
+        const percentDone = Math.round(100 * event.loaded / (event.total ?? 0));
+        console.log(`File is ${percentDone}% uploaded.`);
+        return;
+  
+      case HttpEventType.Response:
+        return `File was completely uploaded!`;
+  
+      default:
+        return `File surprising upload event: ${event.type}.`;
+    }
   }
 
   deleteDataset(id: number):Observable<any[]>{

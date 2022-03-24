@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ColDef,GridApi,GridReadyEvent,CellValueChangedEvent } from 'ag-grid-community';
 import { DatasetService } from '../services/dataset.service';
-import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-show-table',
@@ -13,16 +13,15 @@ export class ShowTableComponent implements OnInit {
   headers:any[] = [];
   data:any = null;
   private gridApi!: GridApi;
-  private insertForm?:FormData;
 
   constructor(private datasetService: DatasetService) { }
-
-  dataSetList$!:Observable<any[]>;
 
   columnDefs: ColDef[] = [];
   rowData:any = [];
   public rowSelection = 'multiple';
   public paginationPageSize = 10;
+
+  public form:FormData = new FormData();
 
   ngOnInit(): void {}
 
@@ -35,13 +34,15 @@ export class ShowTableComponent implements OnInit {
 
     if (fileList && fileList?.length > 0) 
     {
+      
       var file = fileList[0];
-      var form = new FormData();
-      form.append('file', file);
-
-      this.datasetService.uploadDataset(form).subscribe({
+     
+      this.form.append('file', file);
+      
+      this.datasetService.uploadDataset(this.form)
+      .subscribe({
         error: (e) => console.error(e),
-        complete: () => this.getDataset()
+        complete: () => console.log("Gotovo")
       });
       /*
       var parseResult : ParseResult = this.papa.parse(file,{
@@ -56,13 +57,13 @@ export class ShowTableComponent implements OnInit {
       });*/
     }
   }
-
   //Hardcodovano za sad, ova metoda ce prihvatati id koji se vraca u responsu upload-a
   getDataset()
   {
     this.datasetService.getData(10).subscribe(
       {
-        next: (res) => this.prepareTable(res)
+        next: (res) => this.prepareTable(res),
+        error: (e) => console.error(e)
       }
     );
   }
@@ -80,7 +81,7 @@ export class ShowTableComponent implements OnInit {
         flex: 1,
         field: header,
         sortable: true,
-        filter: true,
+        filter: 'agTextColumnFilter',
         editable: true,
         resizable:true,
         minWidth: 100
@@ -108,6 +109,5 @@ export class ShowTableComponent implements OnInit {
       var index = this.data.indexOf(sData,0);
       if (index != -1) this.data.splice(index,1);
     }
-    //console.log(this.data)
   }
 }
