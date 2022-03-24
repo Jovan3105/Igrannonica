@@ -60,27 +60,48 @@ namespace backend.Controllers
                 });
             }
             user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
-            this.userContext.Users.Add(user);
-            await this.userContext.SaveChangesAsync();
-
-
-
-            
-
-            //slanje verifikacionog mejla
-
-            await resendEmail(user);
-
-            return Ok(new
+            user.VerifiedEmail = false;
+            try
             {
-                success = true,
-            });
+                this.userContext.Users.Add(user);
+
+                await this.userContext.SaveChangesAsync();
+
+                //slanje verifikacionog mejla
+
+                await sendVerificationEmail(user.Email);
+
+                return Ok(new
+                {
+                    success = true
+                });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "userOrEmail_AlreadyExists"
+                            }
+                            }
+
+
+
+                    }
+                });
+            }
         }
 
-        [HttpGet("checkMail")]
-        public async Task<ActionResult<string>> checkMail(string email,string hash)
+        [HttpGet("verifyEmail")]
+        public async Task<ActionResult<string>> verifyEmail(string email,string token)
         {
-            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email && user.PasswordHashed==hash);
+            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
             if(user == null)
             {
                 return BadRequest(new
@@ -103,55 +124,83 @@ namespace backend.Controllers
             }
             else
             {
-                // za sad se menja user dok ivan ne napravi skroz bazu
-                user.Username = "prosaoCheck";
-                this.userContext.Update(user);
-                await this.userContext.SaveChangesAsync();
-                List<Claim> claims = new List<Claim>
-                     {
-                            new Claim(ClaimTypes.Name,user.Username),
-                            new Claim(ClaimTypes.Email,user.Email),
-                             new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
-                            new Claim("message","Logging in..."),
-
-
-
-
-                         };
-               
-                JwtSecurityToken token = CreateToken(claims);
-
-                return Ok(new
+                if (IsTokenValid(token, user))
                 {
-                    success = true,
-                    data = new
+                    user.VerifiedEmail = true;
+                    this.userContext.Update(user);
+                    await this.userContext.SaveChangesAsync();
+                    return Ok(new
                     {
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                        success = true,
+                        data = new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            refreshToken = refreshToken
 
-
-
-
-                    }
-                });
+                        }
+                    });
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        data = new
+                        {
+                            token = "",
+                            errors = new[] {
+                                new {
+                                    message = "bad request",
+                                    code = "token_notValid"
+                                }
+                            }
+                        }
+                    });
+                }
             }    
         }
 
-        [HttpPost("resendEmail")]
-        public async Task<ActionResult<string>> resendEmail(User user)
+        [HttpPost("sendVerificationEmail")]
+        public async Task<ActionResult<string>> sendVerificationEmail(string email)
         {
 
 
             // treba naci bolje resenje umesto password hasha ali nek je ovako za sad
 
-            string poruka = @"Hello, <b>" + user.Username + @"</b>.<br>
-                                Please confirm your email <a href='https://localhost:7220/api/Auth/checkMail?email=" + user.Email + "&hash=" + user.PasswordHashed + @"'>here</a>.";
-
-            await emailSender.SendEmailAsync(user.Email, "Confirm Account", poruka);
-
-            return Ok(new
+            User user = this.userContext.Users.FirstOrDefault(x => x.Email == email);
+            if (user == null)
             {
-                success = true,
-            });
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_notExists"
+                            }
+                            }
+
+                    }
+                });
+            }
+            else
+            {
+                string token = GenerateEmailToken(user.Email, DateTime.UtcNow.Ticks);
+
+                string message = @"Hello, <b>" + user.Username + @"</b>.<br>
+                                Please confirm your email <a href='https://localhost:7220/api/Auth/verifyEmail?email=" + user.Email + "&token=" + token + @"'>here</a>.<br>
+                                    <b>This link will be valid for 5 minutes!</b>";
+
+                await emailSender.SendEmailAsync(user.Email, "Confirm Account", message);
+
+                return Ok(new
+                {
+                    success = true,
+                });
+            }
         }
 
 
@@ -185,43 +234,51 @@ namespace backend.Controllers
             {
                 if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHashed))
                 {
-
-                    List<Claim> claims = new List<Claim>
-                     {
+                    if (user.VerifiedEmail == false)
+                    {
+                        return BadRequest(new
+                        {
+                            success = false,
+                            data = new
+                            {
+                                token = "",
+                                errors = new[] {
+                                    new {
+                                        message = "bad request",
+                                        code = "email_notVerified"
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    else
+                    {
+                        List<Claim> claims = new List<Claim>
+                        {
                             new Claim(ClaimTypes.Name,user.Username),
                             new Claim(ClaimTypes.Email,user.Email),
-                             new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
+                            new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
+                            new Claim("message","Logging in...")
+                        };
 
-                            new Claim("message","Logging in..."),
-                            
+                        var refreshToken = GenerateRefreshToken();
+                        JwtSecurityToken token = CreateToken(claims);
+                        user.RefreshToken = refreshToken;
+                        _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
+                        user.RefreshTokenExpires = DateTime.Now.AddDays(refreshTokenValidityInDays);
 
-
-
-                         };
-                    var refreshToken = GenerateRefreshToken();
-                    JwtSecurityToken token = CreateToken(claims);
-                    user.RefreshToken = refreshToken;
-                    _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
-                    user.RefreshTokenExpires = DateTime.Now.AddDays(refreshTokenValidityInDays);
-
-
-
-
-                    userContext.Entry(user).State = EntityState.Modified;
-                    await userContext.SaveChangesAsync();
-                    return Ok(new
-                    {
-                        success = true,
-                        data = new
+                        userContext.Entry(user).State = EntityState.Modified;
+                        await userContext.SaveChangesAsync();
+                        return Ok(new
                         {
-                            token = new JwtSecurityTokenHandler().WriteToken(token),
-                            refreshToken= refreshToken
-
-
-
-
-                        }
-                    });
+                            success = true,
+                            data = new
+                            {
+                                token = new JwtSecurityTokenHandler().WriteToken(token),
+                                refreshToken= refreshToken
+                            }
+                        });
+                    }
                 }
                 else
                 {   
@@ -232,62 +289,23 @@ namespace backend.Controllers
                         {   
                             token="",
                             errors= new[] {
-                            new {
-                                message = "bad request",
-                                code = "incorrect_password"
-                            } 
+                                new {
+                                    message = "bad request",
+                                    code = "incorrect_password"
+                                } 
                             }
-                            
-                            
-
                         }
                     });
                 }
-               
             }
 
 
            
         }
-<<<<<<< HEAD
         
    
         private string CreateJWT(User user)
-=======
-        [HttpGet("users")]
-        public async Task<ActionResult<List<User>>> getUsers()
         {
-            return Ok(await this.userContext.Users.ToListAsync());
-        }
-                
-
-        private void CreatePasswordHash(string password,out byte[] passwordHash,out byte[] passwordSalt)
-        {
-            using(var hmac =  new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash= hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-
-            }
-        }     
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);  
-
-            }
-        }
-       
-        
-        private JwtSecurityToken CreateToken(List<Claim> authClaims)
->>>>>>> origin/refresh-token-back
-        {
-
-
-
-
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
             _ = int.TryParse(_configuration["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
 
@@ -384,7 +402,7 @@ namespace backend.Controllers
 
             if (trimmedEmail.EndsWith("."))
             {
-                return false; // suggested by @TK-421
+                return false;
             }
             try
             {
@@ -397,5 +415,67 @@ namespace backend.Controllers
             }
         }
 
+        private string GenerateEmailToken(string email, long ticks)
+        {
+            string hash = string.Join(":", new string[] { email, ticks.ToString() });
+            string hashLeft = "";
+            string hashRight = "";
+
+            using (HMAC hmac = new HMACSHA512())
+            {
+                hmac.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:EmailToken").Value);
+                hmac.ComputeHash(Encoding.UTF8.GetBytes(hash));
+
+                hashLeft = Convert.ToBase64String(hmac.Hash);
+                hashRight = string.Join(":", new string[] { email, ticks.ToString() });
+            }
+
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Join(":", hashLeft, hashRight)));
+        }
+        private const int _expirationMinutes = 5;
+
+        private bool IsTokenValid(string token,User user)
+        {
+            bool result = false;
+
+            try
+            {
+                string key = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+
+                string[] parts = key.Split(new char[] { ':' });
+                if (parts.Length == 3)
+                {
+                    string hash = parts[0];
+                    string email = parts[1];
+                    long ticks = long.Parse(parts[2]);
+                    DateTime timeStamp = new DateTime(ticks);
+
+                    bool expired = Math.Abs((DateTime.UtcNow - timeStamp).TotalMinutes) > _expirationMinutes;
+                    if (expired == false)
+                    {
+                        if(user.Email==email)
+                        {
+
+                            string computedToken = GenerateEmailToken(email, ticks);
+
+                            result = (token == computedToken);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                result = false;
+            }
+
+            return result;
+        }
+
+        [HttpDelete]
+        public void Delete(User user)
+        {
+            this.userContext.Remove(user);
+            this.userContext.SaveChanges();
+        }
     }
 }
