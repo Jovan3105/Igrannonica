@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map, tap } from 'rxjs/operators';
+import { catchError, map, mapTo, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Tokens } from 'src/app/auth/models/tokens';
-import { Observable } from 'rxjs';
-import { Token } from '@angular/compiler';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import jwt_decode from 'jwt-decode';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -33,11 +32,31 @@ export class AuthService {
       map((response:any) => {
         const user = response;
         if(user.success){
-          this.doLoginUser(user.username,user.data.token);
+          this.doLoginUser(user.data);
           //ubacuje token u localstorage inpectelement->application->localstorage
         }
       })
     )
+  }
+
+  logout() {
+    this.doLogoutUser();
+    this.router.navigateByUrl('/api/login');
+    /*
+    return this.http.post<any>(`${this.apiUrl}/auth/logout`, {
+      'refreshToken': this.getRefreshToken()
+    }).pipe(
+      map((response:any)=>{
+        if(response.success)
+        {
+          this.doLogoutUser();
+          this.router.navigateByUrl('/api/login');
+        }
+      }),
+      catchError(error => {
+        alert(error.error);
+        return of(false);
+      }));*/
   }
 
   register(model: any){
@@ -75,23 +94,24 @@ export class AuthService {
     return false;
   }
 
-  private doLoginUser(username: string, token : string) {
-    this.loggedUser = username;
-    localStorage.setItem(this.JWT_TOKEN, token);
+  private doLoginUser(data : any) {
+    localStorage.setItem(this.JWT_TOKEN, data.token);
+    localStorage.setItem(this.REFRESH_TOKEN, data.refreshToken);
     //this.storeTokens(tokens);
   }
 
   private doLogoutUser() {
-    this.loggedUser = null;
     localStorage.removeItem(this.JWT_TOKEN);
+    localStorage.removeItem(this.REFRESH_TOKEN);
     //this.removeTokens();
   }
   
   refreshToken() {
-    return this.http.post<any>(`${this.apiUrl}/refresh`, {
+    return this.http.post<any>(`${this.apiUrl}/refresh-token`, {
       'refreshToken': this.getRefreshToken()
-    }).pipe(tap((tokens: Tokens) => {
-      this.storeJwtToken(tokens.jwt);
+    }).pipe(
+      tap((tokens: Tokens) => {
+        this.storeJwtToken(tokens.jwt);
     }));
   }
 
@@ -99,22 +119,12 @@ export class AuthService {
     return localStorage.getItem(this.JWT_TOKEN);
   }
 
-  private getRefreshToken() {
+  getRefreshToken() {
     return localStorage.getItem(this.REFRESH_TOKEN);
   }
 
   private storeJwtToken(jwt: string) {
     localStorage.setItem(this.JWT_TOKEN, jwt);
-  }
-
-  private storeTokens(tokens: Tokens) {
-    localStorage.setItem(this.JWT_TOKEN, tokens.jwt);
-    localStorage.setItem(this.REFRESH_TOKEN, tokens.refreshToken);
-  }
-
-  private removeTokens() {
-    localStorage.removeItem(this.JWT_TOKEN);
-    localStorage.removeItem(this.REFRESH_TOKEN);
   }
 
   getDecodedAccessToken(token: string): any {
@@ -126,7 +136,6 @@ export class AuthService {
   } 
 
   getUser(id:number):any{
-    console.log("radi")
     return this.http.get<any>(this.apiUrl + `/Users/${id}`);
   }
 }
