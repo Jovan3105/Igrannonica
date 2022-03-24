@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ShowTableComponent } from './table/show-table/show-table.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EmailVerifComponent } from './auth/components/email-verif/email-verif.component';
 
 
 @NgModule({

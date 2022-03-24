@@ -22,7 +22,7 @@ export class AuthService {
   authUrl = "http://localhost:7220/api/auth/login";
   registerUrl = "http://localhost:7220/api/auth/register";
 
-  confirmEmailUrl = "test.com";
+  confirmEmailUrl = "http://localhost:7220/api/Auth/verifyEmail";
   /////////url swaggera/////////
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -134,6 +134,10 @@ export class AuthService {
       return null;
     }
   } 
+
+  verifyEmailAddress(email:string, token:string): any {
+    return this.http.get<any>(this.confirmEmailUrl + `?email=${email}&token=${token}`);
+  }
 
   getUser(id:number):any{
     return this.http.get<any>(this.apiUrl + `/Users/${id}`);

@@ -197,6 +197,7 @@ namespace backend.Controllers
         [HttpGet("verifyEmail")]
         public async Task<ActionResult<string>> verifyEmail(string email, string token)
         {
+            Console.WriteLine($"email={email}, token={token}");
             User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
             if(user == null)
             {
@@ -308,7 +309,7 @@ namespace backend.Controllers
                 
                 string message = @"Hello, <b>" + user.Username 
                                 + @"</b>.<br> Please confirm your email 
-                                    <a href='http://localhost:7220/api/Auth/verifyEmail?email=" 
+                                    <a href='http://localhost:4200/verifyEmail?email=" 
                                 + user.Email 
                                 + "&token=" + GenerateMyToken(user.Email)
                                 /*Convert.ToBase64String(

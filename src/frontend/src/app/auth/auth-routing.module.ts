@@ -8,13 +8,15 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { ShowTableComponent } from '../table/show-table/show-table.component';
 import { AuthGuard } from './guards/auth.guard';
 import { DashboardGuard } from './guards/dashboard.guard';
+import { EmailVerifComponent } from './components/email-verif/email-verif.component';
 
 const routes: Routes = [
   { path: 'api/login', component: LoginComponent, canActivate: [AuthGuard]},
   { path: 'api/register', component: RegisterComponent, canActivate:[AuthGuard]},
   { path: 'api/reset-password', component: ResetPasswordComponent},
   { path: '#', component: AppComponent},
-  { path:'dashboard', component:ShowTableComponent, /*canActivate:[DashboardGuard] */}
+  { path:'dashboard', component:ShowTableComponent, /*canActivate:[DashboardGuard] */},
+  { path:'verifyEmail', component:EmailVerifComponent }
 ];
 
 @NgModule({
