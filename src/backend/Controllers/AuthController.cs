@@ -325,7 +325,6 @@ namespace backend.Controllers
                 });
             }
         }
-
         
         [Authorize]
         [HttpPost]
@@ -375,6 +374,7 @@ namespace backend.Controllers
                 refreshToken = newRefreshToken
             });
         }
+
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
         {
             Console.WriteLine("\n\n\n\n\n pozvano");
@@ -480,6 +480,34 @@ namespace backend.Controllers
             }
             return true;
         }
+        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+        {
+            Console.WriteLine("\n\n\n\n\n pozvano");
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+
+        }
+        private static string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
 
         private bool IsValidEmail(string email)
         {

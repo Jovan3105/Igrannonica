@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: 'api/register', component: RegisterComponent, canActivate:[AuthGuard]},
   { path: 'api/reset-password', component: ResetPasswordComponent},
   { path: '#', component: AppComponent},
-  { path:'dashboard', component:ShowTableComponent, canActivate:[DashboardGuard] }
+  { path:'dashboard', component:ShowTableComponent, /*canActivate:[DashboardGuard] */}
 ];
 
 @NgModule({
