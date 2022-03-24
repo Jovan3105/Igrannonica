@@ -26,6 +26,8 @@ namespace backend.Controllers
 
         private readonly UserContext userContext;
         private readonly IConfiguration _configuration;
+        //private const int _expirationMinutes = 5;
+
         public AuthController(UserContext userContext,IConfiguration configuration)
         {
             this.userContext = userContext;
@@ -89,120 +91,11 @@ namespace backend.Controllers
                                 message = "bad request",
                                 code = "userOrEmail_AlreadyExists"
                             }
-                            }
-
-
-
-                    }
-                });
-            }
-        }
-
-        [HttpGet("verifyEmail")]
-        public async Task<ActionResult<string>> verifyEmail(string email,string token)
-        {
-            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
-            if(user == null)
-            {
-                return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "user_notFound"
-                            }
-                            }
-
-
-
-                    }
-                });
-            }
-            else
-            {
-                if (IsTokenValid(token, user))
-                {
-                    user.VerifiedEmail = true;
-                    this.userContext.Update(user);
-                    await this.userContext.SaveChangesAsync();
-                    return Ok(new
-                    {
-                        success = true,
-                        data = new
-                        {
-                            token = new JwtSecurityTokenHandler().WriteToken(token),
-                            refreshToken = refreshToken
-
                         }
-                    });
-                }
-                else
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        data = new
-                        {
-                            token = "",
-                            errors = new[] {
-                                new {
-                                    message = "bad request",
-                                    code = "token_notValid"
-                                }
-                            }
-                        }
-                    });
-                }
-            }    
-        }
-
-        [HttpPost("sendVerificationEmail")]
-        public async Task<ActionResult<string>> sendVerificationEmail(string email)
-        {
-
-
-            // treba naci bolje resenje umesto password hasha ali nek je ovako za sad
-
-            User user = this.userContext.Users.FirstOrDefault(x => x.Email == email);
-            if (user == null)
-            {
-                return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "email_notExists"
-                            }
-                            }
-
                     }
                 });
             }
-            else
-            {
-                string token = GenerateEmailToken(user.Email, DateTime.UtcNow.Ticks);
-
-                string message = @"Hello, <b>" + user.Username + @"</b>.<br>
-                                Please confirm your email <a href='https://localhost:7220/api/Auth/verifyEmail?email=" + user.Email + "&token=" + token + @"'>here</a>.<br>
-                                    <b>This link will be valid for 5 minutes!</b>";
-
-                await emailSender.SendEmailAsync(user.Email, "Confirm Account", message);
-
-                return Ok(new
-                {
-                    success = true,
-                });
-            }
         }
-
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(userDto request)
@@ -211,8 +104,8 @@ namespace backend.Controllers
             User user = this.userContext.Users.FirstOrDefault(user => user.Username == request.Username || user.Email == request.Username);
             if (user == null)
             {
-                
-                 return BadRequest(new
+
+                return BadRequest(new
                 {
                     success = false,
                     data = new
@@ -275,50 +168,165 @@ namespace backend.Controllers
                             data = new
                             {
                                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                                refreshToken= refreshToken
+                                refreshToken = refreshToken
                             }
                         });
                     }
                 }
                 else
-                {   
+                {
                     return BadRequest(new
-                    {   
-                        success=false,
+                    {
+                        success = false,
                         data = new
-                        {   
-                            token="",
-                            errors= new[] {
+                        {
+                            token = "",
+                            errors = new[] {
                                 new {
                                     message = "bad request",
                                     code = "incorrect_password"
-                                } 
+                                }
                             }
                         }
                     });
                 }
             }
-
-
-           
         }
-        
-   
-        private string CreateJWT(User user)
+
+
+        [HttpGet("verifyEmail")]
+        public async Task<ActionResult<string>> verifyEmail(string email, string token)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
-            _ = int.TryParse(_configuration["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
+            if(user == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "user_notFound"
+                            }
+                            }
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddMinutes(tokenValidityInMinutes),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
 
-            return token;
+
+                    }
+                });
+            }
+            else
+            {
+                if (ValidateCurrentToken(token))
+                {
+                    // TODO
+                    if(true || user.Email == GetClaim(token, ClaimTypes.Email))
+                    {
+                        user.VerifiedEmail = true;
+                        this.userContext.Update(user);
+                        await this.userContext.SaveChangesAsync();
+                        return Ok(new
+                        {
+                            success = true,
+                            data = ""
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest(new
+                        {
+                            success = false,
+                            data = new
+                            {
+                                token = "",
+                                errors = new[] {
+                                new {
+                                    message = "bad request",
+                                    code = "token_emailMismatch"
+                                }
+                            }
+                            }
+                        });
+                    }
+
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        data = new
+                        {
+                            token = "",
+                            errors = new[] {
+                                new {
+                                    message = "bad request",
+                                    code = "token_notValid"
+                                }
+                            }
+                        }
+                    });
+                }
+            }    
         }
+
+        [HttpPost("sendVerificationEmail")]
+        public async Task<ActionResult<string>> sendVerificationEmail(string email)
+        {
+            User user = this.userContext.Users.FirstOrDefault(x => x.Email == email);
+            if (user == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_notExists"
+                            }
+                        }
+
+                    }
+                });
+            }
+            else
+            {
+                /*List<Claim> claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim("message", "Verify email address")
+                };*/
+
+                //JwtSecurityToken token = CreateToken(claims);
+                
+                string message = @"Hello, <b>" + user.Username 
+                                + @"</b>.<br> Please confirm your email 
+                                    <a href='http://localhost:7220/api/Auth/verifyEmail?email=" 
+                                + user.Email 
+                                + "&token=" + GenerateMyToken(user.Email)
+                                /*Convert.ToBase64String(
+                                    Encoding.UTF8.GetBytes(
+                                        new JwtSecurityTokenHandler().WriteToken(token)))*/
+                                + @"'>here</a>.<br>
+                                    <b>This link will be valid for 5 minutes!</b>";
+
+                await emailSender.SendEmailAsync(user.Email, "Confirm Account", message);
+
+                return Ok(new
+                {
+                    success = true,
+                });
+            }
+        }
+
+        
         [Authorize]
         [HttpPost]
         [Route("refresh-token")]
@@ -396,6 +404,83 @@ namespace backend.Controllers
         }
 
 
+        private JwtSecurityToken CreateToken(List<Claim> authClaims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
+            _ = int.TryParse(_configuration["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddMinutes(tokenValidityInMinutes),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
+            return token;
+        }
+
+        private string GenerateMyToken(string email)
+        {
+
+            _ = int.TryParse(_configuration["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+
+            var mySecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
+            var myIssuer = _configuration["JWT:ValidIssuer"];
+            var myAudience = _configuration["JWT:ValidAudience"];
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Email, email),
+                }),
+                Expires = DateTime.Now.AddMinutes(tokenValidityInMinutes),
+                Issuer = myIssuer,
+                Audience = myAudience,
+                SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        private string GetClaim(string token, string claimType)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+            var stringClaimValue = securityToken.Claims.First(claim => claim.Type == claimType).Value;
+            Console.WriteLine(securityToken);
+
+            return stringClaimValue;
+        }
+
+        private bool ValidateCurrentToken(string token)
+        {
+            var mySecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
+            var myIssuer = _configuration["JWT:ValidIssuer"];
+            var myAudience = _configuration["JWT:ValidAudience"];
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = myIssuer,
+                    ValidAudience = myAudience,
+                    IssuerSigningKey = mySecurityKey
+                }, out SecurityToken validatedToken);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
         private bool IsValidEmail(string email)
         {
             var trimmedEmail = email.Trim();
@@ -413,69 +498,6 @@ namespace backend.Controllers
             {
                 return false;
             }
-        }
-
-        private string GenerateEmailToken(string email, long ticks)
-        {
-            string hash = string.Join(":", new string[] { email, ticks.ToString() });
-            string hashLeft = "";
-            string hashRight = "";
-
-            using (HMAC hmac = new HMACSHA512())
-            {
-                hmac.Key = Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:EmailToken").Value);
-                hmac.ComputeHash(Encoding.UTF8.GetBytes(hash));
-
-                hashLeft = Convert.ToBase64String(hmac.Hash);
-                hashRight = string.Join(":", new string[] { email, ticks.ToString() });
-            }
-
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Join(":", hashLeft, hashRight)));
-        }
-        private const int _expirationMinutes = 5;
-
-        private bool IsTokenValid(string token,User user)
-        {
-            bool result = false;
-
-            try
-            {
-                string key = Encoding.UTF8.GetString(Convert.FromBase64String(token));
-
-                string[] parts = key.Split(new char[] { ':' });
-                if (parts.Length == 3)
-                {
-                    string hash = parts[0];
-                    string email = parts[1];
-                    long ticks = long.Parse(parts[2]);
-                    DateTime timeStamp = new DateTime(ticks);
-
-                    bool expired = Math.Abs((DateTime.UtcNow - timeStamp).TotalMinutes) > _expirationMinutes;
-                    if (expired == false)
-                    {
-                        if(user.Email==email)
-                        {
-
-                            string computedToken = GenerateEmailToken(email, ticks);
-
-                            result = (token == computedToken);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                result = false;
-            }
-
-            return result;
-        }
-
-        [HttpDelete]
-        public void Delete(User user)
-        {
-            this.userContext.Remove(user);
-            this.userContext.SaveChanges();
         }
     }
 }

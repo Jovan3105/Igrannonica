@@ -59,8 +59,8 @@ export class AuthService {
             if(uspesnaRegistracijaMessage) {
               const user = response;
               uspesnaRegistracijaMessage.style.display = "none";
-              this.doLoginUser(user.username,user.data.token);
-              this.router.navigateByUrl('/dashboard');
+              //this.doLoginUser(user.username,user.data.token);
+              this.router.navigateByUrl('/');
             }
           }
           setTimeout(hide_button, 2000);
