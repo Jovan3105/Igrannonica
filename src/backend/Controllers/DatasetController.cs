@@ -7,6 +7,8 @@ using System.Web;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace backend.Controllers
 {
@@ -183,21 +185,24 @@ namespace backend.Controllers
         [Route("{id}/stat_indicators")]
         public async Task<ActionResult<string>> statIndicators(int id)
         {
-            var url = "http://localhost:8081/dataset/" + id + "/stat_indicators";
 
-            var httpRequest = (HttpWebRequest)WebRequest.Create(url);
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
-            httpRequest.Accept = "application/json";
+            var url = "http://localhost:8081/dataset/stat_indicators";
 
+            HttpClient client = new HttpClient();
 
-            var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-            {
-                var result = streamReader.ReadToEnd();
+            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
-                return Ok(result);
-            }
-            
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(dataset.Path));
+
+            var response = await client.PostAsync(url, multipartFormContent);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return Ok(responseString);
 
         }
 

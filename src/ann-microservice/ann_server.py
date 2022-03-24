@@ -15,7 +15,7 @@ serverPort = 8081
 # Resources & routes
 
 api.add_resource(DatasetParsing, '/dataset/parsing')
-api.add_resource(Training, '/dataset/<int:tid>/stat_indicators')
+api.add_resource(Training, '/dataset/stat_indicators')
 api.init_app(app)
 
 #################################################################
