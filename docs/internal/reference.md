@@ -18,7 +18,10 @@ Sadržaj
 4. [.NET](#net)
    1. [Konfiguracija .NET-a](#konfiguracija-net-a)
    2. [Entity Framework](#entity-framework)
-5. [pipenv - mikroservis](#pipenv-mikroservis)
+5. [ANN mikroservis](#ann-mikroservis)
+   1. [Instalacija mikroservisa](#instalacija-mikroservisa)
+   2. [Pokretanje mikroservisa](#pokretanje-mikroservisa)
+   3. [pipenv](#pipenv)
 
 ## Git
 
@@ -182,18 +185,38 @@ Port: 7220
 `dotnet-ef migrations list` - Prikaz svih migracija (naziv kreće nakon karaktera `_`)  
 `dotnet-ef migrations remove` - Brisanje poslednje migracije    
 
-## pipenv - mikroservis
+## ANN mikroservis
 
-Instalacija mikroservis dela:
+**Bitno**: sve pakete je potrebno instalirati pomoću `pipenv`, a ne preko `pip`-a. Ukoliko se to ne uradi, paketi instalirani na taj način neće biti razmatrani tokom instalacije svih paketa iz okruženja jer se neće naći na listi potrebnih paketa pa će doći do greške o nedostatku potrebnog paketa kada se program pokrene.
+
+Kada dođe do promene okruženja (paketa) i kod bude spreman da ide u produkciju potrebno je izvršiti komandu `pipenv lock` kako bi se izvršilo ažuriranje svih informacija. Time se obezbeđuje da se dobije isto okruženje kada se bude vršila instalacija u produkciji.
+
+### Instalacija mikroservisa
 1. `pip install pipenv`
 2. `cd .\src\ann-microservice`
-3. `pipenv install` - kreira virtuelno okruženje u trenutnom direktorijumu
-4. `pipenv install flask-restful` - instalira flask-restful
-5. `pipenv install numpy` - instalira numpy paketa
-6. `pipenv install pandas` - instalira pandas paketa
-7. `pipenv shell` - aktiviranje virtualnog okruženja
-8.	Pokretanje ann servera, postoje 2 načina:
-	* `pipenv run server`
-	* `python flask_restful .\ann_server.py`
+3. `pipenv install`
+
+### Pokretanje mikroservisa
+1. `pipenv shell`
+2. `pipenv run server`
+
+### pipenv
+
+`Pipfile` je zamena za `requirements.txt`.  
+`Pipfile.lock` omogućava determinističke build-ove. Komandom `pipenv lock` kreira se snapshot svih verzija paketa koji se koriste u nekom okruženju (daje sličan rezultat kao komanda `pip freeze`)
+
+Neke od bitnih komandi:
+* `pipenv install` - instalira potrebe pakete i dependency-e koji su definisani u `Pipfile`
+* `pipenv install --dev` - instalira potrebe pakete i dependency-e koji su definisani u `Pipfile` zajedno sa paketima koji se samo koriste za development
+* `pipenv install ime-paketa` - instalira navedeni paket u virtuelno okruženje
+* `pipenv install ime-paketa --dev` - instalira navedeni paket u virtuelno okruženje i postavlja ga u dev sekciji u fajlu `Pipfile`
+* `pipenv uninstall ime-paketa` - briše navedeni paket iz virtuelnog okruženja
+* `pipenv --venv` - štampa lokaciju virtuelnog okruženja
+* `pipenv lock` - pravi snapshot okruženja; koristi se kada je stanje okruženja potrebno sačuvati jer će ići u produkciju
+* `pipenv sync` - instalacija paketa (radi se u fazi produkcije umesto `pipenv install`)
+* `pipenv run ime-skripte` - pokreće skriptu koja je definisana u `Pipfile`
+* `pipenv shell` - aktiviranje virtualnog okruženja
+
+[Više o pipenv](https://codedamn.com/news/python/how-to-use-pipenv-to-manage-your-python-projects)
 
 [**Vrati se na vrh ^**](#reference)
