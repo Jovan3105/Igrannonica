@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
     const loginObserver = {
       next: (x:any) => { 
         console.log('User logged in'); 
+        this.authService.updatemenu.next();
         this.router.navigateByUrl('/dashboard'); 
       },
       error: (err: Error) => console.log(err)

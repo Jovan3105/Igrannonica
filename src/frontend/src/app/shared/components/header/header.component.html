@@ -7,18 +7,18 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto" id="dugmici">
-          <li class="nav-item" *ngIf="!isLoggedIn">
-            <a class="nav-link" [routerLink]="['/api/register']" routerLinkActive="active">Register</a>
+          <li class="nav-item" *ngIf="displayLoginElement">
+            <a class="nav-link" [routerLink]="['/register']" routerLinkActive="active">Register</a>
           </li>
-          <li class="nav-item" *ngIf="!isLoggedIn">
-            <a class="nav-link" [routerLink]="['/api/login']" routerLinkActive="active">Login</a>
+          <li class="nav-item" *ngIf="displayLoginElement">
+            <a class="nav-link" [routerLink]="['/login']" routerLinkActive="active">Login</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a>
           </li> 
         </ul>
       </div>
-      <div class="justify-content-end" *ngIf="service.isLoggedIn && user$">
+      <div class="justify-content-end" *ngIf="!displayLoginElement && user$">
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/api/my-profile']" routerLinkActive="active">
@@ -29,7 +29,7 @@
         </ul>
         
       </div>
-      <div class="justify-content-end" *ngIf="service.isLoggedIn">
+      <div class="justify-content-end" *ngIf="!displayLoginElement">
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
             <a class="nav-link" (click)="doLogout()">Logout</a>

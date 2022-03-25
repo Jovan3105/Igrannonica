@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Tokens } from 'src/app/auth/models/tokens';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import jwt_decode from 'jwt-decode';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,12 @@ export class AuthService {
   private readonly JWT_TOKEN = 'JWT_TOKEN';
   private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
   private loggedUser!: string | null;
-  private helper!: JwtHelperService
+  private helper!: JwtHelperService;
+
+  private _updatemenu = new Subject<void>();
+  get updatemenu() {
+    return this._updatemenu;
+  }
 
   /////////url swaggera/////////
   apiUrl = "http://localhost:7220/api";
@@ -41,8 +46,8 @@ export class AuthService {
 
   logout() {
     this.doLogoutUser();
-    this.router.navigateByUrl('/api/login');
-
+    this.router.navigateByUrl('/login');
+    this.updatemenu.next();
     //kada se napravi API za logout
     /*
     return this.http.post<any>(`${this.apiUrl}/auth/logout`, {
