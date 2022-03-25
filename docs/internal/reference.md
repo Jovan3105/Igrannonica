@@ -63,7 +63,7 @@ git fetch origin
 git reset --hard origin/grana
 ```
   
-[**Vrati se na vrh ^**](#reference)
+[**Vrati se na početak^**](#reference)
   
 ### Brisanje poslednjeg commit-a
 
@@ -119,7 +119,7 @@ git diff HEAD origin/grana
 
 
 
-[**Vrati se na vrh ^**](#reference)
+[**Vrati se na početak^**](#reference)
 
 ## Angular
 ### Instalacija angular-a
@@ -157,7 +157,7 @@ Ukoliko postoji više context-a (što je već slučaj i trenutku pisanja ovog te
 Do NuGet terminala se može doći na sledeći način:  
 `Tools > NuGet Package Manager > Packer Manager Console`
 
-[**Vrati se na vrh ^**](#reference)
+[**Vrati se na početak^**](#reference)
 ### Konfiguracija postgresql-a
 
 User: `postgres`  
@@ -172,7 +172,7 @@ Port: `5432`
 `\dt` - prikaz liste tabela  
 `\quit` - izlazam iz PostgreSQL shell-a  
 
-[**Vrati se na vrh ^**](#reference)
+[**Vrati se na početak^**](#reference)
 
 
 ## .NET
@@ -219,4 +219,4 @@ Neke od bitnih komandi:
 
 [Više o pipenv](https://codedamn.com/news/python/how-to-use-pipenv-to-manage-your-python-projects)
 
-[**Vrati se na vrh ^**](#reference)
+[**Vrati se na početak^**](#reference)
