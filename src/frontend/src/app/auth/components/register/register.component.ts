@@ -22,9 +22,14 @@ export class RegisterComponent implements OnInit {
       
     const registerObserver = {
       next: (x:any) => {
+        document.getElementById("neuspesnaRegistracijaMessage")!.style.display = "none";
         console.log('User created');
       },
-      error: (err: Error) => console.log(err)
+      error: (err: Error) => {
+        document.getElementById("neuspesnaRegistracijaMessage")!.style.display = "block";
+        console.log(err);
+
+      }
     };
     // TODO: Naredna linija predstavlja samo trenutno resenje problema.
     // Potrebno je izbaciti registerConfirmPassword iz forme jer uzrokuje BadRequest (zato sto nije ocekivan na backend-u)

@@ -1,10 +1,10 @@
 <div class="row" id="blok">
   <div class="col-md-6 offset-md-3 mt-4">
-      <h3>Register</h3>
+      <h3>Registracija</h3>
       <form  #forma="ngForm" 
             (ngSubmit)="onSubmit(forma)">
           <div class="mb-3">
-              <label for="registerUsername">Username</label>
+              <label for="registerUsername">Korisničko ime</label>
               <input type="text"
                      name="username"
                      ngModel
@@ -30,7 +30,7 @@
                      
           </div>
           <div class="mb-3">
-              <label for="registerPassword">Password</label>
+              <label for="registerPassword">Šifra</label>
               <input type="password"
                      name="password"
                      ngModel
@@ -43,7 +43,7 @@
                      (ngModelChange)="onPasswordConfirmChange(forma)">
           </div>
           <div class="mb-3">
-            <label for="registerConfirmPassword">Confirm Password</label>
+            <label for="registerConfirmPassword">Potvrdi šifru</label>
             <input type="password"
                    name="registerConfirmPassword"
                    ngModel
@@ -59,11 +59,14 @@
           
           <button type="submit"
                   [disabled]="forma.invalid"
-                  class="btn btn-primary">Register <i class="fas fa-sign-in-alt"></i></button>
+                  class="btn btn-primary">Regustruj se<i class="fas fa-sign-in-alt"></i></button>
       </form>
   </div>
   
 </div>
 <div class="col-md-6 offset-md-3 mt-4" id="uspesnaRegistracijaMessage" style="display: none;">
   <p class="alert alert-success text-center" role="alert">Uspesna registracija. Bicete prebaceni na pocetnu stranu...</p>
+</div>
+<div class="col-md-6 offset-md-3 mt-4" id="neuspesnaRegistracijaMessage" style="display: none;">
+  <p class="alert alert-danger text-center" role="alert">Uneli ste postojeće korisničko ime/email.</p>
 </div>

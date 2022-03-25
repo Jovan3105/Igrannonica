@@ -8,7 +8,6 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  isLoggedIn: any;
 
   constructor(public service: AuthService) { }
 
@@ -17,15 +16,11 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.isLoggedIn = this.service.isLoggedIn();
     this.service.updatemenu.subscribe(res => {
       this.MenuDisplay();
     });
 
     this.MenuDisplay();
-    if (this.isLoggedIn){
-      
-    }
     
   }
 
@@ -44,7 +39,6 @@ export class HeaderComponent implements OnInit {
   doLogout()
   {
     this.service.logout();
-    this.isLoggedIn = !this.isLoggedIn;
   }
 
 }

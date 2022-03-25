@@ -18,11 +18,15 @@ export class LoginComponent implements OnInit {
   onSubmit(f: NgForm) {
     const loginObserver = {
       next: (x:any) => { 
-        console.log('User logged in'); 
+        console.log('User logged in');
         this.authService.updatemenu.next();
         this.router.navigateByUrl('/dashboard'); 
       },
-      error: (err: Error) => console.log(err)
+      error: (err: Error) => 
+      {
+        document.getElementById("neUspesanLogin")!.style.display = "block";
+        console.log(err);
+      }
     };
     this.authService.login(f.value).subscribe(loginObserver);
     console.log(f.value);  // { first: '', last: '' }

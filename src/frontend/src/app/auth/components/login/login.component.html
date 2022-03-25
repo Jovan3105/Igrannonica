@@ -1,19 +1,19 @@
 <div class="row" id="blok">
     <div class="col-md-6 offset-md-3 mt-4">
-        <h3>Login</h3>
+        <h3>Prijava</h3>
         <form #f="ngForm" (ngSubmit)="onSubmit(f)">
             <div class="mb-3">
-              <label for="loginUsername" class="form-label">Username</label>
+              <label for="loginUsername" class="form-label">Korisničko ime</label>
               <input type="text" name="username" ngModel required #username="ngModel" class="form-control" id="loginUsername" placeholder="Enter username">
             </div>
             <div class="mb-3">
-              <label for="loginPassword" class="form-label">Password</label>
+              <label for="loginPassword" class="form-label">Šifra</label>
               <input type="password" name="password" ngModel required #password="ngModel" class="form-control" id="loginPassword" placeholder="Enter password">
             </div>
             <div class="mb-3 form-check">
-                <a [routerLink]="['/api/reset-password']">Forgot Password</a>
+                <a [routerLink]="['/reset-password']">Forgot Password</a>
             </div>
-            <button type="submit" [disabled]="f.invalid" class="btn btn-primary"><i class="bi bi-box-arrow-in-right"></i>Login</button>
+            <button type="submit" [disabled]="f.invalid" class="btn btn-primary"><i class="bi bi-box-arrow-in-right"></i>Prijavi se</button>
           </form>
     </div>
 </div>
@@ -21,5 +21,5 @@
   <p class="alert alert-success text-center" role="alert">Uspesan login. Bicete prebaceni na dashboard...</p>
 </div>
 <div class="col-md-6 offset-md-3 mt-4" id="neUspesanLogin" style="display: none;">
-  <p class="alert alert-danger text-center" role="alert">Neuspesan login.</p>
+  <p class="alert alert-danger text-center" role="alert">Neispravno korisničko ime/šifra.</p>
 </div>
