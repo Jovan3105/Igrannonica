@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, mapTo, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { Tokens } from 'src/app/auth/models/tokens';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import jwt_decode from 'jwt-decode';
 import { of, Subject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,6 @@ export class AuthService {
 
   private readonly JWT_TOKEN = 'JWT_TOKEN';
   private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
-  private loggedUser!: string | null;
   private helper!: JwtHelperService;
 
   private _updatemenu = new Subject<void>();
@@ -23,17 +22,18 @@ export class AuthService {
   }
 
   /////////url swaggera/////////
-  apiUrl = "http://localhost:7220/api";
-  authUrl = "http://localhost:7220/api/auth/login";
-  registerUrl = "http://localhost:7220/api/auth/register";
+  apiUrl = environment.apiUrl;
+  LoginUrl = environment.apiUrl + "/auth/login";
+  registerUrl = environment.apiUrl + "/auth/register";
 
-  confirmEmailUrl = "http://localhost:7220/api/Auth/verifyEmail";
+  confirmEmailUrl = environment.apiUrl + "/Auth/verifyEmail";
   /////////url swaggera/////////
+
   constructor(private http: HttpClient, private router: Router) { }
 
 
   login(model: any){
-    return this.http.post(this.authUrl, model).pipe(
+    return this.http.post(this.LoginUrl, model).pipe(
       map((response:any) => {
         const user = response;
         if(user.success){

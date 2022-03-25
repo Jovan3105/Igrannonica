@@ -1,13 +1,14 @@
-import { HttpClient, HttpEvent, HttpEventType, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DatasetService {
   
-  readonly datasetAPIUrl = "http://localhost:7220/api/Dataset";
+  readonly datasetAPIUrl = environment.apiUrl + "/Dataset";
   
   /*
   httpHeader = new HttpHeaders()
