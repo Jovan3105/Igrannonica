@@ -4,16 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask-restful = "*"
-flask = "*"
 numpy = "*"
 pandas = "*"
 chardet = "*"
+uvicorn = "*"
+fastapi = "*"
+pydantic = "*"
+typing = "*"
 
 [dev-packages]
 
 [scripts]
 server = "python ann_server.py"
+dev_server = "python ann_server.py dev"
 
 [requires]
 python_version = "*"

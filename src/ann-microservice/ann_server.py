@@ -1,29 +1,50 @@
-from flask import Flask
-from flask_restful import Resource, Api
-from controllers.dataprep import *
-from controllers.training import *
+import uvicorn
+import sys
+from fastapi import FastAPI
 
-
-app = Flask(__name__)
-api = Api(app)
-app.config['BUNDLE_ERRORS'] = True
-
-hostName = "localhost"
-serverPort = 8081
-
-#################################################################
-# Resources & routes
-
-api.add_resource(DatasetParsing, '/dataset/parsing')
-api.add_resource(Training, '/dataset/stat_indicators')
-api.init_app(app)
+from routers import dataprep
 
 #################################################################
 
-if __name__ == "__main__":        
-    app.run(
-        host=hostName, 
-        port=serverPort, 
-        threaded=True, # thread per request
-        debug=True)
-    print("Server started http://%s:%s" % (hostName, serverPort))
+description = """
+Mikroservis za Artifical Neural Network playground web platformu
+
+## Data Preparation
+
+TODO
+
+## Training
+
+TODO
+"""
+
+tags_metadata = [
+    {
+        "name": "users",
+        "description": "Operations with users. The **login** logic is also here.",
+    }
+]
+
+app = FastAPI(#__name__, 
+    title="ANN mikroservice",
+    description=description
+    )
+
+host_name = "localhost"
+server_port = 8081
+dev_mode = False
+
+#################################################################
+# Routers
+
+app.include_router(dataprep.router)
+
+#################################################################
+
+if __name__ == "__main__":      
+    dev_str = ''
+    if sys.argv[1] == 'dev':
+        dev_mode = True
+        dev_str = ' in dev mode'
+
+    uvicorn.run("ann_server:app", host=host_name, port=server_port, reload=True, workers=4, debug=dev_mode)  
