@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Tokens } from 'src/app/auth/models/tokens';
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
 import { Token } from '@angular/compiler';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import jwt_decode from 'jwt-decode';
@@ -29,11 +29,15 @@ export class AuthService {
 
 
   login(model: any){
+    var circle = document.getElementById('circle')
+    circle!.style.display = "block";
     return this.http.post(this.authUrl, model).pipe(
       map((response:any) => {
         const user = response;
         if(user.success){
+          circle!.style.display = "none";
           this.doLoginUser(user.username,user.data.token);
+          window.location.reload()
           //ubacuje token u localstorage inpectelement->application->localstorage
         }
       })
@@ -41,34 +45,42 @@ export class AuthService {
   }
 
   register(model: any){
+    var circle = document.getElementById('circle')
     console.log(model);
     let headers = new HttpHeaders({
       'confirmEmailUrl': this.confirmEmailUrl
     });
     let options = {headers: headers};   
+    circle!.style.display = "block";
     return this.http.post(this.registerUrl, model, options).pipe(
       map((response:any) => {
         if(response.success){
+          
           var forma = document.getElementById('blok');
           var uspesnaRegistracijaMessage = document.getElementById('uspesnaRegistracijaMessage')
-          if(forma) {
-            forma.style.display = "none";
-          }
+          forma!.style.display = "none";
+          circle!.style.display = "block";
+            
+          circle!.style.display = "none";
+          
           uspesnaRegistracijaMessage!.style.display = "block";
           var hide_button = () => {
             if(uspesnaRegistracijaMessage) {
               const user = response;
               uspesnaRegistracijaMessage.style.display = "none";
-              this.doLoginUser(user.username,user.data.token);
-              this.router.navigateByUrl('/dashboard');
+              this.router.navigateByUrl('/');
             }
+            
           }
-          setTimeout(hide_button, 2000);
+          setTimeout(hide_button, 3000);
         }
+        
       })
+      
     );
 
   }
+
 
   isLoggedIn() {
     if (this.getJwtToken()) return true;
