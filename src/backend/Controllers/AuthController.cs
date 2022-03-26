@@ -16,7 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace backend.Controllers
 {
 
-
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -269,6 +269,7 @@ namespace backend.Controllers
                 return false;
             }
         }
+        
 
     }
 }

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 namespace backend.Controllers
 {
 
-
+    
     [Route("api/[controller]")]
     public class CardController:ControllerBase
     {

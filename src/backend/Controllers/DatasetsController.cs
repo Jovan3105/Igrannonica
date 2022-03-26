@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Web;
 using Newtonsoft.Json;
 using System.IO;
+using System.Net.Http.Headers;
 
 namespace backend.Controllers
 {
@@ -25,8 +26,8 @@ namespace backend.Controllers
 
        
         [HttpGet]
-        [Route("{p}")]
-        public async Task<ActionResult<List<Dataset>>> ges(string p)
+        [Route("")]
+        public async Task<ActionResult<List<Dataset>>> ges(string? p)
         {
             List<Dataset> lista = new List<Dataset>();
             if (p == "1")
@@ -47,7 +48,7 @@ namespace backend.Controllers
             return Ok(lista);
         }
         [HttpPost]
-        [Route("addDataset")]
+        [Route("")]
         public async Task<ActionResult<List<Dataset>>> insert([FromForm]datasetDto dto) {
 
             Dataset dataset = dto.dataSet;
@@ -226,7 +227,38 @@ namespace backend.Controllers
 
             return Ok("da");
         }
+        [HttpPost]
+        [Route("mlfajl")]
+        public async Task<ActionResult<string>> sendToMl(IFormFile file)
+        {
+           // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
+            var url = "http://localhost:8081/dataset/parsing";
+
+            HttpClient client = new HttpClient();
+
+            var fileStreamContent = new StreamContent(file.OpenReadStream());
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(file.FileName));
+
+            var response = await client.PostAsync(url, multipartFormContent);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return Ok(responseString);
+
+
+
+
+
+
+
+
+
+        }
+        
 
 
     }
