@@ -25,7 +25,7 @@ namespace backend.Controllers
        
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<List<Dataset>>> ges(string? p)
+        public async Task<ActionResult<List<Dataset>>> fetchAllDatasets(string? p)
         {
             List<Dataset> lista = new List<Dataset>();
             if (p == "1")
@@ -48,7 +48,7 @@ namespace backend.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<List<Dataset>>> insert([FromForm]datasetDto dto) {
+        public async Task<ActionResult<List<Dataset>>> addDataset([FromForm]datasetDto dto) {
 
             Dataset dataset = dto.dataSet;
             IFormFile file = dto.fajl;
@@ -82,8 +82,8 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        [Route("data/{id}")]
-        public async Task<ActionResult<string>> getData(int id,int page)
+        [Route("{id:int}/data")]
+        public async Task<ActionResult<string>> fetchData(int id, int page)
         {
             if (page == 0)
             {
@@ -146,10 +146,10 @@ namespace backend.Controllers
                 return Ok(JsonConvert.SerializeObject(listaRecnika));
             }
         }
-     
+        
         [HttpPost]
-        [Route("upload")]
-        public async Task<ActionResult<string>> uploadData(IFormFile file)
+        [Route("upload-old")]
+        public async Task<ActionResult<string>> uploadDataOld(IFormFile file)
         {
             if (file.Length == 0)
             {
@@ -203,19 +203,19 @@ namespace backend.Controllers
 
         [HttpPut]
         [Route("")]
-        public async Task<ActionResult<string>> putDataset(int id,Dataset data)
+        public async Task<ActionResult<string>> updateDataset(int id, Dataset data)
         {
             //var dataset = await this.datasetContext.Datasets.FindAsync(id);
             data.Id = id;
             datasetContext.Entry(data).State = EntityState.Modified;
-             await  datasetContext.SaveChangesAsync();
+            await datasetContext.SaveChangesAsync();
 
             return Ok("da");
         }
 
         [HttpPost]
-        [Route("mlfajl")]
-        public async Task<ActionResult<string>> sendToMl(IFormFile file)
+        [Route("upload")]
+        public async Task<ActionResult<string>> uploadData(IFormFile file)
         {
            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
