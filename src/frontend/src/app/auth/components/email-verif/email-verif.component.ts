@@ -15,7 +15,7 @@ export class EmailVerifComponent implements OnInit {
     const emailVerifObserver = {
       next: (x:any) => { 
         console.log('Email is verified'); 
-        this.router.navigateByUrl('/api/login'); 
+        this.router.navigateByUrl('/login'); 
       },
       error: (err: Error) => {
         console.log(err)
