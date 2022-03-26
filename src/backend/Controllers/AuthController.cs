@@ -61,24 +61,9 @@ namespace backend.Controllers
                     }
                 });
             }
-            user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
-            user.VerifiedEmail = false;
-            try
-            {
-                this.userContext.Users.Add(user);
 
-                await this.userContext.SaveChangesAsync();
-
-                //slanje verifikacionog mejla
-
-                await sendVerificationEmail(user.Email);
-
-                return Ok(new
-                {
-                    success = true
-                });
-            }
-            catch(Exception ex)
+            User userDB = this.userContext.Users.FirstOrDefault(x => x.Username == user.Username);
+            if (userDB != null)
             {
                 return BadRequest(new
                 {
@@ -89,12 +74,46 @@ namespace backend.Controllers
                         errors = new[] {
                             new {
                                 message = "bad request",
-                                code = "userOrEmail_AlreadyExists"
+                                code = "username_AlreadyExists"
                             }
                         }
                     }
                 });
             }
+            userDB = this.userContext.Users.FirstOrDefault(x => x.Email == user.Email);
+            if (userDB != null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "email_AlreadyExists"
+                            }
+                        }
+                    }
+                });
+            }
+
+            user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
+            user.VerifiedEmail = false;
+            
+            this.userContext.Users.Add(user);
+
+            await this.userContext.SaveChangesAsync();
+
+            //slanje verifikacionog mejla
+
+            await sendVerificationEmail(user.Email);
+
+            return Ok(new
+            {
+                success = true
+            });
         }
 
         [HttpPost("login")]
