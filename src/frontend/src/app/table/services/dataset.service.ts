@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 })
 export class DatasetService {
   
-  readonly datasetAPIUrl = environment.apiUrl + "/Dataset";
+  readonly datasetAPIUrl = environment.apiUrl + "/Datasets";
   
   /*
   httpHeader = new HttpHeaders()
@@ -17,14 +17,14 @@ export class DatasetService {
   constructor(private http:HttpClient) { }
 
   getDatasets():Observable<any[]>{
-    return this.http.get<any>(this.datasetAPIUrl + '/getAll').pipe(
+    return this.http.get<any>(this.datasetAPIUrl).pipe(
       tap(_ => console.log(`fetched all data`)),
       catchError(this.handleError<any>('getDatasets'))
     );
   }
 
   getpublicDatasets():Observable<any[]>{
-    return this.http.get<any>(this.datasetAPIUrl + '/getPublic').pipe(
+    return this.http.get<any>(this.datasetAPIUrl + '?p=1').pipe(
       tap(_ => console.log(`fetched public data`)),
       catchError(this.handleError<any>('getpublicDatasets'))
     );
@@ -35,14 +35,14 @@ export class DatasetService {
   }
 
   getData(id: number):Observable<any[]>{
-    return this.http.get<any>(this.datasetAPIUrl + `/getData?id=${id}`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/data`).pipe(
       tap(_ => console.log(`fetched data id=${id}`)),
       catchError(this.handleError<any>('getData'))
     );
   }
   
   getPage(id: number,page: number):Observable<any[]>{
-    return this.http.get<any>(this.datasetAPIUrl + `/getPage?id=${id}&page=${page}`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/data?page=${page}`).pipe(
       tap(_ => console.log(`fetched page id=${id}, page=${page}`)),
       catchError(this.handleError<any>('getPage'))
     );
@@ -86,7 +86,7 @@ export class DatasetService {
   }
 
   updateDataset(id: number, data: any):Observable<any[]>{
-    return this.http.put<any>(this.datasetAPIUrl + `/update/${id}`, data).pipe(
+    return this.http.put<any>(this.datasetAPIUrl + `/${id}`, data).pipe(
       tap(_ => console.log(`updated data id=${id}`)),
       catchError(this.handleError<any>('uploadDataset'))
     );;

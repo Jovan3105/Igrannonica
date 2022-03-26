@@ -23,6 +23,9 @@ async def parse_dataset(
 
     '''
 
+    print(f"####:     Params=(dataset_source,{dataset_source}); (delimiter,{delimiter});"
+    + f" (lineterminator,{lineterminator}); (quotechar,{quotechar}); (escapechar,{escapechar}); (encoding,{encoding}); ")
+
     ( parsed_dataset, column_types ) = dataprep_service.parse_dataset(
         dataset_source,
         delimiter = delimiter, 
