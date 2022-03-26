@@ -41,9 +41,24 @@ namespace backend.Controllers
         {
             //proveravanje maila
 
+            
+            var response = new
+            {
+                success = false,
+                data = new
+                {
+                    token = "",
+                    errors = new List<object>()
+
+
+
+                }
+            };
+
+
             if (!IsValidEmail(user.Email))
             {
-                return BadRequest(new
+                /*return BadRequest(new
                 {
                     success = false,
                     data = new
@@ -59,13 +74,18 @@ namespace backend.Controllers
 
 
                     }
+                });*/
+                response.data.errors.Add(new
+                {
+                    message = "bad request",
+                    code = "email_notValid"
                 });
             }
 
             User userDB = this.userContext.Users.FirstOrDefault(x => x.Username == user.Username);
             if (userDB != null)
             {
-                return BadRequest(new
+                /*return BadRequest(new
                 {
                     success = false,
                     data = new
@@ -78,12 +98,17 @@ namespace backend.Controllers
                             }
                         }
                     }
+                });*/
+                response.data.errors.Add(new
+                {
+                    message = "bad request",
+                    code = "username_AlreadyExists"
                 });
             }
             userDB = this.userContext.Users.FirstOrDefault(x => x.Email == user.Email);
             if (userDB != null)
             {
-                return BadRequest(new
+                /*return BadRequest(new
                 {
                     success = false,
                     data = new
@@ -96,7 +121,17 @@ namespace backend.Controllers
                             }
                         }
                     }
+                });*/
+                response.data.errors.Add(new
+                {
+                    message = "bad request",
+                    code = "email_AlreadyExists"
                 });
+            }
+            
+            if(response.data.errors.Count>0)
+            {
+                return BadRequest(response);
             }
 
             user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
@@ -120,7 +155,7 @@ namespace backend.Controllers
         public async Task<ActionResult<string>> Login(userDto request)
         {
             //proveravanje da li postoji username
-            User user = this.userContext.Users.FirstOrDefault(user => user.Username == request.Username || user.Email == request.Username);
+            User user = this.userContext.Users.FirstOrDefault(user => user.Username == request.UsernameOrEmail || user.Email == request.UsernameOrEmail);
             if (user == null)
             {
 
@@ -133,7 +168,7 @@ namespace backend.Controllers
                         errors = new[] {
                             new {
                                 message = "bad request",
-                                code = "username_notFound"
+                                code = "user_notFound"
                             }
                             }
 

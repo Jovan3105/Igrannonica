@@ -9,7 +9,7 @@ namespace backend
     public class userDto
     {
         [Required]
-        public string  Username { get; set;} = string.Empty;
+        public string  UsernameOrEmail { get; set;} = string.Empty;
         [Required]
         public string Password  { get; set; }= string.Empty;
     }
