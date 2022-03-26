@@ -14,8 +14,6 @@ namespace backend.Controllers
     [ApiController]
     public class DatasetsController : ControllerBase
     {
-
-
         private readonly IConfiguration _configuration;
         private readonly DatasetContext datasetContext;
         public DatasetsController(DatasetContext datasetContext, IConfiguration configuration)
@@ -47,6 +45,7 @@ namespace backend.Controllers
             }
             return Ok(lista);
         }
+
         [HttpPost]
         [Route("")]
         public async Task<ActionResult<List<Dataset>>> insert([FromForm]datasetDto dto) {
@@ -71,29 +70,21 @@ namespace backend.Controllers
 
             var filePath = "C:\\Users\\Pivan\\Documents\\";
 
-            
+            string path = Path.Combine(filePath, fileName);
+            using StreamWriter f = new(path);
+            await f.WriteAsync(text);
 
-          
-          
-                string path = Path.Combine(filePath, fileName);
-                using StreamWriter f = new(path);
-                await f.WriteAsync(text);
             dataset.Path=path;
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
             return Ok("Success");
-
-
-
-
         }
+
         [HttpGet]
         [Route("data/{id}")]
         public async Task<ActionResult<string>> getData(int id,int page)
         {
-
-
             if (page == 0)
             {
                 var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
@@ -139,25 +130,21 @@ namespace backend.Controllers
                 {
                     upper = (page ) * 20;
                 }
-               // Console.WriteLine(page+"\n\n\n\n\n\n\n"+upper);
+               
+                // Console.WriteLine(page+"\n\n\n\n\n\n\n"+upper);
                 var listaRecnika = new List<Dictionary<string, string>>();
                 for (int i = (page - 1) * 20; i < upper; i++)
                 {
-                   // Console.WriteLine(i);
+                    // Console.WriteLine(i);
                     var objResult = new Dictionary<string, string>();
                     for (int j = 0; j < header.Length; j++)
                         objResult.Add(header[j], csv[i][j]);
-
 
                     listaRecnika.Add(objResult);
                 }
 
                 return Ok(JsonConvert.SerializeObject(listaRecnika));
             }
-
-
-
-
         }
      
         [HttpPost]
@@ -182,7 +169,6 @@ namespace backend.Controllers
             var filePath = @"C:\Users\Pivan\Documents\";
 
 
-
             try
             {
                 string path = Path.Combine(filePath, fileName);
@@ -197,6 +183,7 @@ namespace backend.Controllers
 
             return Ok("");
         }
+
         [HttpDelete]
         [Route("")]
         public async Task<ActionResult<string>> deleteDataset(int id)
@@ -212,8 +199,8 @@ namespace backend.Controllers
                 await this.datasetContext.SaveChangesAsync();
                 return Ok("Its okey");
             }
-
         }
+
         [HttpPut]
         [Route("")]
         public async Task<ActionResult<string>> putDataset(int id,Dataset data)
@@ -223,10 +210,9 @@ namespace backend.Controllers
             datasetContext.Entry(data).State = EntityState.Modified;
              await  datasetContext.SaveChangesAsync();
 
-
-
             return Ok("da");
         }
+
         [HttpPost]
         [Route("mlfajl")]
         public async Task<ActionResult<string>> sendToMl(IFormFile file)
@@ -248,18 +234,6 @@ namespace backend.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
-
-
-
-
-
-
-
-
-
         }
-        
-
-
     }
 }
