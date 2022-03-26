@@ -1,13 +1,13 @@
 <div class="row" id="blok">
     <div class="col-md-6 offset-md-3 mt-4">
-        <h3>Prijava</h3>
+        <h3>Login</h3>
         <form #f="ngForm" (ngSubmit)="onSubmit(f)">
             <div class="mb-3">
-              <label for="loginUsername" class="form-label">Korisničko ime</label>
+              <label for="loginUsername" class="form-label">Username</label>
               <input type="text" name="username" ngModel required #username="ngModel" class="form-control" id="loginUsername" placeholder="Enter username">
             </div>
             <div class="mb-3">
-              <label for="loginPassword" class="form-label">Šifra</label>
+              <label for="loginPassword" class="form-label">Password</label>
               <input type="password" name="password" ngModel required #password="ngModel" class="form-control" id="loginPassword" placeholder="Enter password">
             </div>
             <div class="mb-3 form-check">
@@ -22,11 +22,12 @@
               </div>
             </div>
           </form>
+          <div class="col-md-6 offset-md-3 mt-4" id="neUspesanLogin" style="display: none;">
+            <p class="alert alert-danger text-center" role="alert">Something went wrong.</p>
+          </div>
     </div>
+    
 </div>
 <div class="col-md-6 offset-md-3 mt-4" id="uspesanLogin" style="display: none;">
-  <p class="alert alert-success text-center" role="alert">Uspesan login. Bicete prebaceni na dashboard...</p>
-</div>
-<div class="col-md-6 offset-md-3 mt-4" id="neUspesanLogin" style="display: none;">
-  <p class="alert alert-danger text-center" role="alert">Neispravno korisničko ime/šifra.</p>
+  <p class="alert alert-success text-center" role="alert">Successful login. You will be redirected automatically...</p>
 </div>

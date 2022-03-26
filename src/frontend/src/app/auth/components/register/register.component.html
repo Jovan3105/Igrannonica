@@ -1,10 +1,10 @@
 <div class="row" id="blok">
   <div class="col-md-6 offset-md-3 mt-4">
-      <h3>Registracija</h3>
+      <h3>Registration</h3>
       <form  #forma="ngForm" 
             (ngSubmit)="onSubmit(forma)">
           <div class="mb-3">
-              <label for="registerUsername">Korisničko ime</label>
+              <label for="registerUsername">Username</label>
               <input type="text"
                      name="username"
                      ngModel
@@ -30,7 +30,7 @@
                      
           </div>
           <div class="mb-3">
-              <label for="registerPassword">Šifra</label>
+              <label for="registerPassword">Password</label>
               <input type="password"
                      name="password"
                      ngModel
@@ -43,7 +43,7 @@
                      (ngModelChange)="onPasswordConfirmChange(forma)">
           </div>
           <div class="mb-3">
-            <label for="registerConfirmPassword">Potvrdi šifru</label>
+            <label for="registerConfirmPassword">Confirm password</label>
             <input type="password"
                    name="registerConfirmPassword"
                    ngModel
@@ -68,14 +68,17 @@
                     </div>
                   </div>
       </form>
+      <div class="col-md-6 offset-md-3 mt-4" id="serverError" style="display: none;">
+        <p class="alert alert-danger text-center" role="alert">Something went wrong.</p>
+      </div>
       
   </div>
   
 </div>
 
 <div class="col-md-6 offset-md-3 mt-4" id="uspesnaRegistracijaMessage" style="display: none;">
-  <p class="alert alert-success text-center" role="alert">Uspesna registracija. Bicete prebaceni na pocetnu stranu...</p>
+  <p class="alert alert-success text-center" role="alert">You're almost done! Check your email for a confirmation link.</p>
 </div>
-<div class="col-md-6 offset-md-3 mt-4" id="neuspesnaRegistracijaMessage" style="display: none;">
-  <p class="alert alert-danger text-center" role="alert">Uneli ste postojeće korisničko ime/email.</p>
+<div class="col-md-6 offset-md-3 mt-4" id="alreadyExists" style="display: none;">
+  <p class="alert alert-danger text-center" role="alert">Username/Email already exists</p>
 </div>

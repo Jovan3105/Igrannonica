@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { Router } from '@angular/router';
+import { timeout } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -19,16 +20,38 @@ export class RegisterComponent implements OnInit {
       console.log("Predugacak email");
       return;
     }
-      
+    
     const registerObserver = {
       next: (x:any) => {
-        document.getElementById("neuspesnaRegistracijaMessage")!.style.display = "none";
         console.log('User created');
       },
-      error: (err: Error) => {
-        document.getElementById("neuspesnaRegistracijaMessage")!.style.display = "block";
-        console.log(err);
+      error: (err: any) => {
+        //userOrEmail_AlreadyExists
+        if(err['error'] instanceof ProgressEvent ){
+          var registrationError = document.getElementById('serverError');
+          var circle = document.getElementById('circle');
+          registrationError!.style.display = "block";
+          f.controls['username'].setValue(null)
+          f.controls['email'].setValue(null)
+          f.controls['password'].setValue(null)
+          f.controls['registerConfirmPassword'].setValue(null)
+          circle!.style.display = "none";
+          setTimeout(() => {
+            registrationError!.style.display = "none";
+          }, 2000);
+        }
+        else if((err['error']['data']['errors']['0']['code']) == "userOrEmail_AlreadyExists"){
+          var registrationError = document.getElementById('alreadyExists');
+          var circle = document.getElementById('circle');
+          registrationError!.style.display = "block";
+          circle!.style.display = "none";
+          setTimeout(() => {
+            registrationError!.style.display = "none";
+          }, 2000);
+        }
 
+        
+        
       }
     };
     // TODO: Naredna linija predstavlja samo trenutno resenje problema.
