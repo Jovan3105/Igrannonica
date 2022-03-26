@@ -59,11 +59,20 @@
           
           <button type="submit"
                   [disabled]="forma.invalid"
-                  class="btn btn-primary">Regustruj se<i class="fas fa-sign-in-alt"></i></button>
+                  class="btn btn-primary">Register </button>
+                  <div id="circle" style="display: none;">
+                    <div class="loader">
+                      <div class="loader">
+                          
+                      </div>
+                    </div>
+                  </div>
       </form>
+      
   </div>
   
 </div>
+
 <div class="col-md-6 offset-md-3 mt-4" id="uspesnaRegistracijaMessage" style="display: none;">
   <p class="alert alert-success text-center" role="alert">Uspesna registracija. Bicete prebaceni na pocetnu stranu...</p>
 </div>

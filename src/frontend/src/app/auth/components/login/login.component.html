@@ -13,7 +13,14 @@
             <div class="mb-3 form-check">
                 <a [routerLink]="['/reset-password']">Forgot Password</a>
             </div>
-            <button type="submit" [disabled]="f.invalid" class="btn btn-primary"><i class="bi bi-box-arrow-in-right"></i>Prijavi se</button>
+            <button type="submit" [disabled]="f.invalid" class="btn btn-primary">Login</button>
+            <div id="circle" style="display: none;">
+              <div class="loader">
+                <div class="loader">
+                    
+                </div>
+              </div>
+            </div>
           </form>
     </div>
 </div>
