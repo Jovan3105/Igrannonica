@@ -40,8 +40,17 @@ export class RegisterComponent implements OnInit {
             registrationError!.style.display = "none";
           }, 2000);
         }
-        else if((err['error']['data']['errors']['0']['code']) == "userOrEmail_AlreadyExists"){
-          var registrationError = document.getElementById('alreadyExists');
+        else if((err['error']['data']['errors']['0']['code']) == "username_AlreadyExists"){
+          var registrationError = document.getElementById('usernameAlreadyExists');
+          var circle = document.getElementById('circle');
+          registrationError!.style.display = "block";
+          circle!.style.display = "none";
+          setTimeout(() => {
+            registrationError!.style.display = "none";
+          }, 2000);
+        }
+        else if((err['error']['data']['errors']['0']['code']) == "email_AlreadyExists"){
+          var registrationError = document.getElementById('emailAlreadyExists');
           var circle = document.getElementById('circle');
           registrationError!.style.display = "block";
           circle!.style.display = "none";
