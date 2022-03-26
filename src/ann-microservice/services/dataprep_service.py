@@ -1,12 +1,19 @@
 import numpy as np
 import pandas as pd
 #from chardet.universaldetector import UniversalDetector # for future revision
+import logging
+
+logger = logging.getLogger()
+
+#if dev_mode:
+logger.setLevel(logging.DEBUG)
+
 
 encoding_first_n_lines = 50
 
 
 def parse_dataset(
-    file, 
+    dataset_source, 
     delimiter=None, 
     lineterminator=None, 
     quotechar='"', 
@@ -23,9 +30,10 @@ def parse_dataset(
     df_dict = None
     column_types = None
 
-    if(file.filename.lower().endswith('.csv')):
+    if(dataset_source.lower().endswith('.csv')):
+        print("####:     Given dataset appears to be .csv file")
         df = pd.read_csv(
-            file, 
+            dataset_source, 
             delimiter        = delimiter, 
             lineterminator   = lineterminator, 
             quotechar        = quotechar,
@@ -42,6 +50,8 @@ def parse_dataset(
 
         df_dict = df.to_dict('records')
 
+        print('####:     Parsing complete.')
+
     return df_dict, column_types
     
 
@@ -56,7 +66,7 @@ def get_encoding(file, n_lines=50):
 
     detector.close()
 
-    print("Log: detected encoding is {}. Detection confidence is {}".format(
+    print("####:     detected encoding is {}. Detection confidence is {}".format(
         detector.result['encoding'],
         detector.result['confidence']))
 
