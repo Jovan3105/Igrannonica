@@ -219,7 +219,7 @@ namespace backend.Controllers
         {
            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
-            var url = "http://localhost:8081/dataset/parsing";
+            var url = _configuration["Addresses:Microservice"]+"/dataset/parsing";
 
             HttpClient client = new HttpClient();
 

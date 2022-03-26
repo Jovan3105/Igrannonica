@@ -309,7 +309,11 @@ namespace backend.Controllers
                 
                 string message = @"Hello, <b>" + user.Username 
                                 + @"</b>.<br> Please confirm your email 
-                                    <a href='http://localhost:4200/verifyEmail?email=" 
+                                    <a href='"
+                                +
+                                _configuration["Addresses:Frontend"]
+                                +
+                                    "/verifyEmail?email=" 
                                 + user.Email 
                                 + "&token=" + GenerateMyToken(user.Email)
                                 /*Convert.ToBase64String(
