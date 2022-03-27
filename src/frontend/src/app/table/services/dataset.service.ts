@@ -31,7 +31,7 @@ export class DatasetService {
   }
 
   insertDataset(data:any):Observable<any[]>{
-    return this.http.post<any>(this.datasetAPIUrl + '/insert',data);
+    return this.http.post<any>(this.datasetAPIUrl, data);
   }
 
   getData(id: number):Observable<any[]>{
@@ -79,7 +79,7 @@ export class DatasetService {
   }
 
   deleteDataset(id: number):Observable<any[]>{
-    return this.http.delete<any>(this.datasetAPIUrl + `/delete/${id}`).pipe(
+    return this.http.delete<any>(this.datasetAPIUrl + `/${id}`).pipe(
       tap(_ => console.log(`deleted data id=${id}`)),
       catchError(this.handleError<any>('deleteDataset'))
     );
