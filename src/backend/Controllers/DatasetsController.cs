@@ -9,6 +9,7 @@ using System.IO;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
+using System.Net;
 
 namespace backend.Controllers
 {
@@ -288,6 +289,29 @@ namespace backend.Controllers
 
 
             return Ok(lines);
+        }
+        [HttpPost]
+        [Route("/begin_training")]
+        public async Task<ActionResult<string>> beginTraining(int epoches, string algorithm)
+        {
+            var data = new
+            {
+                epoches = epoches,
+                algorithm = algorithm
+            };
+            var url = _configuration["Addresses:Microservice"] + "/training";
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+            var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
+            streamWriter.Write(data);
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            var streamReader = new StreamReader(httpResponse.GetResponseStream());
+            
+            var result = streamReader.ReadToEnd();
+            
+            return Ok(result);
+
         }
        
         
