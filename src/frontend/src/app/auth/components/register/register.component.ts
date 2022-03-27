@@ -3,6 +3,7 @@ import { NgForm, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { Router } from '@angular/router';
 import { timeout } from 'rxjs';
+import { Tuple } from 'ag-grid-community/dist/lib/filter/provided/simpleFilter';
 
 @Component({
   selector: 'app-register',
@@ -40,27 +41,29 @@ export class RegisterComponent implements OnInit {
             registrationError!.style.display = "none";
           }, 2000);
         }
-        else if((err['error']['data']['errors']['0']['code']) == "username_AlreadyExists"){
-          var registrationError = document.getElementById('usernameAlreadyExists');
-          var circle = document.getElementById('circle');
-          registrationError!.style.display = "block";
-          circle!.style.display = "none";
-          setTimeout(() => {
-            registrationError!.style.display = "none";
-          }, 2000);
+        else{
+          err['error']['data']['errors'].forEach(function (item:any) {
+            if(item['code'] == "username_AlreadyExists"){
+              var usernameError = document.getElementById('usernameAlreadyExists');
+              var circle = document.getElementById('circle');
+              usernameError!.style.display = "block";
+              circle!.style.display = "none";
+              setTimeout(() => {
+                usernameError!.style.display = "none";
+              }, 2000);
+            }
+            if(item['code'] == "email_AlreadyExists"){
+              var emailError = document.getElementById('emailAlreadyExists');
+              var circle = document.getElementById('circle');
+              emailError!.style.display = "block";
+              circle!.style.display = "none";
+              setTimeout(() => {
+                emailError!.style.display = "none";
+              }, 2000);
+            }
+          });
         }
-        else if((err['error']['data']['errors']['0']['code']) == "email_AlreadyExists"){
-          var registrationError = document.getElementById('emailAlreadyExists');
-          var circle = document.getElementById('circle');
-          registrationError!.style.display = "block";
-          circle!.style.display = "none";
-          setTimeout(() => {
-            registrationError!.style.display = "none";
-          }, 2000);
-        }
-
-        
-        
+       
       }
     };
     // TODO: Naredna linija predstavlja samo trenutno resenje problema.
