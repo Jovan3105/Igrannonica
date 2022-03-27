@@ -235,5 +235,31 @@ namespace backend.Controllers
 
             return Ok(responseString);
         }
+
+        [HttpGet]
+        [Route("{id}/stat_indicators")]
+        public async Task<ActionResult<string>> statIndicators(int id)
+        {
+
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+
+            var url = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
+
+            HttpClient client = new HttpClient();
+
+            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(dataset.Path));
+
+            var response = await client.PostAsync(url, multipartFormContent);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return Ok(responseString);
+
+        }
+
     }
 }
