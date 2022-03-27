@@ -11,7 +11,7 @@ router = APIRouter(prefix="/data-preparation")
 
 @router.get("/parse")
 async def parse_dataset(
-    dataset_source : AnyHttpUrl= Query(None, title='Dataset Source', description='Lokacija resursa'),
+    dataset_source : AnyHttpUrl,
     delimiter      : Optional[str] = None,
     lineterminator : Optional[str] = None,
     quotechar      : Optional[str] = None,
