@@ -9,9 +9,9 @@ router = APIRouter(prefix="/data-preparation")
 
 #################################################################
 
-@router.post("/parse")
+@router.get("/parse")
 async def parse_dataset(
-    dataset_source : AnyHttpUrl= Query(None, title='Dataset Source', description='Lokacija resursa'),
+    dataset_source : AnyHttpUrl,
     delimiter      : Optional[str] = None,
     lineterminator : Optional[str] = None,
     quotechar      : Optional[str] = None,
@@ -32,4 +32,4 @@ async def parse_dataset(
         encoding = encoding 
         )
 
-    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types }, 200    
+    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types }, 200  

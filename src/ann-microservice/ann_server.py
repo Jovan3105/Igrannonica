@@ -43,7 +43,7 @@ app.include_router(dataprep.router)
 
 if __name__ == "__main__":      
     dev_str = ''
-    if sys.argv[1] == 'dev':
+    if len(sys.argv) > 1 and sys.argv[1] == 'dev':
         dev_mode = True
         dev_str = ' in dev mode'
 

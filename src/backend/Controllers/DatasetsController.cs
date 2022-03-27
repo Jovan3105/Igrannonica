@@ -7,6 +7,8 @@ using System.Web;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace backend.Controllers
 {
@@ -16,6 +18,8 @@ namespace backend.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly DatasetContext datasetContext;
+        private static readonly HttpClient client = new HttpClient();
+
         public DatasetsController(DatasetContext datasetContext, IConfiguration configuration)
         {
             this.datasetContext = datasetContext;
@@ -41,7 +45,7 @@ namespace backend.Controllers
 
             foreach (var item in lista)
             {
-                item.Path = "";
+               // item.Path = "";
             }
             return Ok(lista);
         }
@@ -215,25 +219,37 @@ namespace backend.Controllers
 
         [HttpPost]
         [Route("upload")]
-        public async Task<ActionResult<string>> uploadData(IFormFile file)
+        public async Task<ActionResult<string>> uploadData([FromBody] DatasetUpdateDto datasetUpdateDto)
         {
-           // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+            string csvLocation = "http://localhost:7220/api/Datasets/getCsv/?name=";
+            csvLocation += datasetUpdateDto.Name;   
 
-            var url = _configuration["Addresses:Microservice"]+"/dataset/parsing";
+            var microserviceURL = _configuration["Addresses:Microservice"]+"/data-preparation/parse";
+            var client = new HttpClient();
+            
+            var res = await client.GetAsync(string.Format(microserviceURL + "/?dataset_source={0},", csvLocation));
 
-            HttpClient client = new HttpClient();
 
-            var fileStreamContent = new StreamContent(file.OpenReadStream());
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
-            var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(file.FileName));
 
-            var response = await client.PostAsync(url, multipartFormContent);
+            
 
-            var responseString = await response.Content.ReadAsStringAsync();
+            var responseString = await res.Content.ReadAsStringAsync();
 
+
+
+            //res.Result.EnsureSuccessStatusCode();
             return Ok(responseString);
+                
+               
+            
+
+
+            //var response = await client.PostAsync(microserviceURL, content);
+
+            //var responseString = await response.Content.ReadAsStringAsync();
+            return BadRequest();
         }
 
         [HttpGet]
@@ -260,6 +276,21 @@ namespace backend.Controllers
             return Ok(responseString);
 
         }
+        [HttpGet]
+        [Route("getCsv")]
+        public async Task<ActionResult<string>> getCsv(string name)
+        {
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Name==name);
+            string path = dataset.Path;
+            var csv = new List<string[]>();
+            var lines = System.IO.File.ReadAllLines(path);
+
+
+
+            return Ok(lines);
+        }
+       
+        
 
     }
 }
