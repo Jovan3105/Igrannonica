@@ -46,7 +46,7 @@ namespace backend.Controllers
 
             foreach (var item in lista)
             {
-                item.Path = "";
+               // item.Path = "";
             }
             return Ok(lista);
         }
@@ -223,24 +223,27 @@ namespace backend.Controllers
         public async Task<ActionResult<string>> uploadData([FromBody] DatasetUpdateDto datasetUpdateDto)
         {
             // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+            string csvLocation = "http://localhost:7220/api/Datasets/getCsv/?name=";
+            csvLocation += datasetUpdateDto.Name;   
 
-            using (var client = new HttpClient())
-            {
-                var res = client.PostAsync(microserviceURL, 
-                    new StringContent(JsonConvert.SerializeObject(datasetUpdateDto))
-                );
+            var client = new HttpClient();
+            
+            var res = await client.GetAsync(string.Format(microserviceURL + "/?dataset_source={0},", csvLocation));
 
-                try
-                {
-                    res.Result.EnsureSuccessStatusCode();
-                    return Ok(res.Result);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    
-                }
-            }
+
+
+
+            
+
+            var responseString = await res.Content.ReadAsStringAsync();
+
+
+
+            //res.Result.EnsureSuccessStatusCode();
+            return Ok(responseString);
+                
+               
+            
 
 
             //var response = await client.PostAsync(microserviceURL, content);
@@ -248,5 +251,21 @@ namespace backend.Controllers
             //var responseString = await response.Content.ReadAsStringAsync();
             return BadRequest();
         }
+        [HttpGet]
+        [Route("getCsv")]
+        public async Task<ActionResult<string>> getCsv(string name)
+        {
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Name==name);
+            string path = dataset.Path;
+            var csv = new List<string[]>();
+            var lines = System.IO.File.ReadAllLines(path);
+
+
+
+            return Ok(lines);
+        }
+       
+        
+
     }
 }
