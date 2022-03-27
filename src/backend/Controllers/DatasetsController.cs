@@ -72,7 +72,25 @@ namespace backend.Controllers
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
-            var filePath = "C:\\Users\\Pivan\\Documents\\";
+            //var filePath = "C:\\Users\\Pivan\\Documents\\";
+            var filePath = string.Format(@"../../files/");
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+            filePath += dto.dataSet.UserID;
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            filePath=filePath +"/"+dto.dataSet.Id+"/";
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+
 
             string path = Path.Combine(filePath, fileName);
             using StreamWriter f = new(path);
@@ -291,8 +309,14 @@ namespace backend.Controllers
 
             return Ok(lines);
         }
-       
-        
+        [HttpGet]
+        [Route("mesto")]
+        public async Task<ActionResult<string>> getpathhh()
+        {
+            return Ok(System.Reflection.Assembly.GetEntryAssembly().Location);
+        }
+
+
 
     }
 }
