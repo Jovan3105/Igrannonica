@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
         var loginError = document.getElementById('neUspesanLogin');
         var circle = document.getElementById('circle');
         loginError!.style.display = "block";
-        f.controls['usernameOrPassword'].setValue(null)
+        f.controls['usernameOrEmail'].setValue(null)
         f.controls['password'].setValue(null)
         circle!.style.display = "none";
         setTimeout(() => {

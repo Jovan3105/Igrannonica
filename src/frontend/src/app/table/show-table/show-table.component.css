@@ -15,6 +15,7 @@
 .panel-table > .panel-heading {
     display: table-header-group;
     background: transparent;
+    border-left: 0;
 }
 .panel-table > .panel-body {
     display: table-row-group;
@@ -58,4 +59,11 @@
 }
 .panel-table > .panel-footer > .tr > .td:last-child {
     border-radius: 0 0 4px 0;
+}
+#buttons{
+    display: inline-flex;
+    margin-bottom: 10px;
+}
+.btn-secondary{
+    margin-left: 10px;
 }
