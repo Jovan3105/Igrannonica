@@ -221,19 +221,21 @@ namespace backend.Controllers
         [Route("upload")]
         public async Task<ActionResult<string>> uploadData([FromBody] DatasetUpdateDto datasetUpdateDto)
         {
-            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
-            string csvLocation = "http://localhost:7220/api/Datasets/getCsv/?name=";
-            csvLocation += datasetUpdateDto.Name;   
+            var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/parse";
 
-            var microserviceURL = _configuration["Addresses:Microservice"]+"/data-preparation/parse";
+            string dataSource = datasetUpdateDto.DatasetSource;
+
+            if ( dataSource == "")
+            {
+                // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+                dataSource = "http://localhost:7220/api/Datasets/getCsv/?name=";
+                dataSource += datasetUpdateDto.Name;
+
+            }
+            
             var client = new HttpClient();
             
-            var res = await client.GetAsync(string.Format(microserviceURL + "/?dataset_source={0},", csvLocation));
-
-
-
-
-            
+            var res = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", dataSource));
 
             var responseString = await res.Content.ReadAsStringAsync();
 

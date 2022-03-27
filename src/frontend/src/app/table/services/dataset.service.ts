@@ -48,8 +48,8 @@ export class DatasetService {
     );
   }
 
-  uploadDataset(file:any):Observable<any[]>{
-    return this.http.post<any>(this.datasetAPIUrl + '/upload',file,{
+  uploadDataset(source:any):Observable<any[]>{
+    return this.http.post<any>(this.datasetAPIUrl + '/upload',source,{
       //reportProgress: true,
       //observe: 'events'
       }).pipe(

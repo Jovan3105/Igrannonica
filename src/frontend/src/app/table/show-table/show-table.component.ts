@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ColDef,GridApi,GridReadyEvent,CellValueChangedEvent } from 'ag-grid-community';
+import { map } from 'rxjs';
 import { DatasetService } from '../services/dataset.service';
 
 
@@ -110,4 +111,42 @@ export class ShowTableComponent implements OnInit {
       if (index != -1) this.data.splice(index,1);
     }
   }
+
+  onShowDataClick() {
+    var datasetURL = (<HTMLInputElement>document.getElementById('dataset-url'));
+    if( datasetURL == null || datasetURL.value == "")
+      console.log("problem: dataset-url");
+    else {
+      var req = {
+        "public": true,
+        "userID": 0,
+        "description": "string",
+        "name": "string",
+        "datasetSource": datasetURL.value,
+        "delimiter": null,
+        "lineTerminator": null,
+        "quotechar": null,
+        "escapechar": null,
+        "encoding": null
+      }
+
+      const fetchTableDataObserver = {
+        next: (response:any) => { 
+          console.log("Gotovo")
+            this.data = response
+            console.log(response)
+            this.prepareTable(response[0]['parsedDataset'])
+        },
+        error: (err: Error) => {
+          console.log(err)
+  
+        }
+      };
+
+      this.datasetService.uploadDataset(req).subscribe(fetchTableDataObserver);
+    }
+
+    
+  }
+
 }
