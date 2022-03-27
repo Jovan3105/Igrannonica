@@ -122,6 +122,7 @@ git diff HEAD origin/grana
 [**Vrati se na početak^**](#reference)
 
 ## Angular
+
 ### Instalacija angular-a
 
 1. `cd src/frontend`
@@ -130,8 +131,10 @@ git diff HEAD origin/grana
 4. `ng serve --open`
 
 ### Konfiguracija angular-a
-Port: 4200
+Port: `4200
+
 ## PostgreSQL
+
 ### Instalacija postgresql-a
 
 Za instalaciju PostgreSQL-a je potrebno ispratiti sledeći niz koraka. Koraci koji nisu navedeni se vrše odabirom podrazumevanih vrednosti/akcija.
@@ -157,6 +160,9 @@ Ukoliko postoji više context-a (što je već slučaj i trenutku pisanja ovog te
 Do NuGet terminala se može doći na sledeći način:  
 `Tools > NuGet Package Manager > Packer Manager Console`
 
+
+**NAPOMENA**: Ukoliko komanda `Update-Database` ne radi, koristiti `EntityFrameworkCore\Update-Database`
+
 [**Vrati se na početak^**](#reference)
 ### Konfiguracija postgresql-a
 
@@ -177,7 +183,7 @@ Port: `5432`
 
 ## .NET
 ### Konfiguracija .NET-a
-Port: 7220
+Port: `7220`
 ### Entity Framework
 
 `dotnet-ef migrations add Ime` - Dodavanje nove migracije  
@@ -197,8 +203,11 @@ Kada dođe do promene okruženja (paketa) i kod bude spreman da ide u produkciju
 3. `pipenv install`
 
 ### Pokretanje mikroservisa
-1. `pipenv shell`
-2. `pipenv run server`
+1. `cd .\src\ann-microservice`
+2. `pipenv shell`
+3.
+   1. `pipenv run server` - za produkciju
+   2. `pipenv run dev_server` - za development
 
 ### pipenv
 
