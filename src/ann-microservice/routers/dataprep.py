@@ -9,15 +9,18 @@ router = APIRouter(prefix="/data-preparation")
 
 #################################################################
 
+class ParsingData(BaseModel):
+    dataset_source : AnyHttpUrl
+    delimiter      : Optional[str] = None
+    lineterminator : Optional[str] = None
+    quotechar      : Optional[str] = None
+    escapechar     : Optional[str] = None
+    encoding       : Optional[str] = None
+
+#################################################################
+
 @router.post("/parse")
-async def parse_dataset(
-    dataset_source : AnyHttpUrl= Query(None, title='Dataset Source', description='Lokacija resursa'),
-    delimiter      : Optional[str] = None,
-    lineterminator : Optional[str] = None,
-    quotechar      : Optional[str] = None,
-    escapechar     : Optional[str] = None,
-    encoding       : Optional[str] = None,
-):
+async def parse_dataset(parsingData: ParsingData):
     '''
     Parsira dataset koji se nalazi na prosleđenoj lokaciji **dataset_source**
 
