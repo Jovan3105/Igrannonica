@@ -275,7 +275,45 @@ namespace backend.Controllers
 
             return Ok(lines);
         }
-            
+
+        [HttpPatch]
+        [Route("")]
+        public async Task<ActionResult<string>> patch(List<int> rows, List<int> cols, Dataset data)
+        {
+            HandleRowsAndCols(rows, cols, data);
+            return Ok("ok");
+        }
+        public async void  HandleRowsAndCols(List<int> rows, List<int> cols, Dataset data)
+        {
+            //brisanje redova
+            string[] lines = System.IO.File.ReadAllLines(data.Path);
+
+
+            using StreamWriter file = new(data.Path);
+
+            int num = 0;
+            foreach (string line in lines)
+            {
+                if (!rows.Contains(num))
+                {
+                    await file.WriteLineAsync(line);
+                }
+                else
+                {
+                    rows.Remove(num);
+                }
+                num++;
+            }
+
+            //brisanje kolona
+
+
+
+        }
+
+
+
+
 
 
 
