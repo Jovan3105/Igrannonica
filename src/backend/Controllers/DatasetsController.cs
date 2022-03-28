@@ -289,8 +289,31 @@ namespace backend.Controllers
 
             return Ok(lines);
         }
-       
-        
+
+        [HttpPatch]
+        [Route("")]
+        public async Task<ActionResult<string>> patch(List<int> rows, List<int> cols, Dataset data)
+        {
+            ModifyCellValue(rows, cols, data);
+            return Ok("ok");
+        }
+        public async void ModifyCellValue(List<int> rows, List<int> cols, Dataset data)
+        {
+
+            string[] lines = System.IO.File.ReadAllLines(data.Path);
+
+
+            using StreamWriter file = new(data.Path);
+
+            foreach (string line in lines)
+            {
+                    await file.WriteLineAsync(line);
+            }
+
+        }
+
+
+
 
     }
 }
