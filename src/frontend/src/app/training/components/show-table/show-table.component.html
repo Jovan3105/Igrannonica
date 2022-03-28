@@ -1,14 +1,4 @@
 
-<div class="mb-3">
-    <label for="formFile" class="form-label">Dodaj fajl</label>
-    <input class="form-control" type="file" id="uploadData" accept=".csv" (change)="onFileSelected($event)"> 
-</div>
-<div class="mb-3">
-    <label for="dataset-url" class="form-label">Dataset URL</label>
-    <input type="text" name="dataset-url" class="form-control" id="dataset-url" placeholder="Enter dataset URL">
-    <button type="submit" class="btn btn-primary" (click)="onShowDataClick()">Show data</button>
-</div>
-
 <div style="width: 1200px;" class="grid-wrapper" *ngIf = "data">
     <div class="panel panel-default panel-table" style="width: 800px; margin: auto;" >
         <div class="panel-heading">
