@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
-import { AuthService } from 'src/app/shared/services/auth.service';
+import { AuthService } from 'src/app/auth/services/auth.service';
 import { Router } from '@angular/router';
 import { timeout } from 'rxjs';
 import { Tuple } from 'ag-grid-community/dist/lib/filter/provided/simpleFilter';
@@ -17,6 +17,7 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
   }
   onSubmit(f: NgForm) {
+    
     if(f.controls['email'].value <= 320){
       console.log("Predugacak email");
       return;
@@ -66,9 +67,8 @@ export class RegisterComponent implements OnInit {
        
       }
     };
-    // TODO: Naredna linija predstavlja samo trenutno resenje problema.
-    // Potrebno je izbaciti registerConfirmPassword iz forme jer uzrokuje BadRequest (zato sto nije ocekivan na backend-u)
-    this.authService.register({username:f.value.username,email:f.value.email,passwordHashed:f.value.password}).subscribe(registerObserver);
+    f.form.removeControl('registerConfirmPassword'); // izbacivanje registerConfirmPassword iz objekta forme
+    this.authService.register(f.value).subscribe(registerObserver);
     console.log(f.value);  // { first: '', last: '' }
     console.log(f.valid);  // false
   }

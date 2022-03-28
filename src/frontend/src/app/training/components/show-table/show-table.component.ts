@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ColDef,GridApi,GridReadyEvent,CellValueChangedEvent } from 'ag-grid-community';
 import { map } from 'rxjs';
-import { DatasetService } from '../services/dataset.service';
-
+import { DatasetService } from '../../services/dataset.service';
 
 @Component({
   selector: 'app-show-table',
@@ -135,7 +134,7 @@ export class ShowTableComponent implements OnInit {
           console.log("Gotovo")
             this.data = response
             console.log(response)
-            this.prepareTable(response[0]['parsedDataset'])
+            this.prepareTable(response['parsedDataset'])
         },
         error: (err: Error) => {
           console.log(err)

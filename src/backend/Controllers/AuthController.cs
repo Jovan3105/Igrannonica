@@ -134,7 +134,7 @@ namespace backend.Controllers
                 return BadRequest(response);
             }
 
-            user.PasswordHashed = BCrypt.Net.BCrypt.HashPassword(user.PasswordHashed);
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             user.VerifiedEmail = false;
             
             this.userContext.Users.Add(user);
@@ -179,7 +179,7 @@ namespace backend.Controllers
             }
             else
             {
-                if (BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHashed))
+                if (BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
                 {
                     if (user.VerifiedEmail == false)
                     {

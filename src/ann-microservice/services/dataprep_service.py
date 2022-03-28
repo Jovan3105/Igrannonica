@@ -10,7 +10,7 @@ logger.setLevel(logging.DEBUG)
 
 
 encoding_first_n_lines = 50
-
+QUOTE_NONNUMERIC = 2
 
 def parse_dataset(
     dataset_source, 
@@ -29,6 +29,7 @@ def parse_dataset(
 
     df_dict = None
     column_types = None
+    basic_info = None
 
     if(dataset_source.lower().endswith('.csv')):
         print("####:     Given dataset appears to be .csv file")
@@ -44,15 +45,18 @@ def parse_dataset(
             skipinitialspace = True
             )
 
-        column_types = [ (name,str(dtype)) for name, dtype in df.dtypes.iteritems() ]
-
+        column_types = [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
         df.reset_index(inplace=True)
 
+        missingValuesEntireDF = int(df.isnull().sum().sum())
+        nrows, ncols = df.shape
+        basic_info = { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
+        
         df_dict = df.to_dict('records')
 
         print('####:     Parsing complete.')
 
-    return df_dict, column_types
+    return df_dict, column_types, basic_info
     
 
 def get_encoding(file, n_lines=50):
