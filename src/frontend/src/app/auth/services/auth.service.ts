@@ -3,11 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, mapTo, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Observable, timer } from 'rxjs';
-import { Token } from '@angular/compiler';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import jwt_decode from 'jwt-decode';
 import { of, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { JwtService } from 'src/app/core/services/jwt.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +18,6 @@ export class AuthService {
   private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
   private helper!: JwtHelperService;
 
-  private _updatemenu = new Subject<void>();
-  get updatemenu() {
-    return this._updatemenu;
-  }
-
   /////////url swaggera/////////
   apiUrl = environment.apiUrl;
   LoginUrl = environment.apiUrl + "/auth/login";
@@ -31,8 +26,12 @@ export class AuthService {
   confirmEmailUrl = environment.apiUrl + "/Auth/verifyEmail";
   /////////url swaggera/////////
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private jwtService: JwtService) { }
 
+  private _updatemenu = new Subject<void>();
+  get updatemenu() {
+    return this._updatemenu;
+  }
 
   login(model: any){
     var circle = document.getElementById('circle')
@@ -42,16 +41,15 @@ export class AuthService {
         const user = response;
         if(user.success){
           circle!.style.display = "none";
-          this.doLoginUser(user.data);
+          this.jwtService.storeTokens(user.data); //ubacuje token u localstorage
           window.location.reload()
-          //ubacuje token u localstorage inpectelement->application->localstorage
         }
       })
     )
   }
 
   logout() {
-    this.doLogoutUser();
+    this.jwtService.removeTokens();
     this.router.navigateByUrl('/login');
     this.updatemenu.next();
     //kada se napravi API za logout
@@ -112,52 +110,22 @@ export class AuthService {
 
 
   isLoggedIn() {
-    if (this.getJwtToken()) return true;
+    if (this.jwtService.getJwtToken()) return true;
     return false;
   }
 
-  private doLoginUser(data : any) {
-    localStorage.setItem(this.JWT_TOKEN, data.token);
-    localStorage.setItem(this.REFRESH_TOKEN, data.refreshToken);
-  }
-
-  private doLogoutUser() {
-    localStorage.removeItem(this.JWT_TOKEN);
-    localStorage.removeItem(this.REFRESH_TOKEN);
-  }
-  
   refreshToken() {
     return this.http.post<any>(`${this.apiUrl}/auth/refresh-token`, {
-      'accessToken':this.getJwtToken(),
-      'refreshToken': this.getRefreshToken()
+      'accessToken':this.jwtService.getJwtToken(),
+      'refreshToken': this.jwtService.getRefreshToken()
     }).pipe(
       tap((data: any) => {
-        localStorage.setItem(this.JWT_TOKEN, data.token);
-        localStorage.setItem(this.REFRESH_TOKEN, data.refreshToken);
+        this.jwtService.storeTokens(data);
     }));
   }
-
-  getJwtToken() {
-    return localStorage.getItem(this.JWT_TOKEN);
-  }
-
-  getRefreshToken() {
-    return localStorage.getItem(this.REFRESH_TOKEN);
-  }
-
-  getDecodedAccessToken(token: string): any {
-    try {
-      return jwt_decode(token);
-    } catch(Error) {
-      return null;
-    }
-  } 
 
   verifyEmailAddress(email:string, token:string): any {
     return this.http.get<any>(this.confirmEmailUrl + `?email=${email}&token=${token}`);
   }
 
-  getUser(id:number):any{
-    return this.http.get<any>(this.apiUrl + `/Users/${id}`);
-  }
 }
