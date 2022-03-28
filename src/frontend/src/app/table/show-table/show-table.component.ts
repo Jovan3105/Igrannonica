@@ -135,7 +135,7 @@ export class ShowTableComponent implements OnInit {
           console.log("Gotovo")
             this.data = response
             console.log(response)
-            this.prepareTable(response[0]['parsedDataset'])
+            this.prepareTable(response['parsedDataset'])
         },
         error: (err: Error) => {
           console.log(err)

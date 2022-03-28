@@ -32,4 +32,4 @@ async def parse_dataset(
         encoding = encoding 
         )
 
-    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info }, 200
+    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info }
