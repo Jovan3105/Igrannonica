@@ -5,13 +5,17 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
 import { SharedModule } from './shared/shared.module';
+import { CoreModule } from './core/core.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TrainingModule } from './training/training.module';
+import { DatasetsModule } from './datasets/datasets.module';
 
 import { HttpClientModule } from '@angular/common/http';
-import { ShowTableComponent } from './table/show-table/show-table.component';
+import { ShowTableComponent } from './training/components/show-table/show-table.component';
 import { AgGridModule } from 'ag-grid-angular';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { EmailVerifComponent } from './auth/components/email-verif/email-verif.component';
+
 
 
 @NgModule({
@@ -22,13 +26,15 @@ import { EmailVerifComponent } from './auth/components/email-verif/email-verif.c
   imports: [
     BrowserModule,
     AppRoutingModule,
+    CoreModule,
     SharedModule,
     AuthModule,
+    TrainingModule,
+    DatasetsModule,
     NgbModule,
     HttpClientModule,
     ReactiveFormsModule,
-    AgGridModule.withComponents([]),
-    FormsModule
+    AgGridModule.withComponents([])
   ],
   providers: [],
   bootstrap: [AppComponent],

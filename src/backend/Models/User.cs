@@ -11,7 +11,7 @@ namespace backend.Models
         [Required]
         public string Email { get; set; }
         [Required]
-        public string PasswordHashed {  get; set; }
+        public string Password {  get; set; }
         public string RefreshToken { get; set; }  = string.Empty;
         public DateTime RefreshTokenExpires { get; set; }
         public bool VerifiedEmail { get; set; }
