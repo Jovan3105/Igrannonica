@@ -72,7 +72,7 @@ namespace backend.Controllers
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
-            var filePath = "C:\\Users\\Pivan\\Documents\\";
+            var filePath = "C:\\Users\\Dragan\\Documents\\";
 
             string path = Path.Combine(filePath, fileName);
             using StreamWriter f = new(path);
@@ -234,7 +234,7 @@ namespace backend.Controllers
             }
             
             var client = new HttpClient();
-            
+
             var res = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", dataSource));
 
             var responseString = await res.Content.ReadAsStringAsync();
@@ -261,21 +261,19 @@ namespace backend.Controllers
 
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
-            var url = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
+            var microserviceURL = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
 
             HttpClient client = new HttpClient();
 
-            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+            string dataSource = "http://localhost:7220/api/Datasets/getCsv/?name="+dataset.Name;
 
-            var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(dataset.Path));
-
-            var response = await client.PostAsync(url, multipartFormContent);
+            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset={0}", dataSource));
 
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
+
+
 
         }
         [HttpGet]
