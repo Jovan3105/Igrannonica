@@ -202,7 +202,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("upload")]
+        [Route("parse")]
         public async Task<ActionResult<string>> uploadData([FromBody] DatasetUpdateDto datasetUpdateDto)
         {
             var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/parse";
@@ -275,7 +275,39 @@ namespace backend.Controllers
 
             return Ok(lines);
         }
-            
+        [HttpPost]
+        [Route("upload")]
+        public async Task<ActionResult<string>> sendToMl(IFormFile file)
+        {
+            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+
+            var url = _configuration["Addresses:Microservice"] + "/data-preparation/parse-file";
+
+            HttpClient client = new HttpClient();
+
+            var fileStreamContent = new StreamContent(file.OpenReadStream());
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(file.FileName));
+
+            var response = await client.PostAsync(url, multipartFormContent);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return Ok(responseString);
+
+
+
+
+
+
+
+
+
+        }
+
+
 
 
 
