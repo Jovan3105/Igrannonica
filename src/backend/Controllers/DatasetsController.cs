@@ -283,11 +283,16 @@ namespace backend.Controllers
             var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Name==name);
             string path = dataset.Path;
             var csv = new List<string[]>();
+            string response = string.Empty;
             var lines = System.IO.File.ReadAllLines(path);
+            foreach(string line in lines)
+            {
+                response += line+"\n\r";
+            }
 
 
 
-            return Ok(lines);
+            return Ok(response);
         }
        
         
