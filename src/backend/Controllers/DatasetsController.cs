@@ -72,13 +72,32 @@ namespace backend.Controllers
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
-            var filePath = "C:\\Users\\Pivan\\Documents\\";
+            //var filePath = "C:\\Users\\Pivan\\Documents\\";
+            var filePath = string.Format(@"../../files/");
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+            filePath += dto.dataSet.UserID;
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            filePath=filePath +"/"+dto.dataSet.Id+"/";
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+
 
             string path = Path.Combine(filePath, fileName);
             using StreamWriter f = new(path);
             await f.WriteAsync(text);
 
             dataset.Path=path;
+            dataset.FileName=fileName;
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
@@ -151,42 +170,7 @@ namespace backend.Controllers
             }
         }
         
-        [HttpPost]
-        [Route("upload-old")]
-        public async Task<ActionResult<string>> uploadDataOld(IFormFile file)
-        {
-            if (file.Length == 0)
-            {
-                return BadRequest("bad");
-            }
-            string fileName = file.FileName;
 
-            await using var stream = file.OpenReadStream();
-
-
-            var reader = new StreamReader(stream);
-            var text = await reader.ReadToEndAsync();
-
-            Console.WriteLine(text);
-            Console.WriteLine(fileName);
-
-            var filePath = @"C:\Users\Pivan\Documents\";
-
-
-            try
-            {
-                string path = Path.Combine(filePath, fileName);
-                using StreamWriter f = new(path);
-                await f.WriteAsync(text);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
-
-            return Ok("");
-        }
 
         [HttpDelete]
         [Route("")]
@@ -291,8 +275,9 @@ namespace backend.Controllers
 
             return Ok(lines);
         }
-       
-        
+            
+
+
 
     }
 }
