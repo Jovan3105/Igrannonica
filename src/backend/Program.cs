@@ -1,3 +1,4 @@
+using backend;
 using backend.Data;
 using backend.Models;
 using backend.Services;
@@ -27,6 +28,7 @@ ConfigurationManager configuration = builder.Configuration;
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<UserContext>(options => {
     // User
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -75,17 +77,23 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 
-
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<SocketHub>("/socket");
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
