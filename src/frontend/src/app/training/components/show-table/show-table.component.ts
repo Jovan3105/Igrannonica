@@ -23,7 +23,9 @@ export class ShowTableComponent implements OnInit {
 
   public form:FormData = new FormData();
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    
+  }
 
     
   onFileSelected(event:Event)

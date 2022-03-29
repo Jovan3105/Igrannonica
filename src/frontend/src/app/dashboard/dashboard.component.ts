@@ -1,23 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { DatasetService } from '../training/services/dataset.service';
-
+import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  headers:any[] = [];
-  data:any = null;
-  private gridApi!: GridApi;
-
-  constructor(private datasetService: DatasetService) { }
+  toggledButton: boolean = true
   
-  columnDefs: ColDef[] = [];
-  rowData:any = [];
-  public rowSelection = 'multiple';
-  public paginationPageSize = 10;
+  constructor(private datasetService: DatasetService) { }
+  //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
+  @ViewChild('dataTable') private dataTable!: ShowTableComponent;
+  @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
+  @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
 
   public form:FormData = new FormData();
   ngOnInit(): void {
@@ -53,61 +50,13 @@ export class DashboardComponent implements OnInit {
       });*/
     }
   }
-  //Hardcodovano za sad, ova metoda ce prihvatati id koji se vraca u responsu upload-a
-  getDataset()
-  {
-    this.datasetService.getData(10).subscribe(
-      {
-        next: (res) => this.prepareTable(res),
-        error: (e) => console.error(e)
-      }
-    );
+
+  
+  onRemoveSelected(){
+    this.dataTable.onRemoveSelected();
   }
-
-  prepareTable(data:any)
-  {
-    this.data = data;
-
-    if (data.length > 0) this.headers = Object.getOwnPropertyNames(data[0]); 
-    this.columnDefs = [];
-    this.rowData = [];
-    for(let header of this.headers)
-    {
-      var col = {
-        flex: 1,
-        field: header,
-        sortable: true,
-        filter: 'agTextColumnFilter',
-        editable: true,
-        resizable:true,
-        minWidth: 100
-      }
-      this.columnDefs.push(col);
-    }
-
-    for(let row of data)
-    {
-      this.rowData.push(row);
-    }
-    
-  }
-
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-  }
-
-  onRemoveSelected() {
-    const selectedData = this.gridApi.getSelectedRows();
-    const res = this.gridApi.applyTransaction({ remove: selectedData })!;
-    
-    for(let sData of selectedData)
-    {
-      var index = this.data.indexOf(sData,0);
-      if (index != -1) this.data.splice(index,1);
-    }
-  }
-
   onShowDataClick() {
+    
     var datasetURL = (<HTMLInputElement>document.getElementById('dataset-url'));
     if( datasetURL == null || datasetURL.value == "")
       console.log("problem: dataset-url");
@@ -127,10 +76,23 @@ export class DashboardComponent implements OnInit {
 
       const fetchTableDataObserver = {
         next: (response:any) => { 
-          console.log("Gotovo")
-            this.data = response
+          console.log("Gotovo1")
             console.log(response)
-            this.prepareTable(response['parsedDataset'])
+            this.dataTable.prepareTable(response['parsedDataset'])
+            this.datasetService.getStatIndicators(2).subscribe(fetchStatsDataObserver);
+            var buttons = document.getElementById('buttons')
+            buttons!.style.display = "block";
+        },
+        error: (err: Error) => {
+          console.log(err)
+  
+        }
+      };
+      const fetchStatsDataObserver = {
+        next: (response:any) => { 
+          console.log("Gotovo2")
+            console.log(response)
+            this.numIndicators.prepareTable(response['continuous'])
         },
         error: (err: Error) => {
           console.log(err)
@@ -139,8 +101,30 @@ export class DashboardComponent implements OnInit {
       };
 
       this.datasetService.uploadDataset(req).subscribe(fetchTableDataObserver);
+      
     }
 
     
   }
+
+  toggleTables(){
+    var statsTable = document.getElementById('numerical');
+    var mainTable = document.getElementById('mainTable');
+    var statsButton = document.getElementById('statsButton');
+    var deleteButton = document.getElementById('deleteButton');
+    if(this.toggledButton){
+      statsTable!.style.display = "block"
+      mainTable!.style.display = "none"
+      statsButton!.innerHTML = "Show table"
+      deleteButton!.style.display = "none";
+    }
+    else{
+      statsTable!.style.display = "none"
+      mainTable!.style.display = "block"
+      statsButton!.innerHTML = "Show stats"
+      deleteButton!.style.display = "inline-block";
+    }
+    this.toggledButton = !this.toggledButton
+  }
+  
 }

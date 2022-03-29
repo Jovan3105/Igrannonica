@@ -1,64 +1,6 @@
 
 <div style="width: 1200px;" class="grid-wrapper" *ngIf = "data">
-    <div class="panel panel-default panel-table" style="width: 800px; margin: auto;" >
-        <div class="panel-heading">
-            <div class="tr" style="border-left: 0px;">
-                <div class="td" style="background-color: transparent;border-top: 0px;border-left: 0px;"> </div>
-                <div class="td">Kolona1</div>
-                <div class="td">Kolona2</div>
-                <div class="td">Kolona3</div>
-                <div class="td">Kolona3</div>
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="tr">
-                <div class="td">Minimum value</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-            </div>
-            <div class="tr">
-                <div class="td">Maximum value</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-            </div> 
-            <div class="tr">
-                <div class="td">Median</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-            </div> 
-            <div class="tr">
-                <div class="td">Average</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-            </div> 
-            <div class="tr">
-                <div class="td">Quartal</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-            </div> 
-            <div class="tr">
-                <div class="td">Standard deviation</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-                <div class="td">Number</div>
-            </div>   
-        </div>
-    </div>
-    <div id="buttons">
-        <button type="button" class="btn btn-danger" (click)="onRemoveSelected()">Delete selected</button>
-        <button type="button" class="btn btn-secondary">Stats</button>
-    </div>
+  
     <ag-grid-angular
         style="height: 520px;"
         class="ag-theme-alpine"
