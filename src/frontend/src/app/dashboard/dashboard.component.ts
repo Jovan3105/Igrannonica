@@ -21,6 +21,8 @@ export class DashboardComponent implements OnInit {
   public form:FormData = new FormData();
   fetchTableDataObserver:any = {
     next: (response:any) => { 
+      var circle = document.getElementById('circle');
+      circle!.style.display = "none";
       console.log("Gotovo1")
         console.log(response)
         console.log(response['basicInfo'])
@@ -73,6 +75,9 @@ export class DashboardComponent implements OnInit {
   }
   onFileSelected(event:Event)
   {
+    var circle = document.getElementById('circle');
+    circle!.style.display = "block";
+
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     
@@ -111,7 +116,7 @@ export class DashboardComponent implements OnInit {
         "escapechar": null,
         "encoding": null
       }
-
+      
       
 
       this.datasetService.parseDataset(req).subscribe(this.fetchTableDataObserver);
