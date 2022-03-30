@@ -10,8 +10,10 @@
         [paginationPageSize]="paginationPageSize"
         [rowSelection]="rowSelection"
         [animateRows]="true"
+        (columnVisible)="onColumnVisible($event)"
         (gridReady)="onGridReady($event)"
         >
     </ag-grid-angular>
 </div>
+
 
