@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ColDef,GridApi,GridReadyEvent,CellValueChangedEvent } from 'ag-grid-community';
 import { map } from 'rxjs';
 import { DatasetService } from '../../services/dataset.service';
@@ -14,7 +15,7 @@ export class ShowTableComponent implements OnInit {
   data:any = null;
   private gridApi!: GridApi;
 
-  constructor(private datasetService: DatasetService) { }
+  constructor(private datasetService: DatasetService, private router: Router) { }
 
   columnDefs: ColDef[] = [];
   rowData:any = [];
@@ -82,6 +83,7 @@ export class ShowTableComponent implements OnInit {
         field: header,
         sortable: true,
         filter: 'agTextColumnFilter',
+        floatingFilter: true,
         editable: true,
         resizable:true,
         minWidth: 100
@@ -148,4 +150,7 @@ export class ShowTableComponent implements OnInit {
     
   }
 
+  OnNextClick(){
+    this.router.navigate(['/labels'], {state:this.headers});
+  }
 }
