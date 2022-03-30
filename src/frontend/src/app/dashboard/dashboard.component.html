@@ -10,17 +10,27 @@
             <button type="submit" class="btn btn-primary" (click)="onShowDataClick()">Show data</button>
         </div>
     </div>
-</div>
+</div><br>
 <div class="float-end me-5">
     <button type="button" class="btn btn-primary" [disabled]="!dataTable.data" (click)="OnNextClick()">Next</button>
 </div>
 
-<div id="buttons" style="width: 1200px; margin: auto; display: none;" >
-    <button type="button" class="btn btn-danger" (click)="onRemoveSelected()" id="deleteButton">Delete selected</button>
-    <button type="button" class="btn btn-secondary" (click)="toggleTables()" id="statsButton">Show stats</button>
+
+<div class="row mx-auto">
+    <div id="buttons" style="display: none;" >
+        <button type="button" class="btn btn-danger" (click)="onRemoveSelected()" id="deleteButton">Delete selected</button>
+        <button type="button" class="btn btn-secondary" (click)="toggleTables()" id="statsButton">Show stats</button>
+    </div>
+    <div class="col m-3">
+        <app-show-table #dataTable id="mainTable">
+        </app-show-table>
+    </div>
+    <div class="col m-3">
+        <app-labels #Labels id="labelsCard"></app-labels>
+    </div>
+    
 </div>
-<app-show-table #dataTable id="mainTable">
-</app-show-table>
+
 
 <app-show-table #numIndicators id="numerical" style="display: none;">
 </app-show-table>

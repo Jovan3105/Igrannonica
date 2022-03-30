@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-labels',
@@ -8,24 +7,46 @@ import { Router } from '@angular/router';
 })
 export class LabelsComponent implements OnInit {
 
-  state:any;
+  headers:any = null;
+  types:any = null;
 
-  constructor(private router: Router) {
-     const navigation = this.router.getCurrentNavigation();
+  constructor() {
+     //const navigation = this.router.getCurrentNavigation();
     
+     /*
      if (navigation)
      {
        this.state = navigation.extras.state;
-     }
+     }*/
   }
 
   ngOnInit(): void {
 
-    console.log(this.state);
+    //console.log(this.state);
   }
 
   onBackClick(){
-    this.router.navigate(['/dashboard']);
+    //this.router.navigate(['/dashboard']);
+  }
+  onDatasetSelected(types:any)
+  {
+    var tempHeader;
+    this.headers = new Map<string,string>();
+    this.types = types;
+
+    this.types.forEach((element:any) => {
+
+      tempHeader = Object.getOwnPropertyNames(element);
+      if (tempHeader.length > 0) this.headers.set(tempHeader[0],element[tempHeader[0]]);
+    });
+
+    console.log(this.headers);
+  }
+
+  onCheck(id:number){
+    //console.log("Doslo je do promene " + id);
+
+
   }
 
 }

@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { DatasetService } from '../training/services/dataset.service';
 import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
+import { LabelsComponent } from '../training/components/labels/labels.component';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -15,6 +17,7 @@ export class DashboardComponent implements OnInit {
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
   @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
+  @ViewChild('Labels') private labels!:LabelsComponent;
 
   public form:FormData = new FormData();
   ngOnInit(): void {
@@ -37,6 +40,7 @@ export class DashboardComponent implements OnInit {
         next: (response:any) => { 
           console.log("Dataset je upload-ovan"); 
           this.dataTable.prepareTable(response['parsedDataset'])
+          this.labels.onDatasetSelected(response['columnTypes']);
           var buttons = document.getElementById('buttons')
           buttons!.style.display = "block";
         },
@@ -72,8 +76,9 @@ export class DashboardComponent implements OnInit {
         next: (response:any) => { 
           console.log("Gotovo1")
             console.log(response)
-            this.dataTable.prepareTable(response['parsedDataset'])
-            this.datasetService.getStatIndicators(2).subscribe(fetchStatsDataObserver);
+            this.dataTable.prepareTable(response['parsedDataset']);
+            this.labels.onDatasetSelected(response['columnTypes']);
+            //this.datasetService.getStatIndicators(2).subscribe(fetchStatsDataObserver);
             var buttons = document.getElementById('buttons')
             buttons!.style.display = "block";
         },

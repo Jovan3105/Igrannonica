@@ -12,6 +12,9 @@ import { LabelsComponent } from './components/labels/labels.component';
   imports: [
     CommonModule,
     TrainingRoutingModule
+  ],
+  exports:[
+    LabelsComponent
   ]
 })
 export class TrainingModule { }

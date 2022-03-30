@@ -1,6 +1,22 @@
-<div class="float-start m-5">
-    <button type="button" class="btn btn-primary" (click)="onBackClick()">Nazad</button>
-</div>
-<div class="float-end m-5">
-    <button type="button" class="btn btn-primary" [disabled]="!state">Dalje</button>
-</div>
+<div class="card" style="height: 350px;" *ngIf = "headers">
+    <h5 class="card-header">Odaberi ulaze (labels):</h5>
+    <div class="card-body">
+      <div *ngFor= "let header of headers | keyvalue; let i = index">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="{{i}}" id="labelCheckbox{{i}}" checked (change)= "onCheck(i)">
+            <label class="form-check-label" for="labelCheckbox{{i}}">
+              "{{header.key}}" ( {{header.value}} )
+            </label>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="height: 150px;" *ngIf = "headers">
+    <h5 class="card-header">Odaberi izlaz:</h5>
+    <div class="card-body">
+        <select class="form-select" aria-label="Default select example">
+            <option *ngFor= "let header of headers | keyvalue; let i = index" value="{{i}}">"{{header.key}}" ({{header.value}})</option>
+        </select>
+    </div>
+  </div>

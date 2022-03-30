@@ -6,8 +6,7 @@ import { LabelsComponent } from './components/labels/labels.component';
 import { ShowTableComponent } from './components/show-table/show-table.component';
 
 const routes: Routes = [
-  { path: 'dashboard', component: DashboardComponent, /*canActivate:[DashboardGuard] */ },
-  { path: 'labels', component: LabelsComponent }
+  { path: 'dashboard', component: DashboardComponent, /*canActivate:[DashboardGuard] */ }
 ];
 
 @NgModule({
