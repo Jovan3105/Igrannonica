@@ -361,20 +361,32 @@ namespace backend.Controllers
 
                 //JwtSecurityToken token = CreateToken(claims);
                 
+                string param= "email="
+                                + user.Email
+                                + "&token=" + GenerateMyToken(user.Email);
+
                 string message = @"Hello, <b>" + user.Username 
                                 + @"</b>.<br> Please confirm your email 
                                     <a href='"
                                 +
                                 _configuration["Addresses:Frontend"]
                                 +
-                                    "/verifyEmail?email=" 
-                                + user.Email 
+                                    "/verifyEmail?email="
+                                + user.Email
                                 + "&token=" + GenerateMyToken(user.Email)
                                 /*Convert.ToBase64String(
                                     Encoding.UTF8.GetBytes(
                                         new JwtSecurityTokenHandler().WriteToken(token)))*/
                                 + @"'>here</a>.<br>
-                                    <b>This link will be valid for 5 minutes!</b>";
+                                    <b>This link will be valid for 5 minutes!</b><br><br>"
+                                +"If you did not create this account please click "
+
+                                //izmeniti link kad se implementuje strana na frontu
+
+                                + "<a href='http://localhost:7220/api/Auth/deleteFakeUser?email="
+                                + user.Email
+                                + "&token=" + GenerateEmailToken(user.Email)
+                                +"'>here</a>.";
 
                 await emailSender.SendEmailAsync(user.Email, "Confirm Account", message);
 
@@ -382,6 +394,105 @@ namespace backend.Controllers
                 {
                     success = true,
                 });
+            }
+        }
+
+        private string GenerateEmailToken(string email)
+        {
+            var mySecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
+            var myIssuer = _configuration["JWT:ValidIssuer"];
+            var myAudience = _configuration["JWT:ValidAudience"];
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Email, email),
+                }),
+                Issuer = myIssuer,
+                Audience = myAudience,
+                SigningCredentials = new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        [HttpDelete("deleteFakeUser")]
+        public async Task<ActionResult> deleteFakeUser(string email, string token)
+        {
+            User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
+            if (user == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    data = new
+                    {
+                        token = "",
+                        errors = new[] {
+                            new {
+                                message = "bad request",
+                                code = "user_notFound"
+                            }
+                            }
+
+
+
+                    }
+                });
+            }
+            else
+            {
+                if (ValidateCurrentToken(token))
+                {
+                    // TODO
+                    if (true || user.Email == GetClaim(token, ClaimTypes.Email))
+                    {
+                        this.userContext.Remove(user);
+                        await this.userContext.SaveChangesAsync();
+                        return Ok(new
+                        {
+                            success = true,
+                            data = ""
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest(new
+                        {
+                            success = false,
+                            data = new
+                            {
+                                token = "",
+                                errors = new[] {
+                                new {
+                                    message = "bad request",
+                                    code = "token_emailMismatch"
+                                }
+                            }
+                            }
+                        });
+                    }
+
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        data = new
+                        {
+                            token = "",
+                            errors = new[] {
+                                new {
+                                    message = "bad request",
+                                    code = "token_notValid"
+                                }
+                            }
+                        }
+                    });
+                }
             }
         }
         
