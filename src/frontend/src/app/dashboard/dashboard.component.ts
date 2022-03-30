@@ -34,20 +34,14 @@ export class DashboardComponent implements OnInit {
       
       this.datasetService.uploadDataset(this.form)
       .subscribe({
-        error: (e) => console.error(e),
-        complete: () => console.log("Gotovo")
+        next: (response:any) => { 
+          console.log("Dataset je upload-ovan"); 
+          this.dataTable.prepareTable(response['parsedDataset'])
+          var buttons = document.getElementById('buttons')
+          buttons!.style.display = "block";
+        },
+        error: (e) => console.error(e)
       });
-      /*
-      var parseResult : ParseResult = this.papa.parse(file,{
-        header: true,
-        skipEmptyLines:true,
-        //download:true,
-        complete: (results) =>
-        {
-          this.data = results.data
-          this.prepareTable()
-        }
-      });*/
     }
   }
 
@@ -100,7 +94,7 @@ export class DashboardComponent implements OnInit {
         }
       };
 
-      this.datasetService.uploadDataset(req).subscribe(fetchTableDataObserver);
+      this.datasetService.parseDataset(req).subscribe(fetchTableDataObserver);
       
     }
 

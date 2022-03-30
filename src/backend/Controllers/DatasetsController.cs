@@ -262,6 +262,7 @@ namespace backend.Controllers
             return Ok(responseString);
 
         }
+
         [HttpGet]
         [Route("getCsv")]
         public async Task<ActionResult<string>> getCsv(string name)
@@ -289,7 +290,7 @@ namespace backend.Controllers
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
             var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(file.FileName));
+            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(file.FileName));
 
             var response = await client.PostAsync(url, multipartFormContent);
 
