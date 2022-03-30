@@ -11,6 +11,7 @@ uvicorn = "*"
 fastapi = "*"
 pydantic = "*"
 typing = "*"
+python-multipart = "*"
 
 [dev-packages]
 

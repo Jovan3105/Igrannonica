@@ -72,13 +72,32 @@ namespace backend.Controllers
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
-            var filePath = "C:\\Users\\Pivan\\Documents\\";
+            //var filePath = "C:\\Users\\Pivan\\Documents\\";
+            var filePath = string.Format(@"../../files/");
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+            filePath += dto.dataSet.UserID;
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            filePath=filePath +"/"+dto.dataSet.Id+"/";
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+
 
             string path = Path.Combine(filePath, fileName);
             using StreamWriter f = new(path);
             await f.WriteAsync(text);
 
             dataset.Path=path;
+            dataset.FileName=fileName;
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
@@ -151,42 +170,7 @@ namespace backend.Controllers
             }
         }
         
-        [HttpPost]
-        [Route("upload-old")]
-        public async Task<ActionResult<string>> uploadDataOld(IFormFile file)
-        {
-            if (file.Length == 0)
-            {
-                return BadRequest("bad");
-            }
-            string fileName = file.FileName;
 
-            await using var stream = file.OpenReadStream();
-
-
-            var reader = new StreamReader(stream);
-            var text = await reader.ReadToEndAsync();
-
-            Console.WriteLine(text);
-            Console.WriteLine(fileName);
-
-            var filePath = @"C:\Users\Pivan\Documents\";
-
-
-            try
-            {
-                string path = Path.Combine(filePath, fileName);
-                using StreamWriter f = new(path);
-                await f.WriteAsync(text);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
-
-            return Ok("");
-        }
 
         [HttpDelete]
         [Route("")]
@@ -218,7 +202,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("upload")]
+        [Route("parse")]
         public async Task<ActionResult<string>> uploadData([FromBody] DatasetUpdateDto datasetUpdateDto)
         {
             var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/parse";
@@ -278,6 +262,7 @@ namespace backend.Controllers
             return Ok(responseString);
 
         }
+
         [HttpGet]
         [Route("getCsv")]
         public async Task<ActionResult<string>> getCsv(string name)
@@ -291,8 +276,41 @@ namespace backend.Controllers
 
             return Ok(lines);
         }
-       
-        
+        [HttpPost]
+        [Route("upload")]
+        public async Task<ActionResult<string>> sendToMl(IFormFile file)
+        {
+            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+
+            var url = _configuration["Addresses:Microservice"] + "/data-preparation/parse-file";
+
+            HttpClient client = new HttpClient();
+
+            var fileStreamContent = new StreamContent(file.OpenReadStream());
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(file.FileName));
+
+            var response = await client.PostAsync(url, multipartFormContent);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return Ok(responseString);
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+
 
     }
 }

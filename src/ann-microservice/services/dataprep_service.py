@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 #from chardet.universaldetector import UniversalDetector # for future revision
 import logging
+from pydantic import AnyHttpUrl
+from starlette.datastructures import UploadFile
 
 logger = logging.getLogger()
 
@@ -30,9 +32,24 @@ def parse_dataset(
     df_dict = None
     column_types = None
     basic_info = None
+    
+    is_url = isinstance(dataset_source, AnyHttpUrl)
+    is_file = isinstance(dataset_source, UploadFile)
 
-    if(dataset_source.lower().endswith('.csv')):
+    # assume datasource is a link
+    fname = dataset_source
+
+    if is_file:
+        fname = dataset_source.filename
+
+    fname = fname.lower()
+
+    if( fname.endswith('.csv') ):
         print("####:     Given dataset appears to be .csv file")
+
+        if is_file:
+            dataset_source = dataset_source.file
+
         df = pd.read_csv(
             dataset_source, 
             delimiter        = delimiter, 

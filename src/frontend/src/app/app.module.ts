@@ -15,13 +15,15 @@ import { ShowTableComponent } from './training/components/show-table/show-table.
 import { AgGridModule } from 'ag-grid-angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EmailVerifComponent } from './auth/components/email-verif/email-verif.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    ShowTableComponent
+    ShowTableComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
