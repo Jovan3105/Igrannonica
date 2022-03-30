@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { DatasetService } from '../training/services/dataset.service';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
+import { style } from '@angular/animations';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -14,6 +15,7 @@ export class DashboardComponent implements OnInit {
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
+  @ViewChild('dataSetInformation') private dataSetInformation!: ShowTableComponent;
   @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
 
   public form:FormData = new FormData();
@@ -78,7 +80,19 @@ export class DashboardComponent implements OnInit {
         next: (response:any) => { 
           console.log("Gotovo1")
             console.log(response)
+            console.log(response['basicInfo'])
             this.dataTable.prepareTable(response['parsedDataset'])
+            this.dataSetInformation.prepareTable([response['basicInfo']])
+
+            this.dataSetInformation.columnDefs.forEach(element => {
+              element['editable'] = false;
+              element['resizable'] = false;
+            });
+            
+            this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
+            this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
+            this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
+            
             this.datasetService.getStatIndicators(2).subscribe(fetchStatsDataObserver);
             var buttons = document.getElementById('buttons')
             buttons!.style.display = "block";
@@ -92,14 +106,26 @@ export class DashboardComponent implements OnInit {
         next: (response:any) => { 
           console.log("Gotovo2")
             console.log(response)
+
             this.numIndicators.prepareTable(response['continuous'])
+            this.numIndicators.columnDefs.forEach(element => {
+              element['editable'] = false;
+              element['resizable'] = false;
+            });
+
+            this.catIndicators.prepareTable(response['categorical'])
+            this.catIndicators.columnDefs.forEach(element => {
+              element['editable'] = false;
+              element['resizable'] = false;
+            });
+            
+            
         },
         error: (err: Error) => {
           console.log(err)
   
         }
       };
-
       this.datasetService.uploadDataset(req).subscribe(fetchTableDataObserver);
       
     }
@@ -108,19 +134,25 @@ export class DashboardComponent implements OnInit {
   }
 
   toggleTables(){
-    var statsTable = document.getElementById('numerical');
+    var numbericalTable = document.getElementById('numerical');
     var mainTable = document.getElementById('mainTable');
+    var basicTable = document.getElementById('basicInfo');
     var statsButton = document.getElementById('statsButton');
     var deleteButton = document.getElementById('deleteButton');
+    var categoricalTable = document.getElementById('categorical');
     if(this.toggledButton){
-      statsTable!.style.display = "block"
+      numbericalTable!.style.display = "block"
+      basicTable!.style.display = "block"
       mainTable!.style.display = "none"
+      categoricalTable!.style.display = "block"
       statsButton!.innerHTML = "Show table"
       deleteButton!.style.display = "none";
     }
     else{
-      statsTable!.style.display = "none"
+      numbericalTable!.style.display = "none"
+      basicTable!.style.display = "none"
       mainTable!.style.display = "block"
+      categoricalTable!.style.display = "none"
       statsButton!.innerHTML = "Show stats"
       deleteButton!.style.display = "inline-block";
     }

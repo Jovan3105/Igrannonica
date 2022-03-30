@@ -13,6 +13,7 @@ export class ShowTableComponent implements OnInit {
   headers:any[] = [];
   data:any = null;
   private gridApi!: GridApi;
+  
 
   constructor(private datasetService: DatasetService) { }
 
@@ -20,6 +21,12 @@ export class ShowTableComponent implements OnInit {
   rowData:any = [];
   public rowSelection = 'multiple';
   public paginationPageSize = 10;
+  tableStyle:string = "height: 520px;"
+  tableClass:string = "ag-theme-alpine"
+  paginationEnabled:boolean = true
+  animateRowsEnabled:boolean = true
+  moveAnimationEnabled:boolean = false
+  suppressDragLeaveHidesColumnsEnabled:boolean = false
 
   public form:FormData = new FormData();
 
@@ -148,6 +155,48 @@ export class ShowTableComponent implements OnInit {
     }
 
     
+  }
+
+  changeAttributeValue(
+    style?:string,
+    tableClass?:string,
+    rowData?:any[],
+    columnDefs?:any[],
+    paginationEnabled?:boolean,
+    paginationPageSize?:number,
+    animateRowsEnabled?:boolean,
+    moveAnimationEnabled?:boolean,
+    suppressDragLeaveHidesColumnsEnabled?:boolean
+    )
+  {
+   if(style !== undefined){
+     this.tableStyle = style
+   }
+    if(tableClass !== undefined){
+      this.tableClass = tableClass
+    } 
+    if(rowData !== undefined){
+      this.rowData = rowData
+    } 
+    if(columnDefs !== undefined){
+      this.columnDefs = columnDefs
+    } 
+    if(paginationEnabled !== undefined){
+      this.paginationEnabled = paginationEnabled
+    } 
+    if(animateRowsEnabled !== undefined){
+      this.animateRowsEnabled = animateRowsEnabled
+    } 
+    if(paginationPageSize !== undefined){
+      this.paginationPageSize = paginationPageSize
+    } 
+    if(moveAnimationEnabled !== undefined){
+      this.moveAnimationEnabled = moveAnimationEnabled
+    }
+    if(suppressDragLeaveHidesColumnsEnabled !== undefined){
+      this.suppressDragLeaveHidesColumnsEnabled = suppressDragLeaveHidesColumnsEnabled
+    }
+
   }
 
 }
