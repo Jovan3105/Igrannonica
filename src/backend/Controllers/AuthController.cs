@@ -383,7 +383,7 @@ namespace backend.Controllers
 
                                 //izmeniti link kad se implementuje strana na frontu
 
-                                + "<a href='"+_configuration["Addresses: Base"]+"/api/Auth/deleteFakeUser?email="
+                                + "<a href='"+_configuration["Addresses: Backend"]+"/api/Auth/deleteFakeUser?email="
                                  + user.Email
                                 + "&token=" + GenerateEmailToken(user.Email)
                                 +"'>here</a>.";
