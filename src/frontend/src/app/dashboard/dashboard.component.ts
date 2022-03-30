@@ -43,8 +43,10 @@ export class DashboardComponent implements OnInit {
         .subscribe({
           next: (response: any) => {
             console.log("Dataset je upload-ovan");
+            console.log(response);
             var headers = this.headersService.getHeaders(response['columnTypes']);
-            this.dataTable.prepareTable(response['parsedDataset'], headers)
+            this.dataTable.prepareTable(response['parsedDataset'], headers);
+            this.labels.ngOnInit();
             this.labels.onDatasetSelected(headers);
             var buttons = document.getElementById('buttons')
             buttons!.style.display = "block";
