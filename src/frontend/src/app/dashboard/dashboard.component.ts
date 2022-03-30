@@ -19,6 +19,56 @@ export class DashboardComponent implements OnInit {
   @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
 
   public form:FormData = new FormData();
+  fetchTableDataObserver:any = {
+    next: (response:any) => { 
+      console.log("Gotovo1")
+        console.log(response)
+        console.log(response['basicInfo'])
+        this.dataTable.prepareTable(response['parsedDataset'])
+        this.dataSetInformation.prepareTable([response['basicInfo']])
+
+        this.dataSetInformation.columnDefs.forEach(element => {
+          element['editable'] = false;
+          element['resizable'] = false;
+        });
+        
+        this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
+        this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
+        this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
+        
+        this.datasetService.getStatIndicators(2).subscribe(this.fetchStatsDataObserver);
+        var buttons = document.getElementById('buttons')
+        buttons!.style.display = "block";
+    },
+    error: (err: Error) => {
+      console.log(err)
+
+    }
+  };
+  fetchStatsDataObserver:any = {
+    next: (response:any) => { 
+      console.log("Gotovo2")
+        console.log(response)
+
+        this.numIndicators.prepareTable(response['continuous'])
+        this.numIndicators.columnDefs.forEach(element => {
+          element['editable'] = false;
+          element['resizable'] = false;
+        });
+
+        this.catIndicators.prepareTable(response['categorical'])
+        this.catIndicators.columnDefs.forEach(element => {
+          element['editable'] = false;
+          element['resizable'] = false;
+        });
+        
+        
+    },
+    error: (err: Error) => {
+      console.log(err)
+
+    }
+  };
   ngOnInit(): void {
   }
   onFileSelected(event:Event)
@@ -35,15 +85,7 @@ export class DashboardComponent implements OnInit {
       this.form.append('file', file);
       
       this.datasetService.uploadDataset(this.form)
-      .subscribe({
-        next: (response:any) => { 
-          console.log("Dataset je upload-ovan"); 
-          this.dataTable.prepareTable(response['parsedDataset'])
-          var buttons = document.getElementById('buttons')
-          buttons!.style.display = "block";
-        },
-        error: (e) => console.error(e)
-      });
+      .subscribe(this.fetchTableDataObserver);
     }
   }
 
@@ -70,58 +112,9 @@ export class DashboardComponent implements OnInit {
         "encoding": null
       }
 
-      const fetchTableDataObserver = {
-        next: (response:any) => { 
-          console.log("Gotovo1")
-            console.log(response)
-            console.log(response['basicInfo'])
-            this.dataTable.prepareTable(response['parsedDataset'])
-            this.dataSetInformation.prepareTable([response['basicInfo']])
+      
 
-            this.dataSetInformation.columnDefs.forEach(element => {
-              element['editable'] = false;
-              element['resizable'] = false;
-            });
-            
-            this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
-            this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
-            this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
-            
-            this.datasetService.getStatIndicators(2).subscribe(fetchStatsDataObserver);
-            var buttons = document.getElementById('buttons')
-            buttons!.style.display = "block";
-        },
-        error: (err: Error) => {
-          console.log(err)
-  
-        }
-      };
-      const fetchStatsDataObserver = {
-        next: (response:any) => { 
-          console.log("Gotovo2")
-            console.log(response)
-
-            this.numIndicators.prepareTable(response['continuous'])
-            this.numIndicators.columnDefs.forEach(element => {
-              element['editable'] = false;
-              element['resizable'] = false;
-            });
-
-            this.catIndicators.prepareTable(response['categorical'])
-            this.catIndicators.columnDefs.forEach(element => {
-              element['editable'] = false;
-              element['resizable'] = false;
-            });
-            
-            
-        },
-        error: (err: Error) => {
-          console.log(err)
-  
-        }
-      };
-
-      this.datasetService.parseDataset(req).subscribe(fetchTableDataObserver);
+      this.datasetService.parseDataset(req).subscribe(this.fetchTableDataObserver);
       
     }
 
