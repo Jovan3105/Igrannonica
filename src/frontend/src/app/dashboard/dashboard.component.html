@@ -1,0 +1,23 @@
+
+<div class="mb-3">
+    <label for="formFile" class="form-label">Dodaj fajl</label>
+    <input class="form-control" type="file" id="uploadData" accept=".csv" (change)="onFileSelected($event)"> 
+</div>
+<div class="mb-3">
+    <label for="dataset-url" class="form-label">Dataset URL</label>
+    <input type="text" name="dataset-url" class="form-control" id="dataset-url" placeholder="Enter dataset URL">
+    <button type="submit" class="btn btn-primary" (click)="onShowDataClick()">Show data</button>
+</div> 
+<div id="buttons" style="width: 1200px; margin: auto; display: none;" >
+    <button type="button" class="btn btn-danger" (click)="onRemoveSelected()" id="deleteButton">Delete selected</button>
+    <button type="button" class="btn btn-secondary" (click)="toggleTables()" id="statsButton">Show stats</button>
+</div>
+<app-show-table #dataTable id="mainTable">
+</app-show-table>
+
+<app-show-table #numIndicators id="numerical" style="display: none;">
+</app-show-table>
+<app-show-table #catIndicators></app-show-table>
+
+
+

@@ -47,6 +47,7 @@ export class DatasetService {
       catchError(this.handleError<any>('getPage'))
     );
   }
+  
 
   uploadDataset(source:any):Observable<any[]>{
     return this.http.post<any>(this.datasetAPIUrl + '/upload',source,{
@@ -55,6 +56,12 @@ export class DatasetService {
       }).pipe(
       //map(event => this.getEventMessage(event)),
       catchError(this.handleError<any>('uploadDataset'))
+    );
+  }
+  getStatIndicators(id:number):Observable<any>{
+    return this.http.get<any>(this.datasetAPIUrl +`/${id}`+`/stat_indicators`).pipe(
+      tap(_ => console.log(`fetched page id=${id}`)),
+      catchError(this.handleError<any>('getStatIndicators'))
     );
   }
 
