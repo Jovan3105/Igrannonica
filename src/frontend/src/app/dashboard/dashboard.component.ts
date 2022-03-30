@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
-import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { DatasetService } from '../training/services/dataset.service';
+import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 @Component({
   selector: 'app-dashboard',
@@ -10,7 +10,7 @@ import { ShowTableComponent } from '../training/components/show-table/show-table
 export class DashboardComponent implements OnInit {
   toggledButton: boolean = true
   
-  constructor(private datasetService: DatasetService) { }
+  constructor(private datasetService: DatasetService, private router: Router) { }
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
@@ -121,4 +121,8 @@ export class DashboardComponent implements OnInit {
     this.toggledButton = !this.toggledButton
   }
   
+
+  OnNextClick(){
+    this.router.navigate(['/labels'], {state:this.dataTable.headers});
+  }
 }
