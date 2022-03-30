@@ -14,13 +14,13 @@ namespace backend.Controllers
     {
         private readonly UserContext userContext;
         private readonly IConfiguration _configuration;
-        private readonly IHubContext<SocketHub> _hubContext;
+        
 
-        public UsersController(UserContext userContext, IConfiguration configuration,IHubContext<SocketHub> hubContext)
+        public UsersController(UserContext userContext, IConfiguration configuration)
         {
             this.userContext = userContext;
             _configuration = configuration;
-            _hubContext = hubContext;
+            
         }
 
         [HttpGet("{id}")]
