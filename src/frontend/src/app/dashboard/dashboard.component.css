@@ -1,4 +1,4 @@
-#buttons{
+#buttons,#mainTable,#labelCards{
     animation: fadein 3s;
 }
 @keyframes fadein {

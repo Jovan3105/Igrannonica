@@ -28,34 +28,35 @@ export class DashboardComponent implements OnInit {
   public featuresLabel:any;
   //activateModal:boolean = false;
 
-  public form:FormData = new FormData();
-
   fetchTableDataObserver:any = {
     next: (response:any) => { 
       var circle = document.getElementById('circle');
       circle!.style.display = "none";
+      var container = document.getElementById('mainContainer');
+      container!.style.visibility = "visible";
+      (document.getElementById('nextButton') as HTMLInputElement).disabled = false;
       console.log("Gotovo1")
-        console.log(response)
+      console.log(response)
         
-        var headers = this.headersService.getHeaders(response['columnTypes'])
-        this.dataTable.prepareTable(response['parsedDataset'], headers)
-        this.labels.ngOnInit();
-        this.labels.onDatasetSelected(headers);
+      var headers = this.headersService.getHeaders(response['columnTypes'])
+      this.dataTable.prepareTable(response['parsedDataset'], headers)
+      this.labels.ngOnInit();
+      this.labels.onDatasetSelected(headers);
 
-        this.dataSetInformation.prepareTable([response['basicInfo']], []) // TODO 
+      this.dataSetInformation.prepareTable([response['basicInfo']], headers) 
 
-        this.dataSetInformation.columnDefs.forEach(element => {
-          element['editable'] = false;
-          element['resizable'] = false;
-        });
-        
-        this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
-        this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
-        this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
-        
-        this.datasetService.getStatIndicators(2).subscribe(this.fetchStatsDataObserver);
-        var buttons = document.getElementById('buttons')
-        buttons!.style.display = "block";
+      this.dataSetInformation.columnDefs.forEach(element => {
+        element['editable'] = false;
+        element['resizable'] = false;
+      });
+      
+      this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
+      this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
+      this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
+      
+      //this.datasetService.getStatIndicators(2).subscribe(this.fetchStatsDataObserver);
+      var buttons = document.getElementById('buttons')
+      buttons!.style.display = "block";
     },
     error: (err: Error) => {
       console.log(err)
@@ -66,14 +67,15 @@ export class DashboardComponent implements OnInit {
     next: (response:any) => { 
       console.log("Gotovo2")
         console.log(response)
+        var headers = this.headersService.getHeaders(response['columnTypes'])
 
-        this.numIndicators.prepareTable(response['continuous'], []) // TODO
+        this.numIndicators.prepareTable(response['continuous'], headers) 
         this.numIndicators.columnDefs.forEach(element => {
           element['editable'] = false;
           element['resizable'] = false;
         });
 
-        this.catIndicators.prepareTable(response['categorical'], []) // TODO
+        this.catIndicators.prepareTable(response['categorical'], headers) 
         this.catIndicators.columnDefs.forEach(element => {
           element['editable'] = false;
           element['resizable'] = false;
@@ -90,8 +92,11 @@ export class DashboardComponent implements OnInit {
   }
   onFileSelected(event:Event)
   {
+    if (this.form.get('file')) this.form.delete('file');
     var circle = document.getElementById('circle');
+    var container = document.getElementById('mainContainer');
     circle!.style.display = "block";
+    container!.style.visibility = "hidden";
 
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
@@ -102,7 +107,6 @@ export class DashboardComponent implements OnInit {
       var file = fileList[0];
 
       this.form.append('file', file);
-
       this.datasetService.uploadDataset(this.form)
       .subscribe(this.fetchTableDataObserver);
     }
@@ -114,6 +118,13 @@ export class DashboardComponent implements OnInit {
   }
 
   onShowDataClick() {
+
+    var circle = document.getElementById('circle');
+    circle!.style.display = "block";
+    var container = document.getElementById('mainContainer');
+    container!.style.visibility = "hidden";
+    (document.getElementById('nextButton') as HTMLInputElement).disabled = true;
+    
 
     var datasetURL = (<HTMLInputElement>document.getElementById('dataset-url'));
     if (datasetURL == null || datasetURL.value == "")
@@ -143,6 +154,7 @@ export class DashboardComponent implements OnInit {
     var statsButton = document.getElementById('statsButton');
     var deleteButton = document.getElementById('deleteButton');
     var categoricalTable = document.getElementById('categorical');
+    var labelCards = document.getElementById('labelCards');
     if(this.toggledButton){
       numbericalTable!.style.display = "block"
       basicTable!.style.display = "block"
@@ -150,6 +162,7 @@ export class DashboardComponent implements OnInit {
       categoricalTable!.style.display = "block"
       statsButton!.innerHTML = "Show table"
       deleteButton!.style.display = "none";
+      labelCards!.style.display = "none";
     }
     else{
       numbericalTable!.style.display = "none"
@@ -158,6 +171,7 @@ export class DashboardComponent implements OnInit {
       categoricalTable!.style.display = "none"
       statsButton!.innerHTML = "Show stats"
       deleteButton!.style.display = "inline-block";
+      labelCards!.style.display = "block";
     }
     this.toggledButton = !this.toggledButton
   }
