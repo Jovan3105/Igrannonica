@@ -1,3 +1,4 @@
+using backend;
 using backend.Data;
 using backend.Models;
 using backend.Services;
@@ -6,9 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Net.WebSockets;
 using System.Text;
-
-
 
 var MyAllowSpecificOrigins = "MyAllowSpecificOrigins";
 
@@ -22,11 +22,13 @@ builder.Services.AddCors(options =>
                           builder.WithOrigins("*").AllowAnyHeader()
                                                   .AllowAnyMethod();
                       });
+    
 });
 ConfigurationManager configuration = builder.Configuration;
 // Add services to the container.
-
+//builder.Services.AddSignalR();
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<UserContext>(options => {
     // User
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -75,17 +77,39 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+
+
+
+
+//SOKETI
+app.UseWebSockets(webSocketOptions);
+
+
+
+ 
 app.UseCors(MyAllowSpecificOrigins);
 
+app.UseRouting();
 
+
+/*app.UseEndpoints(endpoints =>
+{   
+    endpoints.MapControllers();
+    endpoints.MapHub<SocketHub>("/SocketHub");
+});*/
 
 app.UseAuthentication();
 app.UseAuthorization();

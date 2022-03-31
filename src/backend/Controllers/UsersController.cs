@@ -2,6 +2,7 @@
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
@@ -13,11 +14,13 @@ namespace backend.Controllers
     {
         private readonly UserContext userContext;
         private readonly IConfiguration _configuration;
+        
 
         public UsersController(UserContext userContext, IConfiguration configuration)
         {
             this.userContext = userContext;
             _configuration = configuration;
+            
         }
 
         [HttpGet("{id}")]
@@ -45,5 +48,7 @@ namespace backend.Controllers
         {
             return Ok(await this.userContext.Users.ToListAsync());
         }
+     
+
     }
 }
