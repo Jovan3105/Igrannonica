@@ -1,8 +1,12 @@
 import { Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
-import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { DatasetService } from '../training/services/dataset.service';
+import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 import { style } from '@angular/animations';
+import { LabelsComponent } from '../training/components/labels/labels.component';
+import { Check } from '../training/models/check';
+import { HeadersService } from '../training/services/headers.service';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -10,24 +14,35 @@ import { style } from '@angular/animations';
 })
 export class DashboardComponent implements OnInit {
   toggledButton: boolean = true
-  
-  constructor(private datasetService: DatasetService) { }
+
+  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService) { }
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
   @ViewChild('dataSetInformation') private dataSetInformation!: ShowTableComponent;
   @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
+  @ViewChild('Labels') private labels!: LabelsComponent;
+
+  public form: FormData = new FormData();
+  
+  public featuresLabel:any;
+  //activateModal:boolean = false;
 
   public form:FormData = new FormData();
+
   fetchTableDataObserver:any = {
     next: (response:any) => { 
       var circle = document.getElementById('circle');
       circle!.style.display = "none";
       console.log("Gotovo1")
         console.log(response)
-        console.log(response['basicInfo'])
-        this.dataTable.prepareTable(response['parsedDataset'])
-        this.dataSetInformation.prepareTable([response['basicInfo']])
+        
+        var headers = this.headersService.getHeaders(response['columnTypes'])
+        this.dataTable.prepareTable(response['parsedDataset'], headers)
+        this.labels.ngOnInit();
+        this.labels.onDatasetSelected(headers);
+
+        this.dataSetInformation.prepareTable([response['basicInfo']], []) // TODO 
 
         this.dataSetInformation.columnDefs.forEach(element => {
           element['editable'] = false;
@@ -52,13 +67,13 @@ export class DashboardComponent implements OnInit {
       console.log("Gotovo2")
         console.log(response)
 
-        this.numIndicators.prepareTable(response['continuous'])
+        this.numIndicators.prepareTable(response['continuous'], []) // TODO
         this.numIndicators.columnDefs.forEach(element => {
           element['editable'] = false;
           element['resizable'] = false;
         });
 
-        this.catIndicators.prepareTable(response['categorical'])
+        this.catIndicators.prepareTable(response['categorical'], []) // TODO
         this.catIndicators.columnDefs.forEach(element => {
           element['editable'] = false;
           element['resizable'] = false;
@@ -80,28 +95,28 @@ export class DashboardComponent implements OnInit {
 
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
-    
 
-    if (fileList && fileList?.length > 0) 
-    {
-      
+
+    if (fileList && fileList?.length > 0) {
+
       var file = fileList[0];
-     
+
       this.form.append('file', file);
-      
+
       this.datasetService.uploadDataset(this.form)
       .subscribe(this.fetchTableDataObserver);
     }
   }
 
-  
-  onRemoveSelected(){
+
+  onRemoveSelected() {
     this.dataTable.onRemoveSelected();
   }
+
   onShowDataClick() {
-    
+
     var datasetURL = (<HTMLInputElement>document.getElementById('dataset-url'));
-    if( datasetURL == null || datasetURL.value == "")
+    if (datasetURL == null || datasetURL.value == "")
       console.log("problem: dataset-url");
     else {
       var req = {
@@ -117,13 +132,8 @@ export class DashboardComponent implements OnInit {
         "encoding": null
       }
       
-      
-
       this.datasetService.parseDataset(req).subscribe(this.fetchTableDataObserver);
-      
     }
-
-    
   }
 
   toggleTables(){
@@ -151,5 +161,42 @@ export class DashboardComponent implements OnInit {
     }
     this.toggledButton = !this.toggledButton
   }
+
+
+  OnNextClick() {
+
+    var temp = this.labels.getValues(); // Cuva se objekat sa odabranim feature-ima i labelom
+
+    if (temp!.label.length > 0){
+      this.featuresLabel = temp;
+      console.log(this.featuresLabel);
+      //Pokreni modal
+      
+    }
+    else{
+      alert("Nisi izabrao izlaz!");
+    }
+    
+
+    //this.router.navigate(['/labels'], { state: this.dataTable.headers });
+
+  }
+
+  onSaveClick()
+  {
+
+  }
   
+  changeColomnVisibility(checkChange: Check) {
+    this.dataTable.changeColomnVisibility(checkChange.id.toString(), checkChange.visible);
+  }
+
+  changeCheckBox(checkChange: Check) {
+    this.labels.changeCheckbox(checkChange)
+  } 
+
+  onSelectedLabel(data:{id:number,pred:number})
+  {
+    this.dataTable.changeLabelColumn(data);
+  }
 }

@@ -1,5 +1,5 @@
 
-<div style="width: 1200px;" class="grid-wrapper" *ngIf = "data">
+<div style="width: 1000px;" class="grid-wrapper" *ngIf = "data">
   
     <ag-grid-angular
         [style]="tableStyle"
@@ -12,7 +12,10 @@
         [animateRows]="paginationEnabled"
         [suppressColumnMoveAnimation] = "moveAnimationEnabled"
         [suppressDragLeaveHidesColumns]="suppressDragLeaveHidesColumnsEnabled"
+        (columnVisible)="onColumnVisible($event)"
         (gridReady)="onGridReady($event)"
         >
     </ag-grid-angular>
 </div>
+
+

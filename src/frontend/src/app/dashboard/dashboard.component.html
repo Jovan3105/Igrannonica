@@ -1,13 +1,16 @@
-
-<div class="mb-3">
-    <label for="formFile" class="form-label">Dodaj fajl</label>
-    <input class="form-control" type="file" id="uploadData" accept=".csv" (change)="onFileSelected($event)"> 
-</div>
-<div class="mb-3">
+<div class="row mx-auto" style="width: 1000px;">
+    <div class="col-sm">
+        <label for="formFile" class="form-label">Upload dataset</label>
+        <input class="form-control" type="file" id="uploadData" accept=".csv" (change)="onFileSelected($event)">
+    </div>
+    <div class="col-sm">
     <label for="dataset-url" class="form-label">Dataset URL</label>
-    <input type="text" name="dataset-url" class="form-control" id="dataset-url" placeholder="Enter dataset URL">
-    <button type="submit" class="btn btn-primary" (click)="onShowDataClick()">Show data</button>
+    <div class="input-group">
+        <input type="text" name="dataset-url" class="form-control" id="dataset-url" placeholder="Enter dataset URL">
+        <button type="submit" class="btn btn-primary" (click)="onShowDataClick()">Show data</button>
+    </div>
 </div>
+
 <div id="circle" style="display: none;">
     <div class="loader">
         <div class="loader">
@@ -19,10 +22,26 @@
         </div>
     </div>
 </div>
-<div id="buttons" style="width: 1200px;margin: auto; margin-bottom: 10px; display: none;" >
-    <button type="button" class="btn btn-danger" (click)="onRemoveSelected()" id="deleteButton" style="margin-right: 5px;">Delete selected</button>
-    <button type="button" class="btn btn-secondary" (click)="toggleTables()" id="statsButton">Show stats</button>
+
+<div class="float-end me-5">
+    <button type="button" class="btn btn-primary" [disabled]="!dataTable.data" (click)="OnNextClick()">Next</button>
 </div>
+
+<div class="row mx-auto">
+    <div id="buttons" style="display: none;" >
+        <button type="button" class="btn btn-danger" (click)="onRemoveSelected()" id="deleteButton">Delete selected</button>
+        <button type="button" class="btn btn-secondary" (click)="toggleTables()" id="statsButton">Show stats</button>
+    </div>
+    <div class="col m-3">
+        <app-show-table #dataTable id="mainTable" (hideEvent)="changeCheckBox($event)">
+        </app-show-table>
+    </div>
+    <div class="col m-3">
+        <app-labels #Labels id="labelsCard" (checkEvent)="changeColomnVisibility($event)" (labelEvent)="onSelectedLabel($event)"></app-labels>
+    </div>
+</div>
+
+<br>
 
 <app-show-table #dataTable id="mainTable">
 </app-show-table>
@@ -38,3 +57,19 @@
 
 
 
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Nastavi dalje</h5>
+        </div>
+        <div class="modal-body">
+            Da li zelite sigurno da nastavite dalje?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ne</button>
+          <button type="button" class="btn btn-primary" (click)="OnNextClick()">Da</button>
+        </div>
+      </div>
+    </div>
+  </div>
