@@ -218,7 +218,7 @@ namespace backend.Controllers
             }
             
             var client = new HttpClient();
-            
+
             var res = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", dataSource));
 
             var responseString = await res.Content.ReadAsStringAsync();
@@ -245,21 +245,19 @@ namespace backend.Controllers
 
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
-            var url = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
+            var microserviceURL = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
 
             HttpClient client = new HttpClient();
 
-            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+            string dataSource = "http://localhost:7220/api/Datasets/getCsv/?name="+dataset.Name;
 
-            var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(dataset.Path));
-
-            var response = await client.PostAsync(url, multipartFormContent);
+            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset={0}", dataSource));
 
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
+
+
 
         }
 
@@ -311,6 +309,31 @@ namespace backend.Controllers
 
 
 
+
+        [HttpPatch]
+        [Route("{dataset_id}/data/cell")]
+        public async Task<ActionResult<string>> patchModifyCell(int dataset_id, List<Cell> values)
+        {
+
+            Dataset data = datasetContext.Datasets.FirstOrDefault(x => x.Id == dataset_id);
+            string[] lines = System.IO.File.ReadAllLines(data.Path);
+
+            foreach (Cell value in values)
+            {
+                var line = lines[value.Row].Split(",");
+                line[value.Col] = value.Value;
+                lines[value.Row] = string.Join(",", line);
+            }
+
+            using StreamWriter file = new(data.Path);
+
+            foreach (string line in lines)
+            {
+                await file.WriteLineAsync(line);
+            }
+
+            return Ok("ok");
+        }
 
     }
 }
