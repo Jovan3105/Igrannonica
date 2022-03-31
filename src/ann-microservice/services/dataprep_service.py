@@ -56,7 +56,7 @@ def parse_dataset(
 
         print('####:     Parsing complete.')
 
-    return df_dict, column_types, basic_info
+    return df, df_dict, column_types, basic_info
     
 
 def get_encoding(file, n_lines=50):
