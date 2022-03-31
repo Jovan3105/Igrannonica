@@ -291,29 +291,32 @@ namespace backend.Controllers
         }
 
         [HttpPatch]
-        [Route("")]
-        public async Task<ActionResult<string>> patch(List<int> rows, List<int> cols, Dataset data)
+        [Route("{dataset_id}/data/cell")]
+        public async Task<ActionResult<string>> patchModifyCell(Dataset data, List<Tuple<int, int, string> >values)
         {
-            ModifyCellValue(rows, cols, data);
+            ModifyCellValue(data,values);
             return Ok("ok");
         }
-        public async void ModifyCellValue(List<int> rows, List<int> cols, Dataset data)
+        public async void ModifyCellValue(Dataset data, List<Tuple<int,int,string>> values)
         {
 
             string[] lines = System.IO.File.ReadAllLines(data.Path);
 
+            foreach(Tuple<int,int,string> value in values)
+            {
+                var line=lines[value.Item1].Split(",");
+                line[value.Item2] = value.Item3;
+                lines[value.Item1] = string.Join(",",line);
+            }
 
             using StreamWriter file = new(data.Path);
 
             foreach (string line in lines)
             {
-                    await file.WriteLineAsync(line);
+                await file.WriteLineAsync(line);
             }
 
         }
-
-
-
 
     }
 }
