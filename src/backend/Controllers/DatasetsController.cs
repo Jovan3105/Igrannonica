@@ -292,21 +292,17 @@ namespace backend.Controllers
 
         [HttpPatch]
         [Route("{dataset_id}/data/cell")]
-        public async Task<ActionResult<string>> patchModifyCell(Dataset data, List<Tuple<int, int, string> >values)
-        {
-            ModifyCellValue(data,values);
-            return Ok("ok");
-        }
-        public async void ModifyCellValue(Dataset data, List<Tuple<int,int,string>> values)
+        public async Task<ActionResult<string>> patchModifyCell(int dataset_id, List<Tuple<int, int, string>> values)
         {
 
+            Dataset data = datasetContext.Datasets.FirstOrDefault(x => x.Id == dataset_id);
             string[] lines = System.IO.File.ReadAllLines(data.Path);
 
-            foreach(Tuple<int,int,string> value in values)
+            foreach (Tuple<int, int, string> value in values)
             {
-                var line=lines[value.Item1].Split(",");
+                var line = lines[value.Item1].Split(",");
                 line[value.Item2] = value.Item3;
-                lines[value.Item1] = string.Join(",",line);
+                lines[value.Item1] = string.Join(",", line);
             }
 
             using StreamWriter file = new(data.Path);
@@ -316,6 +312,7 @@ namespace backend.Controllers
                 await file.WriteLineAsync(line);
             }
 
+            return Ok("ok");
         }
 
     }
