@@ -23,7 +23,7 @@ async def parse_dataset(
 
     '''
 
-    ( parsed_dataset, column_types, basic_info ) = dataprep_service.parse_dataset(
+    ( df, parsed_dataset, column_types, basic_info ) = dataprep_service.parse_dataset(
         dataset_source,
         delimiter = delimiter, 
         lineterminator = lineterminator, 

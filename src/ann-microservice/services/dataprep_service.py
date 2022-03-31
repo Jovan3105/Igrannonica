@@ -35,6 +35,7 @@ def parse_dataset(
     
     is_url = isinstance(dataset_source, AnyHttpUrl)
     is_file = isinstance(dataset_source, UploadFile)
+    df = None
 
     # assume datasource is a link
     fname = dataset_source
@@ -61,6 +62,7 @@ def parse_dataset(
             on_bad_lines     = 'warn',
             skipinitialspace = True
             )
+        df = df.fillna('') # TODO proveriti
 
         column_types = [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
         df.reset_index(inplace=True)
@@ -73,7 +75,7 @@ def parse_dataset(
 
         print('####:     Parsing complete.')
 
-    return df_dict, column_types, basic_info
+    return df, df_dict, column_types, basic_info
     
 
 def get_encoding(file, n_lines=50):
