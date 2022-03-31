@@ -2,14 +2,16 @@
 <div style="width: 1200px;" class="grid-wrapper" *ngIf = "data">
   
     <ag-grid-angular
-        style="height: 520px;"
-        class="ag-theme-alpine"
+        [style]="tableStyle"
+        [class]="tableClass"
         [rowData]="rowData"
         [columnDefs]="columnDefs"
-        [pagination]="true"
+        [pagination]="paginationEnabled"
         [paginationPageSize]="paginationPageSize"
         [rowSelection]="rowSelection"
-        [animateRows]="true"
+        [animateRows]="paginationEnabled"
+        [suppressColumnMoveAnimation] = "moveAnimationEnabled"
+        [suppressDragLeaveHidesColumns]="suppressDragLeaveHidesColumnsEnabled"
         (gridReady)="onGridReady($event)"
         >
     </ag-grid-angular>
