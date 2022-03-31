@@ -7,10 +7,13 @@ name = "pypi"
 numpy = "*"
 pandas = "*"
 chardet = "*"
-uvicorn = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 fastapi = "*"
 pydantic = "*"
 typing = "*"
+websockets = "*"
+asyncio = "*"
+urllib3 = "==1.25.11"
 
 [dev-packages]
 
