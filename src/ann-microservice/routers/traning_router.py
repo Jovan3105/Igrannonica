@@ -1,28 +1,57 @@
-from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
-
-from tensorflow import keras
-from tensorflow.keras import layers
-
-import asyncio
-import websockets
-import tensorflow as tf
+from fastapi import APIRouter, Query
+from typing import Optional, List
+from pydantic import AnyHttpUrl
+from services import dataprep_service
+from services import training_service
  
-
 #################################################################
 
 backend_base_addr = 'localhost:7220'
 uri = f'ws://{backend_base_addr}/ws'
+print_prefix = "####:     "
 
 router = APIRouter(prefix="/training")
+
 
 #################################################################
 
 @router.get("/")
-async def make_connection():
-    async with websockets.connect(uri = uri) as websocket:
-        await websocket.send("Test: hello")
-        response = await websocket.recv()
-        print(response)
- 
-asyncio.get_event_loop().run_until_complete(make_connection())
+async def train_model(
+    dataset_source   : AnyHttpUrl,
+    features         : List[str] = Query(...),
+    labels           : List[str] = Query(...),
+    delimiter        : Optional[str] = None,
+    lineterminator   : Optional[str] = None,
+    quotechar        : Optional[str] = None,
+    escapechar       : Optional[str] = None,
+    encoding         : Optional[str] = None,
+    learning_rate    : Optional[float] = 0.1,
+    loss_function    : Optional[str] = 'mean_absolute_error',
+    testing_split    : Optional[float] = 0.8,
+    validation_split : Optional[float] = 0.2,
+    epochs           : Optional[int] = 100,
+    optimizer_key        : Optional[str] = 'adam',
+):
+    ( df, _, _, _ ) = dataprep_service.parse_dataset(
+            dataset_source,
+            delimiter = delimiter, 
+            lineterminator = lineterminator, 
+            quotechar = '"' if quotechar == None else quotechar, 
+            escapechar = escapechar, 
+            encoding = encoding 
+            )
+    
+    print(print_prefix+f"Passed as features={features}; passed as labels={labels}")
+
+    model = train_model(
+        df,
+        features,
+        labels,
+        learning_rate,
+        loss_function,
+        testing_split,
+        validation_split,
+        epochs,
+        optimizer_key )
+
+    return "trening je zavrsen"

@@ -30,6 +30,7 @@ def parse_dataset(
     df_dict = None
     column_types = None
     basic_info = None
+    df = None
 
     if(dataset_source.lower().endswith('.csv')):
         print("####:     Given dataset appears to be .csv file")
@@ -44,6 +45,7 @@ def parse_dataset(
             on_bad_lines     = 'warn',
             skipinitialspace = True
             )
+        df = df.fillna('') # TODO proveriti
 
         column_types = [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
         df.reset_index(inplace=True)
