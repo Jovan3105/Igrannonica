@@ -305,7 +305,7 @@ namespace backend.Controllers
         {
             HandleRowsAndCols(rows, cols, data);
             return Ok("ok");
-        }*/
+        }
 
         public async void  HandleRowsAndCols(List<int> rows, List<int> cols, Dataset data)
         {
@@ -331,7 +331,7 @@ namespace backend.Controllers
 
             //brisanje kolona
 
-        }
+        }*/
 
 
         [HttpPatch]
