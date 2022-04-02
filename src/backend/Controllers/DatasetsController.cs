@@ -172,7 +172,6 @@ namespace backend.Controllers
         }
         
 
-
         [HttpDelete]
         [Route("")]
         public async Task<ActionResult<string>> deleteDataset(int id)
@@ -225,18 +224,12 @@ namespace backend.Controllers
             var responseString = await res.Content.ReadAsStringAsync();
 
 
-
             //res.Result.EnsureSuccessStatusCode();
             return Ok(responseString);
-                
-               
-            
-
 
             //var response = await client.PostAsync(microserviceURL, content);
 
             //var responseString = await response.Content.ReadAsStringAsync();
-            return BadRequest();
         }
 
         [HttpGet]
@@ -264,9 +257,6 @@ namespace backend.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
-
-
-
         }
 
         [HttpGet]
@@ -282,8 +272,6 @@ namespace backend.Controllers
             {
                 response += line+"\n\r";
             }
-
-
 
             return Ok(response);
         }
@@ -309,14 +297,16 @@ namespace backend.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
+        }
 
-        [HttpPatch]
+        /*[HttpPatch]
         [Route("")]
         public async Task<ActionResult<string>> patch(List<int> rows, List<int> cols, Dataset data)
         {
             HandleRowsAndCols(rows, cols, data);
             return Ok("ok");
-        }
+        }*/
+
         public async void  HandleRowsAndCols(List<int> rows, List<int> cols, Dataset data)
         {
             //brisanje redova
@@ -341,26 +331,7 @@ namespace backend.Controllers
 
             //brisanje kolona
 
-
-
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        }
-
-
-
 
 
         [HttpPatch]
@@ -378,15 +349,17 @@ namespace backend.Controllers
                 lines[value.Row] = string.Join(",", line);
             }
 
-            using StreamWriter file = new(data.Path);
-
-            foreach (string line in lines)
+            using (StreamWriter file = new(data.Path))
             {
-                await file.WriteLineAsync(line);
+                foreach (string line in lines)
+                {
+                    await file.WriteLineAsync(line);
+                }
             }
 
             return Ok("ok");
         }
+
         [HttpPost]
         [Route("/begin_training")]
         public async Task<ActionResult<string>> beginTraining(int epoches, string algorithm)
@@ -410,8 +383,5 @@ namespace backend.Controllers
             return Ok(result);
 
         }
-       
-        
-
     }
 }
