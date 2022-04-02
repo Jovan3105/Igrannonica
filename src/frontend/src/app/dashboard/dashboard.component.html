@@ -33,12 +33,16 @@
 <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility}">
     
     <div class="mx-5" id="buttons" [ngStyle]="{'margin-bottom':'5px'}" >
-        <button type="button" class="btn btn-secondary" (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
-        <button type="button" class="btn btn-danger" (click)="onRemoveSelected()" [ngStyle]="{'display': deleteButtonDisplay}" 
+        <button type="button" class="btn btn-secondary" 
+        (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
+        <button type="button" class="btn btn-danger" 
+        (click)="onRemoveSelected()" 
+        [ngStyle]="{'display': deleteButtonDisplay}" 
         id="deleteButton">Delete selected</button>
     </div>
     <div class="col-sm-9">
-        <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" (hideEvent)="changeCheckBox($event)">
+        <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
+        (hideEvent)="changeCheckBox($event)">
         </app-show-table>
         <div [ngStyle]="{'visibility':statsTableVisibility}">
             <app-show-table #dataSetInformation id="basicInfo"></app-show-table>
@@ -51,7 +55,9 @@
         </div>
     </div>
     <div class="col-sm">
-        <app-labels #Labels id="labelCards" [ngStyle]="{'visibility': labelsVisibility}" (checkEvent)="changeColomnVisibility($event)" (labelEvent)="onSelectedLabel($event)"></app-labels>
+        <app-labels #Labels id="labelCards" [ngStyle]="{'visibility': labelsVisibility}" 
+        (checkEvent)="changeColomnVisibility($event)" 
+        (labelEvent)="onSelectedLabel($event)"></app-labels>
     </div>
 </div>
 <br>
