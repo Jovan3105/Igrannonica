@@ -55,17 +55,16 @@ export class DashboardComponent implements OnInit {
       this.showElements();
 
       console.log(response)
-        
-      var header = this.headersService.getDataHeader(response['columnTypes'])
+      
+      var header = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], header);
 
-      this.labels.ngOnInit();
       this.labels.onDatasetSelected(header);
 
       this.dataSetInformation.setPaginationEnabled(false);
       this.dataSetInformation.setTableStyle("height: 200px;");
       header = this.headersService.getInfoHeader(response['basicInfo']);
-      this.dataSetInformation.prepareTable(TableIndicator.INFO,[response['basicInfo']], header) 
+      this.dataSetInformation.prepareTable(TableIndicator.INFO, [response['basicInfo']], header) 
 
 
       // TODO ispraviti kada se omoguci povratak ID-a
@@ -107,6 +106,7 @@ export class DashboardComponent implements OnInit {
   {
     this.loaderDisplay = "block";
     this.containerVisibility = "hidden";
+    this.labelsVisibility = "hidden";
     this.nextButtonDisable = true;
   }
 
@@ -114,6 +114,7 @@ export class DashboardComponent implements OnInit {
   {
     this.loaderDisplay = "none";
     this.containerVisibility = "visible";
+    this.labelsVisibility = "visible";
     this.nextButtonDisable = false;
   }
 
@@ -222,7 +223,7 @@ export class DashboardComponent implements OnInit {
     this.labels.changeCheckbox(checkChange)
   } 
 
-  onSelectedLabel(data:{id:number,pred:number})
+  onSelectedLabel(data:{id:number,pred:number | null})
   {
     this.dataTable.changeLabelColumn(data);
   }
