@@ -8,14 +8,14 @@ export class HeadersService {
 
   constructor() { }
 
-  getHeaders(data : Array<any>) : Array<HeaderDict>{
+  getDataHeader(data : Array<any>) : Array<HeaderDict>{
     
     var tempHeader;
-    var newHeaders = new Array<HeaderDict>();
+    var newHeader = new Array<HeaderDict>();
     for(let i=0; i<data.length; i++)
     {
       tempHeader = Object.getOwnPropertyNames(data[i]);
-      if (tempHeader.length > 0) newHeaders.push(new HeaderDict(i,tempHeader[0], data[i][tempHeader[0]]));
+      if (tempHeader.length > 0) newHeader.push(new HeaderDict(i,tempHeader[0], data[i][tempHeader[0]]));
     }
     /*
     this.types.forEach((element:any) => {
@@ -23,6 +23,18 @@ export class HeadersService {
       if (tempHeader.length > 0) temp.splice(index,0,new HeaderDict(index,tempHeader[0], element[tempHeader[0]]));
       index++;
     });*/
-    return newHeaders;
+    return newHeader;
+  }
+
+  getInfoHeader(data:Array<any>)
+  {
+    var newHeader = new Array<HeaderDict>();
+    var temp = Object.getOwnPropertyNames(data);
+    for (let i=0; i<temp.length; i++)
+    {
+      newHeader.push(new HeaderDict(i,temp[i]));
+    }
+
+    return newHeader;
   }
 }

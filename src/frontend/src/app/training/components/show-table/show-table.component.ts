@@ -7,6 +7,7 @@ import { Check, HeaderDict } from '../../models/check';
   templateUrl: './show-table.component.html',
   styleUrls: ['./show-table.component.css']
 })
+
 export class ShowTableComponent implements OnInit {
 
   headers: Array<HeaderDict> = [];
@@ -28,36 +29,20 @@ export class ShowTableComponent implements OnInit {
   moveAnimationEnabled:boolean = false
   suppressDragLeaveHidesColumnsEnabled:boolean = false
 
-  public form: FormData = new FormData();
-
   ngOnInit(): void {
 
   }
 
-  prepareTable(data: any, headers: Array<HeaderDict>) {
+  prepareTable(indicator:TableIndicator,data: any, headers: Array<HeaderDict>) {
+    
     this.data = data;
 
     if (data.length > 0) this.headers = headers;
     this.columnDefs = [];
     this.rowData = [];
-    var index = 0;
-    for (let header of this.headers) {
-      var col = {
-        colId: header.key.toString(),
-        flex: 1,
-        field: header.name,
-        sortable: true,
-        filter: 'agTextColumnFilter',
-        floatingFilter: true,
-        editable: true,
-        resizable: true,
-        minWidth: 100,
-        hide:false
-      }
-      this.columnDefs.push(col);
-      index++;
-    }
 
+    this.setColumnDefs(indicator);
+    
     for (let row of data) {
       this.rowData.push(row);
     }
@@ -66,9 +51,51 @@ export class ShowTableComponent implements OnInit {
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
+    console.log(this.columnDefs);
+    console.log(this.rowData);
     this.columnApi = params.columnApi;
   }
 
+  setRowData(rowData:any[]){
+    this.rowData = rowData;
+  }
+  
+  setColumnDefs(indicator:TableIndicator){
+    if (indicator == TableIndicator.DATA_MANIPULATION)
+    {
+      for (let header of this.headers) {
+        var col = {
+          colId: header.key.toString(),
+          flex: 1,
+          field: header.name,
+          filter: 'agTextColumnFilter',
+          floatingFilter: true,
+          editable: true,
+          resizable: true,
+          sortable: true,
+          minWidth: 100,
+          hide:false
+        }
+        this.columnDefs.push(col);
+      }
+    }
+    else if (indicator == TableIndicator.INFO)
+    { 
+      for (let header of this.headers) {
+        var col2 = {
+          colId: header.key.toString(),
+          flex: 1,
+          field: header.name,
+          resizable: true,
+          sortable: true,
+          minWidth: 100,
+          lockPosition:true
+        }
+        this.columnDefs.push(col2);
+      }
+    }
+  }
+  
   onRemoveSelected() {
     const selectedData = this.gridApi.getSelectedRows();
     const res = this.gridApi.applyTransaction({ remove: selectedData })!;
@@ -96,7 +123,21 @@ export class ShowTableComponent implements OnInit {
       //console.log('Event Column Visible', e);
     }
   }
+  
+  setTableStyle(style:string)
+  {
+    this.tableStyle = style;
+  }
+  setPaginationEnabled(paginationEnabled:boolean)
+  {
+    this.paginationEnabled = paginationEnabled;
+  }
 
+  setPaginationPageSize(paginationPageSize:number){
+    this.paginationPageSize = paginationPageSize;
+  }
+
+  
   changeAttributeValue(
     style?:string,
     tableClass?:string,
@@ -155,4 +196,9 @@ export class ShowTableComponent implements OnInit {
     this.gridApi.refreshCells();
     */
   }
+}
+
+export enum TableIndicator {
+  DATA_MANIPULATION,
+  INFO
 }

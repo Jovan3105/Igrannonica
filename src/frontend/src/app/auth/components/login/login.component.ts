@@ -11,6 +11,10 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 })
 export class LoginComponent implements OnInit {
 
+  loaderDisplay:string = "none";
+  loginErrorDisplay:string = "none";
+  loginSuccessDisplay:string = "none";
+
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
@@ -18,18 +22,18 @@ export class LoginComponent implements OnInit {
   onSubmit(f: NgForm) {
     const loginObserver = {
       next: (x:any) => { 
-        console.log('User logged in'); 
+        console.log('User logged in');
+        this.loaderDisplay = "none"; 
         this.router.navigateByUrl('/dashboard'); 
       },
       error: (err: Error) => {
-        var loginError = document.getElementById('neUspesanLogin');
-        var circle = document.getElementById('circle');
-        loginError!.style.display = "block";
-        f.controls['usernameOrEmail'].setValue(null)
-        f.controls['password'].setValue(null)
-        circle!.style.display = "none";
+        this.loaderDisplay = "block";
+        this.loginErrorDisplay = "block"
+        f.controls['usernameOrEmail'].setValue(null);
+        f.controls['password'].setValue(null);
+        this.loaderDisplay = "none";
         setTimeout(() => {
-          loginError!.style.display = "none";
+          this.loginErrorDisplay = "none"
         }, 2000);
       }
     };

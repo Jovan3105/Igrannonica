@@ -34,15 +34,13 @@ export class AuthService {
   }
 
   login(model: any){
-    var circle = document.getElementById('circle')
-    circle!.style.display = "block";
+
     return this.http.post(this.LoginUrl, model).pipe(
       map((response:any) => {
         const user = response;
         if(user.success){
-          circle!.style.display = "none";
           this.jwtService.storeTokens(user.data); //ubacuje token u localstorage
-          window.location.reload()
+          //window.location.reload()
         }
       })
     )
