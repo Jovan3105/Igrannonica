@@ -2,7 +2,7 @@ import uvicorn
 import sys
 from fastapi import FastAPI
 
-from routers import dataprep, traning_router
+from routers import dataprep_router, datastat_router, traning_router
 
 #################################################################
 
@@ -37,7 +37,8 @@ dev_mode = False
 #################################################################
 # Routers
 
-app.include_router(dataprep.router)
+app.include_router(dataprep_router.router)
+app.include_router(datastat_router.router)
 app.include_router(traning_router.router)
 
 #################################################################

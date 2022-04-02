@@ -58,14 +58,13 @@ def parse_dataset(
             quotechar        = quotechar,
             escapechar       = escapechar, 
             encoding         = encoding,
-            index_col        = 0, 
+            index_col        = None, 
             on_bad_lines     = 'warn',
             skipinitialspace = True
             )
         df = df.fillna('') # TODO proveriti
 
         column_types = [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
-        df.reset_index(inplace=True)
 
         missingValuesEntireDF = int(df.isnull().sum().sum())
         nrows, ncols = df.shape

@@ -43,8 +43,7 @@ export class DashboardComponent implements OnInit {
       this.labels.ngOnInit();
       this.labels.onDatasetSelected(headers);
 
-      this.dataSetInformation.prepareTable([response['basicInfo']], headers) 
-
+      this.dataSetInformation.prepareTable([response['basicInfo']], headers)
       this.dataSetInformation.columnDefs.forEach(element => {
         element['editable'] = false;
         element['resizable'] = false;
@@ -54,7 +53,8 @@ export class DashboardComponent implements OnInit {
       this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       
-      //this.datasetService.getStatIndicators(2).subscribe(this.fetchStatsDataObserver);
+      // TODO ispraviti kada se omoguci povratak ID-a
+      this.datasetService.getStatIndicators(22).subscribe(this.fetchStatsDataObserver);
       var buttons = document.getElementById('buttons')
       buttons!.style.display = "block";
     },

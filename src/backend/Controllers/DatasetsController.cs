@@ -248,11 +248,18 @@ namespace backend.Controllers
 
             var microserviceURL = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
 
-            HttpClient client = new HttpClient();
+            var dataSource = "http://localhost:7220/api/Datasets/getCsv/?filename=";
+            dataSource += dataset.FileName;
 
-            string dataSource = "http://localhost:7220/api/Datasets/getCsv/?name="+dataset.Name;
 
-            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset={0}", dataSource));
+            var client = new HttpClient();
+
+            // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
+            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://raw.githubusercontent.com/zrnsm/pyculiarity/master/tests/raw_data.csv"));
+
+            // stari kod
+            // var response = await client.GetAsync(string.Format(microserviceURL + "?dataset={0}", dataSource)); 
+            // string dataSource = "http://localhost:7220/api/Datasets/getCsv/?name="+dataset.Name;
 
             var responseString = await response.Content.ReadAsStringAsync();
 
@@ -264,9 +271,9 @@ namespace backend.Controllers
 
         [HttpGet]
         [Route("getCsv")]
-        public async Task<ActionResult<string>> getCsv(string name)
+        public async Task<ActionResult<string>> getCsv(string fileName)
         {
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Name==name);
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.FileName == fileName);
             string path = dataset.Path;
             var csv = new List<string[]>();
             string response = string.Empty;
@@ -280,6 +287,7 @@ namespace backend.Controllers
 
             return Ok(response);
         }
+
         [HttpPost]
         [Route("upload")]
         public async Task<ActionResult<string>> sendToMl(IFormFile file)
