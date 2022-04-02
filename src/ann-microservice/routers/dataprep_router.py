@@ -48,8 +48,8 @@ async def parse_dataset_file(
     Parsira dataset koji je upload-ovan
 
     '''
-
-    ( parsed_dataset, column_types, basic_info ) = dataprep_service.parse_dataset(
+    print("#"*30)
+    ( _, parsed_dataset, column_types, basic_info ) = dataprep_service.parse_dataset(
         dataset_source,
         delimiter = delimiter, 
         lineterminator = lineterminator, 

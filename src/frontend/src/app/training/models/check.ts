@@ -11,8 +11,7 @@ export class Check {
 export class HeaderDict {
   key: number;
   name: string;
-  type:string;
-  checked?:boolean;
+  type?:string;
 
   constructor(key:number,name:string,type:string = "")
   {

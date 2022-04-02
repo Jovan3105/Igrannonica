@@ -12,6 +12,12 @@ import { Tuple } from 'ag-grid-community/dist/lib/filter/provided/simpleFilter';
 })
 export class RegisterComponent implements OnInit {
 
+  loaderDisplay:string = "none";
+  serverErrorDisplay:string = "none";
+  registerSuccessDisplay:string = "none";
+  usernameExistsDisplay:string = "none";
+  emailExistsDisplay:string = "none";
+
   constructor(private authService: AuthService, private router:Router) { }
 
   ngOnInit(): void {
@@ -30,36 +36,30 @@ export class RegisterComponent implements OnInit {
       error: (err: any) => {
         //userOrEmail_AlreadyExists
         if(err['error'] instanceof ProgressEvent ){
-          var registrationError = document.getElementById('serverError');
-          var circle = document.getElementById('circle');
-          registrationError!.style.display = "block";
+          this.serverErrorDisplay = "block";
           f.controls['username'].setValue(null)
           f.controls['email'].setValue(null)
           f.controls['password'].setValue(null)
           f.controls['registerConfirmPassword'].setValue(null)
-          circle!.style.display = "none";
+          this.loaderDisplay = "none";
           setTimeout(() => {
-            registrationError!.style.display = "none";
+            this.serverErrorDisplay = "none";
           }, 2000);
         }
         else{
-          err['error']['data']['errors'].forEach(function (item:any) {
+          err['error']['data']['errors'].forEach( (item:any) => {
             if(item['code'] == "username_AlreadyExists"){
-              var usernameError = document.getElementById('usernameAlreadyExists');
-              var circle = document.getElementById('circle');
-              usernameError!.style.display = "block";
-              circle!.style.display = "none";
+              this.usernameExistsDisplay = "block";
+              this.loaderDisplay = "none";
               setTimeout(() => {
-                usernameError!.style.display = "none";
+                this.usernameExistsDisplay = "none";
               }, 2000);
             }
             if(item['code'] == "email_AlreadyExists"){
-              var emailError = document.getElementById('emailAlreadyExists');
-              var circle = document.getElementById('circle');
-              emailError!.style.display = "block";
-              circle!.style.display = "none";
+              this.emailExistsDisplay = "block";
+              this.loaderDisplay = "none";
               setTimeout(() => {
-                emailError!.style.display = "none";
+                this.emailExistsDisplay = "none";
               }, 2000);
             }
           });

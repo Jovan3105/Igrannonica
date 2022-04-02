@@ -1,10 +1,11 @@
 <div class="card" style="height: 350px;" *ngIf = "headers">
     <h5 class="card-header">Odaberi ulaze(features):</h5>
     <div class="card-body" style="overflow-y: scroll;" tabindex="0">
-      <div *ngFor="let header of headers;">
+      <div *ngFor="let header of headers; index as i">
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="{{header.key}}" id="labelCheckbox{{header.key}}" checked (change)= "onCheck(header.key)">
-            <label class="form-check-label" for="labelCheckbox{{header.key}}">
+            <input class="form-check-input" type="checkbox" [value]="header.key" [checked]="checkboxCheckedArray[i]" 
+            [disabled]="checkboxDisabledArray[i]" id="inputCheckbox{{header.key}}" (change)= "onCheckChange($event)">
+            <label class="form-check-label" for="inputCheckbox{{header.key}}">
               "{{header.name}}" ( {{header.type}} )
             </label>
           </div>
@@ -12,13 +13,13 @@
     </div>
   </div>
 
-  <div class="card" style="height: 100px;" *ngIf = "headers">
+  <div class="card" style="height: 150px;" *ngIf = "headers">
     <h5 class="card-header">Odaberi izlaz (labelu):</h5>
     <div class="card-body">
-        <select id="selectLabel" class="form-select" aria-label="Default select example" (change)="onSelect()">
-          <option selected value="-1" >Izaberi izlaz</option>
-            <option *ngFor="let header of headers;" value="{{header.key}}">
-              "{{header.name}}" ({{header.type}})</option>
+        <select [(ngModel)]="selectedLabel" #selectLabel class="form-select" aria-label="Odabir izlaza" (change)="onSelectLabel()">
+          <option [ngValue]="null" disabled>Izaberi izlaz</option>
+          <option *ngFor="let header of headers;" [ngValue]="header">
+            "{{header.name}}" ({{header.type}})</option>
         </select>
     </div>
   </div>

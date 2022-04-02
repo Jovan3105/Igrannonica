@@ -172,7 +172,6 @@ namespace backend.Controllers
         }
         
 
-
         [HttpDelete]
         [Route("")]
         public async Task<ActionResult<string>> deleteDataset(int id)
@@ -225,18 +224,12 @@ namespace backend.Controllers
             var responseString = await res.Content.ReadAsStringAsync();
 
 
-
             //res.Result.EnsureSuccessStatusCode();
             return Ok(responseString);
-                
-               
-            
-
 
             //var response = await client.PostAsync(microserviceURL, content);
 
             //var responseString = await response.Content.ReadAsStringAsync();
-            return BadRequest();
         }
 
         [HttpGet]
@@ -248,25 +241,29 @@ namespace backend.Controllers
 
             var microserviceURL = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
 
-            HttpClient client = new HttpClient();
+            var dataSource = "http://localhost:7220/api/Datasets/getCsv/?filename=";
+            dataSource += dataset.FileName;
 
-            string dataSource = "http://localhost:7220/api/Datasets/getCsv/?name="+dataset.Name;
 
-            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset={0}", dataSource));
+            var client = new HttpClient();
+
+            // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
+            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://raw.githubusercontent.com/zrnsm/pyculiarity/master/tests/raw_data.csv"));
+
+            // stari kod
+            // var response = await client.GetAsync(string.Format(microserviceURL + "?dataset={0}", dataSource)); 
+            // string dataSource = "http://localhost:7220/api/Datasets/getCsv/?name="+dataset.Name;
 
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
-
-
-
         }
 
         [HttpGet]
         [Route("getCsv")]
-        public async Task<ActionResult<string>> getCsv(string name)
+        public async Task<ActionResult<string>> getCsv(string fileName)
         {
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Name==name);
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.FileName == fileName);
             string path = dataset.Path;
             var csv = new List<string[]>();
             string response = string.Empty;
@@ -276,10 +273,9 @@ namespace backend.Controllers
                 response += line+"\n\r";
             }
 
-
-
             return Ok(response);
         }
+
         [HttpPost]
         [Route("upload")]
         public async Task<ActionResult<string>> sendToMl(IFormFile file)
@@ -301,14 +297,16 @@ namespace backend.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
+        }
 
-        [HttpPatch]
+        /*[HttpPatch]
         [Route("")]
         public async Task<ActionResult<string>> patch(List<int> rows, List<int> cols, Dataset data)
         {
             HandleRowsAndCols(rows, cols, data);
             return Ok("ok");
         }
+
         public async void  HandleRowsAndCols(List<int> rows, List<int> cols, Dataset data)
         {
             //brisanje redova
@@ -333,26 +331,7 @@ namespace backend.Controllers
 
             //brisanje kolona
 
-
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        }
-
-
-
+        }*/
 
 
         [HttpPatch]
@@ -370,15 +349,17 @@ namespace backend.Controllers
                 lines[value.Row] = string.Join(",", line);
             }
 
-            using StreamWriter file = new(data.Path);
-
-            foreach (string line in lines)
+            using (StreamWriter file = new(data.Path))
             {
-                await file.WriteLineAsync(line);
+                foreach (string line in lines)
+                {
+                    await file.WriteLineAsync(line);
+                }
             }
 
             return Ok("ok");
         }
+
         [HttpPost]
         [Route("/begin_training")]
         public async Task<ActionResult<string>> beginTraining(int epoches, string algorithm)
@@ -402,8 +383,5 @@ namespace backend.Controllers
             return Ok(result);
 
         }
-       
-        
-
     }
 }

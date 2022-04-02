@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
 import { Check, HeaderDict } from '../../models/check';
+
 
 @Component({
   selector: 'app-labels',
@@ -13,6 +13,9 @@ export class LabelsComponent implements OnInit {
   pred?:number | null;
   @Output() checkEvent: EventEmitter<Check>;
   @Output() labelEvent: EventEmitter<{ id: number; pred: number; }>;
+  selectedLabel:any = null;
+  checkboxCheckedArray:boolean[];
+  checkboxDisabledArray:boolean[];
 
   constructor() {
 
@@ -20,73 +23,70 @@ export class LabelsComponent implements OnInit {
     this.pred = null;
     this.checkEvent = new EventEmitter<Check>();
     this.labelEvent = new EventEmitter<{id:number,pred:number}>();
+    this.checkboxCheckedArray = new Array<boolean>();
+    this.checkboxDisabledArray = new Array<boolean>();
 
-    //const navigation = this.router.getCurrentNavigation();
-
-    /*
-    if (navigation)
-    {
-      this.state = navigation.extras.state;
-    }*/
   }
 
   ngOnInit(): void {
     this.pred = null;
+    this.selectedLabel = null;
     this.labelEvent = new EventEmitter<{id:number,pred:number}>();
+    this.checkboxCheckedArray.splice(0,this.checkboxCheckedArray.length);
+    this.checkboxDisabledArray.splice(0,this.checkboxDisabledArray.length);
   }
 
-  onDatasetSelected(headers: Array<HeaderDict>) {
+  onDatasetSelected(headers: Array<HeaderDict>) 
+  {
     this.headers = headers;
+    for(let i = 0; i<headers.length; i++) {
+      this.checkboxCheckedArray.push(true);
+      this.checkboxDisabledArray.push(false);
+    };
   }
 
-  onCheck(id: number) {
-    var checkbox = <HTMLInputElement>document.getElementById('labelCheckbox' + id);
-    if (checkbox) {
-      if (checkbox.checked) {
-        console.log("Menja se");
-        this.checkEvent.emit(new Check(id, true));
-      }
-      else {
-        console.log("Menja se");
-        this.checkEvent.emit(new Check(id, false));
-      }
+  onCheckChange(event: any) 
+  {
+
+    if (event.target.checked)
+    {
+
+      this.checkboxCheckedArray[event.target.value] = true;
+      this.checkEvent.emit(new Check(event.target.value, true));
     }
+    else{
+      this.checkboxCheckedArray[event.target.value] = false;
+      this.checkEvent.emit(new Check(event.target.value, false));
+    }
+    
   }
 
   changeCheckbox(checkChange:Check)
   {
-    var checkbox = <HTMLInputElement>document.getElementById('labelCheckbox' + checkChange.id);
-    if (checkbox) {
-      if (checkbox.checked) {
-        checkbox.checked = false;
-      }
-      else {
-        checkbox.checked = true;
-      }
-    }
+    if (this.checkboxCheckedArray[checkChange.id])
+      this.checkboxCheckedArray[checkChange.id] = false;
+    else 
+      this.checkboxCheckedArray[checkChange.id] = true;
   }
 
-  onSelect()
+  onSelectLabel()
   {
-    var selectedItem = <HTMLInputElement>document.getElementById("selectLabel");
+    //console.log(this.selectedLabel);
 
-    if (this.pred != null){
-      var selectedCheckbox =  <HTMLInputElement>document.getElementById('labelCheckbox' + this.pred);
-      selectedCheckbox.disabled = false;
-      selectedCheckbox.checked = true;
-      this.onCheck(this.pred);
-      console.log(this.pred);
+    if (this.pred != null)
+    {
+      this.checkboxDisabledArray[this.pred] = false;
+      this.checkboxCheckedArray[this.pred] = true;
       this.pred = null;
     }
 
-    if (selectedItem.value != "-1")
+    if (this.selectedLabel != null)
     {
-      var selectedCheckbox =  <HTMLInputElement>document.getElementById('labelCheckbox' + selectedItem.value);
-      if (selectedCheckbox.checked) selectedCheckbox.checked = false;
-      //this.onCheck(parseInt(selectedItem.value));
-      selectedCheckbox.disabled = true;
-      this.pred = parseInt(selectedItem.value);
-      this.labelEvent.emit({id:parseInt(selectedItem.value),pred:this.pred});
+      
+      if (this.checkboxCheckedArray[this.selectedLabel.key]) this.checkboxCheckedArray[this.selectedLabel.key] = false;
+      this.checkboxDisabledArray[this.selectedLabel.key] = true;
+      this.pred = parseInt(this.selectedLabel.key);
+      this.labelEvent.emit({id:parseInt(this.selectedLabel.key),pred:this.pred});
     }
   }
 
@@ -94,17 +94,17 @@ export class LabelsComponent implements OnInit {
 
     var values;
     var tempHeader = [];
+
     if (this.headers)
     {
-      var selectedItem = <HTMLInputElement>document.getElementById("selectLabel");
 
       for(let i=0; i<this.headers.length; i++)
       {
-        var selectedCheckbox =  <HTMLInputElement>document.getElementById('labelCheckbox' + this.headers[i].key);
-        if (selectedCheckbox.checked) tempHeader.push(this.headers[i]);
+        if (this.checkboxCheckedArray[i]) tempHeader.push(this.headers[i]);
       }
-      var features = tempHeader.filter(element => element.key != parseInt(selectedItem.value));
-      var label = this.headers.filter(element => element.key == parseInt(selectedItem.value));
+      var features = tempHeader.filter(element => element.key != this.selectedLabel.key);
+      var label = this.headers.filter(element => element.key == this.selectedLabel.key);
+      
       values = {
         "features":features,
         "label":label
