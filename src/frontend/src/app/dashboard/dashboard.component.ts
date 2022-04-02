@@ -6,6 +6,7 @@ import { style } from '@angular/animations';
 import { LabelsComponent } from '../training/components/labels/labels.component';
 import { Check } from '../training/models/check';
 import { HeadersService } from '../training/services/headers.service';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,6 +15,16 @@ import { HeadersService } from '../training/services/headers.service';
 })
 export class DashboardComponent implements OnInit {
   toggledButton: boolean = true
+  visibilityTrigger: boolean = false;
+
+  algorithmControl = new FormControl('', Validators.required);
+  selectFormControl = new FormControl('', Validators.required);
+  algorithms: any[] = [
+    {name: 'Alghoritm1', info: 'Alghoritm1!'},
+    {name: 'Alghoritm2', info: 'Alghoritm2!'},
+    {name: 'Alghoritm3', info: 'Alghoritm3!'},
+    {name: 'Alghoritm4', info: 'Alghoritm4!'},
+  ];
 
   constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService) { }
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
@@ -185,6 +196,7 @@ export class DashboardComponent implements OnInit {
       this.featuresLabel = temp;
       console.log(this.featuresLabel);
       //Pokreni modal
+      this.visibilityTrigger=!this.visibilityTrigger;
       
     }
     else{
@@ -212,5 +224,12 @@ export class DashboardComponent implements OnInit {
   onSelectedLabel(data:{id:number,pred:number})
   {
     this.dataTable.changeLabelColumn(data);
+  }
+  change(value: number): void {
+    console.log(value);
+  }
+
+  TrainingClick(){
+
   }
 }

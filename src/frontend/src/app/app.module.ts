@@ -16,8 +16,9 @@ import { AgGridModule } from 'ag-grid-angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EmailVerifComponent } from './auth/components/email-verif/email-verif.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-
-
+import { NgxNumberSpinnerModule } from 'ngx-number-spinner';
+import { MatSelectModule } from "@angular/material/select";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     NgbModule,
     HttpClientModule,
     ReactiveFormsModule,
-    AgGridModule.withComponents([])
+    AgGridModule.withComponents([]),
+    NgxNumberSpinnerModule,
+    MatSelectModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent],
