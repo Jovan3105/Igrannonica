@@ -245,17 +245,17 @@ namespace backend.Controllers
 
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
-            var url = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
+            var microserviceURL = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
 
-            HttpClient client = new HttpClient();
+            var dataSource = "http://localhost:7220/api/Datasets/getCsv/?filename=";
+            dataSource += dataset.FileName;
 
-            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
-            var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset", fileName: Path.GetFileName(dataset.Path));
+            var client = new HttpClient();
 
-            var response = await client.PostAsync(url, multipartFormContent);
+            // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
+            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://raw.githubusercontent.com/zrnsm/pyculiarity/master/tests/raw_data.csv"));
+
 
             var responseString = await response.Content.ReadAsStringAsync();
 
@@ -265,9 +265,9 @@ namespace backend.Controllers
 
         [HttpGet]
         [Route("getCsv")]
-        public async Task<ActionResult<string>> getCsv(string name)
+        public async Task<ActionResult<string>> getCsv(string fileName)
         {
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Name==name);
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.FileName == fileName);
             string path = dataset.Path;
             var csv = new List<string[]>();
             var lines = System.IO.File.ReadAllLines(path);
@@ -276,6 +276,7 @@ namespace backend.Controllers
 
             return Ok(lines);
         }
+
         [HttpPost]
         [Route("upload")]
         public async Task<ActionResult<string>> sendToMl(IFormFile file)

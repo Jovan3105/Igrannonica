@@ -1,10 +1,10 @@
-from xml.etree.ElementInclude import include
 from fastapi import APIRouter, HTTPException, Path, Query
 from pydantic import BaseModel, AnyHttpUrl
 from typing import Optional
 import pandas as pd
 
-from services import datastatistics_service
+from services import dataprep_service
+from services import datastat_service
 
 #################################################################
 
@@ -17,28 +17,21 @@ async def get_stat_indicators(
     dataset_source : AnyHttpUrl,
     delimiter      : Optional[str] = None,
     lineterminator : Optional[str] = None,
+    quotechar      : Optional[str] = None,
+    escapechar     : Optional[str] = None,
     encoding       : Optional[str] = None,
 ):
 
-    ( dataset, column_types, basic_info ) = datastatistics_service.get_stat_indicators(
+    df, _, _, _ = dataprep_service.parse_dataset(
         dataset_source,
         delimiter = delimiter, 
         lineterminator = lineterminator, 
+        quotechar = '"' if quotechar == None else quotechar, 
+        escapechar = escapechar, 
         encoding = encoding 
         )
     
-    dataset = pd.DataFrame.from_dict(dataset)
+    print(f"####:     Dataset:")
+    print(df)
 
-    #columns with numeric values
-    continuous = dataset.select_dtypes(include='number')
-    continuous = continuous.describe().T.to_dict('records')
-
-    #columns with non-numeric values
-    categorical = dataset.select_dtypes(include='object')
-    categorical = categorical.describe().T.to_dict('records')
-
-    newDict = {}
-    newDict["continuous"] = continuous
-    newDict["categorical"] = categorical
-
-    return newDict
+    return datastat_service.get_stat_indicators(df)

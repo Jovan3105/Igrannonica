@@ -38,7 +38,8 @@ export class DashboardComponent implements OnInit {
         this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
         this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
         
-        this.datasetService.getStatIndicators(2).subscribe(this.fetchStatsDataObserver);
+        // TODO ispraviti kada se omoguci povratak ID-a
+        this.datasetService.getStatIndicators(22).subscribe(this.fetchStatsDataObserver);
         var buttons = document.getElementById('buttons')
         buttons!.style.display = "block";
     },

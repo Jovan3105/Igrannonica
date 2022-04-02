@@ -31,4 +31,4 @@ async def image_to_uri(plt, ext='png'):
  
 #################################################################
 
-asyncio.get_event_loop().run_until_complete(make_connection())
+#asyncio.get_event_loop().run_until_complete(make_connection())
