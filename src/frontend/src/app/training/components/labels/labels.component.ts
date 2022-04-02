@@ -10,9 +10,9 @@ import { Check, HeaderDict } from '../../models/check';
 export class LabelsComponent implements OnInit {
 
   headers: HeaderDict[] | null;
-  pred?:number | null;
-  @Output() checkEvent: EventEmitter<Check>;
-  @Output() labelEvent: EventEmitter<{ id: number; pred: number; }>;
+  pred: number | null;
+  @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
+  @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
   selectedLabel:any = null;
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
@@ -22,7 +22,7 @@ export class LabelsComponent implements OnInit {
     this.headers = null;
     this.pred = null;
     this.checkEvent = new EventEmitter<Check>();
-    this.labelEvent = new EventEmitter<{id:number,pred:number}>();
+    this.labelEvent = new EventEmitter<{id:number,pred:number | null}>();
     this.checkboxCheckedArray = new Array<boolean>();
     this.checkboxDisabledArray = new Array<boolean>();
 
@@ -31,26 +31,27 @@ export class LabelsComponent implements OnInit {
   ngOnInit(): void {
     this.pred = null;
     this.selectedLabel = null;
-    this.labelEvent = new EventEmitter<{id:number,pred:number}>();
+    //this.labelEvent = new EventEmitter<{id:number,pred:number}>();
     this.checkboxCheckedArray.splice(0,this.checkboxCheckedArray.length);
     this.checkboxDisabledArray.splice(0,this.checkboxDisabledArray.length);
   }
 
   onDatasetSelected(headers: Array<HeaderDict>) 
   {
+    this.ngOnInit();
     this.headers = headers;
     for(let i = 0; i<headers.length; i++) {
       this.checkboxCheckedArray.push(true);
       this.checkboxDisabledArray.push(false);
     };
+    console.log(this.checkboxCheckedArray);
   }
 
   onCheckChange(event: any) 
   {
-
+    console.log("Podigao se event kad se klikne");
     if (event.target.checked)
     {
-
       this.checkboxCheckedArray[event.target.value] = true;
       this.checkEvent.emit(new Check(event.target.value, true));
     }
@@ -63,31 +64,27 @@ export class LabelsComponent implements OnInit {
 
   changeCheckbox(checkChange:Check)
   {
-    if (this.checkboxCheckedArray[checkChange.id])
-      this.checkboxCheckedArray[checkChange.id] = false;
-    else 
-      this.checkboxCheckedArray[checkChange.id] = true;
+    console.log("Podigao se event kad se hideuje iz tabele");
+    console.log(checkChange);
+    this.checkboxCheckedArray[checkChange.id] = !this.checkboxCheckedArray[checkChange.id];
   }
 
   onSelectLabel()
   {
-    //console.log(this.selectedLabel);
 
     if (this.pred != null)
     {
       this.checkboxDisabledArray[this.pred] = false;
       this.checkboxCheckedArray[this.pred] = true;
-      this.pred = null;
     }
 
-    if (this.selectedLabel != null)
-    {
-      
-      if (this.checkboxCheckedArray[this.selectedLabel.key]) this.checkboxCheckedArray[this.selectedLabel.key] = false;
-      this.checkboxDisabledArray[this.selectedLabel.key] = true;
-      this.pred = parseInt(this.selectedLabel.key);
-      this.labelEvent.emit({id:parseInt(this.selectedLabel.key),pred:this.pred});
-    }
+    if (this.checkboxCheckedArray[this.selectedLabel.key]) 
+      this.checkboxCheckedArray[this.selectedLabel.key] = false;
+
+    this.checkboxDisabledArray[this.selectedLabel.key] = true;
+    this.labelEvent.emit({id:parseInt(this.selectedLabel.key),pred:this.pred});
+    this.pred = parseInt(this.selectedLabel.key);
+    
   }
 
   getValues(){

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, Column, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
 import { Check, HeaderDict } from '../../models/check';
 
 @Component({
@@ -14,9 +14,10 @@ export class ShowTableComponent implements OnInit {
   data: any = null;
   private gridApi!: GridApi;
   private columnApi!: ColumnApi;
-  @Output() hideEvent = new EventEmitter<Check>();
+  colIds:string[];
+  @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
 
-  constructor() { }
+  public defaultColDef : ColDef = {};
 
   columnDefs: ColDef[] = [];
   rowData: any = [];
@@ -29,11 +30,26 @@ export class ShowTableComponent implements OnInit {
   moveAnimationEnabled:boolean = false
   suppressDragLeaveHidesColumnsEnabled:boolean = false
 
+  constructor() {
+    this.columnDefs = [];
+    this.rowData = [];
+    this.rowSelection = 'multiple';
+    this.paginationPageSize = 10;
+    this.tableStyle = "height: 520px;";
+    this.tableClass = "ag-theme-alpine";
+    this.paginationEnabled = true;
+    this.moveAnimationEnabled = false;
+    this.animateRowsEnabled = true;
+    this.suppressDragLeaveHidesColumnsEnabled = false;
+    this.colIds = [];
+    this.hideEvent = new EventEmitter<Check>();
+  }
+
   ngOnInit(): void {
 
   }
 
-  prepareTable(indicator:TableIndicator,data: any, headers: Array<HeaderDict>) {
+  prepareTable(indicator:TableIndicator, data: any, headers: Array<HeaderDict>) {
     
     this.data = data;
 
@@ -46,24 +62,32 @@ export class ShowTableComponent implements OnInit {
     for (let row of data) {
       this.rowData.push(row);
     }
-
+    this.resetVisibility();
   }
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    console.log(this.columnDefs);
-    console.log(this.rowData);
     this.columnApi = params.columnApi;
+  }
+
+  resetVisibility()
+  {
+    if(this.columnApi)
+      this.columnApi.setColumnsVisible(this.colIds,true);
   }
 
   setRowData(rowData:any[]){
     this.rowData = rowData;
   }
   
-  setColumnDefs(indicator:TableIndicator){
+  setColumnDefs(indicator:TableIndicator)
+  {
+    this.colIds = [];
     if (indicator == TableIndicator.DATA_MANIPULATION)
     {
-      for (let header of this.headers) {
+      for (let header of this.headers) 
+      {
+        this.colIds.push(header.key.toString());
         var col = {
           colId: header.key.toString(),
           flex: 1,
@@ -74,14 +98,16 @@ export class ShowTableComponent implements OnInit {
           resizable: true,
           sortable: true,
           minWidth: 100,
-          hide:false
+          lockVisible:false
         }
         this.columnDefs.push(col);
       }
     }
     else if (indicator == TableIndicator.INFO)
-    { 
-      for (let header of this.headers) {
+    {
+      for (let header of this.headers) 
+      {
+        this.colIds.push(header.key.toString()); 
         var col2 = {
           colId: header.key.toString(),
           flex: 1,
@@ -107,20 +133,23 @@ export class ShowTableComponent implements OnInit {
     }
   }
 
+  //Kada se promeni u checkboxu, mora da se prikaze ili sakrije i u tabeli
   changeColomnVisibility(id: string, visible: boolean) {
     this.columnApi.setColumnVisible(id, visible);
   }
 
+  //Salje obavestenje Label komponenti ukoliko se dragguje kolona iz tabele, da se to azurira i na checkbox-u
+
   onColumnVisible(e: ColumnVisibleEvent) {
 
-    if (e.source != "api") {
+    if (e.source == "uiColumnDragged") {
       if (e.visible == false) {
-        this.hideEvent.emit(new Check(e.columns![0].getInstanceId(), false));
+        this.hideEvent.emit(new Check(parseInt(e.columns![0].getColId()), false));
       }
       else {
-        this.hideEvent.emit(new Check(e.columns![0].getInstanceId(), true));
+        this.hideEvent.emit(new Check(parseInt(e.columns![0].getColId()), true));
       }
-      //console.log('Event Column Visible', e);
+      console.log('Event Column Visible', e);
     }
   }
   
@@ -137,7 +166,6 @@ export class ShowTableComponent implements OnInit {
     this.paginationPageSize = paginationPageSize;
   }
 
-  
   changeAttributeValue(
     style?:string,
     tableClass?:string,
@@ -180,21 +208,36 @@ export class ShowTableComponent implements OnInit {
 
   }
 
-  changeLabelColumn(data:{id:number,pred:number}){
-    
-  /*
-    var colDef1 = this.columnApi.getColumn(data.id)?.getColDef();
-    var colDef2 = this.columnApi.getColumn(data.pred)?.getColDef();
+  //Lock-uje kolonu koja je odabrana za label tako da ne moze da se hide-uje iz tabele
+  changeLabelColumn(data:{id:number,pred:number | null }){
 
-    if (colDef1){
-      colDef1.lockPosition = true;
+    console.log(data);
+    if (data.pred != null)
+    {
+      this.columnDefs.forEach(element=>{
+        if (element.colId == data.id.toString())
+        {
+          element.lockVisible  = true;
+
+        }
+        else if (element.colId == data.pred!.toString()){
+          element.lockVisible  = false;
+        }
+      });
     }
-    if (colDef2) colDef2.lockPosition = false;
+    else
+    {
+      this.columnDefs.forEach(element=>{
+        if (element.colId == data.id.toString())
+        {
+          element.lockVisible  = true;
+        }
+      });
+    }
 
-    this.columnApi.getColumn(data.id)?.setColDef(colDef1!,null!);
-    this.columnApi.getColumn(data.pred)?.setColDef(colDef2!,null!);
-    this.gridApi.refreshCells();
-    */
+    this.changeColomnVisibility(data.id.toString(),true);
+    console.log(this.columnDefs);
+    this.gridApi.setColumnDefs(this.columnDefs);
   }
 }
 
