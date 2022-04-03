@@ -1,4 +1,4 @@
-<div id="first" [hidden]="visibilityTrigger">
+<div id="first" [ngStyle]="{'display': firstVisibility}">
     <div class="row mx-auto" style="width: 1200px;">
         <div class="col-sm">
             <label for="formFile" class="form-label">Upload dataset</label>
@@ -31,7 +31,7 @@
         </div>
     </div>
     <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility}">
-        
+        <!-- ova dva dugmeta prave problem -->
         <div class="mx-5" id="buttons" [ngStyle]="{'margin-bottom':'5px'}" >
             <button type="button" class="btn btn-secondary" 
             (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
@@ -77,7 +77,7 @@
         </div>
     </div>
 </div>
-<div id="second" class="row mx-auto" style="width: 1200px;" [hidden]="!visibilityTrigger">
+<div id="second" class="row mx-auto" style="width: 1200px;" [ngStyle]="{'display': secondVisibility}">
     <div class="options">
         <form #form>
             <h4>Number of epochs</h4>
@@ -91,12 +91,6 @@
                     style="width: 300px;">
                 </ngx-number-spinner>
                 <br>
-                <ngx-number-spinner
-                    [value]="4"
-                    (change)="change($event)" 
-                    [min]="0"
-                    style="margin-left: 30px; width: 300px;">
-                </ngx-number-spinner>
             </div>
             <hr>
             <h4>Select an algorithm</h4>
@@ -113,6 +107,14 @@
             </mat-form-field>
             <br><br>
             <button type="button" class="btn btn-primary" (click)="TrainingClick()">Start</button>
+            <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
+                <div class="miniLoader">
+                    <div class="miniLoader">
+
+                    </div>
+                </div>
+            </div>
+            <br>
         </form>
     </div>
     

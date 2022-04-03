@@ -7,6 +7,7 @@ import { Check } from '../training/models/check';
 import { HeadersService } from '../training/services/headers.service';
 import { FormControl, Validators } from '@angular/forms';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
+import { TrainingService } from '../training/services/training.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,7 +17,8 @@ import { TableIndicator } from '../training/components/show-table/show-table.com
 export class DashboardComponent implements OnInit {
   
   toggledButton: boolean = true
-  visibilityTrigger: boolean = false;
+  numberOfEpochs: number = 4;
+  //visibilityTrigger: boolean = false;
 
   algorithmControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
@@ -35,8 +37,11 @@ export class DashboardComponent implements OnInit {
   deleteButtonDisplay:string = "inline";
   labelsVisibility:string = "visible";
   mainTableDisplay:string = "block";
+  firstVisibility:string = "block";
+  secondVisibility:string = "none";
+  loaderMiniDisplay:string = "none";
 
-  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService) { }
+  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService, private trainingService: TrainingService) { }
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
@@ -198,7 +203,8 @@ export class DashboardComponent implements OnInit {
       this.featuresLabel = temp;
       console.log(this.featuresLabel);
       //Pokreni modal
-      this.visibilityTrigger=!this.visibilityTrigger;
+      this.firstVisibility = "none";
+      this.secondVisibility = "block";
       
     }
     else{
@@ -229,9 +235,17 @@ export class DashboardComponent implements OnInit {
   }
   change(value: number): void {
     console.log(value);
+    this.numberOfEpochs = value;
   }
 
   TrainingClick(){
-
+    //this.loaderDisplay = "block";
+    //this.secondVisibility = "none";
+    this.loaderMiniDisplay = "block";
+    this.trainingService.sendDataForTraining({
+      epochs: this.numberOfEpochs,
+      algorithm: this.algorithmControl.value.name
+    })
+    console.log("Poslato "+ this.numberOfEpochs + " i " + this.algorithmControl.value.name)
   }
 }
