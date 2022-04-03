@@ -32,15 +32,16 @@
     </div>
     <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility}">
         <!-- ova dva dugmeta prave problem -->
-        <div class="mx-5" id="buttons" [ngStyle]="{'margin-bottom':'5px'}" >
-            <button type="button" class="btn btn-secondary" 
-            (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
-            <button type="button" class="btn btn-danger" 
-            (click)="onRemoveSelected()" 
-            [ngStyle]="{'display': deleteButtonDisplay}" 
-            id="deleteButton">Delete selected</button>
-        </div>
-        <div class="col-sm-9">
+        
+        <div class="col-sm-9" id="block">
+            <div class="mx-auto" id="buttons" [ngStyle]="{'margin-bottom':'5px'}" >
+                <button type="button" class="btn btn-secondary" 
+                (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
+                <button type="button" class="btn btn-danger" 
+                (click)="onRemoveSelected()" 
+                [ngStyle]="{'display': deleteButtonDisplay}" 
+                id="deleteButton">Delete selected</button>
+            </div>
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)">
             </app-show-table>
@@ -93,17 +94,17 @@
                 <br>
             </div>
             <hr>
-            <h4>Select an algorithm</h4>
-            <mat-form-field appearance="fill">
-                <mat-label>Favorite algorithm</mat-label>
-                <mat-select [formControl]="algorithmControl" name="algorithm">
+            <h4>Select a activation function</h4>
+            <mat-form-field appearance="fill" style="width: 40%;">
+                <mat-label>Favorite function</mat-label>
+                <mat-select [formControl]="activationFunctionControl" name="activationFunctionControl">
                     <mat-option>--</mat-option>
-                    <mat-option *ngFor="let item of algorithms" [value]="item">
+                    <mat-option *ngFor="let item of activationFunctions" [value]="item">
                     {{item.name}}
                     </mat-option>
                 </mat-select>
-                <mat-error *ngIf="algorithmControl.hasError('required')">Please choose an algorithm</mat-error>
-                <mat-hint>{{algorithmControl.value?.info}}</mat-hint>
+                <mat-error *ngIf="activationFunctionControl.hasError('required')">Please choose a activation function</mat-error>
+                <mat-hint>{{activationFunctionControl.value.info}}</mat-hint>
             </mat-form-field>
             <br><br>
             <button type="button" class="btn btn-primary" (click)="TrainingClick()">Start</button>

@@ -20,13 +20,13 @@ export class DashboardComponent implements OnInit {
   numberOfEpochs: number = 4;
   //visibilityTrigger: boolean = false;
 
-  algorithmControl = new FormControl('', Validators.required);
+  activationFunctionControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
-  algorithms: any[] = [
-    {name: 'Alghoritm1', info: 'Alghoritm1!'},
-    {name: 'Alghoritm2', info: 'Alghoritm2!'},
-    {name: 'Alghoritm3', info: 'Alghoritm3!'},
-    {name: 'Alghoritm4', info: 'Alghoritm4!'},
+  activationFunctions: any[] = [
+    {name: 'Sigmoid', info: 'Sigmoid!', codename: 'sigmoid'},
+    {name: 'ReLu', info: 'ReLu!', codename: 'relu'},
+    {name: 'Activation function2', info: 'Activation function2!', codename: 'function1'},
+    {name: 'Activation function3', info: 'Activation function3!', codename: 'function2'},
   ];
   loaderDisplay:string = "none";
   containerVisibility:string = "hidden";
@@ -100,6 +100,18 @@ export class DashboardComponent implements OnInit {
     },
     error: (err: Error) => {
       console.log("dashboard > DashboardComponent > fetchStatsDataObserver > error:")
+      console.log(err)
+    }
+  };
+
+  startTrainingObserver:any = {
+    next: (response:any) => { 
+      console.log("dashboard > DashboardComponent > startTrainingObserver > next:")
+      console.log(response)
+        
+    },
+    error: (err: Error) => {
+      console.log("dashboard > DashboardComponent > startTrainingObserver > error:")
       console.log(err)
     }
   };
@@ -244,8 +256,11 @@ export class DashboardComponent implements OnInit {
     this.loaderMiniDisplay = "block";
     this.trainingService.sendDataForTraining({
       epochs: this.numberOfEpochs,
-      algorithm: this.algorithmControl.value.name
-    })
-    console.log("Poslato "+ this.numberOfEpochs + " i " + this.algorithmControl.value.name)
+      activationFunction: this.activationFunctionControl.value.name,
+      features: this.featuresLabel['features'],
+      labels: this.featuresLabel['label']
+    }).subscribe(this.startTrainingObserver);
+    console.log("Features: "+ this.featuresLabel['features'][0]['name']+" label: "+ this.featuresLabel['label'][0]['name'])
+    console.log("Poslato "+ this.numberOfEpochs + " i " + this.activationFunctionControl.value.name)
   }
 }

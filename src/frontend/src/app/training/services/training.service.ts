@@ -13,7 +13,10 @@ export class TrainingService {
   constructor(private http: HttpClient) { }
 
   sendDataForTraining(source:any):Observable<any[]>{
-    return this.http.post<any>(this.trainingAPIUrl + `/begin_training`, source).pipe(
+    return this.http.post<any>(this.trainingAPIUrl + `/begin_training`, source,{
+      //reportProgress: true,
+      //observe: 'events'
+    }).pipe(
       //tap(_ => console.log(`fetched all data`)),
       catchError(this.handleError<any>('getDatasets'))
     );
