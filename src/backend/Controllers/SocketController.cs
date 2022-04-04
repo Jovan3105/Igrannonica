@@ -10,7 +10,23 @@ namespace backend.Controllers
     {
 
         [HttpGet("/ws")]
-        public async Task Get()
+        public async Task Get(int userId)
+        {
+            
+            if (HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                Console.WriteLine(userId);
+                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                
+                await Echo(webSocket);
+            }
+            else
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
+        }
+        [HttpGet("/ws/ml")]
+        public async Task GetMl()
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
@@ -22,6 +38,7 @@ namespace backend.Controllers
                 HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
         }
+        
         static async Task Echo(WebSocket webSocket)
         {
             var buffer = new byte[1024 * 4];
