@@ -16,8 +16,8 @@ print_prefix = "####:     "
 def encode_cat_data(df):
     return pd.get_dummies(df)
 
-def train_test_split(df):
-    train_dataset = df.sample(frac=testing_split, random_state=0)
+def train_test_split(df, testing_split, random_state=0):
+    train_dataset = df.sample(frac=testing_split, random_state=random_state)
     test_dataset = df.drop(train_dataset.index)
 
     return train_dataset, test_dataset
@@ -83,7 +83,7 @@ def train_model(
     df = encode_cat_data(df)
 
     # Split dataset
-    train_dataset, test_dataset = train_test_split(df)
+    train_dataset, test_dataset = train_test_split(df, testing_split)
 
     # Separate labels from features
     train_features = train_dataset.copy()
@@ -123,7 +123,7 @@ def train_model(
         validation_split = validation_split,
         callbacks=[callback])
 
-    plot_loss(history, train_labels[0], train_labels[0].min(), train_labels[0].max())
+    #plot_loss(history, train_labels[0], train_labels[0].min(), train_labels[0].max())
 
 
     return model

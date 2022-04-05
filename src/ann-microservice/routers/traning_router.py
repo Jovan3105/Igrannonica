@@ -2,7 +2,7 @@ from fastapi import APIRouter, Query
 from typing import Optional, List
 from pydantic import AnyHttpUrl
 from services import dataprep_service
-from services import training_service
+from services.training_service import train_model
  
 #################################################################
 
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/training")
 #################################################################
 
 @router.get("/")
-async def train_model(
+async def training(
     dataset_source   : AnyHttpUrl,
     features         : List[str] = Query(...),
     labels           : List[str] = Query(...),
