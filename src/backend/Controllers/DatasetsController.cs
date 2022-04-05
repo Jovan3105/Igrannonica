@@ -362,6 +362,16 @@ namespace backend.Controllers
         }
 
         [HttpGet]
+        [Route("getData")]
+        public async Task<ActionResult<string>> getJsonData(int id)
+        {
+            var dataset = await this.datasetContext.Datasets.FindAsync(id);
+            StreamReader r = new StreamReader(dataset.Path);
+            string data = r.ReadToEnd();
+            return Ok(data);
+        }
+
+        [HttpGet]
         [Route("getCsv")]
         public async Task<ActionResult<string>> getCsv(string fileName)
         {
