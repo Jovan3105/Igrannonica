@@ -67,6 +67,17 @@ def train_model(
     epochs,
     optimizer_key ):
     
+    dataset_headers = list(df.columns.values) 
+
+    # Validate user input
+    for feature in features:
+        if feature not in dataset_headers:
+            raise HTTPException(status_code=404, detail=f"Invalid feature: {feature}")
+        
+    for label in labels:
+        if label not in dataset_headers:
+            raise HTTPException(status_code=404, detail=f"Invalid label: {label}")
+
     # Prepare dataframe
     df = df.dropna()
     df = encode_cat_data(df)
