@@ -102,7 +102,7 @@ namespace backend.Controllers
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
-            return Ok("Success");
+            return Ok(dataset.Id);
         }
 
         [HttpGet]
@@ -202,34 +202,136 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("parse")]
-        public async Task<ActionResult<string>> uploadData([FromBody] DatasetUpdateDto datasetUpdateDto)
+        [Route("uploadLink")]
+        public async Task<ActionResult<string>> uploadLink(String url)
         {
             var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/parse";
-
-            string dataSource = datasetUpdateDto.DatasetSource;
-
-            if ( dataSource == "")
-            {
-                // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
-                dataSource = _configuration["Addresses:Backend"] + "/api/Datasets/getCsv/?name=";
-                dataSource += datasetUpdateDto.Name;
-
-            }
-            
+           
             var client = new HttpClient();
 
-            var res = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", dataSource));
+            var res = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", url));
 
             var responseString = await res.Content.ReadAsStringAsync();
 
+            Dataset dataset = new Dataset();
+            dataset.UserID = 0;
+            dataset.Path = "a";
+
+            this.datasetContext.Datasets.Add(dataset);
+            await this.datasetContext.SaveChangesAsync();
+
+            string[] splitted = url.Split("/");
+
+            string fileName = splitted[splitted.Length - 1].Substring(0,splitted[splitted.Length-1].Length-4)+".json";
+
+
+            //var filePath = "C:\\Users\\Pivan\\Documents\\";
+            var filePath = string.Format(@"../../files/");
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+            filePath += dataset.UserID;
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            filePath = filePath + "/" + dataset.Id + "/";
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+
+
+            string path = Path.Combine(filePath, fileName);
+            using StreamWriter f = new(path);
+            await f.WriteAsync(responseString);
+
+            dataset.Path = path;
+            dataset.FileName = fileName;
+            this.datasetContext.Datasets.Update(dataset);
+            await this.datasetContext.SaveChangesAsync();
+
+            return Ok(dataset.Id);
+
 
             //res.Result.EnsureSuccessStatusCode();
-            return Ok(responseString);
+            //return Ok(responseString);
 
             //var response = await client.PostAsync(microserviceURL, content);
 
             //var responseString = await response.Content.ReadAsStringAsync();
+        }
+
+        [HttpPost]
+        [Route("uploadFile")]
+        public async Task<ActionResult<List<Dataset>>> uploadFile(IFormFile file)
+        {
+
+            
+
+
+            if (file.Length == 0)
+            {
+                return BadRequest("bad");
+            }
+
+            var url = _configuration["Addresses:Microservice"] + "/data-preparation/parse-file";
+
+            HttpClient client = new HttpClient();
+
+            var fileStreamContent = new StreamContent(file.OpenReadStream());
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(file.FileName));
+
+            var response = await client.PostAsync(url, multipartFormContent);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            Dataset dataset = new Dataset();
+            dataset.UserID = 0;
+            dataset.Path = "a";
+
+            this.datasetContext.Datasets.Add(dataset);
+            await this.datasetContext.SaveChangesAsync();
+
+            string fileName = Path.GetFileName(file.FileName).Substring(0, Path.GetFileName(file.FileName).Length-4)+".json";
+
+
+            //var filePath = "C:\\Users\\Pivan\\Documents\\";
+            var filePath = string.Format(@"../../files/");
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+            filePath += dataset.UserID;
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            filePath = filePath + "/" + dataset.Id + "/";
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+
+
+            string path = Path.Combine(filePath, fileName);
+            using StreamWriter f = new(path);
+            await f.WriteAsync(responseString);
+
+            dataset.Path = path;
+            dataset.FileName = fileName;
+            this.datasetContext.Datasets.Update(dataset);
+            await this.datasetContext.SaveChangesAsync();
+
+            return Ok(dataset.Id);
         }
 
         [HttpGet]
