@@ -3,7 +3,7 @@ import { DatasetService } from '../training/services/dataset.service';
 import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 import { LabelsComponent } from '../training/components/labels/labels.component';
-import { Check } from '../training/models/check';
+import { Check } from '../training/models/models';
 import { HeadersService } from '../training/services/headers.service';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
 
@@ -24,6 +24,8 @@ export class DashboardComponent implements OnInit {
   deleteButtonDisplay:string = "inline";
   labelsVisibility:string = "visible";
   mainTableDisplay:string = "block";
+  undoDisabled:boolean = true;
+  undoDeletedDisabled:boolean = true;
 
   constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService) { }
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
@@ -127,11 +129,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-
-  onRemoveSelected() {
-    this.dataTable.onRemoveSelected();
-  }
-
   onShowDataClick() {
 
     this.hideElements();
@@ -156,6 +153,33 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  onRemoveSelected() 
+  {
+    this.dataTable.onRemoveSelected();
+  }
+  onApplyChanges()
+  {
+
+  }
+
+  enableUndo(indicator:boolean)
+  {
+    if (indicator) this.undoDisabled = false;
+    else this.undoDisabled = true;
+  }
+  enableUndoDeleted(indicator:boolean)
+  {
+    if(indicator) this.undoDeletedDisabled = false;
+    else this.undoDeletedDisabled = true;
+  }
+  onUndo()
+  {
+    this.dataTable.onUndo();
+  }
+  onUndoDeleted()
+  {
+    this.dataTable.onUndoDeleted();
+  }
   toggleTables(event:any){
     
     this.statsTableVisibility = "visible";

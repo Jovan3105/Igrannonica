@@ -21,3 +21,17 @@ export class HeaderDict {
   }
 
 }
+
+export class EditedCell{
+  
+  row:number;
+  col:number;
+  value:any;
+
+  constructor(row:number,col:number,value:any)
+  {
+    this.row = row;
+    this.col = col;
+    this.value = value;
+  }
+}
