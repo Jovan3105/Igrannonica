@@ -3,7 +3,7 @@ import { DatasetService } from '../training/services/dataset.service';
 import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 import { LabelsComponent } from '../training/components/labels/labels.component';
-import { Check } from '../training/models/models';
+import { Check, ModifiedData } from '../training/models/models';
 import { HeadersService } from '../training/services/headers.service';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
 
@@ -14,6 +14,7 @@ import { TableIndicator } from '../training/components/show-table/show-table.com
 })
 export class DashboardComponent implements OnInit {
   
+  dataID:number;
   toggledButton: boolean = true
   loaderDisplay:string = "none";
   containerVisibility:string = "hidden";
@@ -27,7 +28,10 @@ export class DashboardComponent implements OnInit {
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
 
-  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService) { }
+  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService) 
+  {
+    this.dataID = -1;
+   }
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
@@ -125,7 +129,13 @@ export class DashboardComponent implements OnInit {
 
       this.form.append('file', file);
       this.datasetService.uploadDataset(this.form)
-      .subscribe(this.fetchTableDataObserver);
+      .subscribe({
+        next: (response:any) =>{
+          console.log(response);
+          this.dataID = response;
+          this.datasetService.getData(response).subscribe(this.fetchTableDataObserver);
+        }
+      });
     }
   }
 
@@ -149,7 +159,14 @@ export class DashboardComponent implements OnInit {
         "encoding": null
       }
       
-      this.datasetService.parseDataset(req).subscribe(this.fetchTableDataObserver);
+      this.datasetService.uploadLink(this.datasetURL).subscribe({
+        next: (response:any) =>{
+          console.log(response);
+          this.dataID = response;
+          this.datasetService.getData(response).subscribe(this.fetchTableDataObserver);
+          }
+        }
+      )  //this.fetchTableDataObserver);
     }
   }
 
@@ -159,7 +176,16 @@ export class DashboardComponent implements OnInit {
   }
   onApplyChanges()
   {
+    var req:ModifiedData = new ModifiedData(this.dataID, this.dataTable.editedCells, this.dataTable.deletedRows);
 
+    console.log(req);
+    this.datasetService.modifyDataset(req).subscribe(
+      {
+        next: (response:any) =>{
+          console.log(response);
+          }
+      }
+    )
   }
 
   enableUndo(indicator:boolean)

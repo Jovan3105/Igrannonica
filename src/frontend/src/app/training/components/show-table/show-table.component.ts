@@ -37,7 +37,7 @@ export class ShowTableComponent implements OnInit {
   undoRedoCellEditing:boolean;
   undoRedoCellEditingLimit:number;
   enableCellChangeFlash:boolean ;
-
+  
   constructor(private tableService:TableService) {
     this.columnDefs = [];
     this.rowData = [];
@@ -112,11 +112,11 @@ export class ShowTableComponent implements OnInit {
           this.editedCells.splice(editedCellIndex,1);
         }
         else 
-          this.editedCells[editedCellIndex].value = newValue;
+          this.editedCells[editedCellIndex].value = newValue.toString();
 
       }
       else 
-        this.editedCells.push(new EditedCell(row,colId,newValue));
+        this.editedCells.push(new EditedCell(row,colId,newValue.toString()));
     }
     
     console.log(this.editedCells);
