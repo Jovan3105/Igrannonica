@@ -3,24 +3,38 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+from sklearn.compose import make_column_transformer
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
+from sklearn.model_selection import train_test_split
 
 from fastapi import HTTPException
-from services import shared_service
+from services.shared_service import log
+
+from helpers.optimizer_helper import map_optimizer
+from helpers.loss_func_helper import map_loss_function
+from helpers.metric_helper import map_metrics
 
 #################################################################
 
-print_prefix = "####:     "
+def encode_and_scale(cont_features, cat_features, X_train, X_test):
+    
+    col_trans = make_column_transformer(
+        (MinMaxScaler(), cont_features),
+        (OneHotEncoder(handle_unknown='ignore'), cat_features)
+    )
 
-#################################################################
+    col_trans.fit(X_train)
 
-def encode_cat_data(df):
-    return pd.get_dummies(df)
+    return col_trans.transform(X_train), col_trans.transform(X_test), col_trans
+    #return pd.get_dummies(df)
 
-def train_test_split(df):
-    train_dataset = df.sample(frac=testing_split, random_state=0)
-    test_dataset = df.drop(train_dataset.index)
 
-    return train_dataset, test_dataset
+# stara TF verzija
+#def train_test_split(df, test_size, random_state=0):
+#    train_dataset = df.sample(frac=test_size, random_state=random_state)
+#    test_dataset = df.drop(train_dataset.index)
+
+#    return train_dataset, test_dataset
 
 def plot_loss(history, label, min, max):
   plt.plot(history.history['loss'], label='loss')
@@ -34,85 +48,136 @@ def plot_loss(history, label, min, max):
   return plot
 
 def generate_img_from_plt(epoch, logs={}):
-    print(f"Model: {self.model}")
+    log(f"Model: {self.model}")
 
     #return image_to_uri(plt) # TODO image ext detection/check
 
-
-def _on_epoch_end(epoch, logs={}):
-    return epoch, self.y_true.numpy(),  self.y_pred.numpy()
-
- 
-def map_optimizer(optimizer_key, learning_rate):   
-    optimizer_switcher = {
-        'adam' : tf.optimizers.Adam(learning_rate=learning_rate)
-    }
-
-    try:         
-        return optimizer_switcher.get(optimizer)
-    except KeyError:
-        print(print_prefix+f'Key "{optimizer}" is not present in optimizer_switcher dictionary')
-        raise HTTPException(status_code=400, detail=f'Optimizer "{optimizer}" is not supported')
-
+#################################################################
 # Main code
 
 def train_model(
     df,
     features,
     labels,
+    metrics,
     learning_rate,
     loss_function,
-    testing_split,
-    validation_split,
+    test_size,
+    validation_size,
     epochs,
-    optimizer_key ):
+    optimizer 
+    ):
+
+    cont_cols_set = set(df.select_dtypes(include='number').columns.values)
+    cat_cols_set = set(df.select_dtypes(exclude='number').columns.values)
+
+    dataset_headers = list(cont_cols_set | cat_cols_set)
+
+    # Validate user input
+    for feature in features:
+        if feature not in dataset_headers:
+            raise HTTPException(status_code=404, detail=f"Invalid feature: {feature}")
+        
+    for label in labels:
+        if label not in dataset_headers:
+            raise HTTPException(status_code=404, detail=f"Invalid label: {label}")
     
+    cont_features = list(set(features) & cont_cols_set)
+    cat_features = list(set(features) & cat_cols_set)
+
+    cont_labels = list(set(labels) & cont_cols_set)
+    cat_labels = list(set(labels) & cat_cols_set)
+
+    log( "[cont_features], [cat_features], [cont_labels], [cat_labels] ==="
+        + f" {cont_features} {cat_features} {cont_labels} {cat_labels}")
+
     # Prepare dataframe
     df = df.dropna()
-    df = encode_cat_data(df)
-
-    # Split dataset
-    train_dataset, test_dataset = train_test_split(df)
+    #df = encode_and_scale(df)
 
     # Separate labels from features
-    train_features = train_dataset.copy()
-    test_features = test_dataset.copy()
+    X = df[features].copy()
+    y = df[labels].copy()
+    
+    # Split dataset
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
 
-    for label in labels:
-        train_labels = train_features.pop(label)
-        test_labels = test_features.pop(label)
-
+    # Scale (normalize) numerical and encode categorical data
+    X_train_normal, X_test_normal, ct = encode_and_scale(cont_features, cat_features, X_train, X_test)
+    
     # Feature normalization
-    normalizer = tf.keras.layers.Normalization(axis=-1)
-    normalizer.adapt(np.array(train_features))
-         
-    # Map optimizer key-code to actual tf optimizer     
-    optimizer = map_optimizer(optimizer_key, learning_rate)
-
+    #normalizer = tf.keras.layers.Normalization(axis=-1)
+    #normalizer.adapt(np.array(X_train))
+    
     # Make a model
     model = tf.keras.Sequential([
-        normalizer,
-        layers.Dense(units=1)
+        #normalizer,
+        layers.Dense(units=128, activation='relu'),
+        layers.Dense(units=32, activation='relu'),
+        layers.Dense(units=1, activation='linear')
     ])
+
+    #model.summary()
+
+    # Map optimizer key-code to actual tf optimizer     
+    optimizer = map_optimizer(optimizer, learning_rate)
+
+    # Map loss function key-code to actual tf loss function     
+    loss_function = map_loss_function(loss_function)
+
+    # Map metric key-code list to actual tf merics
+    metrics = map_metrics(metrics)
 
     # Configure the model 
     model.compile(
-        optimizer=tf.optimizers.Adam(learning_rate=learning_rate),
-        loss=loss_function)
+        optimizer=optimizer,
+        loss=loss_function,
+        metrics=metrics
+    )
 
-    callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=_on_epoch_end)
+    callback = CustomCallback()
 
-    history = linear_model.fit(
-        train_features,
-        train_labels,
+    print(X_train_normal)
+
+    print(y_train)
+
+    # Train the model
+    history = model.fit(
+        X_train_normal,
+        y_train,
         epochs=epochs,
         # Suppress logging.
-        verbose=0,
+        verbose=1,
         # Calculate validation results on x% of the training data.
-        validation_split = validation_split,
-        callbacks=[callback])
+        validation_split=validation_size,
+        callbacks=[callback]
+    )
 
-    plot_loss(history, train_labels[0], train_labels[0].min(), train_labels[0].max())
+    #plot_loss(history, y_train[0], train_labels[0].min(), y_train[0].max())
+
+    y_pred = model.predict(X_train_normal)
+
+    score = model.evaluate(X_test_normal, y_test)
+
+    print('Test loss:', score[0]) 
+    print('Test accuracy:', score[1])
+
+    return y_test.values.tolist(), y_pred.tolist()
 
 
-    return model
+#################################################################
+### Callbacks
+
+# u ovom callback-u ce se vrsiti komunikacija preko socket-a
+class CustomCallback(keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        keys = list(logs.keys())
+        log("\nEnd epoch {} of training; got log keys: {}".format(epoch, keys))
+
+        metric_info = ""
+        for key in keys:
+            metric_info += f" ({key}:{logs[key]})"
+            
+        log( f"{epoch} {metric_info}")
+
+
