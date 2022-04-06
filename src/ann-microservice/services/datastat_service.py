@@ -74,11 +74,11 @@ def get_corr_matrix(df):
     # Set up the matplotlib figure
     f, ax = plt.subplots(figsize=(12, 9))
     # Generate a custom diverging colormap
-    cmap = sns.diverging_palette(230, 20, as_cmap=True)
+    cmap ="Spectral" #sns.diverging_palette(230, 20, as_cmap=True)
     
 
     # Draw the heatmap with the mask and correct aspect ratio
-    heatmap = sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
+    heatmap = sns.heatmap(corr, mask=mask, cmap=cmap, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": 1}, fmt='.5f')
     #wrap_labels(ax,30)
     sns.set(font_scale=0.5)

@@ -108,6 +108,12 @@ export class DatasetService {
       catchError(this.handleError<any>('uploadDataset'))
     );;
   }
+  getCorrMatrix(id:any):Observable<any>{
+    return this.http.get<any>(this.datasetAPIUrl +`/${id}/corr_matrix`).pipe(
+      //tap(_ => console.log(`fetched page id=${id}`)),
+      catchError(this.handleError<any>('getCorrMatrix'))
+    );
+  }
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
