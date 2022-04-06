@@ -286,7 +286,7 @@ namespace backend.Controllers
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
             var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(file.FileName));
+            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: file.FileName);
 
             var response = await client.PostAsync(url, multipartFormContent);
 
@@ -334,31 +334,30 @@ namespace backend.Controllers
             return Ok(dataset.Id);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("{id}/stat_indicators")]
         public async Task<ActionResult<string>> statIndicators(int id)
         {
 
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
-            var microserviceURL = _configuration["Addresses:Microservice"]+"/dataset/stat_indicators";
 
-            var dataSource = "http://localhost:7220/api/Datasets/getCsv/?filename=";
-            dataSource += dataset.FileName;
+            var url = _configuration["Addresses:Microservice"] + "/dataset/stat_indicators";
 
+            HttpClient client = new HttpClient();
 
-            var client = new HttpClient();
+            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
-            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://raw.githubusercontent.com/zrnsm/pyculiarity/master/tests/raw_data.csv"));
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(dataset.Path));
 
-            // stari kod
-            // var response = await client.GetAsync(string.Format(microserviceURL + "?dataset={0}", dataSource)); 
-            // string dataSource = "http://localhost:7220/api/Datasets/getCsv/?name="+dataset.Name;
+            var response = await client.PostAsync(url, multipartFormContent);
 
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
+
         }
 
         [HttpGet]
