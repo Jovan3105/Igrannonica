@@ -67,3 +67,6 @@
 .btn-secondary{
     margin-left: 10px;
 }
+.ag-header-cell-label {
+    justify-content: center;
+ }

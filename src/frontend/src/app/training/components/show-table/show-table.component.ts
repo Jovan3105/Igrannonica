@@ -17,7 +17,7 @@ export class ShowTableComponent implements OnInit {
   colIds:string[];
   @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
 
-  public defaultColDef : ColDef = {};
+  indicator?:TableIndicator;
 
   columnDefs: ColDef[] = [];
   rowData: any = [];
@@ -52,6 +52,7 @@ export class ShowTableComponent implements OnInit {
   prepareTable(indicator:TableIndicator, data: any, headers: Array<HeaderDict>) {
     
     this.data = data;
+    this.indicator = indicator;
 
     if (data.length > 0) this.headers = headers;
     this.columnDefs = [];
@@ -68,6 +69,13 @@ export class ShowTableComponent implements OnInit {
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.columnApi = params.columnApi;
+    console.log(this.columnDefs[0].field);
+    if (this.indicator && this.indicator == TableIndicator.STATS && this.columnDefs[0].field != "indicator")
+    {
+      var ind = this.columnDefs.find(element => element.field == "indicator")
+      if (ind)
+        this.moveColumn(ind?.colId!);
+    }
   }
 
   resetVisibility()
@@ -103,18 +111,18 @@ export class ShowTableComponent implements OnInit {
         this.columnDefs.push(col);
       }
     }
-    else if (indicator == TableIndicator.INFO)
+    else if (indicator == TableIndicator.INFO || indicator == TableIndicator.STATS)
     {
       for (let header of this.headers) 
       {
-        this.colIds.push(header.key.toString()); 
+        //this.colIds.push(header.key.toString()); 
         var col2 = {
           colId: header.key.toString(),
           flex: 1,
           field: header.name,
           resizable: true,
           sortable: true,
-          minWidth: 100,
+          minWidth: 50,
           lockPosition:true
         }
         this.columnDefs.push(col2);
@@ -138,6 +146,9 @@ export class ShowTableComponent implements OnInit {
     this.columnApi.setColumnVisible(id, visible);
   }
 
+  moveColumn(key:string) {
+    this.columnApi.moveColumn(key, 0);
+  }
   //Salje obavestenje Label komponenti ukoliko se dragguje kolona iz tabele, da se to azurira i na checkbox-u
 
   onColumnVisible(e: ColumnVisibleEvent) {
@@ -243,5 +254,6 @@ export class ShowTableComponent implements OnInit {
 
 export enum TableIndicator {
   DATA_MANIPULATION,
-  INFO
+  INFO,
+  STATS
 }

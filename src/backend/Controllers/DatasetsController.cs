@@ -315,7 +315,7 @@ namespace backend.Controllers
             var client = new HttpClient();
 
             // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
-            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://raw.githubusercontent.com/kintan-pitaloka/weight-height-dataset/main/weight-height.csv"));
+            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://people.sc.fsu.edu/~jburkardt/data/csv/hurricanes.csv"));
 
 
             var responseString = await response.Content.ReadAsStringAsync();

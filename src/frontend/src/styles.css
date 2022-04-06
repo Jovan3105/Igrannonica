@@ -3,6 +3,10 @@
 @import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 @import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
 
+.ag-header-cell-label {
+    justify-content: center;
+}
+
 
 
   

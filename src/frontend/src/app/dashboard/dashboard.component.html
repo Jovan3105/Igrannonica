@@ -30,11 +30,10 @@
             </div>
         </div>
     </div>
-    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility}">
+    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility, 'text-align':'center'}">
         <!-- ova dva dugmeta prave problem -->
-        
         <div class="col-sm-9" id="block">
-            <div class="mx-auto" id="buttons" [ngStyle]="{'margin-bottom':'5px'}" >
+            <div class="mx-auto" id="buttons" [ngStyle]="{'margin-bottom':'5px','text-align':'left'}" >
                 <button type="button" class="btn btn-secondary" 
                 (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
                 <button type="button" class="btn btn-danger" 
@@ -45,16 +44,19 @@
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)">
             </app-show-table>
-            <div [ngStyle]="{'visibility':statsTableVisibility}">
-                <app-show-table #dataSetInformation id="basicInfo"></app-show-table>
-                <br> 
-                <app-show-table #numIndicators id="numerical">
-                </app-show-table>
-                <br>
-                <app-show-table #catIndicators id="categorical">
-                </app-show-table>
-                <img [src]="corrMatrixSource" style="height: auto;width: 80%;">
-            </div>
+        </div>
+        <div [ngStyle]="{'display':statsTableDisplay}">
+            <h4>Basic Info</h4>
+            <app-show-table #dataSetInformation id="basicInfo"></app-show-table>
+            <br>
+            <h4>Statistical Indicators for Numerical Data</h4>
+            <app-show-table #numIndicators id="numerical">
+            </app-show-table>
+            <br>
+            <h4>Statistical Indicators for Categorical Data</h4>
+            <app-show-table #catIndicators id="categorical">
+            </app-show-table>
+            <img [src]="corrMatrixSource" style="height: auto;width: 80%;">
         </div>
         <div class="col-sm">
             <app-labels #Labels id="labelCards" [ngStyle]="{'visibility': labelsVisibility}" 

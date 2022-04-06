@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
   nextButtonDisable:boolean = true;
   displayTableButtons:string = "block";
   datasetURL:string = "";
-  statsTableVisibility:string = "hidden";
+  statsTableDisplay:string = "none";
   deleteButtonDisplay:string = "inline";
   labelsVisibility:string = "visible";
   mainTableDisplay:string = "block";
@@ -69,7 +69,7 @@ export class DashboardComponent implements OnInit {
       this.labels.onDatasetSelected(header);
 
       this.dataSetInformation.setPaginationEnabled(false);
-      this.dataSetInformation.setTableStyle("height: 200px;");
+      this.dataSetInformation.setTableStyle("height: 100px;");
       header = this.headersService.getInfoHeader(response['basicInfo']);
       this.dataSetInformation.prepareTable(TableIndicator.INFO, [response['basicInfo']], header) 
       
@@ -78,8 +78,8 @@ export class DashboardComponent implements OnInit {
       // this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       // this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       
-      //this.datasetService.getStatIndicators(22).subscribe(this.fetchStatsDataObserver);
-      //this.datasetService.getCorrMatrix(2).subscribe(this.fetchCorrMatrixObserver);
+      this.datasetService.getStatIndicators(96).subscribe(this.fetchStatsDataObserver);
+      this.datasetService.getCorrMatrix(96).subscribe(this.fetchCorrMatrixObserver);
     },
     error: (err: Error) => {
       console.log(err)
@@ -91,13 +91,15 @@ export class DashboardComponent implements OnInit {
         console.log("dashboard > DashboardComponent > fetchStatsDataObserver > next:")
         console.log(response)
 
-        // TODO ispravka header-a
-        var header = this.headersService.getDataHeader(response['continuous'])
-        this.numIndicators.prepareTable(TableIndicator.INFO, response['continuous'], header) 
+        var headerContinuous = this.headersService.getInfoHeader(response['continuous']);
+        this.numIndicators.setPaginationEnabled(false);
+        this.numIndicators.setTableStyle("height: 400px;");
+        this.numIndicators.prepareTable(TableIndicator.STATS, response['continuous'], headerContinuous) 
 
-        // TODO ispravka header-a
-        header = this.headersService.getDataHeader(response['categorical'])
-        this.catIndicators.prepareTable(TableIndicator.INFO, response['categorical'], header) 
+        var headerCategorical = this.headersService.getInfoHeader(response['categorical']);
+        this.catIndicators.setPaginationEnabled(false);
+        this.catIndicators.setTableStyle("height: 250px;");
+        this.catIndicators.prepareTable(TableIndicator.STATS, response['categorical'], headerCategorical) 
         
     },
     error: (err: Error) => {
@@ -199,11 +201,10 @@ export class DashboardComponent implements OnInit {
 
   toggleTables(event:any){
     
-    this.statsTableVisibility = "visible";
     if(this.toggledButton)
     {
       event.currentTarget.innerHTML = "Show table";
-      this.statsTableVisibility = "visible";
+      this.statsTableDisplay = "block";
       this.deleteButtonDisplay = "none";
       this.labelsVisibility = "hidden";
       this.mainTableDisplay = "none";
@@ -211,7 +212,7 @@ export class DashboardComponent implements OnInit {
     else
     {
       event.currentTarget.innerHTML = "Show stats"
-      this.statsTableVisibility = "hidden";
+      this.statsTableDisplay = "none";
       this.deleteButtonDisplay = "inline";
       this.labelsVisibility = "visible";
       this.mainTableDisplay = "block";
