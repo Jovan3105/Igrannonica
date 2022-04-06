@@ -35,3 +35,28 @@ async def get_stat_indicators(
     print(df)
 
     return datastat_service.get_stat_indicators(df)
+
+@router.get("/corr_matrix")
+async def get_corr_matrix(
+    dataset_source : AnyHttpUrl,
+    delimiter      : Optional[str] = None,
+    lineterminator : Optional[str] = None,
+    quotechar      : Optional[str] = None,
+    escapechar     : Optional[str] = None,
+    encoding       : Optional[str] = None,
+):
+
+    df, _, _, _ = dataprep_service.parse_dataset(
+        dataset_source,
+        delimiter = delimiter, 
+        lineterminator = lineterminator, 
+        quotechar = '"' if quotechar == None else quotechar, 
+        escapechar = escapechar, 
+        encoding = encoding 
+        )
+    
+    print(f"####:     Dataset:")
+    print(df)
+
+    return datastat_service.get_corr_matrix(df)
+    

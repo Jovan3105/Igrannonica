@@ -18,6 +18,7 @@ urllib3 = "==1.25.11"
 tensorflow = "*"
 matplotlib = "*"
 sklearn = "*"
+seaborn = "*"
 
 [dev-packages]
 

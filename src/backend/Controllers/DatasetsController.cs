@@ -299,6 +299,30 @@ namespace backend.Controllers
             return Ok(responseString);
         }
 
+        [HttpGet]
+        [Route("{id}/corr_matrix")]
+        public async Task<ActionResult<string>> getCorrMatrix(int id)
+        {
+
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+
+            var microserviceURL = _configuration["Addresses:Microservice"] + "/dataset/corr_matrix";
+
+            var dataSource = "http://localhost:7220/api/Datasets/getCsv/?filename=";
+            dataSource += dataset.FileName;
+
+
+            var client = new HttpClient();
+
+            // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
+            var response = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://raw.githubusercontent.com/kintan-pitaloka/weight-height-dataset/main/weight-height.csv"));
+
+
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return Ok(responseString);
+        }
+
         /*[HttpPatch]
         [Route("")]
         public async Task<ActionResult<string>> patch(List<int> rows, List<int> cols, Dataset data)

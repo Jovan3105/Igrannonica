@@ -8,6 +8,7 @@ import { HeadersService } from '../training/services/headers.service';
 import { FormControl, Validators } from '@angular/forms';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
 import { TrainingService } from '../training/services/training.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,6 +19,7 @@ export class DashboardComponent implements OnInit {
   
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
+  corrMatrixSource: any;
   //visibilityTrigger: boolean = false;
 
   activationFunctionControl = new FormControl('', Validators.required);
@@ -41,7 +43,7 @@ export class DashboardComponent implements OnInit {
   secondVisibility:string = "none";
   loaderMiniDisplay:string = "none";
 
-  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService, private trainingService: TrainingService) { }
+  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService, private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
@@ -70,14 +72,14 @@ export class DashboardComponent implements OnInit {
       this.dataSetInformation.setTableStyle("height: 200px;");
       header = this.headersService.getInfoHeader(response['basicInfo']);
       this.dataSetInformation.prepareTable(TableIndicator.INFO, [response['basicInfo']], header) 
-
-
+      
       // TODO ispraviti kada se omoguci povratak ID-a
       // this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
       // this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       // this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       
       //this.datasetService.getStatIndicators(22).subscribe(this.fetchStatsDataObserver);
+      //this.datasetService.getCorrMatrix(2).subscribe(this.fetchCorrMatrixObserver);
     },
     error: (err: Error) => {
       console.log(err)
@@ -112,6 +114,17 @@ export class DashboardComponent implements OnInit {
     },
     error: (err: Error) => {
       console.log("dashboard > DashboardComponent > startTrainingObserver > error:")
+      console.log(err)
+    }
+  };
+  fetchCorrMatrixObserver:any = {
+    next: (response:any) => { 
+        console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > next:")
+        //console.log(response)
+        this.corrMatrixSource = this.domSanitizer.bypassSecurityTrustUrl(response);
+    },
+    error: (err: Error) => {
+      console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > error:")
       console.log(err)
     }
   };
