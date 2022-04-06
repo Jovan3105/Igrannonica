@@ -180,15 +180,23 @@ export class ShowTableComponent implements OnInit {
     }
   }
   
-  onRemoveSelected() {
+  onRemoveSelected() 
+  {
     const selectedData = this.gridApi.getSelectedRows();
     this.tempDeleted = selectedData;
     const res = this.gridApi.applyTransaction({ remove: selectedData });
+    var editedCellIndex;
 
     for (let sData of selectedData) 
     {
       var index = this.rowData.indexOf(sData, 0);
       this.deletedRows.push(index);
+      while((editedCellIndex = this.editedCells.findIndex(element => element.row == index)) != -1)
+      {
+        console.log(editedCellIndex);
+        this.editedCells.splice(editedCellIndex,1);
+
+      }
     }
 
     console.log(this.deletedRows);

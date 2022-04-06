@@ -385,18 +385,18 @@ namespace backend.Controllers
             {
                 
                 StreamReader r = new StreamReader(dataset.Path);
-                string dataFromPath = r.ReadToEnd();
-
+                string dataFromPath = r.ReadToEnd();;
+             
                 var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/modify";
 
                 HttpClient client = new HttpClient();
 
-                //var response = await client.PostAsync(microserviceURL, new HttpContent());
+                var response = await client.PutAsJsonAsync(microserviceURL+ "?path=" + dataset.Path, data);
 
-                //var responseString = await response.Content.ReadAsStringAsync();
+                var responseString = await response.Content.ReadAsStringAsync();
 
 
-                return Ok(new { Message = "OK je" } );
+                return Ok(new { Message = responseString } );
             }
 
         }
