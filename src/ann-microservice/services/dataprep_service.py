@@ -103,7 +103,7 @@ def modify(path:str, data:models.ModifiedData):
     is_file = os.path.isfile(path)
 
     if not is_file:
-        return "Server error"
+        return "error"
     
     f = open(path)
 

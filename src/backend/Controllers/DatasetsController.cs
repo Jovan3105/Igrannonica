@@ -385,7 +385,8 @@ namespace backend.Controllers
             {
                 
                 StreamReader r = new StreamReader(dataset.Path);
-                string dataFromPath = r.ReadToEnd();;
+                string dataFromPath = r.ReadToEnd();
+                r.Close();
              
                 var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/modify";
 
@@ -395,8 +396,18 @@ namespace backend.Controllers
 
                 var responseString = await response.Content.ReadAsStringAsync();
 
+                if (responseString == "error")
+                {
+                    return BadRequest(new { Message = "Error on microservice" });
+                }
+                else 
+                {
+                    StreamWriter f = new(dataset.Path);
+                    f.Write(responseString);
+                    f.Close();
+                }
 
-                return Ok(new { Message = responseString } );
+                return Ok(new { Message = "OK" } );
             }
 
         }
