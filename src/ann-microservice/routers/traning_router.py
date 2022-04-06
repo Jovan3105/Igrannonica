@@ -1,17 +1,19 @@
 from fastapi import APIRouter, Query
 from typing import Optional, List
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, BaseModel
+
 from services import dataprep_service
 from services.training_service import train_model
+from helpers.optimizer_helper import Optimizer
+from helpers.loss_func_helper import LossFunction
+from helpers.metric_helper import Metric
+from services.shared_service import log
+
+from tensorflow.keras.optimizers import Optimizer as tfOptimizer
  
 #################################################################
 
-backend_base_addr = 'localhost:7220'
-uri = f'ws://{backend_base_addr}/ws'
-print_prefix = "####:     "
-
 router = APIRouter(prefix="/training")
-
 
 #################################################################
 
@@ -20,17 +22,18 @@ async def training(
     dataset_source   : AnyHttpUrl,
     features         : List[str] = Query(...),
     labels           : List[str] = Query(...),
+    metrics          : List[Metric] = Query(...),
     delimiter        : Optional[str] = None,
     lineterminator   : Optional[str] = None,
     quotechar        : Optional[str] = None,
     escapechar       : Optional[str] = None,
     encoding         : Optional[str] = None,
-    learning_rate    : Optional[float] = 0.1,
-    loss_function    : Optional[str] = 'mean_absolute_error',
-    testing_split    : Optional[float] = 0.8,
-    validation_split : Optional[float] = 0.2,
+    loss_function    : Optional[LossFunction] = LossFunction.MeanAbsoluteError,
+    test_size        : Optional[float] = 0.8,
+    validation_size  : Optional[float] = 0.2,
     epochs           : Optional[int] = 100,
-    optimizer_key        : Optional[str] = 'adam',
+    optimizer        : Optional[Optimizer] = Optimizer.Adam,
+    learning_rate    : Optional[float] = 0.1
 ):
     ( df, _, _, _ ) = dataprep_service.parse_dataset(
             dataset_source,
@@ -41,17 +44,18 @@ async def training(
             encoding = encoding 
             )
     
-    print(print_prefix+f"Passed as features={features}; passed as labels={labels}")
+    log(f"Feature list={features}; Label list={labels}; Metric list={metrics}")
 
-    model = train_model(
+    true, pred = train_model(
         df,
         features,
         labels,
+        metrics,
         learning_rate,
         loss_function,
-        testing_split,
-        validation_split,
+        test_size,
+        validation_size,
         epochs,
-        optimizer_key )
+        optimizer )
 
-    return "trening je zavrsen"
+    return { "true-pred" : dict(zip([x[0] for x in true], [x[0] for x in pred])) }

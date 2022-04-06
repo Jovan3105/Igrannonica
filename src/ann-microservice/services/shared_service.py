@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 #################################################################
 
+print_prefix = "####:     "
 backend_base_addr = 'localhost:7220'
 uri = f'ws://{backend_base_addr}/ws'
  
@@ -28,6 +29,10 @@ async def image_to_uri(plt, ext='png'):
 
     uri = 'data:image/png;base64,' + urllib.parse.quote(string)
     return uri
+
+    
+def log(msg):
+    print(print_prefix+msg)
  
 #################################################################
 
