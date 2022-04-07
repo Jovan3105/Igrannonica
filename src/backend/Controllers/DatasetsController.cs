@@ -63,7 +63,7 @@ namespace backend.Controllers
             string fileName = file.FileName;
             await using var stream = file.OpenReadStream();
              
-            var reader = new StreamReader(stream);
+            using var reader = new StreamReader(stream);
             var text = await reader.ReadToEndAsync();
 
             Console.WriteLine(text);
@@ -217,7 +217,9 @@ namespace backend.Controllers
 
             // Formiranje i slanje zahteva za parsiranje //
 
-            var fileStreamContent = new StreamContent(file.OpenReadStream());
+            using var _x = file.OpenReadStream();
+
+            var fileStreamContent = new StreamContent(_x);
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
             var multipartFormContent = new MultipartFormDataContent();
@@ -257,7 +259,9 @@ namespace backend.Controllers
         {
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
 
-            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
+            using var _x = System.IO.File.OpenRead(dataset.Path);
+
+            var fileStreamContent = new StreamContent(_x);
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var multipartFormContent = new MultipartFormDataContent();
@@ -276,7 +280,9 @@ namespace backend.Controllers
         {
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
 
-            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
+            using var _x = System.IO.File.OpenRead(dataset.Path);
+
+            var fileStreamContent = new StreamContent(_x);
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var multipartFormContent = new MultipartFormDataContent();
@@ -306,7 +312,7 @@ namespace backend.Controllers
         public async Task<ActionResult<string>> fetchJsonData(int dataset_id)
         {
             var dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
-            StreamReader r = new StreamReader(dataset.Path);
+            using StreamReader r = new StreamReader(dataset.Path);
             string data = r.ReadToEnd();
 
             return Ok(data);
@@ -462,10 +468,10 @@ namespace backend.Controllers
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
-            var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
+            using var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
             streamWriter.Write(data);
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            var streamReader = new StreamReader(httpResponse.GetResponseStream());
+            using var streamReader = new StreamReader(httpResponse.GetResponseStream());
             
             var result = streamReader.ReadToEnd();
             
