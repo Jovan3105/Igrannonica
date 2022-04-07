@@ -35,7 +35,7 @@ export class DatasetService {
   }
 
   getData(id: number):Observable<any[]>{
-    return this.http.get<any>(this.datasetAPIUrl + `/${id}/data`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/getData`).pipe(
       tap(_ => console.log(`fetched data id=${id}`)),
       catchError(this.handleError<any>('getData'))
     );
@@ -48,8 +48,18 @@ export class DatasetService {
     );
   }
   
-  uploadDataset(source:any):Observable<any[]>{
-    return this.http.post<any>(this.datasetAPIUrl + '/upload',source,{
+  uploadDatasetFile(source:any):Observable<any[]>{
+    return this.http.post<any>(this.datasetAPIUrl + '/uploadFile', source, {
+      //reportProgress: true,
+      //observe: 'events'
+      }).pipe(
+      //map(event => this.getEventMessage(event)),
+      catchError(this.handleError<any>('fileUploadDataset'))
+    );
+  }
+
+  uploadDatasetFileWithLink(source:any):Observable<any[]>{
+    return this.http.post<any>(this.datasetAPIUrl + `/uploadWithLink?url=${source}`, null, {
       //reportProgress: true,
       //observe: 'events'
       }).pipe(
@@ -62,16 +72,6 @@ export class DatasetService {
     return this.http.get<any>(this.datasetAPIUrl +`/${id}/stat_indicators`).pipe(
       tap(_ => console.log(`fetched page id=${id}`)),
       catchError(this.handleError<any>('getStatIndicators'))
-    );
-  }
-
-  parseDataset(source:any):Observable<any[]>{
-    return this.http.post<any>(this.datasetAPIUrl + '/parse',source,{
-      //reportProgress: true,
-      //observe: 'events'
-      }).pipe(
-      //map(event => this.getEventMessage(event)),
-      catchError(this.handleError<any>('parseDataset'))
     );
   }
 

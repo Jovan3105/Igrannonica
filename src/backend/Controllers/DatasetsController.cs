@@ -174,8 +174,8 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("uploadLink")]
-        public async Task<ActionResult<string>> uploadLink(String url)
+        [Route("uploadWithLink")]
+        public async Task<ActionResult<string>> uploadWithLink(String url)
         { // TODO dodati user id u request
             var microserviceURL = _microserviceBaseURL + "/data-preparation/parse";
             var response = await _client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", url));
@@ -191,7 +191,7 @@ namespace backend.Controllers
             if(url[url.Length-1] == '/')
                 url = url.Remove(url.Length - 1, 1);
 
-            string fileName = Path.ChangeExtension(url, ".json");
+            string fileName = Path.ChangeExtension(Path.GetFileName(url), ".json");
             
             // Sacuvaj fajl
             string path = CreatePathToDataRoot(dataset.UserID, dataset.Id, fileName);
@@ -271,10 +271,10 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        [Route("getData")]
-        public async Task<ActionResult<string>> fetchJsonData(int id)
+        [Route("{dataset_id}/getData")]
+        public async Task<ActionResult<string>> fetchJsonData(int dataset_id)
         {
-            var dataset = await this.datasetContext.Datasets.FindAsync(id);
+            var dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
             StreamReader r = new StreamReader(dataset.Path);
             string data = r.ReadToEnd();
 
@@ -424,7 +424,7 @@ namespace backend.Controllers
                 Directory.CreateDirectory(filePath);
             }
 
-            filePath = Path.Combine(filePath, datasetID.ToString()); 
+            filePath = filePath + "/" + datasetID + "/";//Path.Combine(filePath, datasetID.ToString()); 
 
             // Proveri da li postoji folder za dati dataset (id)
             if (!Directory.Exists(filePath))
