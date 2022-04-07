@@ -19,14 +19,17 @@ namespace backend.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly DatasetContext datasetContext;
-        private static readonly HttpClient client = new HttpClient();
+        private static string _datasetFolderPath;
+        private static string _microserviceBaseURL;
+        private static readonly HttpClient _client = new HttpClient();
 
         public DatasetsController(DatasetContext datasetContext, IConfiguration configuration)
         {
             this.datasetContext = datasetContext;
             _configuration = configuration;
+            _microserviceBaseURL = _configuration["Addresses:Microservice"];
+            _datasetFolderPath = @"../../files/"; // TODO proveriti da li postoji bolji nacin, npr. koriscenjem klase Path
         }
-
        
         [HttpGet]
         [Route("")]
@@ -35,37 +38,30 @@ namespace backend.Controllers
             List<Dataset> lista = new List<Dataset>();
             if (p == "1")
             {
-                 lista = await this.datasetContext.Datasets.ToListAsync();
+                lista = await this.datasetContext.Datasets.ToListAsync();
                 lista.Where(x => x.Public == true);
-                
             }
             else
             {
                 lista = await this.datasetContext.Datasets.ToListAsync();
             }
 
-            foreach (var item in lista)
-            {
-               // item.Path = "";
-            }
             return Ok(lista);
         }
 
         [HttpPost]
         [Route("")]
         public async Task<ActionResult<List<Dataset>>> addDataset([FromForm]datasetDto dto) {
-
             Dataset dataset = dto.dataSet;
             IFormFile file = dto.fajl;
 
             if (file.Length == 0)
             {
-                return BadRequest("bad");
+                return BadRequest("empty file");
             }
+
             string fileName = file.FileName;
-
             await using var stream = file.OpenReadStream();
-
              
             var reader = new StreamReader(stream);
             var text = await reader.ReadToEndAsync();
@@ -73,32 +69,14 @@ namespace backend.Controllers
             Console.WriteLine(text);
             Console.WriteLine(fileName);
 
-            //var filePath = "C:\\Users\\Pivan\\Documents\\";
-            var filePath = string.Format(@"../../files/");
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-            filePath += dto.dataSet.UserID;
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
+            // Sacuvaj fajl //
 
-            filePath=filePath +"/"+dto.dataSet.Id+"/";
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-
-
-
-            string path = Path.Combine(filePath, fileName);
+            string path = CreatePathToDataRoot(dataset.UserID, dataset.Id, fileName);
             using StreamWriter f = new(path);
             await f.WriteAsync(text);
 
-            dataset.Path=path;
-            dataset.FileName=fileName;
+            dataset.Path = path;
+            dataset.FileName = fileName;
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
@@ -109,20 +87,25 @@ namespace backend.Controllers
         [Route("{id:int}/data")]
         public async Task<ActionResult<string>> fetchData(int id, int page)
         {
+            int rowsPerPage = 20;
+            string delimiter = ",";
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
+            string path = dataset.Path;
+            var csv = new List<string[]>();
+            var lines = System.IO.File.ReadAllLines(path);
+
+            foreach (string line in lines)
+                csv.Add(line.Split(delimiter));
+
+            var header = lines[0].Split(delimiter);
+            
             if (page == 0)
             {
-                var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
-                string path = dataset.Path;
-                var csv = new List<string[]>();
-                var lines = System.IO.File.ReadAllLines(path);
-                foreach (string line in lines)
-                    csv.Add(line.Split(','));
-                var header = lines[0].Split(',');
-
                 var listaRecnika = new List<Dictionary<string, string>>();
                 for (int i = 1; i < lines.Length; i++)
                 {
                     var objResult = new Dictionary<string, string>();
+
                     for (int j = 0; j < header.Length; j++)
                         objResult.Add(header[j], csv[i][j]);
 
@@ -130,37 +113,26 @@ namespace backend.Controllers
                 }
 
                 return Ok(JsonConvert.SerializeObject(listaRecnika));
-
             }
             else
             {
-                var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
-                string path = dataset.Path;
-                var csv = new List<string[]>();
-                var lines = System.IO.File.ReadAllLines(path);
-                foreach (string line in lines)
-                    csv.Add(line.Split(','));
-                var header = lines[0].Split(',');
-                if ((page - 1) * 20 > lines.Length)
+                if ((page - 1) * rowsPerPage > lines.Length)
                 {
-                    return BadRequest(page+"dasdas"+lines.Length);
+                    return BadRequest(page + " " + lines.Length);
                 }
+
                 int upper = 0;
-                if((page - 1) * 20> lines.Length)
-                {
+                if((page - 1) * rowsPerPage > lines.Length)
                     upper = lines.Length;
-                }
                 else
-                {
-                    upper = (page ) * 20;
-                }
+                    upper = (page) * rowsPerPage;
                
-                // Console.WriteLine(page+"\n\n\n\n\n\n\n"+upper);
                 var listaRecnika = new List<Dictionary<string, string>>();
-                for (int i = (page - 1) * 20; i < upper; i++)
+                for (int i = (page - 1) * rowsPerPage; i < upper; i++)
                 {
                     // Console.WriteLine(i);
                     var objResult = new Dictionary<string, string>();
+
                     for (int j = 0; j < header.Length; j++)
                         objResult.Add(header[j], csv[i][j]);
 
@@ -171,7 +143,6 @@ namespace backend.Controllers
             }
         }
         
-
         [HttpDelete]
         [Route("")]
         public async Task<ActionResult<string>> deleteDataset(int id)
@@ -184,6 +155,7 @@ namespace backend.Controllers
             else
             {
                 this.datasetContext.Datasets.Remove(dataset);
+                // TODO dodati brisanje sa fajl sistema
                 await this.datasetContext.SaveChangesAsync();
                 return Ok("Its okey");
             }
@@ -193,7 +165,7 @@ namespace backend.Controllers
         [Route("")]
         public async Task<ActionResult<string>> updateDataset(int id, Dataset data)
         {
-            //var dataset = await this.datasetContext.Datasets.FindAsync(id);
+            //var dataset = await this.datasetContext.Datasets.FindAsync(id); // TODO proveriti
             data.Id = id;
             datasetContext.Entry(data).State = EntityState.Modified;
             await datasetContext.SaveChangesAsync();
@@ -204,48 +176,25 @@ namespace backend.Controllers
         [HttpPost]
         [Route("uploadLink")]
         public async Task<ActionResult<string>> uploadLink(String url)
-        {
-            var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/parse";
-           
-            var client = new HttpClient();
-
-            var res = await client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", url));
-
-            var responseString = await res.Content.ReadAsStringAsync();
+        { // TODO dodati user id u request
+            var microserviceURL = _microserviceBaseURL + "/data-preparation/parse";
+            var response = await _client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", url));
+            var responseString = await response.Content.ReadAsStringAsync();
 
             Dataset dataset = new Dataset();
-            dataset.UserID = 0;
-            dataset.Path = "a";
+            dataset.UserID = 0; // TODO privremeno
+            dataset.Path = "temp"; // TODO privremeno
 
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
-            string[] splitted = url.Split("/");
+            if(url[url.Length-1] == '/')
+                url = url.Remove(url.Length - 1, 1);
 
-            string fileName = splitted[splitted.Length - 1].Substring(0,splitted[splitted.Length-1].Length-4)+".json";
-
-
-            //var filePath = "C:\\Users\\Pivan\\Documents\\";
-            var filePath = string.Format(@"../../files/");
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-            filePath += dataset.UserID;
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-
-            filePath = filePath + "/" + dataset.Id + "/";
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-
-
-
-            string path = Path.Combine(filePath, fileName);
+            string fileName = Path.ChangeExtension(url, ".json");
+            
+            // Sacuvaj fajl
+            string path = CreatePathToDataRoot(dataset.UserID, dataset.Id, fileName);
             using StreamWriter f = new(path);
             await f.WriteAsync(responseString);
 
@@ -255,32 +204,18 @@ namespace backend.Controllers
             await this.datasetContext.SaveChangesAsync();
 
             return Ok(dataset.Id);
-
-
-            //res.Result.EnsureSuccessStatusCode();
-            //return Ok(responseString);
-
-            //var response = await client.PostAsync(microserviceURL, content);
-
-            //var responseString = await response.Content.ReadAsStringAsync();
         }
 
         [HttpPost]
         [Route("uploadFile")]
         public async Task<ActionResult<List<Dataset>>> uploadFile(IFormFile file)
-        {
-
-            
-
-
+        { // TODO dodati user id u request
             if (file.Length == 0)
             {
-                return BadRequest("bad");
+                return BadRequest("empty file");
             }
 
-            var url = _configuration["Addresses:Microservice"] + "/data-preparation/parse-file";
-
-            HttpClient client = new HttpClient();
+            // Formiranje i slanje zahteva za parsiranje //
 
             var fileStreamContent = new StreamContent(file.OpenReadStream());
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
@@ -288,41 +223,23 @@ namespace backend.Controllers
             var multipartFormContent = new MultipartFormDataContent();
             multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: file.FileName);
 
-            var response = await client.PostAsync(url, multipartFormContent);
+            var url = _microserviceBaseURL + "/data-preparation/parse-file";
+            var response = await _client.PostAsync(url, multipartFormContent);
 
             var responseString = await response.Content.ReadAsStringAsync();
 
+            // Sacuvaj parsirane podatke u bazu i na fs //
+
             Dataset dataset = new Dataset();
             dataset.UserID = 0;
-            dataset.Path = "a";
+            dataset.Path = "temp";
 
             this.datasetContext.Datasets.Add(dataset);
             await this.datasetContext.SaveChangesAsync();
 
-            string fileName = Path.GetFileName(file.FileName).Substring(0, Path.GetFileName(file.FileName).Length-4)+".json";
+            string fileName = Path.ChangeExtension(file.FileName, ".json");
 
-
-            //var filePath = "C:\\Users\\Pivan\\Documents\\";
-            var filePath = string.Format(@"../../files/");
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-            filePath += dataset.UserID;
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-
-            filePath = filePath + "/" + dataset.Id + "/";
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-
-
-
-            string path = Path.Combine(filePath, fileName);
+            string path = CreatePathToDataRoot(dataset.UserID, dataset.Id, file.FileName);
             using StreamWriter f = new(path);
             await f.WriteAsync(responseString);
 
@@ -335,16 +252,10 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/stat_indicators")]
-        public async Task<ActionResult<string>> statIndicators(int id)
+        [Route("{dataset_id}/stat_indicators")]
+        public async Task<ActionResult<string>> fetchStatisticalIndicators(int dataset_id)
         {
-
-            Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
-
-
-            var url = _configuration["Addresses:Microservice"] + "/dataset/stat_indicators";
-
-            HttpClient client = new HttpClient();
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
 
             var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -352,36 +263,37 @@ namespace backend.Controllers
             var multipartFormContent = new MultipartFormDataContent();
             multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(dataset.Path));
 
-            var response = await client.PostAsync(url, multipartFormContent);
-
+            var url = _microserviceBaseURL + "/dataset/stat_indicators";
+            var response = await _client.PostAsync(url, multipartFormContent);
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
-
         }
 
         [HttpGet]
         [Route("getData")]
-        public async Task<ActionResult<string>> getJsonData(int id)
+        public async Task<ActionResult<string>> fetchJsonData(int id)
         {
             var dataset = await this.datasetContext.Datasets.FindAsync(id);
             StreamReader r = new StreamReader(dataset.Path);
             string data = r.ReadToEnd();
+
             return Ok(data);
         }
 
         [HttpGet]
         [Route("getCsv")]
-        public async Task<ActionResult<string>> getCsv(string fileName)
+        public async Task<ActionResult<string>> fetchCsv(string fileName)
         {
             var dataset = datasetContext.Datasets.FirstOrDefault(x => x.FileName == fileName);
-            string path = dataset.Path;
-            var csv = new List<string[]>();
             string response = string.Empty;
+
+            string path = dataset.Path;
             var lines = System.IO.File.ReadAllLines(path);
+
             foreach(string line in lines)
             {
-                response += line+"\n\r";
+                response += line + "\n\r";
             }
 
             return Ok(response);
@@ -393,18 +305,14 @@ namespace backend.Controllers
         {
             // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
 
-            var url = _configuration["Addresses:Microservice"] + "/data-preparation/parse-file";
-
-            HttpClient client = new HttpClient();
-
             var fileStreamContent = new StreamContent(file.OpenReadStream());
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
             var multipartFormContent = new MultipartFormDataContent();
             multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(file.FileName));
 
-            var response = await client.PostAsync(url, multipartFormContent);
-
+            var url =_microserviceBaseURL + "/data-preparation/parse-file";
+            var response = await _client.PostAsync(url, multipartFormContent);
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
@@ -449,15 +357,15 @@ namespace backend.Controllers
         [Route("{dataset_id}/data/cell")]
         public async Task<ActionResult<string>> patchModifyCell(int dataset_id, List<Cell> values)
         {
-
+            string delimiter = ",";
             Dataset data = datasetContext.Datasets.FirstOrDefault(x => x.Id == dataset_id);
             string[] lines = System.IO.File.ReadAllLines(data.Path);
 
             foreach (Cell value in values)
             {
-                var line = lines[value.Row].Split(",");
+                var line = lines[value.Row].Split(delimiter);
                 line[value.Col] = value.Value;
-                lines[value.Row] = string.Join(",", line);
+                lines[value.Row] = string.Join(delimiter, line);
             }
 
             using (StreamWriter file = new(data.Path))
@@ -480,10 +388,13 @@ namespace backend.Controllers
                 epoches = epoches,
                 algorithm = algorithm
             };
-            var url = _configuration["Addresses:Microservice"] + "/training";
+
+            var url = _microserviceBaseURL + "/training";
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
+
             var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
             streamWriter.Write(data);
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
@@ -493,6 +404,35 @@ namespace backend.Controllers
             
             return Ok(result);
 
+        }
+
+        private string CreatePathToDataRoot(int userID, int datasetID, string filename)
+        {
+            var filePath = string.Format(_datasetFolderPath);
+
+            // Proveri da li postoji folder u kome se cuvaju podaci
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            filePath += userID.ToString();
+
+            // Proveri da li postoji folder korisnika (naziv foldera njegov id)
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            filePath = Path.Combine(filePath, datasetID.ToString()); 
+
+            // Proveri da li postoji folder za dati dataset (id)
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            return Path.Combine(filePath, filename);
         }
     }
 }
