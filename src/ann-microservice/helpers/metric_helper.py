@@ -35,11 +35,11 @@ class Metric(str, Enum):
     #SensitivityAtSpecificity      = "SensitivityAtSpecificity" required specificity
     SparseCategoricalAccuracy     = "SparseCategoricalAccuracy"
     SparseCategoricalCrossentropy = "SparseCategoricalCrossentropy"
-    SparseTopKCategoricalAccuracy = "SparseTopKCategoricalAccuracy"
+    #SparseTopKCategoricalAccuracy = "SparseTopKCategoricalAccuracy"
     #SpecificityAtSensitivity      = "SpecificityAtSensitivity" required sensitivity
     SquaredHinge                  = "SquaredHinge"
     Sum                           = "Sum"
-    TopKCategoricalAccuracy       = "TopKCategoricalAccuracy"
+    #TopKCategoricalAccuracy       = "TopKCategoricalAccuracy"
     TrueNegatives                 = "TrueNegatives"
     TruePositives                 = "TruePositives"
 
@@ -77,11 +77,11 @@ def map_metrics(metrics):
         #Metric.SensitivityAtSpecificity      : tf.keras.metrics.SensitivityAtSpecificity(), required specificity
         Metric.SparseCategoricalAccuracy     : tf.keras.metrics.SparseCategoricalAccuracy(),
         Metric.SparseCategoricalCrossentropy : tf.keras.metrics.SparseCategoricalCrossentropy(),
-        Metric.SparseTopKCategoricalAccuracy : tf.keras.metrics.SparseTopKCategoricalAccuracy(),
+        #Metric.SparseTopKCategoricalAccuracy : tf.keras.metrics.SparseTopKCategoricalAccuracy(),
         #Metric.SpecificityAtSensitivity      : tf.keras.metrics.SpecificityAtSensitivity(), required sensitivity
         Metric.SquaredHinge                  : tf.keras.metrics.SquaredHinge(),
         Metric.Sum                           : tf.keras.metrics.Sum(),
-        Metric.TopKCategoricalAccuracy       : tf.keras.metrics.TopKCategoricalAccuracy(),
+        #Metric.TopKCategoricalAccuracy       : tf.keras.metrics.TopKCategoricalAccuracy(),
         Metric.TrueNegatives                 : tf.keras.metrics.TrueNegatives(),
         Metric.TruePositives                 : tf.keras.metrics.TruePositives()
     }

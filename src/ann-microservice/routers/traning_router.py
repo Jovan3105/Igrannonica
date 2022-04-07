@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, UploadFile, File
 from typing import Optional, List
 from pydantic import AnyHttpUrl, BaseModel
+import pandas as pd
 
-from services import dataprep_service
+from services.dataprep_service import read_json_data
 from services.training_service import train_model
 from helpers.optimizer_helper import Optimizer
 from helpers.loss_func_helper import LossFunction
@@ -17,17 +18,12 @@ router = APIRouter(prefix="/training")
 
 #################################################################
 
-@router.get("/")
+@router.post("")
 async def training(
-    dataset_source   : AnyHttpUrl,
+    dataset_source   : UploadFile = File(...),
     features         : List[str] = Query(...),
     labels           : List[str] = Query(...),
     metrics          : List[Metric] = Query(...),
-    delimiter        : Optional[str] = None,
-    lineterminator   : Optional[str] = None,
-    quotechar        : Optional[str] = None,
-    escapechar       : Optional[str] = None,
-    encoding         : Optional[str] = None,
     loss_function    : Optional[LossFunction] = LossFunction.MeanAbsoluteError,
     test_size        : Optional[float] = 0.8,
     validation_size  : Optional[float] = 0.2,
@@ -35,14 +31,9 @@ async def training(
     optimizer        : Optional[Optimizer] = Optimizer.Adam,
     learning_rate    : Optional[float] = 0.1
 ):
-    ( df, _, _, _ ) = dataprep_service.parse_dataset(
-            dataset_source,
-            delimiter = delimiter, 
-            lineterminator = lineterminator, 
-            quotechar = '"' if quotechar == None else quotechar, 
-            escapechar = escapechar, 
-            encoding = encoding 
-            )
+    json_data = read_json_data(dataset_source.file)
+
+    df = pd.DataFrame(json_data['parsedDataset'])
     
     log(f"Feature list={features}; Label list={labels}; Metric list={metrics}")
 

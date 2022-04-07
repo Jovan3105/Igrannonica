@@ -21,7 +21,7 @@ router = APIRouter(prefix="/dataset")
 async def get_statistical_indicators(
     dataset_source : UploadFile = File(...)
 ):
-    print(dataset_source,type(dataset_source))
+    #print(dataset_source,type(dataset_source))
     json_data = read_json_data(dataset_source.file)
 
     return get_stat_indicators(json_data['parsedDataset'])
@@ -31,7 +31,7 @@ async def get_correlation_matrix(
     dataset_source : UploadFile = File(...)
 ):
     json_data = read_json_data(dataset_source.file)
-    print(json_data,type(dataset_source))
+    #print(json_data,type(dataset_source))
     
     return get_corr_matrix(json_data['parsedDataset'])
     
