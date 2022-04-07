@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { Check, HeaderDict } from '../../models/check';
+import { Check, HeaderDict } from '../../models/models';
 
 
 @Component({
@@ -44,12 +44,11 @@ export class LabelsComponent implements OnInit {
       this.checkboxCheckedArray.push(true);
       this.checkboxDisabledArray.push(false);
     };
-    console.log(this.checkboxCheckedArray);
   }
 
   onCheckChange(event: any) 
   {
-    console.log("Podigao se event kad se klikne");
+    //console.log("Podigao se event kad se klikne");
     if (event.target.checked)
     {
       this.checkboxCheckedArray[event.target.value] = true;
@@ -64,7 +63,7 @@ export class LabelsComponent implements OnInit {
 
   changeCheckbox(checkChange:Check)
   {
-    console.log("Podigao se event kad se hideuje iz tabele");
+    //console.log("Podigao se event kad se hideuje iz tabele");
     console.log(checkChange);
     this.checkboxCheckedArray[checkChange.id] = !this.checkboxCheckedArray[checkChange.id];
   }

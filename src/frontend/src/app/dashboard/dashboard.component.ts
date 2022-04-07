@@ -3,7 +3,7 @@ import { DatasetService } from '../training/services/dataset.service';
 import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 import { LabelsComponent } from '../training/components/labels/labels.component';
-import { Check } from '../training/models/check';
+import { Check, ModifiedData } from '../training/models/models';
 import { HeadersService } from '../training/services/headers.service';
 import { FormControl, Validators } from '@angular/forms';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
@@ -17,6 +17,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class DashboardComponent implements OnInit {
   
+  datasetId:number;
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
   corrMatrixSource: any;
@@ -42,8 +43,19 @@ export class DashboardComponent implements OnInit {
   firstVisibility:string = "block";
   secondVisibility:string = "none";
   loaderMiniDisplay:string = "none";
+  undoDisabled:boolean = true;
+  undoDeletedDisabled:boolean = true;
 
-  constructor(private datasetService: DatasetService, private router: Router, private headersService: HeadersService, private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
+  constructor(
+    private datasetService: DatasetService, 
+    private router: Router, 
+    private headersService: HeadersService, 
+    private trainingService: TrainingService, 
+    private domSanitizer: DomSanitizer
+    ) {
+    this.datasetId = -1;
+   }
+   
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
@@ -55,6 +67,34 @@ export class DashboardComponent implements OnInit {
   
   public featuresLabel:any;
   //activateModal:boolean = false;
+
+  req : any = {
+    "public": true,
+    "userID": 0,
+    "description": "string",
+    "name": "string",
+    "datasetSource": "change me!",
+    "delimiter": null,
+    "lineTerminator": null,
+    "quotechar": null,
+    "escapechar": null,
+    "encoding": null
+  }   
+
+  uploadObserver:any = {
+    next: (response:any) => { 
+      console.log("### next@uploadObserver")
+      console.log(response)
+
+      this.datasetId = response;
+
+      this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+    },
+    error: (err: Error) => {
+      console.log("### error@uploadObserver")
+      console.log(err)
+    }
+  };
 
   fetchTableDataObserver:any = {
     next: (response:any) => { 
@@ -72,14 +112,14 @@ export class DashboardComponent implements OnInit {
       this.dataSetInformation.setTableStyle("height: 100px;");
       header = this.headersService.getInfoHeader(response['basicInfo']);
       this.dataSetInformation.prepareTable(TableIndicator.INFO, [response['basicInfo']], header) 
-      
+
       // TODO ispraviti kada se omoguci povratak ID-a
       // this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
       // this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       // this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       
-      this.datasetService.getStatIndicators(96).subscribe(this.fetchStatsDataObserver);
-      this.datasetService.getCorrMatrix(96).subscribe(this.fetchCorrMatrixObserver);
+      this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
+      this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },
     error: (err: Error) => {
       console.log(err)
@@ -165,14 +205,9 @@ export class DashboardComponent implements OnInit {
       var file = fileList[0];
 
       this.form.append('file', file);
-      this.datasetService.uploadDataset(this.form)
-      .subscribe(this.fetchTableDataObserver);
+      this.datasetService.uploadDatasetFile(this.form)
+        .subscribe(this.uploadObserver);
     }
-  }
-
-
-  onRemoveSelected() {
-    this.dataTable.onRemoveSelected();
   }
 
   onShowDataClick() {
@@ -182,23 +217,49 @@ export class DashboardComponent implements OnInit {
     if (this.datasetURL == null || this.datasetURL == "")
       console.log("problem: dataset-url");
     else {
-      var req = {
-        "public": true,
-        "userID": 0,
-        "description": "string",
-        "name": "string",
-        "datasetSource": this.datasetURL,
-        "delimiter": null,
-        "lineTerminator": null,
-        "quotechar": null,
-        "escapechar": null,
-        "encoding": null
-      }
-      
-      this.datasetService.parseDataset(req).subscribe(this.fetchTableDataObserver);
+      this.req["datasetSource"] = this.datasetURL
+  
+      this.datasetService.uploadDatasetFileWithLink(this.datasetURL).subscribe(this.uploadObserver);
     }
   }
 
+  onRemoveSelected() 
+  {
+    this.dataTable.onRemoveSelected();
+  }
+  
+  onApplyChanges()
+  {
+    var req:ModifiedData = new ModifiedData(this.datasetId, this.dataTable.editedCells, this.dataTable.deletedRows);
+
+    console.log(req);
+    this.datasetService.modifyDataset(req).subscribe(
+      {
+        next: (response:any) =>{
+          console.log(response);
+          }
+      }
+    )
+  }
+
+  enableUndo(indicator:boolean)
+  {
+    if (indicator) this.undoDisabled = false;
+    else this.undoDisabled = true;
+  }
+  enableUndoDeleted(indicator:boolean)
+  {
+    if(indicator) this.undoDeletedDisabled = false;
+    else this.undoDeletedDisabled = true;
+  }
+  onUndo()
+  {
+    this.dataTable.onUndo();
+  }
+  onUndoDeleted()
+  {
+    this.dataTable.onUndoDeleted();
+  }
   toggleTables(event:any){
     
     if(this.toggledButton)

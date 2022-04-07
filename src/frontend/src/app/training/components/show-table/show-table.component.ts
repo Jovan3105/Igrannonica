@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
-import { Check, HeaderDict } from '../../models/check';
+import { Check, EditedCell, HeaderDict } from '../../models/models';
+import { TableService } from '../../services/table.service';
 
 @Component({
   selector: 'app-show-table',
@@ -14,23 +15,32 @@ export class ShowTableComponent implements OnInit {
   data: any = null;
   private gridApi!: GridApi;
   private columnApi!: ColumnApi;
-  colIds:string[];
-  @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
+  private colIds:string[];
+  private tempDeleted:any[];
 
   indicator?:TableIndicator;
+  editedCells:EditedCell[];
+  deletedRows:number[];
+  
+  @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
+  @Output() undoEvent; //event koji se dize kada treba dis/enable undo dugme
+  @Output() deleteEvent; //event koji se dize kada treba dis/enable undo deleted dugme
 
   columnDefs: ColDef[] = [];
   rowData: any = [];
-  public rowSelection = 'multiple';
-  public paginationPageSize = 10;
-  tableStyle:string = "height: 520px;"
-  tableClass:string = "ag-theme-alpine"
-  paginationEnabled:boolean = true
-  animateRowsEnabled:boolean = true
-  moveAnimationEnabled:boolean = false
-  suppressDragLeaveHidesColumnsEnabled:boolean = false
-
-  constructor() {
+  public rowSelection;
+  public paginationPageSize;
+  tableStyle:string;
+  tableClass:string;
+  paginationEnabled:boolean;
+  animateRowsEnabled:boolean;
+  moveAnimationEnabled:boolean;
+  suppressDragLeaveHidesColumnsEnabled:boolean;
+  undoRedoCellEditing:boolean;
+  undoRedoCellEditingLimit:number;
+  enableCellChangeFlash:boolean ;
+  
+  constructor(private tableService:TableService) {
     this.columnDefs = [];
     this.rowData = [];
     this.rowSelection = 'multiple';
@@ -41,11 +51,20 @@ export class ShowTableComponent implements OnInit {
     this.moveAnimationEnabled = false;
     this.animateRowsEnabled = true;
     this.suppressDragLeaveHidesColumnsEnabled = false;
+    this.undoRedoCellEditing = true;
+    this.undoRedoCellEditingLimit = 20;
+    this.enableCellChangeFlash = true;
     this.colIds = [];
+    this.deletedRows = [];
+    this.editedCells = [];
+    this.tempDeleted = [];
     this.hideEvent = new EventEmitter<Check>();
+    this.undoEvent = new EventEmitter<boolean>();
+    this.deleteEvent = new EventEmitter<boolean>();
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void 
+  {
 
   }
 
@@ -53,15 +72,21 @@ export class ShowTableComponent implements OnInit {
     
     this.data = data;
     this.indicator = indicator;
+    this.headers = headers;
 
-    if (data.length > 0) this.headers = headers;
     this.columnDefs = [];
     this.rowData = [];
+
+    if(indicator == TableIndicator.DATA_MANIPULATION)
+    {
+      this.deletedRows = [];
+      this.editedCells = [];
+    }
 
     this.setColumnDefs(indicator);
     
     for (let row of data) {
-      this.rowData.push(row);
+      this.rowData.push({... row});
     }
     this.resetVisibility();
   }
@@ -77,6 +102,41 @@ export class ShowTableComponent implements OnInit {
         this.moveColumn(ind?.colId!);
     }
   }
+
+  onCellValueChanged(params:CellValueChangedEvent)
+  {
+    console.log(params.node);  
+    var editedCellIndex;
+    var row = parseInt(params.node.id!);
+    var colId = parseInt(params.column.getColId());
+
+    var newValue = this.tableService.onCellValueChanged(params,this.rowData,this.headers);
+
+    if (newValue != undefined)
+    {
+      if ((editedCellIndex = this.editedCells.findIndex(element => element.col == colId && element.row == row)) != -1)
+      {
+        console.log(row);
+        if (this.data[row][this.headers[colId].name] == newValue) //provera da se ne salje originalna vrednost za izmenu
+        { 
+          this.editedCells.splice(editedCellIndex,1);
+        }
+        else 
+          this.editedCells[editedCellIndex].value = newValue.toString();
+
+      }
+      else 
+        this.editedCells.push(new EditedCell(row,colId,newValue.toString()));
+    }
+    
+    console.log(this.editedCells);
+    if(this.gridApi.getCurrentUndoSize()) 
+    {
+      //console.log("Ima nesto za menjanje");
+      this.undoEvent.emit(true);
+    }
+    else this.undoEvent.emit(false);
+ }
 
   resetVisibility()
   {
@@ -130,15 +190,56 @@ export class ShowTableComponent implements OnInit {
     }
   }
   
-  onRemoveSelected() {
+  onRemoveSelected() 
+  {
     const selectedData = this.gridApi.getSelectedRows();
-    const res = this.gridApi.applyTransaction({ remove: selectedData })!;
+    this.tempDeleted = selectedData;
+    const res = this.gridApi.applyTransaction({ remove: selectedData });
+    var editedCellIndex;
 
-    for (let sData of selectedData) {
-      var index = this.data.indexOf(sData, 0);
-      console.log(index);
-      if (index != -1) this.data.splice(index, 1);
+    for (let sData of selectedData) 
+    {
+      var index = this.rowData.indexOf(sData, 0);
+      this.deletedRows.push(index);
+      while((editedCellIndex = this.editedCells.findIndex(element => element.row == index)) != -1)
+      {
+        console.log(editedCellIndex);
+        this.editedCells.splice(editedCellIndex,1);
+
+      }
     }
+
+    console.log(this.deletedRows);
+    console.log(this.rowData);
+    if (this.deletedRows.length) this.deleteEvent.emit(true);
+    else this.deleteEvent.emit(false);
+  }
+
+  onUndo()
+  {
+    this.gridApi.undoCellEditing();
+    if(this.gridApi.getCurrentUndoSize()) 
+    {
+      //console.log("Ima nesto za menjanje");
+      this.undoEvent.emit(true);
+    }
+    else this.undoEvent.emit(false)
+  }
+
+  onUndoDeleted()
+  {
+    /*
+    this.gridApi.applyTransaction({ add: this.tempDeleted });
+    
+    for (let temp of this.tempDeleted) 
+    {
+      var index = this.rowData.indexOf(temp, 0);
+      this.deletedRows.splice(this.deletedRows.indexOf(index),1);
+    }
+
+    console.log(this.tempDeleted);
+    console.log(this.deletedRows);
+    this.deleteEvent.emit(false);*/
   }
 
   //Kada se promeni u checkboxu, mora da se prikaze ili sakrije i u tabeli
@@ -150,7 +251,6 @@ export class ShowTableComponent implements OnInit {
     this.columnApi.moveColumn(key, 0);
   }
   //Salje obavestenje Label komponenti ukoliko se dragguje kolona iz tabele, da se to azurira i na checkbox-u
-
   onColumnVisible(e: ColumnVisibleEvent) {
 
     if (e.source == "uiColumnDragged") {

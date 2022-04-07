@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Path, Query, File, UploadFile
 from typing import Optional
 from pydantic import BaseModel, AnyHttpUrl
 from services import dataprep_service
+from models import models
 
 #################################################################
 
@@ -59,3 +60,12 @@ async def parse_dataset_file(
         )
 
     return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info }
+
+
+@router.put("/modify")
+async def modify(path:str, data : models.ModifiedData):
+    
+    (msg) = dataprep_service.modify(path,data)
+
+    return msg
+

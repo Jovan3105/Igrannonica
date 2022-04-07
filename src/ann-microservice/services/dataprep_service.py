@@ -4,6 +4,9 @@ import pandas as pd
 import logging
 from pydantic import AnyHttpUrl
 from starlette.datastructures import UploadFile
+from models import models
+import json
+import os
 
 logger = logging.getLogger()
 
@@ -93,3 +96,36 @@ def get_encoding(file, n_lines=50):
         detector.result['confidence']))
 
     return detector.result['encoding']
+
+
+def modify(path:str, data:models.ModifiedData):
+
+    is_file = os.path.isfile(path)
+
+    if not is_file:
+        return "error"
+    
+    f = open(path)
+
+    dataset = json.load(f)
+
+    parsedData = dataset['parsedDataset']
+
+    df = pd.json_normalize(parsedData)
+
+    for edit in data.edited:
+        df.iloc[edit.row,edit.col] = edit.value
+    
+    for delete in data.deleted:
+        df.drop(delete,inplace=True)
+    
+
+    missingValuesEntireDF = int(df.isnull().sum().sum())
+    nrows, ncols = df.shape
+    basic_info = { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
+    
+    dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))
+    dataset['basicInfo'] = basic_info
+
+    return dataset
+

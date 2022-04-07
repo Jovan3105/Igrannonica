@@ -39,11 +39,22 @@
                 <button type="button" class="btn btn-danger" 
                 (click)="onRemoveSelected()" 
                 [ngStyle]="{'display': deleteButtonDisplay}" 
-                id="deleteButton">Delete selected</button>
+                id="deleteButton">Delete selected</button>&nbsp;
+                <!--<button type="button" class="btn btn-secondary" 
+                (click)="onUndoDeleted()" 
+                [disabled]="undoDeletedDisabled" 
+                id="undoDeletedButton">Undo deleted</button>&nbsp;-->
+                <button type="button" class="btn btn-secondary" 
+                (click)="onUndo()" 
+                [disabled]="undoDisabled" 
+                id="undoButton">Undo</button>&nbsp;
+                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>
             </div>
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
-            (hideEvent)="changeCheckBox($event)">
-            </app-show-table>
+            (hideEvent)="changeCheckBox($event)"
+            (undoEvent)="enableUndo($event)"
+            (deleteEvent)="enableUndoDeleted($event)">
+            </app-show-table><br>
         </div>
         <div [ngStyle]="{'display':statsTableDisplay}">
             <h4>Basic Info</h4>
