@@ -251,7 +251,7 @@ namespace backend.Controllers
             return Ok(dataset.Id);
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("{dataset_id}/stat_indicators")]
         public async Task<ActionResult<string>> fetchStatisticalIndicators(int dataset_id)
         {
@@ -268,6 +268,37 @@ namespace backend.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
+        }
+
+        [HttpGet]
+        [Route("{dataset_id}/corr_matrix")]
+        public async Task<ActionResult<string>> getCorrMatrix(int dataset_id)
+        {
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
+
+            var fileStreamContent = new StreamContent(System.IO.File.OpenRead(dataset.Path));
+            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(dataset.Path));
+
+            var url = _microserviceBaseURL + "/dataset/corr_matrix";
+            var response = await _client.PostAsync(url, multipartFormContent);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            return Ok(responseString);
+            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+
+            // var microserviceURL = _microserviceBaseURL + "/dataset/corr_matrix";
+
+            // var dataSource = "http://localhost:7220/api/Datasets/getCsv/?filename=";
+            // dataSource += dataset.FileName;
+
+            // // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
+            // var response = await _client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://people.sc.fsu.edu/~jburkardt/data/csv/hurricanes.csv"));
+            // var responseString = await response.Content.ReadAsStringAsync();
+
+            // return Ok(responseString);
         }
 
         [HttpGet]
@@ -293,17 +324,13 @@ namespace backend.Controllers
             }
             else
             {
-                
                 StreamReader r = new StreamReader(dataset.Path);
                 string dataFromPath = r.ReadToEnd();
                 r.Close();
              
-                var microserviceURL = _configuration["Addresses:Microservice"] + "/data-preparation/modify";
+                var microserviceURL = _microserviceBaseURL + "/data-preparation/modify";
 
-                HttpClient client = new HttpClient();
-
-                var response = await client.PutAsJsonAsync(microserviceURL+ "?path=" + dataset.Path, data);
-
+                var response = await _client.PutAsJsonAsync(microserviceURL+ "?path=" + dataset.Path, data);
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 if (responseString == "error")
@@ -319,7 +346,6 @@ namespace backend.Controllers
 
                 return Ok(new { Message = "OK" } );
             }
-
         }
 
         [HttpGet]

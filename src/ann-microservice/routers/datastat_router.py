@@ -1,10 +1,15 @@
-from fastapi import APIRouter, HTTPException, Path, Query
-from pydantic import BaseModel, AnyHttpUrl
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from typing import Optional
-import pandas as pd
+from pydantic import BaseModel, AnyHttpUrl
 
-from services import dataprep_service
-from services import datastat_service
+import pandas as pd
+import json
+import os
+from io import StringIO
+
+
+from services.dataprep_service import read_json_data
+from services.datastat_service import get_corr_matrix, get_stat_indicators
 
 #################################################################
 
@@ -12,51 +17,21 @@ router = APIRouter(prefix="/dataset")
 
 #################################################################
 
-@router.get("/stat_indicators")
-async def get_stat_indicators(
-    dataset_source : AnyHttpUrl,
-    delimiter      : Optional[str] = None,
-    lineterminator : Optional[str] = None,
-    quotechar      : Optional[str] = None,
-    escapechar     : Optional[str] = None,
-    encoding       : Optional[str] = None,
+@router.post("/stat_indicators")
+async def get_statistical_indicators(
+    dataset_source : UploadFile = File(...)
 ):
+    print(dataset_source,type(dataset_source))
+    json_data = read_json_data(dataset_source.file)
 
-    df, _, _, _ = dataprep_service.parse_dataset(
-        dataset_source,
-        delimiter = delimiter, 
-        lineterminator = lineterminator, 
-        quotechar = '"' if quotechar == None else quotechar, 
-        escapechar = escapechar, 
-        encoding = encoding 
-        )
-    
-    print(f"####:     Dataset:")
-    print(df)
+    return get_stat_indicators(json_data['parsedDataset'])
 
-    return datastat_service.get_stat_indicators(df)
-
-@router.get("/corr_matrix")
-async def get_corr_matrix(
-    dataset_source : AnyHttpUrl,
-    delimiter      : Optional[str] = None,
-    lineterminator : Optional[str] = None,
-    quotechar      : Optional[str] = None,
-    escapechar     : Optional[str] = None,
-    encoding       : Optional[str] = None,
+@router.post("/corr_matrix")
+async def get_correlation_matrix(
+    dataset_source : UploadFile = File(...)
 ):
-
-    df, _, _, _ = dataprep_service.parse_dataset(
-        dataset_source,
-        delimiter = delimiter, 
-        lineterminator = lineterminator, 
-        quotechar = '"' if quotechar == None else quotechar, 
-        escapechar = escapechar, 
-        encoding = encoding 
-        )
+    json_data = read_json_data(dataset_source.file)
+    print(json_data,type(dataset_source))
     
-    print(f"####:     Dataset:")
-    print(df)
-
-    return datastat_service.get_corr_matrix(df)
+    return get_corr_matrix(json_data['parsedDataset'])
     

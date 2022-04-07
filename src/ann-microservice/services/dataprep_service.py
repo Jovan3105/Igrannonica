@@ -17,6 +17,9 @@ logger.setLevel(logging.DEBUG)
 encoding_first_n_lines = 50
 QUOTE_NONNUMERIC = 2
 
+def read_json_data(json_file):
+    return json.load(json_file) 
+
 def parse_dataset(
     dataset_source, 
     delimiter=None, 
@@ -98,25 +101,18 @@ def get_encoding(file, n_lines=50):
     return detector.result['encoding']
 
 
-def modify(path:str, data:models.ModifiedData):
-
-    is_file = os.path.isfile(path)
-
-    if not is_file:
-        return "error"
-    
-    f = open(path)
-
-    dataset = json.load(f)
+def modify(
+    dataset, 
+    modifiedData:models.ModifiedData):
 
     parsedData = dataset['parsedDataset']
 
     df = pd.json_normalize(parsedData)
 
-    for edit in data.edited:
+    for edit in modifiedData.edited:
         df.iloc[edit.row,edit.col] = edit.value
     
-    for delete in data.deleted:
+    for delete in modifiedData.deleted:
         df.drop(delete,inplace=True)
     
 
