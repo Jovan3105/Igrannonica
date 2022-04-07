@@ -63,14 +63,10 @@ async def parse_dataset_file(
 
 
 @router.put("/modify")
-async def modify(
-    modifiedData : models.ModifiedData,
-    dataset_source : UploadFile = File(...)
-    ):
+async def modify(path:str, data : models.ModifiedData):
     
-    json_data = read_json_data(dataset_source.file)
-
-    msg = dataprep_service.modify(json_data['parsedDataset'], modifiedData)
+    (msg) = dataprep_service.modify(path,data)
 
     return msg
+
 

@@ -101,18 +101,25 @@ def get_encoding(file, n_lines=50):
     return detector.result['encoding']
 
 
-def modify(
-    dataset, 
-    modifiedData:models.ModifiedData):
+def modify(path:str, data:models.ModifiedData):
+
+    is_file = os.path.isfile(path)
+
+    if not is_file:
+        return "error"
+    
+    f = open(path)
+
+    dataset = json.load(f)
 
     parsedData = dataset['parsedDataset']
 
     df = pd.json_normalize(parsedData)
 
-    for edit in modifiedData.edited:
+    for edit in data.edited:
         df.iloc[edit.row,edit.col] = edit.value
     
-    for delete in modifiedData.deleted:
+    for delete in data.deleted:
         df.drop(delete,inplace=True)
     
 
@@ -124,4 +131,3 @@ def modify(
     dataset['basicInfo'] = basic_info
 
     return dataset
-
