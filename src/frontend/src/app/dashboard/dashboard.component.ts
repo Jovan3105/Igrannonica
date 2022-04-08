@@ -9,6 +9,8 @@ import { FormControl, Validators } from '@angular/forms';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
 import { TrainingService } from '../training/services/training.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Options } from '@angular-slider/ngx-slider';
+import { translate } from '@angular/localize/src/utils';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,16 +23,75 @@ export class DashboardComponent implements OnInit {
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
   corrMatrixSource: any;
+  metricsArrayToSend: any[] = [];
   //visibilityTrigger: boolean = false;
 
   activationFunctionControl = new FormControl('', Validators.required);
+  optimizerFunctionControl = new FormControl('', Validators.required);
+  lossFunctionControl = new FormControl('', Validators.required);
+  metricsControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
+
+
   activationFunctions: any[] = [
     {name: 'Sigmoid', info: 'Sigmoid!', codename: 'sigmoid'},
     {name: 'ReLu', info: 'ReLu!', codename: 'relu'},
     {name: 'Activation function2', info: 'Activation function2!', codename: 'function1'},
     {name: 'Activation function3', info: 'Activation function3!', codename: 'function2'},
   ];
+  optimizerFunctions: any[] = [
+    {name: 'Adam', info: 'Adam!', codename: 'adam'},
+    {name: 'Adadelta', info: 'Adadelta!', codename: 'adadelta'},
+    {name: 'Adagrad', info: 'Adagrad!', codename: 'adagrad'},
+    {name: 'Adamax', info: 'Adamax!', codename: 'adamax'},
+    {name: 'Ftrl', info: 'Ftrl!', codename: 'ftrl'},
+    {name: 'Nadam', info: 'Nadam!', codename: 'nadam'},
+    {name: 'RMSprop', info: 'RMSprop!', codename: 'rmsprop'},
+    {name: 'SGD', info: 'SGD!', codename: 'sgd'},
+  ];
+  lossFunctions: any[] = [
+    {name: 'Binary Crossentropy', info: 'BinaryCrossentropy!', codename: 'binarycrossentropy'},
+    {name: 'Binary Focal Crossentropy', info: 'BinaryFocalCrossentropy!', codename: 'binaryfocalcrossentropy'},
+    {name: 'Categorical Crossentropy', info: 'CategoricalCrossentropy!', codename: 'categoricalcrossentropy'},
+    {name: 'Categorical Hinge', info: 'CategoricalHinge!', codename: 'categoricalhinge'},
+    {name: 'Cosine Similarity', info: 'CosineSimilarity!', codename: 'cosinesimilarity'},
+    {name: 'Hinge', info: 'Hinge!', codename: 'hinge'},
+    {name: 'Huber', info: 'Huber!', codename: 'huber'},
+    {name: 'KL Divergence', info: 'KLDivergence!', codename: 'kldivergence'},
+    {name: 'Mean Absolute Error', info: 'MeanAbsoluteError!', codename: 'meanabsoluteerror'},
+    {name: 'Mean Absolute Percentage Error', info: 'MeanAbsolutePercentageError!', codename: 'meanabsolutepercentageerror'},
+    {name: 'Mean Squared Error', info: 'MeanSquaredError!', codename: 'meansquarederror'},
+    {name: 'Mean Squared Logarithmic Error', info: 'MeanSquaredLogarithmicError!', codename: 'meansquaredlogarithmicerror'},
+    {name: 'Poisson', info: 'Poisson!', codename: 'poisson'},
+    {name: 'Sparse Categorical Crossentropy', info: 'SparseCategoricalCrossentropy!', codename: 'sparsecategoricalcrossentropy'},
+    {name: 'Squared Hinge', info: 'SquaredHinge!', codename: 'squaredhinge'},
+  ];
+  metrics: any[] = [
+    {name: 'Accuracy', info: 'Accuracy!', codename: 'Accuracy'},
+    {name: 'Binary Accuracy', info: 'BinaryAccuracy!', codename: 'BinaryAccuracy'},
+    {name: 'Categorical Accuracy', info: 'CategoricalAccuracy!', codename: 'CategoricalAccuracy'},
+    {name: 'Categorical Hinge', info: 'CategoricalHinge!', codename: 'CategoricalHinge'},
+    {name: 'False Negatives', info: 'FalseNegatives!', codename: 'FalseNegatives'},
+    {name: 'Hinge', info: 'Hinge!', codename: 'hinge'},
+    {name: 'False Positives', info: 'FalsePositives!', codename: 'FalsePositives'},
+    {name: 'KL Divergence', info: 'KLDivergence!', codename: 'kldivergence'},
+    {name: 'Mean Absolute Error', info: 'MeanAbsoluteError!', codename: 'meanabsoluteerror'},
+    {name: 'Mean Absolute Percentage Error', info: 'MeanAbsolutePercentageError!', codename: 'meanabsolutepercentageerror'},
+    {name: 'Mean Squared Error', info: 'MeanSquaredError!', codename: 'meansquarederror'},
+    {name: 'Mean Squared Logarithmic Error', info: 'MeanSquaredLogarithmicError!', codename: 'meansquaredlogarithmicerror'},
+    {name: 'Poisson', info: 'Poisson!', codename: 'poisson'},
+    {name: 'Sparse Categorical Crossentropy', info: 'SparseCategoricalCrossentropy!', codename: 'sparsecategoricalcrossentropy'},
+    {name: 'Log Cosh Error', info: 'LogCoshError!', codename: 'logcosherror'},
+    {name: 'Precision', info: 'Precision!', codename: 'precision'},
+    {name: 'Recall', info: 'Recall!', codename: 'recall'},
+    {name: 'Root MeanSquared Error', info: 'RootMeanSquaredError!', codename: 'rootmeansquarederror'},
+    {name: 'Sparse Categorical Accuracy', info: 'SparseCategoricalAccuracy!', codename: 'sparsecategoricalaccuracy'},
+    {name: 'Sum', info: 'Sum!', codename: 'sum'},
+    {name: 'Squared Hinge', info: 'SquaredHinge!', codename: 'squaredhinge'},
+    {name: 'True Negatives', info: 'TrueNegatives!', codename: 'truenegatives'},
+    {name: 'True Positives', info: 'TruePositives!', codename: 'truepositives'},
+  ];
+
   loaderDisplay:string = "none";
   containerVisibility:string = "hidden";
   nextButtonDisable:boolean = true;
@@ -45,6 +106,32 @@ export class DashboardComponent implements OnInit {
   loaderMiniDisplay:string = "none";
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
+
+  sliderValue: number = 80;
+  sliderOptions: Options = {
+    floor: 10,
+    ceil: 90,
+    step: 10,
+    showSelectionBar: true,
+    getSelectionBarColor: (value: number): string => {
+      if (value <= 25) {
+          return 'red';
+      }
+      if (value <= 50) {
+          return 'orange';
+      }
+      if (value <= 75) {
+          return 'yellow';
+      }
+      return '#2AE02A';
+    },
+    getPointerColor: (value: number): string => {
+      return '#0d6efd';
+    },
+    translate: (value: number): string => {
+      return value+"%";
+    }
+  };
 
   constructor(
     private datasetService: DatasetService, 
@@ -320,7 +407,7 @@ export class DashboardComponent implements OnInit {
   {
     this.dataTable.changeLabelColumn(data);
   }
-  change(value: number): void {
+  changeEpoch(value: number): void {
     console.log(value);
     this.numberOfEpochs = value;
   }
@@ -329,13 +416,25 @@ export class DashboardComponent implements OnInit {
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
+    this.metrics.forEach(element => {
+      this.metricsArrayToSend.push(element)
+    });
     this.trainingService.sendDataForTraining({
       epochs: this.numberOfEpochs,
       activationFunction: this.activationFunctionControl.value.name,
       features: this.featuresLabel['features'],
-      labels: this.featuresLabel['label']
+      labels: this.featuresLabel['label'],
+      optimizer: this.optimizerFunctionControl.value.name,
+      lossFunction: this.lossFunctionControl.value.name,
+      testDataRatio: this.sliderValue/100,
+      metrics: this.metricsControl.value
     }).subscribe(this.startTrainingObserver);
-    console.log("Features: "+ this.featuresLabel['features'][0]['name']+" label: "+ this.featuresLabel['label'][0]['name'])
-    console.log("Poslato "+ this.numberOfEpochs + " i " + this.activationFunctionControl.value.name)
+    console.log("metric control "+ this.metricsControl.value[0].codename)
+    console.log("optimizer "+ this.optimizerFunctionControl.value.name)
+    console.log("testDataRatio "+ this.sliderValue/100)
+    console.log("metrics "+ this.metricsControl.value.name)
+    console.log("lossFunction "+ this.lossFunctionControl.value.name)
+    console.log("metric array to send "+ this.metricsArrayToSend)
+
   }
 }

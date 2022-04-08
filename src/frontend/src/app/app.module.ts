@@ -19,6 +19,9 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { NgxNumberSpinnerModule } from 'ngx-number-spinner';
 import { MatSelectModule } from "@angular/material/select";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 @NgModule({
   declarations: [
@@ -39,7 +42,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AgGridModule.withComponents([]),
     NgxNumberSpinnerModule,
     MatSelectModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    NgxSliderModule,
+    NgxMatSelectSearchModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

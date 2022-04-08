@@ -93,39 +93,95 @@
     </div>
 </div>
 <div id="second" class="row mx-auto" style="width: 1200px;" [ngStyle]="{'display': secondVisibility}">
-    <div class="options">
+    <h1 style="text-align: center;">Configure hyperparameters</h1>
+    <div class="options" style="margin-top: 10px;">
         <form #form>
-            <h4>Number of epochs</h4>
+            <h4>Selections</h4>
             <br>
-            <div style="display: inline-flex;">
-                <ngx-number-spinner
+            <div class="row justify-content-center">
+                <div class="col-md-4 select">
+                    <h6>Activation function</h6>
+                    <mat-form-field appearance="fill">
+                        <mat-label><b>Favorite function</b></mat-label>
+                        <mat-select [formControl]="activationFunctionControl" name="activationFunctionControl">
+                            <mat-option>--</mat-option>
+                            <mat-option *ngFor="let item of activationFunctions" [value]="item">
+                            {{item.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="activationFunctionControl.hasError('required')">Please choose a activation function</mat-error>
+                        <mat-hint>{{activationFunctionControl.value.info}}</mat-hint>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4 select">
+                    <h6>Optimizer</h6>
+                    <mat-form-field appearance="fill">
+                        <mat-label><b>Favorite optimizer</b></mat-label>
+                        <mat-select [formControl]="optimizerFunctionControl" name="optimizerFunctionControl">
+                            <mat-option>--</mat-option>
+                            <mat-option *ngFor="let item of optimizerFunctions" [value]="item">
+                            {{item.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="optimizerFunctionControl.hasError('required')">Please choose an optimizer</mat-error>
+                        <mat-hint>{{optimizerFunctionControl.value.info}}</mat-hint>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4 select">
+                    <h6>Loss function</h6>
+                    <mat-form-field appearance="fill">
+                        <mat-label><b>Favorite loss fun.</b></mat-label>
+                        <mat-select [formControl]="lossFunctionControl" name="lossFunctionControl">
+                            <mat-option>--</mat-option>
+                            <mat-option *ngFor="let item of lossFunctions" [value]="item">
+                            {{item.name}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="lossFunctionControl.hasError('required')">Please choose a loss function</mat-error>
+                        <mat-hint>{{lossFunctionControl.value.info}}</mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+            <br>
+            <hr>
+            <div> 
+                <h4>Test data ratio</h4>
+                <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
+            </div>
+            <br>
+            <hr>
+            <div class="row justify-content-center" style="width: inherit;">
+                <h6>Metrics</h6>
+                <mat-form-field appearance="fill" style="width: 100%;">
+                    <mat-label><b>Favorite function</b></mat-label>
+                    <mat-select [formControl]="metricsControl" name="metricsControl" multiple>
+                        <mat-option *ngFor="let item of metrics" [value]="item">
+                        {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="metricsControl.hasError('required')">Please choose some metrics</mat-error>
+                    <mat-hint>{{metricsControl.value.info}}</mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <h6>Number of epochs</h6>
+                    <ngx-number-spinner
                     name="epochs"
                     [value]="4"
-                    (change)="change($event)" 
-                    [min]="0"
-                    style="width: 300px;">
-                </ngx-number-spinner>
-                <br>
+                    (change)="changeEpoch($event)" 
+                    [min]="0">
+                    </ngx-number-spinner>
+                </div>
             </div>
-            <hr>
-            <h4>Select a activation function</h4>
-            <mat-form-field appearance="fill" style="width: 40%;">
-                <mat-label>Favorite function</mat-label>
-                <mat-select [formControl]="activationFunctionControl" name="activationFunctionControl">
-                    <mat-option>--</mat-option>
-                    <mat-option *ngFor="let item of activationFunctions" [value]="item">
-                    {{item.name}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="activationFunctionControl.hasError('required')">Please choose a activation function</mat-error>
-                <mat-hint>{{activationFunctionControl.value.info}}</mat-hint>
-            </mat-form-field>
             <br><br>
-            <button type="button" class="btn btn-primary" (click)="TrainingClick()">Start</button>
-            <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
-                <div class="miniLoader">
+            <div id="button" style="display: inline-flex;">
+                <button type="button" class="btn btn-primary" (click)="TrainingClick()">Start</button>
+                <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
                     <div class="miniLoader">
+                        <div class="miniLoader">
 
+                        </div>
                     </div>
                 </div>
             </div>
