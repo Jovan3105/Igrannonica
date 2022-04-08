@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import AnyHttpUrl
 
 from models import models
-from services.dataprep_service import parse_dataset, get_column_types, get_basic_info, modify
+from services.dataprep_service import parse_dataset, get_column_types, get_basic_info, modify_dataset
 
 #################################################################
 
@@ -34,7 +34,7 @@ async def get_parsed_dataset(
         encoding = encoding 
         )
 
-    parse_dataset = df.to_dict('records')
+    parsed_dataset = df.to_dict('records')
     column_types = get_column_types(df)
     basic_info = get_basic_info(df)
 
@@ -64,7 +64,7 @@ async def parse_dataset_file(
         encoding = encoding 
         )
 
-    parse_dataset = df.to_dict('records')
+    parsed_dataset = df.to_dict('records')
     column_types = get_column_types(df)
     basic_info = get_basic_info(df)
 
@@ -77,8 +77,9 @@ async def modify(path:str, data : models.ModifiedData):
     '''
     Na osnovu liste akcija vrsi izmenu vrednosti, brisanje reda ili kolone u prosledjenom fajlu
     '''
-    msg = modify(path,data)
-
+    msg = modify_dataset(path, data)
+    print("@@@@@@@@@ poruka")
+    print(msg)
     return msg
 
 

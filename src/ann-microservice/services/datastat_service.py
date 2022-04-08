@@ -66,11 +66,11 @@ def get_stat_indicators(df):
 # # #
 
 def get_corr_matrix(df, diagonal=False):
+    mask = None
     corr = df.corr()
 
     sns.set_theme(style="white")
-    sns.set(font_scale=0.5)
-    figure.set_tight_layout(True)
+    #sns.set(font_scale=0.5)
     
     if diagonal:
         # Generate a mask for the upper triangle
@@ -80,6 +80,7 @@ def get_corr_matrix(df, diagonal=False):
 
     # Set up the matplotlib figure
     figure, ax = plt.subplots(figsize=(12, 9))
+    figure.set_tight_layout(True)
 
     # Generate a custom diverging colormap
     cmap = "Spectral" #sns.diverging_palette(230, 20, as_cmap=True)

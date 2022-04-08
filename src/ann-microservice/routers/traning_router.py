@@ -15,7 +15,7 @@ router = APIRouter(prefix="/training")
 
 @router.post("")
 async def begin_training(
-    dataset_source   : UploadFile = File(...),
+    stored_dataset   : UploadFile = File(...),
     features         : List[str] = Query(...),
     labels           : List[str] = Query(...),
     metrics          : List[Metric] = Query(...),
@@ -27,7 +27,7 @@ async def begin_training(
     learning_rate    : Optional[float] = 0.1
     ):
     
-    df = stored_dataset_to_dataframe(dataset_source)
+    df = stored_dataset_to_dataframe(stored_dataset)
     
     log(f"Feature list={features}; Label list={labels}; Metric list={metrics}")
 

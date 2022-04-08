@@ -1,10 +1,10 @@
 import io
+import json
 import asyncio
 import websockets
 import urllib, base64
 import pandas as pd
 import matplotlib.pyplot as plt
-from services.dataprep_service import read_json_data
 
 #################################################################
 
@@ -43,8 +43,13 @@ def log(msg):
  
 # # #
 
+def read_json_data(json_file):
+    return json.load(json_file) 
+
+# # #
+
 def stored_dataset_to_dataframe(dataset):
-    json_data = read_json_data(dataset_source.file)
+    json_data = read_json_data(dataset.file)
     return pd.DataFrame(json_data['parsedDataset'])
 
 

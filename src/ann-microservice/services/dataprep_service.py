@@ -8,18 +8,13 @@ from pydantic import AnyHttpUrl
 from starlette.datastructures import UploadFile
 
 from models import models
-from shared_service import log
+from services.shared_service import log
 
 #################################################################
 
 QUOTE_NONNUMERIC = 2
 
 #################################################################
-
-def read_json_data(json_file):
-    return json.load(json_file) 
-
-# # #
 
 def parse_dataset(
     dataset_source, 
@@ -82,8 +77,8 @@ def get_column_types(df):
 
 # # #
 
-def modify(path:str, data:models.ModifiedData):
-
+def modify_dataset(path:str, data:models.ModifiedData):
+    print(30*"-#@")
     is_file = os.path.isfile(path)
 
     if not is_file:
@@ -97,6 +92,9 @@ def modify(path:str, data:models.ModifiedData):
 
     df = pd.json_normalize(parsedData)
 
+    print('dataframe')
+    print(df)
+
     for edit in data.edited:
         df.iloc[edit.row, edit.col] = edit.value
     
@@ -105,5 +103,7 @@ def modify(path:str, data:models.ModifiedData):
     
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))
     dataset['basicInfo'] = get_basic_info(df)
+
+    print(dataset)
 
     return dataset
