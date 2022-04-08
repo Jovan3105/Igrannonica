@@ -1,15 +1,17 @@
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+
+from fastapi import HTTPException
+
 from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
-from fastapi import HTTPException
-from services.shared_service import log
 
+from services.shared_service import log
 from helpers.optimizer_helper import map_optimizer
 from helpers.loss_func_helper import map_loss_function
 from helpers.metric_helper import map_metrics
@@ -26,31 +28,17 @@ def encode_and_scale(cont_features, cat_features, X_train, X_test):
     col_trans.fit(X_train)
 
     return col_trans.transform(X_train), col_trans.transform(X_test), col_trans
-    #return pd.get_dummies(df)
 
-
-# stara TF verzija
-#def train_test_split(df, test_size, random_state=0):
-#    train_dataset = df.sample(frac=test_size, random_state=random_state)
-#    test_dataset = df.drop(train_dataset.index)
-
-#    return train_dataset, test_dataset
-
-def plot_loss(history, label, min, max):
+def plot_history(history, label, min, max):
   plt.plot(history.history['loss'], label='loss')
   plt.plot(history.history[label], label=label)
-  plt.ylim([min, max])
+  plt.ylim([min - 0.1, max + 0.1])
   plt.xlabel('Epoch')
   plt.ylabel(f'Error [{label}]')
   plt.legend()
   plt.grid(True)
 
   return plot
-
-def generate_img_from_plt(epoch, logs={}):
-    log(f"Model: {self.model}")
-
-    #return image_to_uri(plt) # TODO image ext detection/check
 
 #################################################################
 # Main code

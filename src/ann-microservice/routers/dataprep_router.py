@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, UploadFile, File
 from typing import Optional
-from pydantic import BaseModel, AnyHttpUrl
-from services import dataprep_service
+from pydantic import AnyHttpUrl
+
 from models import models
+from services.dataprep_service import parse_dataset, get_column_types, get_basic_info, modify
 
 #################################################################
 
@@ -11,20 +12,20 @@ router = APIRouter(prefix="/data-preparation")
 #################################################################
 
 @router.get("/parse")
-async def parse_dataset(
+async def get_parsed_dataset(
     dataset_source : AnyHttpUrl,
     delimiter      : Optional[str] = None,
     lineterminator : Optional[str] = None,
     quotechar      : Optional[str] = None,
     escapechar     : Optional[str] = None,
     encoding       : Optional[str] = None,
-):
+    ):
     '''
-    Parsira dataset koji se nalazi na prosleđenoj lokaciji **dataset_source**
+    Parsira dataset koji se nalazi na prosleđenom linku **dataset_source**. 
 
     '''
 
-    ( df, parsed_dataset, column_types, basic_info ) = dataprep_service.parse_dataset(
+    df  = parse_dataset(
         dataset_source,
         delimiter = delimiter, 
         lineterminator = lineterminator, 
@@ -33,8 +34,13 @@ async def parse_dataset(
         encoding = encoding 
         )
 
-    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info }
+    parse_dataset = df.to_dict('records')
+    column_types = get_column_types(df)
+    basic_info = get_basic_info(df)
 
+    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info}
+
+# # #
 
 @router.post("/parse-file")
 async def parse_dataset_file(
@@ -44,13 +50,12 @@ async def parse_dataset_file(
     quotechar      : Optional[str] = None,
     escapechar     : Optional[str] = None,
     encoding       : Optional[str] = None,
-):
+    ):
     '''
-    Parsira dataset koji je upload-ovan
+    Parsira dataset **dataset_source** koji je upload-ovan.
 
     '''
-    print("#"*30)
-    ( _, parsed_dataset, column_types, basic_info ) = dataprep_service.parse_dataset(
+    df  = parse_dataset(
         dataset_source,
         delimiter = delimiter, 
         lineterminator = lineterminator, 
@@ -59,13 +64,20 @@ async def parse_dataset_file(
         encoding = encoding 
         )
 
-    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info }
+    parse_dataset = df.to_dict('records')
+    column_types = get_column_types(df)
+    basic_info = get_basic_info(df)
 
+    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info}
+
+# # #
 
 @router.put("/modify")
 async def modify(path:str, data : models.ModifiedData):
-    
-    (msg) = dataprep_service.modify(path,data)
+    '''
+    Na osnovu liste akcija vrsi izmenu vrednosti, brisanje reda ili kolone u prosledjenom fajlu
+    '''
+    msg = modify(path,data)
 
     return msg
 

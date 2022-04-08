@@ -1,17 +1,12 @@
 from fastapi import APIRouter, Query, UploadFile, File
 from typing import Optional, List
-from pydantic import AnyHttpUrl, BaseModel
-import pandas as pd
 
-from services.dataprep_service import read_json_data
 from services.training_service import train_model
 from helpers.optimizer_helper import Optimizer
 from helpers.loss_func_helper import LossFunction
 from helpers.metric_helper import Metric
-from services.shared_service import log
+from services.shared_service import log, stored_dataset_to_dataframe
 
-from tensorflow.keras.optimizers import Optimizer as tfOptimizer
- 
 #################################################################
 
 router = APIRouter(prefix="/training")
@@ -19,7 +14,7 @@ router = APIRouter(prefix="/training")
 #################################################################
 
 @router.post("")
-async def training(
+async def begin_training(
     dataset_source   : UploadFile = File(...),
     features         : List[str] = Query(...),
     labels           : List[str] = Query(...),
@@ -30,10 +25,9 @@ async def training(
     epochs           : Optional[int] = 100,
     optimizer        : Optional[Optimizer] = Optimizer.Adam,
     learning_rate    : Optional[float] = 0.1
-):
-    json_data = read_json_data(dataset_source.file)
-
-    df = pd.DataFrame(json_data['parsedDataset'])
+    ):
+    
+    df = stored_dataset_to_dataframe(dataset_source)
     
     log(f"Feature list={features}; Label list={labels}; Metric list={metrics}")
 
@@ -47,6 +41,7 @@ async def training(
         test_size,
         validation_size,
         epochs,
-        optimizer )
+        optimizer
+        )
 
     return { "true-pred" : dict(zip([x[0] for x in true], [x[0] for x in pred])) }

@@ -2,15 +2,17 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import io
-import urllib, base64
-import textwrap
 
-def get_stat_indicators(data):
-    df = pd.DataFrame(data)
+from services.shared_service import figure_to_uri
 
-    cont_indexes = ["Count","Mean","Standard deviation","Minimum","25th ercentile","50th percentile","75th percentile","max"]
-    cat_indexes = ["Count","Unique","Top","Frequency"]
+#################################################################
+
+CAT_INDEXES = ["Count","Unique","Top","Frequency"]
+CONT_INDEXES = ["Count","Mean","Standard deviation","Minimum","25th percentile","50th percentile","75th percentile","Max"]
+
+#################################################################
+
+def get_stat_indicators(df):
 
     #columns with numeric values
     continuous = df.select_dtypes(include='number')
@@ -34,7 +36,6 @@ def get_stat_indicators(data):
     else:
         categorical_stat = []
     
-    
     print("######## categorical_stat:")
     print(categorical_stat)
 
@@ -43,14 +44,14 @@ def get_stat_indicators(data):
     
     i = 0
     for stat in continuous_stat:
-        row = {"indicator":cont_indexes[i], **stat}
+        row = {"indicator":CONT_INDEXES[i], **stat}
         cont_stat_response += [row]
         i += 1
 
     print(categorical_stat)
     i = 0
     for stat in categorical_stat:
-        row = {"indicator":cat_indexes[i], **stat}
+        row = {"indicator":CAT_INDEXES[i], **stat}
         cat_stat_response += [row]
         i += 1
     print(cat_stat_response)
@@ -62,39 +63,31 @@ def get_stat_indicators(data):
 
     return stat_indicators
 
-def get_corr_matrix(data):
-    df = pd.DataFrame(data)
+# # #
+
+def get_corr_matrix(df, diagonal=False):
     corr = df.corr()
 
-    # creating mask
-    #mask = np.triu(np.ones_like(df.corr()))
-    #sns.heatmap(df.corr(method='pearson'), annot=True, cbar=False, mask=mask)
-    #ax.set_yticklabels(ax.get_yticklabels(), rotation="horizontal")
     sns.set_theme(style="white")
+    sns.set(font_scale=0.5)
+    figure.set_tight_layout(True)
     
-    # Generate a mask for the upper triangle
-    mask = np.triu(corr)
+    if diagonal:
+        # Generate a mask for the upper triangle
+        mask = np.triu(corr)
 
-    np.fill_diagonal(mask, False)
+        np.fill_diagonal(mask, False)
 
     # Set up the matplotlib figure
-    f, ax = plt.subplots(figsize=(12, 9))
+    figure, ax = plt.subplots(figsize=(12, 9))
 
     # Generate a custom diverging colormap
-    cmap ="Spectral" #sns.diverging_palette(230, 20, as_cmap=True)
+    cmap = "Spectral" #sns.diverging_palette(230, 20, as_cmap=True)
 
     # Draw the heatmap with the mask and correct aspect ratio
     heatmap = sns.heatmap(corr, mask=mask, cmap=cmap, center=0,
-            square=True, linewidths=.5, cbar_kws={"shrink": 1}, fmt='.5f')
+        square=True, linewidths=.5, cbar_kws={"shrink": 1}, fmt='.5f')
 
-    sns.set(font_scale=0.5)
-    buf = io.BytesIO()
-    f.set_tight_layout(True)
-
-    f.savefig(buf, format='png')
-    buf.seek(0)
-    string = base64.b64encode(buf.read())
-
-    uri = 'data:image/png;base64,' + urllib.parse.quote(string)
+    uri = figure_to_uri(figure)
 
     return uri

@@ -1,24 +1,25 @@
+import os
+import json
+
 import numpy as np
 import pandas as pd
-#from chardet.universaldetector import UniversalDetector # for future revision
-import logging
+
 from pydantic import AnyHttpUrl
 from starlette.datastructures import UploadFile
+
 from models import models
-import json
-import os
+from shared_service import log
 
-logger = logging.getLogger()
+#################################################################
 
-#if dev_mode:
-logger.setLevel(logging.DEBUG)
-
-
-encoding_first_n_lines = 50
 QUOTE_NONNUMERIC = 2
+
+#################################################################
 
 def read_json_data(json_file):
     return json.load(json_file) 
+
+# # #
 
 def parse_dataset(
     dataset_source, 
@@ -29,19 +30,10 @@ def parse_dataset(
     encoding=None
     ):
     
-    # for future revision
-    #
-    #if encoding == None or encoding == "auto":
-    #    encoding = get_encoding(file.read(), encoding_first_n_lines)
-    #    print('Log: assume encoding is {}'.format(encoding))
-
-    df_dict = None
-    column_types = None
-    basic_info = None
+    df = None
     
     is_url = isinstance(dataset_source, AnyHttpUrl)
     is_file = isinstance(dataset_source, UploadFile)
-    df = None
 
     # assume datasource is a link
     fname = dataset_source
@@ -52,7 +44,7 @@ def parse_dataset(
     fname = fname.lower()
 
     if( fname.endswith('.csv') ):
-        print("####:     Given dataset appears to be .csv file")
+        log("Given dataset appears to be .csv file")
 
         if is_file:
             dataset_source = dataset_source.file
@@ -68,38 +60,27 @@ def parse_dataset(
             on_bad_lines     = 'warn',
             skipinitialspace = True
             )
+            
         df = df.fillna('') # TODO proveriti
 
-        column_types = [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
+        log('Parsing completed.')
 
-        missingValuesEntireDF = int(df.isnull().sum().sum())
-        nrows, ncols = df.shape
-        basic_info = { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
-        
-        df_dict = df.to_dict('records')
+    return df
 
-        print('####:     Parsing complete.')
+# # #
 
-    return df, df_dict, column_types, basic_info
-    
+def get_basic_info(df):
+    missingValuesEntireDF = int(df.isnull().sum().sum())
+    nrows, ncols = df.shape
 
-def get_encoding(file, n_lines=50):
-    detector = UniversalDetector()
-    detector.reset()
+    return { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
 
-    for i, row in enumerate(file):
-        detector.feed(row)
-        if i >= n_lines-1 or detector.done: 
-            break
+# # #
 
-    detector.close()
+def get_column_types(df):
+    return [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
 
-    print("####:     detected encoding is {}. Detection confidence is {}".format(
-        detector.result['encoding'],
-        detector.result['confidence']))
-
-    return detector.result['encoding']
-
+# # #
 
 def modify(path:str, data:models.ModifiedData):
 
@@ -117,17 +98,12 @@ def modify(path:str, data:models.ModifiedData):
     df = pd.json_normalize(parsedData)
 
     for edit in data.edited:
-        df.iloc[edit.row,edit.col] = edit.value
+        df.iloc[edit.row, edit.col] = edit.value
     
     for delete in data.deleted:
-        df.drop(delete,inplace=True)
-    
-
-    missingValuesEntireDF = int(df.isnull().sum().sum())
-    nrows, ncols = df.shape
-    basic_info = { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
+        df.drop(delete, inplace=True)
     
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))
-    dataset['basicInfo'] = basic_info
+    dataset['basicInfo'] = get_basic_info(df)
 
     return dataset
