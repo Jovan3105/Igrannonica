@@ -142,7 +142,6 @@
                     </mat-form-field>
                 </div>
             </div>
-            <br>
             <hr>
             <div> 
                 <h4>Test data ratio</h4>
@@ -168,15 +167,25 @@
                     <h6>Number of epochs</h6>
                     <ngx-number-spinner
                     name="epochs"
-                    [value]="4"
+                    [value]="numberOfEpochs"
                     (change)="changeEpoch($event)" 
                     [min]="0">
+                    </ngx-number-spinner>
+                </div>
+                <div class="col-md-5">
+                    <h6>Learning rate</h6>
+                    <ngx-number-spinner
+                    name="rate"
+                    [value]="learningRate"
+                    (change)="changeRate($event)" 
+                    [min]="0.1"
+                    [step]="0.1">
                     </ngx-number-spinner>
                 </div>
             </div>
             <br><br>
             <div id="button" style="display: inline-flex;">
-                <button type="button" class="btn btn-primary" (click)="TrainingClick()">Start</button>
+                <button type="button" class="btn btn-primary" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || activationFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid">Start</button>
                 <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
                     <div class="miniLoader">
                         <div class="miniLoader">

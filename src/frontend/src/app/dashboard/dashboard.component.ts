@@ -22,6 +22,7 @@ export class DashboardComponent implements OnInit {
   datasetId:number;
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
+  learningRate: number = 0.1;
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
   //visibilityTrigger: boolean = false;
@@ -67,13 +68,13 @@ export class DashboardComponent implements OnInit {
     {name: 'Squared Hinge', info: 'SquaredHinge!', codename: 'squaredhinge'},
   ];
   metrics: any[] = [
-    {name: 'Accuracy', info: 'Accuracy!', codename: 'Accuracy'},
-    {name: 'Binary Accuracy', info: 'BinaryAccuracy!', codename: 'BinaryAccuracy'},
-    {name: 'Categorical Accuracy', info: 'CategoricalAccuracy!', codename: 'CategoricalAccuracy'},
-    {name: 'Categorical Hinge', info: 'CategoricalHinge!', codename: 'CategoricalHinge'},
-    {name: 'False Negatives', info: 'FalseNegatives!', codename: 'FalseNegatives'},
+    {name: 'Accuracy', info: 'Accuracy!', codename: 'accuracy'},
+    {name: 'Binary Accuracy', info: 'BinaryAccuracy!', codename: 'binaryaccuracy'},
+    {name: 'Categorical Accuracy', info: 'CategoricalAccuracy!', codename: 'categoricalaccuracy'},
+    {name: 'Categorical Hinge', info: 'CategoricalHinge!', codename: 'categoricalhinge'},
+    {name: 'False Negatives', info: 'FalseNegatives!', codename: 'falsenegatives'},
     {name: 'Hinge', info: 'Hinge!', codename: 'hinge'},
-    {name: 'False Positives', info: 'FalsePositives!', codename: 'FalsePositives'},
+    {name: 'False Positives', info: 'FalsePositives!', codename: 'falsepositives'},
     {name: 'KL Divergence', info: 'KLDivergence!', codename: 'kldivergence'},
     {name: 'Mean Absolute Error', info: 'MeanAbsoluteError!', codename: 'meanabsoluteerror'},
     {name: 'Mean Absolute Percentage Error', info: 'MeanAbsolutePercentageError!', codename: 'meanabsolutepercentageerror'},
@@ -188,7 +189,7 @@ export class DashboardComponent implements OnInit {
       
       this.showElements();
 
-      console.log(response)
+      //console.log(response)
       
       var header = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], header);
@@ -216,7 +217,7 @@ export class DashboardComponent implements OnInit {
   fetchStatsDataObserver:any = {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchStatsDataObserver > next:")
-        console.log(response)
+        //console.log(response)
 
         var headerContinuous = this.headersService.getInfoHeader(response['continuous']);
         this.numIndicators.setPaginationEnabled(false);
@@ -408,33 +409,35 @@ export class DashboardComponent implements OnInit {
     this.dataTable.changeLabelColumn(data);
   }
   changeEpoch(value: number): void {
-    console.log(value);
+    //console.log(value);
     this.numberOfEpochs = value;
+  }
+  changeRate(value: number): void {
+    value = +value.toFixed(2)
+    this.learningRate = value;
   }
 
   TrainingClick(){
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
-    this.metrics.forEach(element => {
-      this.metricsArrayToSend.push(element)
-    });
     this.trainingService.sendDataForTraining({
       epochs: this.numberOfEpochs,
-      activationFunction: this.activationFunctionControl.value.name,
+      activationFunction: this.activationFunctionControl.value.codename,
       features: this.featuresLabel['features'],
       labels: this.featuresLabel['label'],
-      optimizer: this.optimizerFunctionControl.value.name,
-      lossFunction: this.lossFunctionControl.value.name,
+      optimizer: this.optimizerFunctionControl.value.codename,
+      lossFunction: this.lossFunctionControl.value.codename,
       testDataRatio: this.sliderValue/100,
-      metrics: this.metricsControl.value
+      learningRate: this.learningRate,
+      metrics: this.metricsArrayToSend
     }).subscribe(this.startTrainingObserver);
-    console.log("metric control "+ this.metricsControl.value[0].codename)
-    console.log("optimizer "+ this.optimizerFunctionControl.value.name)
-    console.log("testDataRatio "+ this.sliderValue/100)
-    console.log("metrics "+ this.metricsControl.value.name)
-    console.log("lossFunction "+ this.lossFunctionControl.value.name)
-    console.log("metric array to send "+ this.metricsArrayToSend)
+    // console.log("metric control "+ this.metricsControl.value[0].codename)
+    // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
+    // console.log("testDataRatio "+ this.sliderValue/100)
+    // console.log("metrics "+ this.metricsControl.value)
+    // console.log("lossFunction "+ this.lossFunctionControl.value.codename)
+    // console.log("metric array to send "+ this.metricsArrayToSend)
 
   }
 }
