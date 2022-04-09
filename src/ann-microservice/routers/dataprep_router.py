@@ -77,8 +77,8 @@ async def modify(path:str, data : models.ModifiedData):
     '''
     Na osnovu liste akcija vrsi izmenu vrednosti, brisanje reda ili kolone u prosledjenom fajlu
     '''
-    msg = modify(path,data)
-
+    msg = modify_dataset(path, data)
+    
     return msg
 
 

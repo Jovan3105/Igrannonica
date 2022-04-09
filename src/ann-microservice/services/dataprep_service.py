@@ -82,8 +82,7 @@ def get_column_types(df):
 
 # # #
 
-def modify(path:str, data:models.ModifiedData):
-
+def modify_dataset(path:str, data:models.ModifiedData):
     is_file = os.path.isfile(path)
 
     if not is_file:

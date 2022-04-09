@@ -11,6 +11,9 @@ class Optimizer(str, Enum):
     RMSprop  = "RMSprop"
     SGD      = "SGD"
 
+    def __str__(self):
+        return str(self.value)
+
 def map_optimizer(optimizer_key, learning_rate):   
     optimizer_switcher = {
         Optimizer.Adam     : tf.optimizers.Adam(learning_rate=learning_rate),

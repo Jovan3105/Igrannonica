@@ -43,6 +43,9 @@ class Metric(str, Enum):
     TrueNegatives                 = "TrueNegatives"
     TruePositives                 = "TruePositives"
 
+    def __str__(self):
+        return str(self.value)
+
 def map_metrics(metrics):   
     metric_switcher = {
         Metric.Accuracy                      : tf.keras.metrics.Accuracy(),
