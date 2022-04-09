@@ -265,7 +265,7 @@ namespace backend.Controllers
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(dataset.Path));
+            multipartFormContent.Add(fileStreamContent, name: "stored_dataset", fileName: Path.GetFileName(dataset.Path));
 
             var url = _microserviceBaseURL + "/dataset/stat_indicators";
             var response = await _client.PostAsync(url, multipartFormContent);
@@ -286,25 +286,13 @@ namespace backend.Controllers
             fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(dataset.Path));
+            multipartFormContent.Add(fileStreamContent, name: "stored_dataset", fileName: Path.GetFileName(dataset.Path));
 
             var url = _microserviceBaseURL + "/dataset/corr_matrix";
             var response = await _client.PostAsync(url, multipartFormContent);
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
-            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
-
-            // var microserviceURL = _microserviceBaseURL + "/dataset/corr_matrix";
-
-            // var dataSource = "http://localhost:7220/api/Datasets/getCsv/?filename=";
-            // dataSource += dataset.FileName;
-
-            // // TODO promeniti hardcoded adresu; hardcode-ovano je jer rezultat getCsv API-a ne moze da se parsira ispravno na ML
-            // var response = await _client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", "https://people.sc.fsu.edu/~jburkardt/data/csv/hurricanes.csv"));
-            // var responseString = await response.Content.ReadAsStringAsync();
-
-            // return Ok(responseString);
         }
 
         [HttpGet]

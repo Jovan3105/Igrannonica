@@ -8,7 +8,7 @@ from pydantic import AnyHttpUrl
 from starlette.datastructures import UploadFile
 
 from models import models
-from shared_service import log
+from services.shared_service import log
 
 #################################################################
 
