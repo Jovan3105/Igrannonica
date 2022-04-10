@@ -1,4 +1,4 @@
-using backend.Data;
+﻿using backend.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using backend.Models;
@@ -147,7 +147,7 @@ namespace backend.Controllers
 
             string fileName = Path.ChangeExtension(file.FileName, ".json");
 
-            string path = CreatePathToDataRoot(dataset.UserID, dataset.Id, file.FileName);
+            string path = CreatePathToDataRoot(dataset.UserID, dataset.Id, fileName);
             using StreamWriter f = new(path);
             await f.WriteAsync(responseString);
 
@@ -202,14 +202,18 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        [Route("{dataset_id}/getData")]
-        public async Task<ActionResult<string>> fetchJsonData(int dataset_id)
-        {
-            var dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
-            using StreamReader r = new StreamReader(dataset.Path);
-            string data = r.ReadToEnd();
+        [Route("{datasetId:int}/Data")]
+        public async Task<ActionResult<string>> fetchDatasetFile(int datasetId, int userId = 0) // TODO razmotriti resenje sa userId-om u buducnosti
+        { // TODO paginacija
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == datasetId);
 
-            return Ok(data);
+            if (dataset == null)
+                return BadRequest(new { Message = "No dataset with this id found" });
+
+            string datasetsVirtPath = _configuration["VirtualFolderPaths:Datasets"];
+            string backendURL = _configuration["Addresses:Backend"];
+            
+            return LocalRedirect($"~/{datasetsVirtPath}/{userId}/{datasetId}/{dataset.FileName}");
         }
 
         [HttpPost]
@@ -224,7 +228,6 @@ namespace backend.Controllers
             }
             else
             {
-                
                 StreamReader r = new StreamReader(dataset.Path);
                 string dataFromPath = r.ReadToEnd();
                 r.Close();
