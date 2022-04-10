@@ -43,14 +43,12 @@ def log(msg):
  
 # # #
 
-def read_json_data(json_file):
-    return json.load(json_file) 
+def read_json_data(url):
+    json_data = None
+    with urllib.request.urlopen(url) as data:
+        json_data = data.read()
 
-# # #
-
-def stored_dataset_to_dataframe(dataset):
-    json_data = read_json_data(dataset.file)
-    return pd.DataFrame(json_data['parsedDataset'])
+    return json.loads(json_data)
 
 
 #################################################################

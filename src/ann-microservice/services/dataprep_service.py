@@ -1,6 +1,3 @@
-import os
-import json
-
 import numpy as np
 import pandas as pd
 
@@ -77,23 +74,8 @@ def get_column_types(df):
 
 # # #
 
-def modify_dataset(path:str, data:models.ModifiedData):
-    print(30*"-#@")
-    is_file = os.path.isfile(path)
-
-    if not is_file:
-        return "error"
-    
-    f = open(path)
-
-    dataset = json.load(f)
-
-    parsedData = dataset['parsedDataset']
-
-    df = pd.json_normalize(parsedData)
-
-    print('dataframe')
-    print(df)
+def modify_dataset(dataset, data:models.ModifiedData):
+    df = pd.DataFrame(dataset['parsedDataset'])
 
     for edit in data.edited:
         df.iloc[edit.row, edit.col] = edit.value
@@ -103,7 +85,5 @@ def modify_dataset(path:str, data:models.ModifiedData):
     
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))
     dataset['basicInfo'] = get_basic_info(df)
-
-    print(dataset)
 
     return dataset

@@ -70,7 +70,7 @@ export class DatasetService {
   }
 
   getStatIndicators(id: number): Observable<any> {
-    return this.http.get<any>(this.datasetAPIUrl + `/${id}/stat_indicators`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/stat-indicators`).pipe(
       tap(_ => console.log(`fetched page id=${id}`)),
       catchError(this.handleError<any>('getStatIndicators'))
     );
@@ -128,7 +128,7 @@ export class DatasetService {
   }
   
   getCorrMatrix(id:any):Observable<any>{
-    return this.http.get<any>(this.datasetAPIUrl +`/${id}/corr_matrix`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl +`/${id}/corr-matrix`).pipe(
       //tap(_ => console.log(`fetched page id=${id}`)),
       catchError(this.handleError<any>('getCorrMatrix'))
     );

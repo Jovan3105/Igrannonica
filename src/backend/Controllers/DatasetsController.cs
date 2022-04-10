@@ -160,42 +160,29 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        [Route("{dataset_id}/stat_indicators")]
-        public async Task<ActionResult<string>> fetchStatisticalIndicators(int dataset_id)
+        [Route("{datasetId}/stat-indicators")]
+        public async Task<ActionResult<string>> fetchStatisticalIndicators(int datasetId)
         {
-            Dataset dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
-
-            using var _x = System.IO.File.OpenRead(dataset.Path);
-
-            var fileStreamContent = new StreamContent(_x);
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "stored_dataset", fileName: Path.GetFileName(dataset.Path));
-
-            var url = _microserviceBaseURL + "/dataset/stat_indicators";
-            var response = await _client.PostAsync(url, multipartFormContent);
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
+            
+            var url = _microserviceBaseURL + "/dataset/stat-indicators";
+            var donwloadUrl = CreateDatasetURL(dataset.UserID, datasetId, dataset.FileName);
+            var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
         }
 
         [HttpGet]
-        [Route("{dataset_id}/corr_matrix")]
-        public async Task<ActionResult<string>> getCorrMatrix(int dataset_id)
+        [Route("{datasetId}/corr-matrix")]
+        public async Task<ActionResult<string>> getCorrMatrix(int datasetId)
         {
-            Dataset dataset = await this.datasetContext.Datasets.FindAsync(dataset_id);
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
 
-            using var _x = System.IO.File.OpenRead(dataset.Path);
+            var url = _microserviceBaseURL + "/dataset/corr-matrix";
+            var donwloadUrl = CreateDatasetURL(dataset.UserID, datasetId, dataset.FileName);
 
-            var fileStreamContent = new StreamContent(_x);
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "stored_dataset", fileName: Path.GetFileName(dataset.Path));
-
-            var url = _microserviceBaseURL + "/dataset/corr_matrix";
-            var response = await _client.PostAsync(url, multipartFormContent);
+            var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Ok(responseString);
@@ -210,10 +197,9 @@ namespace backend.Controllers
             if (dataset == null)
                 return BadRequest(new { Message = "No dataset with this id found" });
 
-            string datasetsVirtPath = _configuration["VirtualFolderPaths:Datasets"];
-            string backendURL = _configuration["Addresses:Backend"];
+            string url = CreateDatasetURL(userId, datasetId, dataset.FileName).Replace(_configuration["Addresses:Backend"], "~");
             
-            return LocalRedirect($"~/{datasetsVirtPath}/{userId}/{datasetId}/{dataset.FileName}");
+            return LocalRedirect(url);
         }
 
         [HttpPost]
@@ -265,5 +251,15 @@ namespace backend.Controllers
 
             return $"{rootDirPath}/{filename}";
         }
+
+        private string CreateDatasetURL(int userID, int datasetID, string filename)
+        {
+            string datasetsVirtPath = _configuration["VirtualFolderPaths:Datasets"];
+            string backendURL = _configuration["Addresses:Backend"];
+            
+            return $"{backendURL}/{datasetsVirtPath}/{userID}/{datasetID}/{filename}";
+        }
+
+
     }
 }
