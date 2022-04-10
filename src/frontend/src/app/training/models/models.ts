@@ -36,11 +36,13 @@ export class EditedCell {
 export class ModifiedData {
   id: number;
   edited: EditedCell[];
-  deleted: number[];
+  deletedRows: number[];
+  deletedCols:number[];
 
-  constructor(id: number, edited: EditedCell[], deleted: number[]) {
+  constructor(id: number, edited: EditedCell[], deletedRows: number[],deletedCols:number[]) {
     this.id = id;
     this.edited = edited;
-    this.deleted = deleted;
+    this.deletedRows = deletedRows;
+    this.deletedCols = deletedCols;
   }
 }

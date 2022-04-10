@@ -4,6 +4,7 @@ from pydantic import AnyHttpUrl
 
 from models import models
 from services.dataprep_service import parse_dataset, get_column_types, get_basic_info, modify_dataset
+from services.shared_service import read_json_data
 
 #################################################################
 
@@ -77,7 +78,7 @@ async def modify(stored_dataset : AnyHttpUrl, modified_data : models.ModifiedDat
     '''
     Na osnovu liste akcija vrsi izmenu vrednosti, brisanje reda ili kolone u prosledjenom fajlu
     '''
-    
+
     dataset = read_json_data(stored_dataset)
     msg = modify_dataset(dataset, modified_data)
     

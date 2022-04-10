@@ -318,7 +318,7 @@ export class DashboardComponent implements OnInit {
   
   onApplyChanges()
   {
-    var req:ModifiedData = new ModifiedData(this.datasetId, this.dataTable.editedCells, this.dataTable.deletedRows);
+    var req:ModifiedData = new ModifiedData(this.datasetId, this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
 
     console.log(req);
     this.datasetService.modifyDataset(req).subscribe(

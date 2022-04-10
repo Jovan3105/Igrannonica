@@ -9,4 +9,5 @@ class Cell(BaseModel):
 class ModifiedData(BaseModel):
     id: int
     edited: List[Cell]
-    deleted: List[int]
+    deletedRows: List[int]
+    deletedCols:List[int]

@@ -213,14 +213,12 @@ namespace backend.Controllers
                 return BadRequest(new { Message = "No dataset with this id" });
             }
             else
-            {
-                StreamReader r = new StreamReader(dataset.Path);
-                string dataFromPath = r.ReadToEnd();
-                r.Close();
-             
+            { 
                 var microserviceURL = _microserviceBaseURL + "/data-preparation/modify";
 
-                var response = await _client.PutAsJsonAsync(microserviceURL+ "?path=" + dataset.Path, data);
+                string url = CreateDatasetURL(dataset.UserID, data.Id, dataset.FileName);
+  
+                var response = await _client.PutAsJsonAsync(microserviceURL+ "?stored_dataset=" + url, data);
 
                 var responseString = await response.Content.ReadAsStringAsync();
 

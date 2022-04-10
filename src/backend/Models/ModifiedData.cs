@@ -6,6 +6,7 @@
 
         public Cell[] Edited { get; set; }
 
-        public int[] Deleted { get; set; }
+        public int[] DeletedRows { get; set; }
+        public int[] DeletedCols { get; set; }  
     }
 }
