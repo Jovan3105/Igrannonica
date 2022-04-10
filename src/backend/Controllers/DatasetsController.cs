@@ -1,4 +1,4 @@
-﻿using backend.Data;
+using backend.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using backend.Models;
@@ -375,32 +375,13 @@ namespace backend.Controllers
         // TODO premestiti logiku za kreiranje root foldera dataset-ova prilikom pokretanja aplikacije
         private string CreatePathToDataRoot(int userID, int datasetID, string filename)
         {
-            // Kreni od root foldera za dataset storage
-            var filePath = string.Format(_datasetFolderPath);
+            var rootDirPath = $"{_datasetFolderPath}/{userID}/{datasetID}";
 
-            // Proveri da li postoji folder u kome se cuvaju podaci
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
+            Directory.CreateDirectory(rootDirPath);
 
-            filePath += "/" + userID.ToString();
+            rootDirPath = rootDirPath.Replace(@"\", "/");
 
-            // Proveri da li postoji folder korisnika (naziv foldera njegov id)
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-
-            filePath = filePath + "/" + datasetID + "/";//Path.Combine(filePath, datasetID.ToString()); 
-
-            // Proveri da li postoji folder za dati dataset (id)
-            if (!Directory.Exists(filePath))
-            {
-                Directory.CreateDirectory(filePath);
-            }
-
-            return Path.Combine(filePath, filename);
+            return $"{rootDirPath}/{filename}";
         }
     }
 }
