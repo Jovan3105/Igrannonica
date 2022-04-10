@@ -28,7 +28,7 @@ namespace backend.Controllers
             this.datasetContext = datasetContext;
             _configuration = configuration;
             _microserviceBaseURL = _configuration["Addresses:Microservice"];
-            _datasetFolderPath = @"../../files/"; // TODO proveriti da li postoji bolji nacin, npr. koriscenjem klase Path
+            _datasetFolderPath = _configuration["FileSystemRelativePaths:Datasets"];
         }
        
         [HttpGet]
@@ -281,22 +281,57 @@ namespace backend.Controllers
             return Ok(data);
         }
 
-        [HttpGet]
-        [Route("getCsv")]
-        public async Task<ActionResult<string>> fetchCsv(string fileName)
+        [HttpPost]
+        [Route("modifyData")]
+        public async Task<ActionResult<Object>> modifyData([FromBody]ModifiedData data)
         {
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.FileName == fileName);
-            string response = string.Empty;
+            var dataset = await this.datasetContext.Datasets.FindAsync(data.Id);
 
-            string path = dataset.Path;
-            var lines = System.IO.File.ReadAllLines(path);
-
-            foreach(string line in lines)
+            if (dataset == null)
             {
-                response += line + "\n\r";
+                return BadRequest(new { Message = "No dataset with this id" });
+            }
+            else
+            {
+                StreamReader r = new StreamReader(dataset.Path);
+                string dataFromPath = r.ReadToEnd();
+                r.Close();
+             
+                var microserviceURL = _microserviceBaseURL + "/data-preparation/modify";
+
+                var response = await _client.PutAsJsonAsync(microserviceURL+ "?path=" + dataset.Path, data);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (responseString == "error")
+                {
+                    return BadRequest(new { Message = "Error on microservice" });
+                }
+                else 
+                {
+                    StreamWriter f = new(dataset.Path);
+                    f.Write(responseString);
+                    f.Close();
+                }
+
+                return Ok(new { Message = "OK" } );
             }
 
-            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{datasetId:int}/File")]
+        public async Task<ActionResult<string>> fetchDatasetFile(int userId, int datasetId)
+        {
+            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == datasetId);
+
+            if (dataset == null)
+                return BadRequest(new { Message = "No dataset with this id found" });
+
+            string datasetsVirtPath = _configuration["VirtualFolderPaths:Datasets"];
+            string backendURL = _configuration["Addresses:Backend"];
+            
+            return LocalRedirect($"~/{datasetsVirtPath}/{userId}/{datasetId}/{dataset.FileName}");
         }
 
         [HttpPost]

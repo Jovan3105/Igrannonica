@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -24,6 +25,7 @@ builder.Services.AddCors(options =>
                       });
     
 });
+
 ConfigurationManager configuration = builder.Configuration;
 // Add services to the container.
 //builder.Services.AddSignalR();
@@ -41,8 +43,6 @@ builder.Services.AddDbContext<DatasetContext>(options => {
 
 });
 //builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<UserContext>().AddDefaultTokenProviders();
-
-
 
 builder.Services.AddAuthentication(options =>
 {
@@ -67,6 +67,7 @@ builder.Services.AddAuthentication(options =>
 
     };
 });
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -85,6 +86,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"../../files")),
+    RequestPath = new PathString("/Datasets")
+});
+
 app.UseHttpsRedirection();
 var webSocketOptions = new WebSocketOptions
 {
@@ -92,14 +101,10 @@ var webSocketOptions = new WebSocketOptions
 };
 
 
-
-
 //SOKETI
 app.UseWebSockets(webSocketOptions);
 
 
-
- 
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseRouting();
@@ -113,7 +118,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllers();
 
