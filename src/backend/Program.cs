@@ -2,6 +2,7 @@ using backend;
 using backend.Data;
 using backend.Models;
 using backend.Services;
+using backend.WS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -72,7 +73,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddWebSocketServerConnectionManager();
 // Email sender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
@@ -100,15 +101,14 @@ var webSocketOptions = new WebSocketOptions
     KeepAliveInterval = TimeSpan.FromMinutes(2)
 };
 
-
 //SOKETI
 app.UseWebSockets(webSocketOptions);
+app.UseWebSocketServer();
 
 
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseRouting();
-
 
 /*app.UseEndpoints(endpoints =>
 {   
