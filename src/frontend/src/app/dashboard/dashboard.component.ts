@@ -107,6 +107,8 @@ export class DashboardComponent implements OnInit {
   loaderMiniDisplay:string = "none";
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
+  fileUploadDisable:boolean = false;
+  linkUploadDisable:boolean = false;
 
   sliderValue: number = 80;
   sliderOptions: Options = {
@@ -357,6 +359,7 @@ export class DashboardComponent implements OnInit {
       this.deleteButtonDisplay = "none";
       this.labelsVisibility = "hidden";
       this.mainTableDisplay = "none";
+      this.fileUploadDisable = this.linkUploadDisable = true;
     }
     else
     {
@@ -365,6 +368,7 @@ export class DashboardComponent implements OnInit {
       this.deleteButtonDisplay = "inline";
       this.labelsVisibility = "visible";
       this.mainTableDisplay = "block";
+      this.fileUploadDisable = this.linkUploadDisable  = false;
     }
     this.toggledButton = !this.toggledButton
   }
