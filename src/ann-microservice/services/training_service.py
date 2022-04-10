@@ -2,15 +2,13 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from fastapi import HTTPException
-
 from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
-
+from models.models import NNLayer
 from services.shared_service import log
 from helpers.optimizer_helper import map_optimizer
 from helpers.loss_func_helper import map_loss_function
@@ -29,6 +27,8 @@ def encode_and_scale(cont_features, cat_features, X_train, X_test):
 
     return col_trans.transform(X_train), col_trans.transform(X_test), col_trans
 
+# # #
+
 def plot_history(history, label, min, max):
   plt.plot(history.history['loss'], label='loss')
   plt.plot(history.history[label], label=label)
@@ -40,6 +40,15 @@ def plot_history(history, label, min, max):
 
   return plot
 
+# # #
+
+def create_layer_array(nnlayers: NNLayer):
+    layers = []
+
+
+
+    return layers
+
 #################################################################
 # Main code
 
@@ -47,28 +56,18 @@ def train_model(
     df,
     features,
     labels,
+    layers,
     metrics,
     learning_rate,
     loss_function,
     test_size,
     validation_size,
     epochs,
-    optimizer 
+    optimizer,
+    dataset_headers,
+    cont_cols_set, 
+    cat_cols_set
     ):
-
-    cont_cols_set = set(df.select_dtypes(include='number').columns.values)
-    cat_cols_set = set(df.select_dtypes(exclude='number').columns.values)
-
-    dataset_headers = list(cont_cols_set | cat_cols_set)
-
-    # Validate user input
-    for feature in features:
-        if feature not in dataset_headers:
-            raise HTTPException(status_code=404, detail=f"Invalid feature: {feature}")
-        
-    for label in labels:
-        if label not in dataset_headers:
-            raise HTTPException(status_code=404, detail=f"Invalid label: {label}")
     
     cont_features = list(set(features) & cont_cols_set)
     cat_features = list(set(features) & cat_cols_set)
@@ -93,13 +92,8 @@ def train_model(
     # Scale (normalize) numerical and encode categorical data
     X_train_normal, X_test_normal, ct = encode_and_scale(cont_features, cat_features, X_train, X_test)
     
-    # Feature normalization
-    #normalizer = tf.keras.layers.Normalization(axis=-1)
-    #normalizer.adapt(np.array(X_train))
-    
     # Make a model
     model = tf.keras.Sequential([
-        #normalizer,
         layers.Dense(units=128, activation='relu'),
         layers.Dense(units=32, activation='relu'),
         layers.Dense(units=1, activation='linear')
