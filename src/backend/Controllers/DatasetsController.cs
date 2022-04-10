@@ -48,100 +48,6 @@ namespace backend.Controllers
 
             return Ok(lista);
         }
-
-        [HttpPost]
-        [Route("")]
-        public async Task<ActionResult<List<Dataset>>> addDataset([FromForm]datasetDto dto) {
-            Dataset dataset = dto.dataSet;
-            IFormFile file = dto.fajl;
-
-            if (file.Length == 0)
-            {
-                return BadRequest("empty file");
-            }
-
-            string fileName = file.FileName;
-            await using var stream = file.OpenReadStream();
-             
-            using var reader = new StreamReader(stream);
-            var text = await reader.ReadToEndAsync();
-
-            Console.WriteLine(text);
-            Console.WriteLine(fileName);
-
-            // Sacuvaj fajl //
-
-            string path = CreatePathToDataRoot(dataset.UserID, dataset.Id, fileName);
-            using StreamWriter f = new(path);
-            await f.WriteAsync(text);
-
-            dataset.Path = path;
-            dataset.FileName = fileName;
-            this.datasetContext.Datasets.Add(dataset);
-            await this.datasetContext.SaveChangesAsync();
-
-            return Ok(dataset.Id);
-        }
-
-        [HttpGet]
-        [Route("{id:int}/data")]
-        public async Task<ActionResult<string>> fetchData(int id, int page)
-        {
-            int rowsPerPage = 20;
-            string delimiter = ",";
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.Id == id);
-            string path = dataset.Path;
-            var csv = new List<string[]>();
-            var lines = System.IO.File.ReadAllLines(path);
-
-            foreach (string line in lines)
-                csv.Add(line.Split(delimiter));
-
-            var header = lines[0].Split(delimiter);
-            
-            if (page == 0)
-            {
-                var listaRecnika = new List<Dictionary<string, string>>();
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    var objResult = new Dictionary<string, string>();
-
-                    for (int j = 0; j < header.Length; j++)
-                        objResult.Add(header[j], csv[i][j]);
-
-                    listaRecnika.Add(objResult);
-                }
-
-                return Ok(JsonConvert.SerializeObject(listaRecnika));
-            }
-            else
-            {
-                if ((page - 1) * rowsPerPage > lines.Length)
-                {
-                    return BadRequest(page + " " + lines.Length);
-                }
-
-                int upper = 0;
-                if((page - 1) * rowsPerPage > lines.Length)
-                    upper = lines.Length;
-                else
-                    upper = (page) * rowsPerPage;
-               
-                var listaRecnika = new List<Dictionary<string, string>>();
-                for (int i = (page - 1) * rowsPerPage; i < upper; i++)
-                {
-                    // Console.WriteLine(i);
-                    var objResult = new Dictionary<string, string>();
-
-                    for (int j = 0; j < header.Length; j++)
-                        objResult.Add(header[j], csv[i][j]);
-
-                    listaRecnika.Add(objResult);
-                }
-
-                return Ok(JsonConvert.SerializeObject(listaRecnika));
-            }
-        }
         
         [HttpDelete]
         [Route("")]
@@ -342,33 +248,6 @@ namespace backend.Controllers
 
                 return Ok(new { Message = "OK" } );
             }
-
-        }
-
-        [HttpPost]
-        [Route("/begin_training")]
-        public async Task<ActionResult<string>> beginTraining(int epoches, string algorithm)
-        {
-            var data = new
-            {
-                epoches = epoches,
-                algorithm = algorithm
-            };
-
-            var url = _microserviceBaseURL + "/training";
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-
-            httpWebRequest.ContentType = "application/json";
-            httpWebRequest.Method = "POST";
-
-            using var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
-            streamWriter.Write(data);
-            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            using var streamReader = new StreamReader(httpResponse.GetResponseStream());
-            
-            var result = streamReader.ReadToEnd();
-            
-            return Ok(result);
 
         }
 
