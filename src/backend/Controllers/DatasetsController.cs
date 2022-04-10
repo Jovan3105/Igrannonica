@@ -28,9 +28,9 @@ namespace backend.Controllers
             this.datasetContext = datasetContext;
             _configuration = configuration;
             _microserviceBaseURL = _configuration["Addresses:Microservice"];
-            _datasetFolderPath = @"../../files/"; // TODO proveriti da li postoji bolji nacin, npr. koriscenjem klase Path
+            _datasetFolderPath = _configuration["FileSystemRelativePaths:Datasets"];
         }
-       
+
         [HttpGet]
         [Route("")]
         public async Task<ActionResult<List<Dataset>>> fetchAllDatasets(string? p)
@@ -345,104 +345,6 @@ namespace backend.Controllers
 
         }
 
-        [HttpGet]
-        [Route("getCsv")]
-        public async Task<ActionResult<string>> fetchCsv(string fileName)
-        {
-            var dataset = datasetContext.Datasets.FirstOrDefault(x => x.FileName == fileName);
-            string response = string.Empty;
-
-            string path = dataset.Path;
-            var lines = System.IO.File.ReadAllLines(path);
-
-            foreach(string line in lines)
-            {
-                response += line + "\n\r";
-            }
-
-            return Ok(response);
-        }
-
-        [HttpPost]
-        [Route("upload")]
-        public async Task<ActionResult<string>> sendToMl(IFormFile file)
-        {
-            // Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
-
-            var fileStreamContent = new StreamContent(file.OpenReadStream());
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-
-            var multipartFormContent = new MultipartFormDataContent();
-            multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: Path.GetFileName(file.FileName));
-
-            var url =_microserviceBaseURL + "/data-preparation/parse-file";
-            var response = await _client.PostAsync(url, multipartFormContent);
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            return Ok(responseString);
-        }
-
-        /*[HttpPatch]
-        [Route("")]
-        public async Task<ActionResult<string>> patch(List<int> rows, List<int> cols, Dataset data)
-        {
-            HandleRowsAndCols(rows, cols, data);
-            return Ok("ok");
-        }
-
-        public async void  HandleRowsAndCols(List<int> rows, List<int> cols, Dataset data)
-        {
-            //brisanje redova
-            string[] lines = System.IO.File.ReadAllLines(data.Path);
-
-
-            using StreamWriter file = new(data.Path);
-
-            int num = 0;
-            foreach (string line in lines)
-            {
-                if (!rows.Contains(num))
-                {
-                    await file.WriteLineAsync(line);
-                }
-                else
-                {
-                    rows.Remove(num);
-                }
-                num++;
-            }
-
-            //brisanje kolona
-
-        }*/
-
-
-        [HttpPatch]
-        [Route("{dataset_id}/data/cell")]
-        public async Task<ActionResult<string>> patchModifyCell(int dataset_id, List<Cell> values)
-        {
-            string delimiter = ",";
-            Dataset data = datasetContext.Datasets.FirstOrDefault(x => x.Id == dataset_id);
-            string[] lines = System.IO.File.ReadAllLines(data.Path);
-
-            foreach (Cell value in values)
-            {
-                var line = lines[value.Row].Split(delimiter);
-                line[value.Col] = value.Value;
-                lines[value.Row] = string.Join(delimiter, line);
-            }
-
-            using (StreamWriter file = new(data.Path))
-            {
-                foreach (string line in lines)
-                {
-                    await file.WriteLineAsync(line);
-                }
-            }
-
-            return Ok("ok");
-        }
-
         [HttpPost]
         [Route("/begin_training")]
         public async Task<ActionResult<string>> beginTraining(int epoches, string algorithm)
@@ -470,8 +372,10 @@ namespace backend.Controllers
 
         }
 
+        // TODO premestiti logiku za kreiranje root foldera dataset-ova prilikom pokretanja aplikacije
         private string CreatePathToDataRoot(int userID, int datasetID, string filename)
         {
+            // Kreni od root foldera za dataset storage
             var filePath = string.Format(_datasetFolderPath);
 
             // Proveri da li postoji folder u kome se cuvaju podaci
@@ -480,7 +384,7 @@ namespace backend.Controllers
                 Directory.CreateDirectory(filePath);
             }
 
-            filePath += userID.ToString();
+            filePath += "/" + userID.ToString();
 
             // Proveri da li postoji folder korisnika (naziv foldera njegov id)
             if (!Directory.Exists(filePath))

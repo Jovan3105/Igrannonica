@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
     {name: 'Activation function2', info: 'Activation function2!', codename: 'function1'},
     {name: 'Activation function3', info: 'Activation function3!', codename: 'function2'},
   ];
+  
   loaderDisplay:string = "none";
   containerVisibility:string = "hidden";
   nextButtonDisable:boolean = true;
@@ -54,7 +55,7 @@ export class DashboardComponent implements OnInit {
     private domSanitizer: DomSanitizer
     ) {
     this.datasetId = -1;
-   }
+  }
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
