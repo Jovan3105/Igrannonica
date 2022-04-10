@@ -21,8 +21,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("*").AllowAnyHeader()
-                                                  .AllowAnyMethod();
+                          builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                       });
     
 });
@@ -91,8 +90,13 @@ app.UseStaticFiles();
 
 app.UseStaticFiles(new StaticFileOptions()
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"../../files")),
-    RequestPath = new PathString("/Datasets")
+    // Kreiranje statickog foldera za dataset-ove
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), builder.Configuration["FileSystemRelativePaths:Datasets"])),
+    RequestPath = new PathString("/" + builder.Configuration["VirtualFolderPaths:Datasets"]),
+    OnPrepareResponse = context =>
+    {
+        context.Context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+    }
 });
 
 app.UseHttpsRedirection();
