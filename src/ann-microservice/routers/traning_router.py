@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Form, UploadFile, File, Body
+from fastapi import APIRouter, HTTPException, Body
 from typing import Optional, List
 from pydantic import AnyHttpUrl
 
@@ -7,7 +7,7 @@ from services.training_service import train_model
 from helpers.optimizer_helper import Optimizer
 from helpers.loss_func_helper import LossFunction
 from helpers.metric_helper import Metric
-from services.shared_service import log, stored_dataset_to_dataframe
+from services.shared_service import log, read_json_data
 
 #################################################################
 
@@ -20,12 +20,6 @@ REGRESSION_METRICS = [
     ]
 
 #################################################################
-
-@router.post("test")
-async def test(f:UploadFile = File(...)):
-    
-    print(stored_dataset_to_dataframe(f.file))
-    
 
 @router.post("")
 async def begin_training(
@@ -44,11 +38,6 @@ async def begin_training(
     ):
     
     df = stored_dataset_to_dataframe(stored_dataset)
-    
-    log(f"Feature list={features}; Label list={labels}; Metric list={metrics}")
-
-    cont_cols_set = set(df.select_dtypes(include='number').columns.values)
-    cat_cols_set = set(df.select_dtypes(exclude='number').columns.values)
     
     dataset_headers = list(cont_cols_set | cat_cols_set)
 

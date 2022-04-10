@@ -2,11 +2,13 @@ using backend;
 using backend.Data;
 using backend.Models;
 using backend.Services;
+using backend.WS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
 using System.Net.WebSockets;
 using System.Text;
 
@@ -19,11 +21,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("*").AllowAnyHeader()
-                                                  .AllowAnyMethod();
+                          builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                       });
     
 });
+
 ConfigurationManager configuration = builder.Configuration;
 // Add services to the container.
 //builder.Services.AddSignalR();
@@ -41,8 +43,6 @@ builder.Services.AddDbContext<DatasetContext>(options => {
 
 });
 //builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<UserContext>().AddDefaultTokenProviders();
-
-
 
 builder.Services.AddAuthentication(options =>
 {
@@ -67,11 +67,12 @@ builder.Services.AddAuthentication(options =>
 
     };
 });
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddWebSocketServerConnectionManager();
 // Email sender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
@@ -85,25 +86,33 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions()
+{
+    // Kreiranje statickog foldera za dataset-ove
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), builder.Configuration["FileSystemRelativePaths:Datasets"])),
+    RequestPath = new PathString("/" + builder.Configuration["VirtualFolderPaths:Datasets"]),
+    OnPrepareResponse = context =>
+    {
+        context.Context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+    }
+});
+
 app.UseHttpsRedirection();
 var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(2)
 };
 
-
-
-
 //SOKETI
 app.UseWebSockets(webSocketOptions);
+app.UseWebSocketServer();
 
 
-
- 
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseRouting();
-
 
 /*app.UseEndpoints(endpoints =>
 {   
@@ -113,7 +122,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllers();
 

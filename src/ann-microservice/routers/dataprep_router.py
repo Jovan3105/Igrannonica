@@ -73,11 +73,13 @@ async def parse_dataset_file(
 # # #
 
 @router.put("/modify")
-async def modify(path:str, data : models.ModifiedData):
+async def modify(stored_dataset : AnyHttpUrl, modified_data : models.ModifiedData):
     '''
     Na osnovu liste akcija vrsi izmenu vrednosti, brisanje reda ili kolone u prosledjenom fajlu
     '''
-    msg = modify_dataset(path, data)
+    
+    dataset = read_json_data(stored_dataset)
+    msg = modify_dataset(dataset, modified_data)
     
     return msg
 

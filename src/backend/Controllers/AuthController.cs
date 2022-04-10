@@ -14,7 +14,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
-
+using Microsoft.AspNetCore.Authentication;
+using Newtonsoft.Json;
 namespace backend.Controllers
 {
 
@@ -501,6 +502,8 @@ namespace backend.Controllers
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
+
+            Console.WriteLine("\n\n\n\n\n\n\n\n\n "+ Request.Headers["Authorization"]);
             if (tokenModel is null)
             {
                 return BadRequest("Invalid client request");

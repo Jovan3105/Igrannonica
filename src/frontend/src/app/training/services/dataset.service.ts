@@ -36,14 +36,14 @@ export class DatasetService {
   }
 
   getData(id: number): Observable<any[]> {
-    return this.http.get<any>(this.datasetAPIUrl + `/${id}/getData`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/Data`).pipe(
       tap(_ => console.log(`fetched data id=${id}`)),
       catchError(this.handleError<any>('getData'))
     );
   }
 
   getPage(id: number, page: number): Observable<any[]> {
-    return this.http.get<any>(this.datasetAPIUrl + `/${id}/data?page=${page}`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/Data?page=${page}`).pipe(
       tap(_ => console.log(`fetched page id=${id}, page=${page}`)),
       catchError(this.handleError<any>('getPage'))
     );
@@ -70,7 +70,7 @@ export class DatasetService {
   }
 
   getStatIndicators(id: number): Observable<any> {
-    return this.http.get<any>(this.datasetAPIUrl + `/${id}/stat_indicators`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/stat-indicators`).pipe(
       tap(_ => console.log(`fetched page id=${id}`)),
       catchError(this.handleError<any>('getStatIndicators'))
     );
@@ -128,7 +128,7 @@ export class DatasetService {
   }
   
   getCorrMatrix(id:any):Observable<any>{
-    return this.http.get<any>(this.datasetAPIUrl +`/${id}/corr_matrix`).pipe(
+    return this.http.get<any>(this.datasetAPIUrl +`/${id}/corr-matrix`).pipe(
       //tap(_ => console.log(`fetched page id=${id}`)),
       catchError(this.handleError<any>('getCorrMatrix'))
     );

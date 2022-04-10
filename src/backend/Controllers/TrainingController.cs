@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿
 using System.IO;
+using System.Net;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 
 namespace backend.Controllers
@@ -12,11 +14,13 @@ namespace backend.Controllers
         private readonly IConfiguration _configuration;
         
         private static readonly HttpClient client = new HttpClient();
+        private static string _microserviceBaseURL;
 
         public TrainingController( IConfiguration configuration)
         {
           
             _configuration = configuration;
+            _microserviceBaseURL = _configuration["Addresses:Microservice"];
         }
 
         [HttpPost]
@@ -43,6 +47,39 @@ namespace backend.Controllers
 
             var responseString = await response.Content.ReadAsStringAsync();
             return Ok(responseString);
+        }
+        
+
+        [HttpPost]
+        [Route("/begin_training")]
+        public async Task<ActionResult<string>> beginTraining(int epoches, string algorithm)
+        {
+            var data = new
+            {
+                epoches = epoches,
+                algorithm = algorithm
+            };
+
+            // Kreiraj zahtev //
+
+            var url = _microserviceBaseURL + "/training";
+            var httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
+
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+
+            using var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
+            streamWriter.Write(data);
+
+            // Procitaj response //
+
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using var streamReader = new StreamReader(httpResponse.GetResponseStream());
+            
+            var result = streamReader.ReadToEnd();
+            
+            return Ok(result);
+
         }
     }
 }
