@@ -24,6 +24,7 @@ export class AuthService {
   registerUrl = environment.apiUrl + "/auth/register";
 
   confirmEmailUrl = environment.apiUrl + "/Auth/verifyEmail";
+  cancelRegistrationUrl = environment.apiUrl + "/Auth/cancelRegistration";
   /////////url swaggera/////////
 
   constructor(private http: HttpClient, private router: Router, private jwtService: JwtService) { }
@@ -124,6 +125,10 @@ export class AuthService {
 
   verifyEmailAddress(email:string, token:string): any {
     return this.http.get<any>(this.confirmEmailUrl + `?email=${email}&token=${token}`);
+  }
+
+  cancelRegistration(email:string, token:string): any {
+    return this.http.get<any>(this.cancelRegistrationUrl + `?email=${email}&token=${token}`);
   }
 
 }
