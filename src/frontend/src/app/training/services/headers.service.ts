@@ -30,7 +30,7 @@ export class HeadersService {
   {
     var newHeader = new Array<HeaderDict>();
     var temp;
-
+    if (!data.length) return newHeader; 
     if (data.length >= 1)
       temp = Object.getOwnPropertyNames(data[0]);
     else 

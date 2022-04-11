@@ -44,3 +44,9 @@ export class ModifiedData {
     this.deletedCols = deletedCols;
   }
 }
+
+export enum TableIndicator {
+  DATA_MANIPULATION,
+  INFO,
+  STATS
+}

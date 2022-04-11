@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CellValueChangedEvent } from 'ag-grid-community';
+import { CellValueChangedEvent, ColumnApi } from 'ag-grid-community';
 import { HeaderDict } from '../models/table_models';
 
 @Injectable({
@@ -51,4 +51,10 @@ export class TableService {
     return newValue;
   }
   
+  resetVisibility(columnApi: ColumnApi, colIds : string[])
+  {
+    if(columnApi)
+      columnApi.setColumnsVisible(colIds,true);
+  }
+
 }

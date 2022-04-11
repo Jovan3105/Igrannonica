@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
-import { Check, EditedCell, HeaderDict } from '../../models/table_models';
+import { Check, EditedCell, HeaderDict, TableIndicator } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { TableService } from '../../services/table.service';
 
 export class ShowTableComponent implements OnInit {
 
-  headers: Array<HeaderDict> = [];
+  headers: Array<HeaderDict>;
   data: any = null;
   private gridApi!: GridApi;
   private columnApi!: ColumnApi;
@@ -43,6 +43,7 @@ export class ShowTableComponent implements OnInit {
   constructor(private tableService:TableService) {
     this.columnDefs = [];
     this.rowData = [];
+    this.headers = [];
     this.rowSelection = 'multiple';
     this.paginationPageSize = 10;
     this.tableStyle = "height: 520px;";
@@ -68,6 +69,11 @@ export class ShowTableComponent implements OnInit {
 
   }
 
+  onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
+    this.columnApi = params.columnApi;
+  }
+
   prepareTable(indicator:TableIndicator, data: any, headers: Array<HeaderDict>) {
     
     this.data = data;
@@ -77,7 +83,7 @@ export class ShowTableComponent implements OnInit {
     this.columnDefs = [];
     this.rowData = [];
 
-    if(indicator == TableIndicator.DATA_MANIPULATION)
+    if(this.indicator == TableIndicator.DATA_MANIPULATION)
     {
       this.deletedRows = [];
       this.deletedCols = [];
@@ -89,24 +95,12 @@ export class ShowTableComponent implements OnInit {
     for (let row of data) {
       this.rowData.push({... row});
     }
-    this.resetVisibility();
-  }
-
-  onGridReady(params: GridReadyEvent) {
-    this.gridApi = params.api;
-    this.columnApi = params.columnApi;
-    console.log(this.columnDefs[0].field);
-    if (this.indicator && this.indicator == TableIndicator.STATS && this.columnDefs[0].field != "indicator")
-    {
-      var ind = this.columnDefs.find(element => element.field == "indicator")
-      if (ind)
-        this.moveColumn(ind?.colId!);
-    }
+    this.tableService.resetVisibility(this.columnApi,this.colIds);
   }
 
   onCellValueChanged(params:CellValueChangedEvent)
   {
-    console.log(params.node);  
+    //console.log(params.node);  
     var editedCellIndex;
     var row = parseInt(params.node.id!);
     var colId = parseInt(params.column.getColId());
@@ -115,7 +109,7 @@ export class ShowTableComponent implements OnInit {
 
     if (newValue != undefined)
     {
-      if ((editedCellIndex = this.editedCells.findIndex(element => element.col == colId && element.row == row)) != -1)
+      if ((editedCellIndex = this.editedCells.findIndex(element => element.col == colId && element.row == row)) != -1) //ukoliko vec postoji u objektu
       {
         console.log(row);
         if (this.data[row][this.headers[colId].name] == newValue) //provera da se ne salje originalna vrednost za izmenu
@@ -130,7 +124,7 @@ export class ShowTableComponent implements OnInit {
         this.editedCells.push(new EditedCell(row,colId,newValue.toString()));
     }
     
-    console.log(this.editedCells);
+    //console.log(this.editedCells);
     if(this.gridApi.getCurrentUndoSize()) 
     {
       //console.log("Ima nesto za menjanje");
@@ -138,12 +132,6 @@ export class ShowTableComponent implements OnInit {
     }
     else this.undoEvent.emit(false);
  }
-
-  resetVisibility()
-  {
-    if(this.columnApi)
-      this.columnApi.setColumnsVisible(this.colIds,true);
-  }
 
   setRowData(rowData:any[]){
     this.rowData = rowData;
@@ -174,6 +162,12 @@ export class ShowTableComponent implements OnInit {
     }
     else if (indicator == TableIndicator.INFO || indicator == TableIndicator.STATS)
     {
+      
+      if (indicator == TableIndicator.STATS) //postavi indicator kao prvu kolonu
+      {
+        const index = this.headers.findIndex((element) => element.name == "indicator");
+        if (index != -1) [this.headers[0], this.headers[index]] = [this.headers[index], this.headers[0]];
+      }
       for (let header of this.headers) 
       {
         //this.colIds.push(header.key.toString()); 
@@ -277,48 +271,6 @@ export class ShowTableComponent implements OnInit {
     this.paginationPageSize = paginationPageSize;
   }
 
-  changeAttributeValue(
-    style?:string,
-    tableClass?:string,
-    rowData?:any[],
-    columnDefs?:any[],
-    paginationEnabled?:boolean,
-    paginationPageSize?:number,
-    animateRowsEnabled?:boolean,
-    moveAnimationEnabled?:boolean,
-    suppressDragLeaveHidesColumnsEnabled?:boolean
-    )
-  {
-   if(style !== undefined){
-     this.tableStyle = style
-   }
-    if(tableClass !== undefined){
-      this.tableClass = tableClass
-    } 
-    if(rowData !== undefined){
-      this.rowData = rowData
-    } 
-    if(columnDefs !== undefined){
-      this.columnDefs = columnDefs
-    } 
-    if(paginationEnabled !== undefined){
-      this.paginationEnabled = paginationEnabled
-    } 
-    if(animateRowsEnabled !== undefined){
-      this.animateRowsEnabled = animateRowsEnabled
-    } 
-    if(paginationPageSize !== undefined){
-      this.paginationPageSize = paginationPageSize
-    } 
-    if(moveAnimationEnabled !== undefined){
-      this.moveAnimationEnabled = moveAnimationEnabled
-    }
-    if(suppressDragLeaveHidesColumnsEnabled !== undefined){
-      this.suppressDragLeaveHidesColumnsEnabled = suppressDragLeaveHidesColumnsEnabled
-    }
-
-  }
-
   //Lock-uje kolonu koja je odabrana za label tako da ne moze da se hide-uje iz tabele
   changeLabelColumn(data:{id:number,pred:number | null }){
 
@@ -352,8 +304,3 @@ export class ShowTableComponent implements OnInit {
   }
 }
 
-export enum TableIndicator {
-  DATA_MANIPULATION,
-  INFO,
-  STATS
-}
