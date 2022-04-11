@@ -14,11 +14,19 @@ BACKEND_URI = f'ws://{BACKEND_BASE_ADDRESS}/ws'
  
 #################################################################
  
-async def make_connection():
-    async with websockets.connect(uri = BACKEND_URI) as websocket:
-        await websocket.send("change me!")
-        response = await websocket.recv()
-        print(response)
+async def make_connection(destId,msg):
+    obj={
+        "From":"me",
+        "To":"you",
+        "Message":"FROMPYTHONS"
+    }
+    async with websockets.connect("ws://localhost:7220") as websocket:
+        responce= await websocket.recv()
+        obj["From"]=responce
+        obj["To"]=destId
+        obj["Message"]=msg
+        await websocket.send(json.dumps(obj))
+        #print(responce)
 
 # # #
 
