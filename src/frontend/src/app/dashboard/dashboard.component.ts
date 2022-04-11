@@ -3,7 +3,7 @@ import { DatasetService } from '../training/services/dataset.service';
 import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 import { LabelsComponent } from '../training/components/labels/labels.component';
-import { Check, ModifiedData } from '../training/models/models';
+import { Check, ModifiedData } from '../training/models/table_models';
 import { HeadersService } from '../training/services/headers.service';
 import { FormControl, Validators } from '@angular/forms';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
@@ -320,10 +320,10 @@ export class DashboardComponent implements OnInit {
   
   onApplyChanges()
   {
-    var req:ModifiedData = new ModifiedData(this.datasetId, this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
+    var req:ModifiedData = new ModifiedData(this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
 
     console.log(req);
-    this.datasetService.modifyDataset(req).subscribe(
+    this.datasetService.modifyDataset(this.datasetId, req).subscribe(
       {
         next: (response:any) =>{
           console.log(response);
@@ -389,9 +389,6 @@ export class DashboardComponent implements OnInit {
     else{
       alert("Nisi izabrao izlaz!");
     }
-    
-
-    //this.router.navigate(['/labels'], { state: this.dataTable.headers });
 
   }
 

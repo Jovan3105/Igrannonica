@@ -2,7 +2,7 @@ import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { ModifiedData } from '../models/models';
+import { ModifiedData } from '../models/table_models';
 
 @Injectable({
   providedIn: 'root'
@@ -86,8 +86,8 @@ export class DatasetService {
     );
   }
 
-  modifyDataset(source: ModifiedData): Observable<any[]> {
-    return this.http.post<any>(this.datasetAPIUrl + '/modifyData', source).pipe(
+  modifyDataset(id: number, source: ModifiedData): Observable<any[]> {
+    return this.http.post<any>(this.datasetAPIUrl + `/${id}/modifyData`, source).pipe(
       tap(_ => console.log(`sent modified data`)),
       catchError(this.handleError<any>('modifyDataset'))
     );

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HeaderDict} from '../models/models';
+import { HeaderDict} from '../models/table_models';
 
 @Injectable({
   providedIn: 'root'

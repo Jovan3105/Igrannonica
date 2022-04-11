@@ -203,10 +203,10 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("modifyData")]
-        public async Task<ActionResult<Object>> modifyData([FromBody]ModifiedData data)
+        [Route("{datasetId:int}/modifyData")]
+        public async Task<ActionResult<Object>> modifyData(int datasetId, [FromBody]ModifiedData data)
         {
-            var dataset = await this.datasetContext.Datasets.FindAsync(data.Id);
+            var dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
 
             if (dataset == null)
             {
@@ -216,7 +216,7 @@ namespace backend.Controllers
             { 
                 var microserviceURL = _microserviceBaseURL + "/data-preparation/modify";
 
-                string url = CreateDatasetURL(dataset.UserID, data.Id, dataset.FileName);
+                string url = CreateDatasetURL(dataset.UserID, dataset.Id, dataset.FileName);
   
                 var response = await _client.PutAsJsonAsync(microserviceURL+ "?stored_dataset=" + url, data);
 

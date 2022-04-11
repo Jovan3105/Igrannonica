@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
-import { Check, EditedCell, HeaderDict } from '../../models/models';
+import { Check, EditedCell, HeaderDict } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
 @Component({
