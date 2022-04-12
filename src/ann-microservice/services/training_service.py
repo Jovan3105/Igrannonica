@@ -119,9 +119,9 @@ def train_model(
 
     callback = CustomCallback()
 
-    print(X_train_normal)
+    log(X_train_normal)
 
-    print(y_train)
+    log(y_train)
 
     # Train the model
     history = model.fit(
@@ -141,8 +141,8 @@ def train_model(
 
     score = model.evaluate(X_test_normal, y_test)
 
-    print('Test loss:', score[0]) 
-    print('Test accuracy:', score[1])
+    log('Test loss:', score[0]) 
+    log('Test accuracy:', score[1])
 
     return y_test.values.tolist(), y_pred.tolist()
 

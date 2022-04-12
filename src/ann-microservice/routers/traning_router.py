@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Body
 from typing import Optional, List
 from pydantic import AnyHttpUrl
 
+
 from models.models import NNLayer
 from services.training_service import train_model
 from helpers.optimizer_helper import Optimizer
@@ -37,7 +38,10 @@ async def begin_training(
     learning_rate    : float = Body(0.1)
     ):
     
-    df = stored_dataset_to_dataframe(stored_dataset)
+    log(f"Feature list={features}; Label list={labels}; Metric list={metrics}")
+
+    dataset = read_json_data(stored_dataset)
+    df = pd.DataFrame(dataset['parsedDataset'])
     
     dataset_headers = list(cont_cols_set | cat_cols_set)
 

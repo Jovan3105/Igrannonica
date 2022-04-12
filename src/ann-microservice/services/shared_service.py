@@ -5,20 +5,37 @@ import websockets
 import urllib, base64
 import pandas as pd
 import matplotlib.pyplot as plt
+import logging
+
+import config
 
 #################################################################
 
-PRINT_PREFIX = "####:     "
-BACKEND_BASE_ADDRESS = 'localhost:7220'
-BACKEND_URI = f'ws://{BACKEND_BASE_ADDRESS}/ws'
+BACKEND_WEB_SOCKET_URI = f'ws://{config.BACKEND_BASE_ADDRESS}/ws'
+LOGGER = logging.getLogger('uvicorn.error')
  
 #################################################################
+
+def log(output):
+    '''
+    Ispisuje prosledjeni objekat. Ukoliko je instanca stringa na njega dodaje prefiks PRINT_PREFIX i onda sve zajedno ispise, 
+    dok u suprotnom samo ispisuje prosledjeni objekat
+
+    **Ispis se vrsi samo u development modu**
+    '''
+    
+    if isinstance(output, str):
+        LOGGER.info(config.PRINT_PREFIX + output)
+    else:
+        LOGGER.info(output)
  
+# # #
+
 async def make_connection():
-    async with websockets.connect(uri = BACKEND_URI) as websocket:
+    async with websockets.connect(uri = BACKEND_WEB_SOCKET_URI) as websocket:
         await websocket.send("change me!")
         response = await websocket.recv()
-        print(response)
+        log(response)
 
 # # #
 
@@ -35,21 +52,12 @@ def figure_to_uri(figure, ext='png'):
     
 # # #   
 
-def log(msg):
-    '''
-    Stampa prosledjenu poruku i na nju dodaje odgovarajuci prefiks
-    '''
-    print(PRINT_PREFIX + msg)
- 
-# # #
-
 def read_json_data(url):
     json_data = None
     with urllib.request.urlopen(url) as data:
         json_data = data.read()
 
     return json.loads(json_data)
-
 
 #################################################################
 
