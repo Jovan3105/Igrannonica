@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from services.shared_service import figure_to_uri
+from services.shared_service import figure_to_uri, log
 
 #################################################################
 
@@ -17,16 +17,16 @@ def get_stat_indicators(df):
     #columns with numeric values
     continuous = df.select_dtypes(include='number')
 
-    print("######## continuous:")
-    print(continuous)
+    log("continuous:")
+    log(continuous)
 
     if len(continuous.columns) > 0:
         continuous_stat = continuous.describe().to_dict('records')
     else:
         continuous_stat = []
 
-    print("######## continuous_stat:")
-    print(continuous_stat)
+    log("continuous_stat:")
+    log(continuous_stat)
 
     #columns with non-numeric values
     categorical = df.select_dtypes(exclude='number')
@@ -36,8 +36,8 @@ def get_stat_indicators(df):
     else:
         categorical_stat = []
     
-    print("######## categorical_stat:")
-    print(categorical_stat)
+    log("categorical_stat:")
+    log(categorical_stat)
 
     cont_stat_response = []
     cat_stat_response = []
@@ -48,13 +48,13 @@ def get_stat_indicators(df):
         cont_stat_response += [row]
         i += 1
 
-    print(categorical_stat)
+    log(categorical_stat)
     i = 0
     for stat in categorical_stat:
         row = {"indicator":CAT_INDEXES[i], **stat}
         cat_stat_response += [row]
         i += 1
-    print(cat_stat_response)
+    log(cat_stat_response)
 
     stat_indicators = {}
 

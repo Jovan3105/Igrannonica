@@ -21,9 +21,10 @@ sklearn = "*"
 seaborn = "*"
 
 [dev-packages]
+waitress = "*"
 
 [scripts]
-server = "python ann_server.py"
+server = "gunicorn ann_server:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:10180"
 dev_server = "python ann_server.py dev"
 
 [requires]

@@ -11,6 +11,9 @@ class Optimizer(str, Enum):
     RMSprop  = "RMSprop"
     SGD      = "SGD"
 
+    def __str__(self):
+        return str(self.value)
+
 def map_optimizer(optimizer_key, learning_rate):   
     optimizer_switcher = {
         Optimizer.Adam     : tf.optimizers.Adam(learning_rate=learning_rate),
@@ -24,6 +27,6 @@ def map_optimizer(optimizer_key, learning_rate):
 
     try:         
         return optimizer_switcher.get(optimizer_key)
-    except KeyError:
+    except (KeyError, AttributeError):
         log(f'Key "{optimizer}" is not present in optimizer_switcher dictionary')
         raise HTTPException(status_code=400, detail=f'Optimizer "{optimizer_key}" is not supported')
