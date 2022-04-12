@@ -3,7 +3,7 @@ import tensorflow as tf
 
 class ActivationFunction(str, Enum):
     #NoActivationfunction = None
-    ELU                  = "ELU"
+    Elu                  = "Elu"
     Exponential          = "Exponential"
     GeLu                 = "GeLu"
     HardSigmoid          = "HardSigmoid"
@@ -39,6 +39,6 @@ def map_activation_function(activation_func):
 
     try:         
         return activation_func_switcher.get(activation_func)
-    except KeyError:
+    except (KeyError, AttributeError):
         log(f'Key "{activation_func}" is not present in activation_func_switcher dictionary')
         raise HTTPException(status_code=400, detail=f'Activation function "{activation_func}" is not supported')

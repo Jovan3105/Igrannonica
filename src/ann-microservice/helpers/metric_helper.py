@@ -95,6 +95,6 @@ def map_metrics(metrics):
             mapped_metrics += [metric_switcher.get(metric)]
 
         return mapped_metrics
-    except KeyError:
+    except (KeyError, AttributeError):
         log(f'Key "{metric}" is not present in metric_switcher dictionary')
         raise HTTPException(status_code=400, detail=f'Metric "{metric}" is not supported')
