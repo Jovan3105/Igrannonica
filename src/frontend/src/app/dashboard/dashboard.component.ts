@@ -11,6 +11,8 @@ import { TrainingService } from '../training/services/training.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
 import { translate } from '@angular/localize/src/utils';
+import { webSocket } from "rxjs/webSocket";
+
 
 @Component({
   selector: 'app-dashboard',
@@ -18,7 +20,7 @@ import { translate } from '@angular/localize/src/utils';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  
+
   datasetId:number;
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
@@ -137,15 +139,15 @@ export class DashboardComponent implements OnInit {
   };
 
   constructor(
-    private datasetService: DatasetService, 
-    private router: Router, 
-    private headersService: HeadersService, 
-    private trainingService: TrainingService, 
+    private datasetService: DatasetService,
+    private router: Router,
+    private headersService: HeadersService,
+    private trainingService: TrainingService,
     private domSanitizer: DomSanitizer
     ) {
     this.datasetId = -1;
   }
-   
+
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
@@ -154,7 +156,7 @@ export class DashboardComponent implements OnInit {
   @ViewChild('Labels') private labels!: LabelsComponent;
 
   public form: FormData = new FormData();
-  
+
   public featuresLabel:any;
   //activateModal:boolean = false;
 
@@ -169,10 +171,10 @@ export class DashboardComponent implements OnInit {
     "quotechar": null,
     "escapechar": null,
     "encoding": null
-  }   
+  }
 
   uploadObserver:any = {
-    next: (response:any) => { 
+    next: (response:any) => {
       console.log("### next@uploadObserver")
       console.log(response)
 
@@ -187,12 +189,12 @@ export class DashboardComponent implements OnInit {
   };
 
   fetchTableDataObserver:any = {
-    next: (response:any) => { 
-      
+    next: (response:any) => {
+
       this.showElements();
 
       //console.log(response)
-      
+
       var header = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], header);
 
@@ -201,13 +203,13 @@ export class DashboardComponent implements OnInit {
       this.dataSetInformation.setPaginationEnabled(false);
       this.dataSetInformation.setTableStyle("height: 100px;");
       header = this.headersService.getInfoHeader(response['basicInfo']);
-      this.dataSetInformation.prepareTable(TableIndicator.INFO, [response['basicInfo']], header) 
+      this.dataSetInformation.prepareTable(TableIndicator.INFO, [response['basicInfo']], header)
 
       // TODO ispraviti kada se omoguci povratak ID-a
       // this.dataSetInformation.changeAttributeValue("height: 100px;",undefined,undefined,undefined,false,1,false,false,true)
       // this.numIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
       // this.catIndicators.changeAttributeValue(undefined,undefined,undefined,undefined,false,undefined,undefined,undefined,true)
-      
+
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },
@@ -217,20 +219,20 @@ export class DashboardComponent implements OnInit {
     }
   };
   fetchStatsDataObserver:any = {
-    next: (response:any) => { 
+    next: (response:any) => {
         console.log("dashboard > DashboardComponent > fetchStatsDataObserver > next:")
         //console.log(response)
 
         var headerContinuous = this.headersService.getInfoHeader(response['continuous']);
         this.numIndicators.setPaginationEnabled(false);
         this.numIndicators.setTableStyle("height: 400px;");
-        this.numIndicators.prepareTable(TableIndicator.STATS, response['continuous'], headerContinuous) 
+        this.numIndicators.prepareTable(TableIndicator.STATS, response['continuous'], headerContinuous)
 
         var headerCategorical = this.headersService.getInfoHeader(response['categorical']);
         this.catIndicators.setPaginationEnabled(false);
         this.catIndicators.setTableStyle("height: 250px;");
-        this.catIndicators.prepareTable(TableIndicator.STATS, response['categorical'], headerCategorical) 
-        
+        this.catIndicators.prepareTable(TableIndicator.STATS, response['categorical'], headerCategorical)
+
     },
     error: (err: Error) => {
       console.log("dashboard > DashboardComponent > fetchStatsDataObserver > error:")
@@ -239,10 +241,10 @@ export class DashboardComponent implements OnInit {
   };
 
   startTrainingObserver:any = {
-    next: (response:any) => { 
+    next: (response:any) => {
       console.log("dashboard > DashboardComponent > startTrainingObserver > next:")
       console.log(response)
-        
+
     },
     error: (err: Error) => {
       console.log("dashboard > DashboardComponent > startTrainingObserver > error:")
@@ -250,7 +252,7 @@ export class DashboardComponent implements OnInit {
     }
   };
   fetchCorrMatrixObserver:any = {
-    next: (response:any) => { 
+    next: (response:any) => {
         console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > next:")
         //console.log(response)
         this.corrMatrixSource = this.domSanitizer.bypassSecurityTrustUrl(response);
@@ -308,16 +310,16 @@ export class DashboardComponent implements OnInit {
       console.log("problem: dataset-url");
     else {
       this.req["datasetSource"] = this.datasetURL
-  
+
       this.datasetService.uploadDatasetFileWithLink(this.datasetURL).subscribe(this.uploadObserver);
     }
   }
 
-  onRemoveSelected() 
+  onRemoveSelected()
   {
     this.dataTable.onRemoveSelected();
   }
-  
+
   onApplyChanges()
   {
     var req:ModifiedData = new ModifiedData(this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
@@ -351,7 +353,7 @@ export class DashboardComponent implements OnInit {
     this.dataTable.onUndoDeleted();
   }
   toggleTables(event:any){
-    
+
     if(this.toggledButton)
     {
       event.currentTarget.innerHTML = "Show table";
@@ -384,7 +386,7 @@ export class DashboardComponent implements OnInit {
       //Pokreni modal
       this.firstVisibility = "none";
       this.secondVisibility = "block";
-      
+
     }
     else{
       alert("Nisi izabrao izlaz!");
@@ -396,14 +398,14 @@ export class DashboardComponent implements OnInit {
   {
 
   }
-  
+
   changeColomnVisibility(checkChange: Check) {
     this.dataTable.changeColomnVisibility(checkChange.id.toString(), checkChange.visible);
   }
 
   changeCheckBox(checkChange: Check) {
     this.labels.changeCheckbox(checkChange)
-  } 
+  }
 
   onSelectedLabel(data:{id:number,pred:number | null})
   {
@@ -422,7 +424,27 @@ export class DashboardComponent implements OnInit {
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
-    this.trainingService.sendDataForTraining({
+    let subject = new WebSocket('ws://localhost:7220');
+    subject.onopen= function (evt){
+      console.log("opened conn");
+    }
+    subject.onmessage= function (evt) {
+      console.log(evt.data);
+  }
+    subject.onclose=function(evt){
+      console.log("connection closed");
+    }
+    //subject.close(); zatbara socket
+
+
+
+
+
+
+
+
+
+    /*this.trainingService.sendDataForTraining({
       epochs: this.numberOfEpochs,
       activationFunction: this.activationFunctionControl.value.codename,
       features: this.featuresLabel['features'],
@@ -432,7 +454,7 @@ export class DashboardComponent implements OnInit {
       testDataRatio: this.sliderValue/100,
       learningRate: this.learningRate,
       metrics: this.metricsArrayToSend
-    }).subscribe(this.startTrainingObserver);
+    }).subscribe(this.startTrainingObserver);*/
     // console.log("metric control "+ this.metricsControl.value[0].codename)
     // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
     // console.log("testDataRatio "+ this.sliderValue/100)
