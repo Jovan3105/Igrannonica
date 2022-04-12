@@ -8,9 +8,9 @@ namespace backend.Services
     {
         public EmailSender() { }
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
-        {
-            string fromMail = "igrannonica@gmail.com";
-            string fromPassword = "ozxiqmqpxsfoahuq";
+        { // TODO prebaciti ove informacije u config fajl
+            string fromMail = "igrannonica@gmail.com"; 
+            string fromPassword = "xetjchokmgscrajo";
             MailMessage message = new MailMessage();
             message.From = new MailAddress(fromMail);
             message.Subject = subject;

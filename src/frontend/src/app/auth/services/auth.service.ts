@@ -18,13 +18,12 @@ export class AuthService {
   private readonly REFRESH_TOKEN = 'REFRESH_TOKEN';
   private helper!: JwtHelperService;
 
-  /////////url swaggera/////////
   apiUrl = environment.apiUrl;
   LoginUrl = environment.apiUrl + "/auth/login";
   registerUrl = environment.apiUrl + "/auth/register";
 
   confirmEmailUrl = environment.apiUrl + "/Auth/verifyEmail";
-  /////////url swaggera/////////
+  cancelRegistrationUrl = environment.apiUrl + "/Auth/cancelRegistration";
 
   constructor(private http: HttpClient, private router: Router, private jwtService: JwtService) { }
 
@@ -124,6 +123,10 @@ export class AuthService {
 
   verifyEmailAddress(email:string, token:string): any {
     return this.http.get<any>(this.confirmEmailUrl + `?email=${email}&token=${token}`);
+  }
+
+  cancelRegistration(email:string, token:string): any {
+    return this.http.get<any>(this.cancelRegistrationUrl + `?email=${email}&token=${token}`);
   }
 
 }

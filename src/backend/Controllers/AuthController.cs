@@ -361,10 +361,6 @@ namespace backend.Controllers
                 };*/
 
                 //JwtSecurityToken token = CreateToken(claims);
-                
-                string param= "email="
-                                + user.Email
-                                + "&token=" + GenerateMyToken(user.Email);
 
                 string message = @"Hello, <b>" + user.Username 
                                 + @"</b>.<br> Please confirm your email 
@@ -384,7 +380,7 @@ namespace backend.Controllers
 
                                 //izmeniti link kad se implementuje strana na frontu
 
-                                + "<a href='"+_configuration["Addresses: Backend"]+"/api/Auth/deleteFakeUser?email="
+                                + "<a href='"+ _configuration["Addresses:Frontend"] + "/cancelRegistration?email="
                                  + user.Email
                                 + "&token=" + GenerateEmailToken(user.Email)
                                 +"'>here</a>.";
@@ -419,7 +415,7 @@ namespace backend.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        [HttpDelete("deleteFakeUser")]
+        [HttpGet("cancelRegistration")]
         public async Task<ActionResult> deleteFakeUser(string email, string token)
         {
             User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
