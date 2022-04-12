@@ -150,7 +150,6 @@ export class ShowTableComponent implements OnInit {
           flex: 1,
           field: header.name,
           filter: 'agTextColumnFilter',
-          floatingFilter: true,
           editable: true,
           resizable: true,
           sortable: true,

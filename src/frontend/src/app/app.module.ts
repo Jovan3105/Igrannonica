@@ -11,7 +11,6 @@ import { TrainingModule } from './training/training.module';
 import { DatasetsModule } from './datasets/datasets.module';
 
 import { HttpClientModule } from '@angular/common/http';
-import { ShowTableComponent } from './training/components/show-table/show-table.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EmailVerifComponent } from './auth/components/email-verif/email-verif.component';

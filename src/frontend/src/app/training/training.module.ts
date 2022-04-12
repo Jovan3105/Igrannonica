@@ -15,13 +15,15 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { TrainingViewComponent } from './_training-view/training-view.component';
 
 
 @NgModule({
   declarations: [
     LabelsComponent,
     ShowTableComponent,
-    HyperparametersComponent
+    HyperparametersComponent,
+    TrainingViewComponent
   ],
   imports: [
     CommonModule,
@@ -38,7 +40,8 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
   exports:[
     LabelsComponent,
     ShowTableComponent,
-    HyperparametersComponent
+    HyperparametersComponent,
+    TrainingViewComponent
   ],
   providers:[
     TableService

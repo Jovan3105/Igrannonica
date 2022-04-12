@@ -1,5 +1,5 @@
 <div class="card" style="height: 350px;" *ngIf = "headers">
-    <h5 class="card-header">Odaberi ulaze(features):</h5>
+    <h5 class="card-header">Odaberi ulaze:</h5>
     <div class="card-body" style="overflow-y: scroll;" tabindex="0">
       <div *ngFor="let header of headers; index as i">
         <div class="form-check">
@@ -16,7 +16,7 @@
   </div>
 
   <div class="card" style="height: 150px;" *ngIf = "headers">
-    <h5 class="card-header">Odaberi izlaz (labelu):</h5>
+    <h5 class="card-header">Odaberi izlaz:</h5>
     <div class="card-body">
         <select [(ngModel)]="selectedLabel" #selectLabel class="form-select" aria-label="Odabir izlaza" 
         (change)="onSelectLabel()">

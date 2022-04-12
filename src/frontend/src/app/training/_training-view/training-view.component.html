@@ -1,0 +1,105 @@
+<div>
+    <button class="btn btn-primary float-start ms-4 my-5" [disabled]="backButtonDisable">Back</button>
+    <button id="nextButton" type="button" class="btn btn-primary float-end me-5 my-5" [disabled]="nextButtonDisable" (click)="OnNextClick()">Next</button>
+</div>
+
+<div id="first" [ngStyle]="{'display': firstVisibility}">
+    <div class="row mx-auto" style="width: 1200px;">
+        <div class="col-sm">
+            <label for="formFile" class="form-label">Upload dataset</label>
+            <input class="form-control" type="file" id="uploadData" accept=".csv" [disabled]="fileUploadDisable" (change)="onFileSelected($event)">
+        </div>
+        <div class="col-sm">
+            <label for="dataset-url" class="form-label">Dataset URL</label>
+            <div class="input-group">
+                <input type="text" name="dataset-url" class="form-control" id="dataset-url" [(ngModel)]="datasetURL" placeholder="Enter dataset URL">
+                <button type="submit" class="btn btn-primary" [disabled]="linkUploadDisable" (click)="onShowDataClick()">Show data</button>
+            </div>
+        </div>
+    </div>
+    <br><br>
+
+    <div id="circle" [ngStyle]="{'display': loaderDisplay}">
+        <div class="loader">
+            <div class="loader">
+                <div class="loader">
+                    <div class="loader">
+                        <div class="loader">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility, 'text-align':'center'}">
+        <!-- ova dva dugmeta prave problem -->
+        <div class="col-sm-9" id="block">
+            <div class="mx-auto" id="buttons" [ngStyle]="{'margin-bottom':'5px','text-align':'left'}" >
+                <button type="button" class="btn btn-secondary" 
+                (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
+                <button type="button" class="btn btn-danger" 
+                (click)="onRemoveSelected()" 
+                [ngStyle]="{'display': deleteButtonDisplay}" 
+                id="deleteButton">Delete selected</button>&nbsp;
+                <!--<button type="button" class="btn btn-secondary" 
+                (click)="onUndoDeleted()" 
+                [disabled]="undoDeletedDisabled" 
+                id="undoDeletedButton">Undo deleted</button>&nbsp;-->
+                <button type="button" class="btn btn-secondary" 
+                (click)="onUndo()" 
+                [disabled]="undoDisabled" 
+                id="undoButton">Undo</button>&nbsp;
+                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>
+            </div>
+            <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
+            (hideEvent)="changeCheckBox($event)"
+            (undoEvent)="enableUndo($event)"
+            (deleteEvent)="enableUndoDeleted($event)">
+            </app-show-table><br>
+        </div>
+        <div [ngStyle]="{'display':statsTableDisplay}">
+            <h4>Basic Info</h4>
+            <app-show-table #dataSetInformation id="basicInfo"></app-show-table>
+            <br>
+            <h4>Statistical Indicators for Numerical Data</h4>
+            <app-show-table #numIndicators id="numerical">
+            </app-show-table>
+            <br>
+            <h4>Statistical Indicators for Categorical Data</h4>
+            <app-show-table #catIndicators id="categorical">
+            </app-show-table>
+            <img [src]="corrMatrixSource" style="height: auto;width: 80%;">
+        </div>
+        <div class="col-sm">
+            <app-labels #Labels id="labelCards" [ngStyle]="{'visibility': labelsVisibility}" 
+            (checkEvent)="changeColomnVisibility($event)" 
+            (labelEvent)="onSelectedLabel($event)"></app-labels>
+        </div>
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Nastavi dalje</h5>
+                    </div>
+                    <div class="modal-body">
+                        Da li zelite sigurno da nastavite dalje?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ne</button>
+                        <button type="button" class="btn btn-primary" (click)="OnNextClick()">Da</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="second" class="row mx-auto" style="width: 1200px;" [ngStyle]="{'display': secondVisibility}">
+    <app-hyperparameters [featuresLabel]="featuresLabel"></app-hyperparameters>
+    <!-- Deo kada se klikne na dugme -->
+    <!-- <div class="options">
+        <input>
+    </div> -->
+    
+</div>
