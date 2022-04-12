@@ -15,10 +15,27 @@ export class CancelRegistrationComponent implements OnInit {
     const cancelRegistrationObserver = {
       next: (x:any) => { 
         console.log('Account is deactivated'); 
-        this.router.navigateByUrl('/register'); 
+        var cancelMessage = document.getElementById('cancelMessage');
+        
+        cancelMessage!.innerHTML = "Account is successfully canceled!";
+        var hide_button = () => {
+
+            this.router.navigateByUrl('/');
+            
+        }
+        setTimeout(hide_button, 3000);
+        //this.router.navigateByUrl('/'); 
       },
       error: (err: Error) => {
         console.log(err)
+        var cancelMessage = document.getElementById('cancelMessage');
+        
+        cancelMessage!.innerText = "Something went wrong!";
+        var hide_button = () => {
+          this.router.navigateByUrl('/');       
+        }
+        setTimeout(hide_button, 3000);
+        
 
       }
     };
