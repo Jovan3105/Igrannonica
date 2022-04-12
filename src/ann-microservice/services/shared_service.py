@@ -5,28 +5,43 @@ import websockets
 import urllib, base64
 import pandas as pd
 import matplotlib.pyplot as plt
+import logging
+
+import config
 
 #################################################################
 
-PRINT_PREFIX = "####:     "
-BACKEND_BASE_ADDRESS = 'localhost:7220'
-BACKEND_URI = f'ws://{BACKEND_BASE_ADDRESS}/ws'
+BACKEND_WEB_SOCKET_URI = f'ws://{config.BACKEND_BASE_ADDRESS}/ws'
+LOGGER = logging.getLogger('uvicorn.error')
  
 #################################################################
+
+def log(output):
+    '''
+    Ispisuje prosledjeni objekat. Ukoliko je instanca stringa na njega dodaje prefiks PRINT_PREFIX i onda sve zajedno ispise, 
+    dok u suprotnom samo ispisuje prosledjeni objekat
+
+    **Ispis se vrsi samo u development modu**
+    '''
+    
+    if isinstance(output, str):
+        LOGGER.info(config.PRINT_PREFIX + output)
+    else:
+        LOGGER.info(output)
  
-async def make_connection(destId,msg):
+async def make_connection(dest_id,msg):
     obj={
         "From":"me",
         "To":"you",
-        "Message":"FROMPYTHONS"
+        "Message":""
     }
-    async with websockets.connect("ws://localhost:7220") as websocket:
-        responce= await websocket.recv()
-        obj["From"]=responce
-        obj["To"]=destId
-        obj["Message"]=msg
+    async with websockets.connect(uri = BACKEND_WEB_SOCKET_URI) as websocket:
+        response = await websocket.recv()
+        obj["From"] = response
+        obj["To"] = dest_id
+        obj["Message"] = msg
         await websocket.send(json.dumps(obj))
-        #print(responce)
+        #print(response)
 
 # # #
 
@@ -43,21 +58,12 @@ def figure_to_uri(figure, ext='png'):
     
 # # #   
 
-def log(msg):
-    '''
-    Stampa prosledjenu poruku i na nju dodaje odgovarajuci prefiks
-    '''
-    print(PRINT_PREFIX + msg)
- 
-# # #
-
 def read_json_data(url):
     json_data = None
     with urllib.request.urlopen(url) as data:
         json_data = data.read()
 
     return json.loads(json_data)
-
 
 #################################################################
 

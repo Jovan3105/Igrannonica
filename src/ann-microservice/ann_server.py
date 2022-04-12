@@ -1,8 +1,12 @@
-import uvicorn
 import sys
+import uvicorn
+import logging
 from fastapi import FastAPI
 
+import config
 from routers import dataprep_router, datastat_router, traning_router
+from services.shared_service import log
+
 
 #################################################################
 
@@ -30,10 +34,6 @@ app = FastAPI(#__name__,
     description=description
     )
 
-host_name = "localhost"
-server_port = 8081
-dev_mode = False
-
 #################################################################
 # Routers
 
@@ -43,10 +43,9 @@ app.include_router(traning_router.router)
 
 #################################################################
 
-if __name__ == "__main__":      
-    dev_str = ''
+if __name__ == "__main__":   
     if len(sys.argv) > 1 and sys.argv[1] == 'dev':
-        dev_mode = True
-        dev_str = ' in dev mode'
+        uvicorn.run("ann_server:app", host=config.HOST_NAME, port=config.SERVER_PORT, reload=True, workers=4, debug=True)  
+    else:
+        logging.basicConfig(stream=sys.stdout, level=logging.NOTSET)
 
-    uvicorn.run("ann_server:app", host=host_name, port=server_port, reload=True, workers=4, debug=dev_mode)  

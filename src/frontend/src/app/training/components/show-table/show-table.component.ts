@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
-import { Check, EditedCell, HeaderDict } from '../../models/models';
+import { Check, EditedCell, HeaderDict } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
 @Component({
@@ -16,11 +16,11 @@ export class ShowTableComponent implements OnInit {
   private gridApi!: GridApi;
   private columnApi!: ColumnApi;
   private colIds:string[];
-  private tempDeleted:any[];
 
   indicator?:TableIndicator;
   editedCells:EditedCell[];
   deletedRows:number[];
+  deletedCols:number[];
   
   @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
   @Output() undoEvent; //event koji se dize kada treba dis/enable undo dugme
@@ -56,8 +56,8 @@ export class ShowTableComponent implements OnInit {
     this.enableCellChangeFlash = true;
     this.colIds = [];
     this.deletedRows = [];
+    this.deletedCols = [];
     this.editedCells = [];
-    this.tempDeleted = [];
     this.hideEvent = new EventEmitter<Check>();
     this.undoEvent = new EventEmitter<boolean>();
     this.deleteEvent = new EventEmitter<boolean>();
@@ -80,6 +80,7 @@ export class ShowTableComponent implements OnInit {
     if(indicator == TableIndicator.DATA_MANIPULATION)
     {
       this.deletedRows = [];
+      this.deletedCols = [];
       this.editedCells = [];
     }
 
@@ -193,7 +194,6 @@ export class ShowTableComponent implements OnInit {
   onRemoveSelected() 
   {
     const selectedData = this.gridApi.getSelectedRows();
-    this.tempDeleted = selectedData;
     const res = this.gridApi.applyTransaction({ remove: selectedData });
     var editedCellIndex;
 

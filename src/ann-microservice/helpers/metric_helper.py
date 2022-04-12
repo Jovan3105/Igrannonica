@@ -43,6 +43,9 @@ class Metric(str, Enum):
     TrueNegatives                 = "TrueNegatives"
     TruePositives                 = "TruePositives"
 
+    def __str__(self):
+        return str(self.value)
+
 def map_metrics(metrics):   
     metric_switcher = {
         Metric.Accuracy                      : tf.keras.metrics.Accuracy(),
@@ -92,6 +95,6 @@ def map_metrics(metrics):
             mapped_metrics += [metric_switcher.get(metric)]
 
         return mapped_metrics
-    except KeyError:
+    except (KeyError, AttributeError):
         log(f'Key "{metric}" is not present in metric_switcher dictionary')
         raise HTTPException(status_code=400, detail=f'Metric "{metric}" is not supported')

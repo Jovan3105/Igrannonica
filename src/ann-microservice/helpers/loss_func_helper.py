@@ -18,6 +18,9 @@ class LossFunction(str, Enum):
     SparseCategoricalCrossentropy = "SparseCategoricalCrossentropy"
     SquaredHinge                  = "SquaredHinge"
 
+    def __str__(self):
+        return str(self.value)
+
 def map_loss_function(loss_func):   
     loss_func_switcher = {
         LossFunction.BinaryCrossentropy            : tf.keras.losses.BinaryCrossentropy(),
@@ -39,6 +42,6 @@ def map_loss_function(loss_func):
 
     try:         
         return loss_func_switcher.get(loss_func)
-    except KeyError:
+    except (KeyError, AttributeError):
         log(f'Key "{loss_func}" is not present in loss_func_switcher dictionary')
         raise HTTPException(status_code=400, detail=f'Loss function "{loss_func}" is not supported')

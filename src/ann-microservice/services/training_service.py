@@ -2,32 +2,34 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from fastapi import HTTPException
-
 from tensorflow import keras
-from tensorflow.keras import layers
+from fastapi import HTTPException
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
-
+from models.models import NNLayer
 from services.shared_service import log
-from helpers.optimizer_helper import map_optimizer
-from helpers.loss_func_helper import map_loss_function
-from helpers.metric_helper import map_metrics
+from helpers.weight_init_helper import map_weight_init
+from helpers.metric_helper import map_metrics, Metric
+from helpers.optimizer_helper import map_optimizer, Optimizer
+from helpers.activation_func_helper import map_activation_function, ActivationFunction
+from helpers.loss_func_helper import map_loss_function, LossFunction
 
 #################################################################
 
-def encode_and_scale(cont_features, cat_features, X_train, X_test):
+def encode_and_scale(cont_features: [str], cat_features: [str], X_train, X_test, encoder = OneHotEncoder):
     
     col_trans = make_column_transformer(
         (MinMaxScaler(), cont_features),
-        (OneHotEncoder(handle_unknown='ignore'), cat_features)
+        (encoder(handle_unknown='ignore'), cat_features)
     )
 
     col_trans.fit(X_train)
 
     return col_trans.transform(X_train), col_trans.transform(X_test), col_trans
+
+# # #
 
 def plot_history(history, label, min, max):
   plt.plot(history.history['loss'], label='loss')
@@ -40,70 +42,100 @@ def plot_history(history, label, min, max):
 
   return plot
 
+# # #
+
+def create_layer_array(nnlayers: NNLayer, problem_type: str, features: [str]):
+    layers = []
+
+    nnlayers.sort(key=lambda nn_layer: nn_layer.index)
+
+    # Add feature layer and hidden layers #
+
+    for layer in nnlayers:
+        if layer.units <= 0:
+            raise HTTPException(status_code=400, 
+                detail=f"Invalid propery value for layer ({layer.index}). Number of units has to be greater then 0")
+        
+        layers.append(
+            keras.layers.Dense(
+            units=layer.units, 
+            activation=map_activation_function(layer.activation_function), 
+            kernel_initializer=map_weight_init(layer.weight_initializer)
+            ))
+
+    # Add output layer # TODO
+
+    output_layer_activation_func = ActivationFunction.Linear
+    
+    if problem_type == 'classification':
+        output_layer_activation_func = ActivationFunction.Softmax
+
+    layers.append(
+        keras.layers.Dense(
+            units=1, # TODO layer.units, 
+            activation=map_activation_function(output_layer_activation_func), 
+            kernel_initializer=map_weight_init(layer.weight_initializer)
+            ))
+
+    return layers
+
 #################################################################
 # Main code
 
 def train_model(
-    df,
-    features,
-    labels,
-    metrics,
-    learning_rate,
-    loss_function,
-    test_size,
-    validation_size,
-    epochs,
-    optimizer 
+    df              : pd.DataFrame,
+    problem_type    : str,
+    features        : [str],
+    labels          : [str],
+    layers          : [NNLayer],
+    metrics         : [Metric],
+    learning_rate   : float,
+    loss_function   : LossFunction,
+    test_size       : float,
+    validation_size : float,
+    epochs          : int,
+    optimizer       : Optimizer,
+    dataset_headers : [str],
+    cont_cols_set   : set, 
+    cat_cols_set    : set
     ):
-
-    cont_cols_set = set(df.select_dtypes(include='number').columns.values)
-    cat_cols_set = set(df.select_dtypes(exclude='number').columns.values)
-
-    dataset_headers = list(cont_cols_set | cat_cols_set)
-
-    # Validate user input
-    for feature in features:
-        if feature not in dataset_headers:
-            raise HTTPException(status_code=404, detail=f"Invalid feature: {feature}")
-        
-    for label in labels:
-        if label not in dataset_headers:
-            raise HTTPException(status_code=404, detail=f"Invalid label: {label}")
     
+    log(f"features: {features}")
+    log(f"labels: {labels}")
+
     cont_features = list(set(features) & cont_cols_set)
     cat_features = list(set(features) & cat_cols_set)
 
     cont_labels = list(set(labels) & cont_cols_set)
     cat_labels = list(set(labels) & cat_cols_set)
 
-    log( "[cont_features], [cat_features], [cont_labels], [cat_labels] ==="
-        + f" {cont_features} {cat_features} {cont_labels} {cat_labels}")
+    log(f"cont_features = {cont_features} | cat_features = {cat_features} |" 
+        + f" cont_labels = {cont_labels} | cat_labels = {cat_labels}"
+        )
 
     # Prepare dataframe
-    df = df.dropna()
-    #df = encode_and_scale(df)
+    #df = df.dropna()
 
     # Separate labels from features
     X = df[features].copy()
     y = df[labels].copy()
     
+    log("X")
+    log(X)
+
+    log("y")
+    log(y)
+
     # Split dataset
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
 
     # Scale (normalize) numerical and encode categorical data
     X_train_normal, X_test_normal, ct = encode_and_scale(cont_features, cat_features, X_train, X_test)
     
-    # Feature normalization
-    #normalizer = tf.keras.layers.Normalization(axis=-1)
-    #normalizer.adapt(np.array(X_train))
-    
-    # Make a model
-    model = tf.keras.Sequential([
-        #normalizer,
-        layers.Dense(units=128, activation='relu'),
-        layers.Dense(units=32, activation='relu'),
-        layers.Dense(units=1, activation='linear')
-    ])
+    # Make a model #
+
+    layers = create_layer_array(layers, problem_type, features)
+    model = tf.keras.Sequential(layers)
 
     #model.summary()
 
@@ -125,9 +157,14 @@ def train_model(
 
     callback = CustomCallback()
 
-    print(X_train_normal)
+    log("X_train_normal")
+    log(X_train_normal)
 
-    print(y_train)
+    log("X_test")
+    log(X_test)
+
+    log("y_train")
+    log(y_train)
 
     # Train the model
     history = model.fit(
@@ -147,8 +184,8 @@ def train_model(
 
     score = model.evaluate(X_test_normal, y_test)
 
-    print('Test loss:', score[0]) 
-    print('Test accuracy:', score[1])
+    log(f'Test loss: {score[0]}') 
+    log(f'Test accuracy: {score[1]}')
 
     return y_test.values.tolist(), y_pred.tolist()
 
@@ -160,7 +197,7 @@ def train_model(
 class CustomCallback(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         keys = list(logs.keys())
-        log("\nEnd epoch {} of training; got log keys: {}".format(epoch, keys))
+        log(f"\nEnd epoch {epoch} of training; got log keys: {keys}")
 
         metric_info = ""
         for key in keys:

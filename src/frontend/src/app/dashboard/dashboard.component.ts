@@ -3,7 +3,7 @@ import { DatasetService } from '../training/services/dataset.service';
 import { Router } from '@angular/router';
 import { ShowTableComponent } from '../training/components/show-table/show-table.component';
 import { LabelsComponent } from '../training/components/labels/labels.component';
-import { Check, ModifiedData } from '../training/models/models';
+import { Check, ModifiedData } from '../training/models/table_models';
 import { HeadersService } from '../training/services/headers.service';
 import { FormControl, Validators } from '@angular/forms';
 import { TableIndicator } from '../training/components/show-table/show-table.component';
@@ -107,6 +107,8 @@ export class DashboardComponent implements OnInit {
   loaderMiniDisplay:string = "none";
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
+  fileUploadDisable:boolean = false;
+  linkUploadDisable:boolean = false;
 
   sliderValue: number = 80;
   sliderOptions: Options = {
@@ -318,10 +320,10 @@ export class DashboardComponent implements OnInit {
   
   onApplyChanges()
   {
-    var req:ModifiedData = new ModifiedData(this.datasetId, this.dataTable.editedCells, this.dataTable.deletedRows);
+    var req:ModifiedData = new ModifiedData(this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
 
     console.log(req);
-    this.datasetService.modifyDataset(req).subscribe(
+    this.datasetService.modifyDataset(this.datasetId, req).subscribe(
       {
         next: (response:any) =>{
           console.log(response);
@@ -357,6 +359,7 @@ export class DashboardComponent implements OnInit {
       this.deleteButtonDisplay = "none";
       this.labelsVisibility = "hidden";
       this.mainTableDisplay = "none";
+      this.fileUploadDisable = this.linkUploadDisable = true;
     }
     else
     {
@@ -365,6 +368,7 @@ export class DashboardComponent implements OnInit {
       this.deleteButtonDisplay = "inline";
       this.labelsVisibility = "visible";
       this.mainTableDisplay = "block";
+      this.fileUploadDisable = this.linkUploadDisable  = false;
     }
     this.toggledButton = !this.toggledButton
   }
@@ -385,9 +389,6 @@ export class DashboardComponent implements OnInit {
     else{
       alert("Nisi izabrao izlaz!");
     }
-    
-
-    //this.router.navigate(['/labels'], { state: this.dataTable.headers });
 
   }
 
