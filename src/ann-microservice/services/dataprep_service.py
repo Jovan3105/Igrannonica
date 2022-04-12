@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import pandas as pd
 
@@ -77,13 +78,14 @@ def get_column_types(df):
 def modify_dataset(dataset, data:models.ModifiedData):
     df = pd.DataFrame(dataset['parsedDataset'])
 
-    for edit in data.edited:
-        df.iloc[edit.row, edit.col] = edit.value
+    for editRow in data.edited:
+        df.iloc[editRow.row, editRow.col] = editRow.value
     
-    for delete in data.deleted:
-        df.drop(delete, inplace=True)
+    df.drop(data.deletedRows, inplace=True)
     
-    dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))
+    df.drop(df.columns[data.deletedCols],axis=1,inplace=True)
+
+    dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije
     dataset['basicInfo'] = get_basic_info(df)
 
     return dataset

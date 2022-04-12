@@ -203,24 +203,22 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Route("modifyData")]
-        public async Task<ActionResult<Object>> modifyData([FromBody]ModifiedData data)
+        [Route("{datasetId:int}/modifyData")]
+        public async Task<ActionResult<Object>> modifyData(int datasetId, [FromBody]ModifiedData data)
         {
-            var dataset = await this.datasetContext.Datasets.FindAsync(data.Id);
+            var dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
 
             if (dataset == null)
             {
                 return BadRequest(new { Message = "No dataset with this id" });
             }
             else
-            {
-                StreamReader r = new StreamReader(dataset.Path);
-                string dataFromPath = r.ReadToEnd();
-                r.Close();
-             
+            { 
                 var microserviceURL = _microserviceBaseURL + "/data-preparation/modify";
 
-                var response = await _client.PutAsJsonAsync(microserviceURL+ "?path=" + dataset.Path, data);
+                string url = CreateDatasetURL(dataset.UserID, dataset.Id, dataset.FileName);
+  
+                var response = await _client.PutAsJsonAsync(microserviceURL+ "?stored_dataset=" + url, data);
 
                 var responseString = await response.Content.ReadAsStringAsync();
 

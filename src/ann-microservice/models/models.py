@@ -7,6 +7,6 @@ class Cell(BaseModel):
     value:str
 
 class ModifiedData(BaseModel):
-    id: int
     edited: List[Cell]
-    deleted: List[int]
+    deletedRows: List[int]
+    deletedCols:List[int]

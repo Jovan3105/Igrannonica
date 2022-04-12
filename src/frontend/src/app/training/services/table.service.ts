@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CellValueChangedEvent } from 'ag-grid-community';
-import { HeaderDict } from '../models/models';
+import { HeaderDict } from '../models/table_models';
 
 @Injectable({
   providedIn: 'root'
@@ -50,4 +50,5 @@ export class TableService {
     
     return newValue;
   }
+  
 }
