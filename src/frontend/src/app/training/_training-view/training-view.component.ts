@@ -43,7 +43,6 @@ export class TrainingViewComponent implements OnInit {
 
   constructor(
     private datasetService: DatasetService, 
-    private router: Router, 
     private headersService: HeadersService, 
     private trainingService: TrainingService, 
     private domSanitizer: DomSanitizer
@@ -283,12 +282,19 @@ export class TrainingViewComponent implements OnInit {
       //Pokreni modal
       this.firstVisibility = "none";
       this.secondVisibility = "block";
+      this.backButtonDisable = false;
       
     }
     else{
       alert("Nisi izabrao izlaz!");
     }
 
+  }
+
+  OnBackClick(){
+    this.firstVisibility = "block";
+    this.secondVisibility = "none";
+    this.backButtonDisable = true;
   }
 
   onSaveClick()
