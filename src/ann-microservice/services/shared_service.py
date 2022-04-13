@@ -13,6 +13,11 @@ import config
 
 BACKEND_WEB_SOCKET_URI = f'ws://{config.BACKEND_BASE_ADDRESS}/ws'
 LOGGER = logging.getLogger('uvicorn.error')
+socket_message = {
+    "From":"me",
+    "To":"you",
+    "Message":""
+}
  
 #################################################################
 
@@ -29,19 +34,23 @@ def log(output):
     else:
         LOGGER.info(output)
  
-async def make_connection(dest_id,msg):
-    obj={
-        "From":"me",
-        "To":"you",
-        "Message":""
-    }
+async def make_socket_connection():
+    ''' 
+    Kreira konekciju i vraca client id za dati socket conn
+    '''
+
     async with websockets.connect(uri = BACKEND_WEB_SOCKET_URI) as websocket:
-        response = await websocket.recv()
-        obj["From"] = response
-        obj["To"] = dest_id
-        obj["Message"] = msg
+        return await websocket.recv()
+
+
+async def send_msg(my_id, dest_id, msg):
+    
+    async with websockets.connect(uri = BACKEND_WEB_SOCKET_URI) as websocket:
+        socket_message["From"] = my_id
+        socket_message["To"] = dest_id
+        socket_message["Message"] = msg
+
         await websocket.send(json.dumps(obj))
-        #print(response)
 
 # # #
 

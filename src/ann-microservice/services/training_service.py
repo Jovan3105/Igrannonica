@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
 from models.models import NNLayer
-from services.shared_service import log
+from services.shared_service import log, send_msg
 from helpers.weight_init_helper import map_weight_init
 from helpers.metric_helper import map_metrics, Metric
 from helpers.optimizer_helper import map_optimizer, Optimizer
@@ -97,7 +97,9 @@ def train_model(
     optimizer       : Optimizer,
     dataset_headers : [str],
     cont_cols_set   : set, 
-    cat_cols_set    : set
+    cat_cols_set    : set,
+    my_client_id    : str,
+    client_conn_id  : str
     ):
     
     log(f"features: {features}")
@@ -156,6 +158,7 @@ def train_model(
     )
 
     callback = CustomCallback()
+    callback.init(my_client_id, client_conn_id)
 
     log("X_train_normal")
     log(X_train_normal)
@@ -195,14 +198,19 @@ def train_model(
 
 # u ovom callback-u ce se vrsiti komunikacija preko socket-a
 class CustomCallback(keras.callbacks.Callback):
+
+    def init(self, my_client_id, client_conn_id):
+        self.my_client_id = my_client_id
+        self.client_conn_id = client_conn_id
+
     def on_epoch_end(self, epoch, logs=None):
         keys = list(logs.keys())
         log(f"\nEnd epoch {epoch} of training; got log keys: {keys}")
 
-        metric_info = ""
+        epoch_report = {"epoch" : epoch}
         for key in keys:
-            metric_info += f" ({key}:{logs[key]})"
+            epoch_report[key] = logs[key]
             
-        log( f"{epoch} {metric_info}")
+        send_msg(self.my_client_id, self.client_conn_id, epoch_report)
 
 
