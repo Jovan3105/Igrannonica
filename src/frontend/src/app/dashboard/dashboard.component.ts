@@ -251,6 +251,7 @@ export class DashboardComponent implements OnInit {
       console.log(err)
     }
   };
+  
   fetchCorrMatrixObserver:any = {
     next: (response:any) => {
         console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > next:")
@@ -425,18 +426,20 @@ export class DashboardComponent implements OnInit {
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
     var trainingService=this.trainingService;
-    var featureL=this.featuresLabel;
-    let subject = new WebSocket('ws://localhost:7220');
-    let connId="";
-    subject.onopen= function (evt){
+    var featureL = this.featuresLabel;
+    let subject = new WebSocket('ws://localhost:7220'); // TODO promeniti zbog prod (izmestiti u env)
+    let connId = "";
+
+    subject.onopen = function (evt){
       console.log("opened conn");
     }
+
     subject.onmessage= function (evt) {
 
       var dataArr=evt.data.split(" ",2)
       if(dataArr[0]=="ConnID:"){
           connId=dataArr[1];
-          objtoSend["connIdClient"]=connId;
+          objtoSend["ClientConnID"] = connId;
           trainingService.sendDataForTraining(objtoSend).subscribe();
           console.log(connId);
       }
@@ -445,18 +448,12 @@ export class DashboardComponent implements OnInit {
         console.log(dataArr[1]);
       }
       console.log(evt.data);
-  }
+    }
+
     subject.onclose=function(evt){
       console.log("connection closed");
     }
     //subject.close(); //zatbara socket
-
-
-
-
-
-
-
 
 
     var nizF=[]
@@ -467,6 +464,7 @@ export class DashboardComponent implements OnInit {
       nizF.push(element["name"]);
 
     }
+
     console.log(this.featuresLabel['label'] );
 
     var nizL=[]
@@ -476,29 +474,35 @@ export class DashboardComponent implements OnInit {
       nizL.push(element["name"]);
 
     }
+
     var objtoSend={
-      epochs: this.numberOfEpochs,
-      activationFunction: this.activationFunctionControl.value.codename,
-      features: nizF,
-      labels: nizL,
-      optimizer: this.optimizerFunctionControl.value.codename,
-      lossFunction: this.lossFunctionControl.value.codename,
-      testDataRatio: this.sliderValue/100,
-      learningRate: this.learningRate,
-      metrics: this.metricsArrayToSend,
-      problemType:"regression",
-      connIdClient:connId
+      DatasetID             : this.datasetId,
+      ClientConnID          : connId,
+      ProblemType           : "regression",
+      Layers                : [/*
+        { 
+          index : 0,
+          this.activationFunctionControl.value.codename
+        }*/
+      ],
+      Features              : nizF,
+      Labels                : nizL,
+      Metrics               : this.metricsArrayToSend,
+      LossFunction          : this.lossFunctionControl.value.codename,
+      TestDatasetSize       : this.sliderValue/100,
+      ValidationDatasetSize : 0.2,
+      Epochs                : this.numberOfEpochs,
+      Optimizer             : this.optimizerFunctionControl.value.codename,
+      LearningRate          : this.learningRate
     }
     console.log(connId);
     console.log(JSON.stringify(nizL))
     // this.trainingService.sendDataForTraining(objtoSend).subscribe(this.startTrainingObserver)
 
-    let conn= function(evt:any){
+    let conn = function(evt:any){
       console.log("connnnnected");
 
     }
-
-
 
   }
 }

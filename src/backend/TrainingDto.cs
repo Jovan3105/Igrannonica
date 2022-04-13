@@ -4,18 +4,18 @@ namespace backend
 {
     public class TrainingDto
     {
-        public int epochs { get; set; }
-      
-        public string activationFunction { get; set; }
-        public string[] features { get; set; }
-        public string[] labels { get; set; }
-        public string optimizer { get; set; }
-        public string lossFunction { get; set; }
-        public float testDataRatio { get; set; }
-        public float learningRate { get; set; }
-        public string[] metrics { get; set; }
-        public string problemType { get; set; }
-        public string connIdClient { get; set; }=string.Empty;
-        public Layer[] layers { get; set; } = Array.Empty<Layer>();
+        public string ClientConnID { get; set; } = string.Empty;
+        public int DatasetID { get; set; }
+        public string ProblemType { get; set; }
+        public Layer[] Layers { get; set; } = Array.Empty<Layer>();
+        public string[] Features { get; set; }
+        public string[] Labels { get; set; }
+        public string[] Metrics { get; set; }
+        public string LossFunction { get; set; }
+        public float TestDatasetSize { get; set; }
+        public float ValidationDatasetSize { get; set; }
+        public int Epochs { get; set; }
+        public string Optimizer { get; set; }
+        public float LearningRate { get; set; }
     }
 }
