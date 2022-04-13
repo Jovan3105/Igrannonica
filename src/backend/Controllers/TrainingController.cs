@@ -60,16 +60,11 @@ namespace backend.Controllers
                 return BadRequest(new { Message = "No dataset with this id" });
 
             string datasetURL = DatasetsController.CreateDatasetURL(_configuration, userID, trainingDto.DatasetID, dataset.FileName);
-
+        
            // Kreiraj zahtev //
 
             var url = _microserviceBaseURL + "/training";
-            var httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
 
-            httpWebRequest.ContentType = "application/json";
-            httpWebRequest.Method = "POST";
-
-            using var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
             var requestData = new {
                 client_conn_id  = trainingDto.ClientConnID,
                 stored_dataset  = datasetURL,
@@ -87,11 +82,7 @@ namespace backend.Controllers
 
             // Procitaj response //
 
-            var response = await client.PostAsync(url, 
-                new StringContent(
-                    JsonConvert.SerializeObject(requestData)
-                )
-            );
+            var response = await client.PostAsJsonAsync(url, requestData);
 
             var responseString = await response.Content.ReadAsStringAsync();
             return Ok(responseString);
