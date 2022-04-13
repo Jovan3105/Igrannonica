@@ -51,25 +51,21 @@ namespace backend.Controllers
         
 
         [HttpPost]
-        [Route("/begin_training")]
-        public async Task<ActionResult<string>> beginTraining(int epoches, string algorithm)
+        [Route("begin_training/")]
+        public async Task<ActionResult<string>> beginTraining(TrainingDto trainDto)
         {
-            var data = new
-            {
-                epoches = epoches,
-                algorithm = algorithm
-            };
+           
 
             // Kreiraj zahtev //
 
-            var url = _microserviceBaseURL + "/training";
+            /*var url = _microserviceBaseURL + "/training";
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
 
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
 
             using var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
-            streamWriter.Write(data);
+            streamWriter.Write(trainDto);
 
             // Procitaj response //
 
@@ -78,7 +74,9 @@ namespace backend.Controllers
             
             var result = streamReader.ReadToEnd();
             
-            return Ok(result);
+            return Ok(result);*/
+            Console.WriteLine("\n\n\n\n\n\n\n\n\n------------------------\n"+trainDto.connIdClient);
+            return ("ok");
 
         }
     }

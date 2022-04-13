@@ -424,17 +424,32 @@ export class DashboardComponent implements OnInit {
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
+    var trainingService=this.trainingService;
+    var featureL=this.featuresLabel;
     let subject = new WebSocket('ws://localhost:7220');
+    let connId="";
     subject.onopen= function (evt){
       console.log("opened conn");
     }
     subject.onmessage= function (evt) {
+
+      var dataArr=evt.data.split(" ",2)
+      if(dataArr[0]=="ConnID:"){
+          connId=dataArr[1];
+          objtoSend["connIdClient"]=connId;
+          trainingService.sendDataForTraining(objtoSend).subscribe();
+          console.log(connId);
+      }
+      else if(dataArr[0]=="Odstupanje:"){
+        //desava nesto sa grafikom
+        console.log(dataArr[1]);
+      }
       console.log(evt.data);
   }
     subject.onclose=function(evt){
       console.log("connection closed");
     }
-    //subject.close(); zatbara socket
+    //subject.close(); //zatbara socket
 
 
 
@@ -444,23 +459,46 @@ export class DashboardComponent implements OnInit {
 
 
 
-    /*this.trainingService.sendDataForTraining({
+    var nizF=[]
+
+    for (let index = 0; index < this.featuresLabel['features'].length; index++) {
+      const element = this.featuresLabel['features'][index];
+
+      nizF.push(element["name"]);
+
+    }
+    console.log(this.featuresLabel['label'] );
+
+    var nizL=[]
+    for (let index = 0; index < this.featuresLabel['label'] .length; index++) {
+      const element = this.featuresLabel['label'][index];
+
+      nizL.push(element["name"]);
+
+    }
+    var objtoSend={
       epochs: this.numberOfEpochs,
       activationFunction: this.activationFunctionControl.value.codename,
-      features: this.featuresLabel['features'],
-      labels: this.featuresLabel['label'],
+      features: nizF,
+      labels: nizL,
       optimizer: this.optimizerFunctionControl.value.codename,
       lossFunction: this.lossFunctionControl.value.codename,
       testDataRatio: this.sliderValue/100,
       learningRate: this.learningRate,
-      metrics: this.metricsArrayToSend
-    }).subscribe(this.startTrainingObserver);*/
-    // console.log("metric control "+ this.metricsControl.value[0].codename)
-    // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
-    // console.log("testDataRatio "+ this.sliderValue/100)
-    // console.log("metrics "+ this.metricsControl.value)
-    // console.log("lossFunction "+ this.lossFunctionControl.value.codename)
-    // console.log("metric array to send "+ this.metricsArrayToSend)
+      metrics: this.metricsArrayToSend,
+      problemType:"regression",
+      connIdClient:connId
+    }
+    console.log(connId);
+    console.log(JSON.stringify(nizL))
+    // this.trainingService.sendDataForTraining(objtoSend).subscribe(this.startTrainingObserver)
+
+    let conn= function(evt:any){
+      console.log("connnnnected");
+
+    }
+
+
 
   }
 }

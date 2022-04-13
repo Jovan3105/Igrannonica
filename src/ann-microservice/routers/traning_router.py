@@ -36,7 +36,8 @@ async def begin_training(
     validation_size  : float = Body(0.2),
     epochs           : int = Body(100),
     optimizer        : Optimizer = Body(Optimizer.Adam),
-    learning_rate    : float = Body(0.1)
+    learning_rate    : float = Body(0.1),
+    connIdClient     : str=Body(...), 
     ):
     
     log(f"Feature list={features}; Label list={labels}; Metric list={metrics}; Layer list: {layers}")
