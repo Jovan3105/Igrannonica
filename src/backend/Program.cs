@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
 using System.Net.WebSockets;
 using System.Text;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Net;
 
 var MyAllowSpecificOrigins = "MyAllowSpecificOrigins";
 
@@ -19,11 +21,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      builder =>
-                      {
-                          builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-                      });
-    
+        builder =>
+        {
+            builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        });
 });
 
 ConfigurationManager configuration = builder.Configuration;
@@ -76,8 +77,17 @@ builder.Services.AddWebSocketServerConnectionManager();
 // Email sender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
-var app = builder.Build();
+//builder.services.AddSpaStaticFiles(configuration =>
+//{
+//    configuration.RootPath = "frontend-published";
+//});
+builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+    {
+        serverOptions.Listen(IPAddress.Any, 10080);
+    }
+);
 
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -99,7 +109,12 @@ app.UseStaticFiles(new StaticFileOptions()
     }
 });
 
-app.UseHttpsRedirection();
+
+/*if (!app.Environment.IsDevelopment())
+{
+    app.UseSpaStaticFiles();
+}*/
+
 var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(2)
