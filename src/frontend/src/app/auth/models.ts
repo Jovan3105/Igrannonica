@@ -1,6 +1,8 @@
-export interface RegisterPayload {
+export class Register
+{
     
 }
+
 
 //{username:f.value.username,
 //email:f.value.email,
