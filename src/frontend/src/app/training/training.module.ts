@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../shared/shared.module';
+import {MatIconModule} from '@angular/material/icon';
 
 import { TrainingRoutingModule } from './training-routing.module';
 import { LabelsComponent } from './components/labels/labels.component';
@@ -16,6 +17,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { TrainingViewComponent } from './_training-view/training-view.component';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartComponent } from './components/chart/chart.component';
 
 
 @NgModule({
@@ -23,7 +26,8 @@ import { TrainingViewComponent } from './_training-view/training-view.component'
     LabelsComponent,
     ShowTableComponent,
     HyperparametersComponent,
-    TrainingViewComponent
+    TrainingViewComponent,
+    ChartComponent
   ],
   imports: [
     CommonModule,
@@ -35,7 +39,9 @@ import { TrainingViewComponent } from './_training-view/training-view.component'
     BrowserAnimationsModule,
     NgxSliderModule,
     NgxMatSelectSearchModule,
-    NgMultiSelectDropDownModule
+    NgMultiSelectDropDownModule,
+    MatIconModule,
+    NgChartsModule
   ],
   exports:[
     LabelsComponent,

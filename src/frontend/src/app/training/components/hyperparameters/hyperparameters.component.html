@@ -1,12 +1,11 @@
-<h1 style="text-align: center;">Configure hyperparameters</h1>
-<div class="options" style="margin-top: 10px;">
+<h3 style="text-align: center;">Configure hyperparameters</h3>
+<div class="options" style="margin-top: 10px; ">
     <form #form>
-        <h4>Selections</h4>
         <br>
         <div class="row justify-content-center">
-            <div class="col-md-4 select">
+            <div class="col-sm select">
                 <h6>Activation function</h6>
-                <mat-form-field appearance="fill">
+                <mat-form-field class="mat-form" appearance="fill">
                     <mat-label><b>Favorite function</b></mat-label>
                     <mat-select [formControl]="activationFunctionControl" name="activationFunctionControl">
                         <mat-option>--</mat-option>
@@ -18,9 +17,9 @@
                     <mat-hint>{{activationFunctionControl.value.info}}</mat-hint>
                 </mat-form-field>
             </div>
-            <div class="col-md-4 select">
+            <div class="col-sm select">
                 <h6>Optimizer</h6>
-                <mat-form-field appearance="fill">
+                <mat-form-field  class="mat-form" appearance="fill">
                     <mat-label><b>Favorite optimizer</b></mat-label>
                     <mat-select [formControl]="optimizerFunctionControl" name="optimizerFunctionControl">
                         <mat-option>--</mat-option>
@@ -32,9 +31,9 @@
                     <mat-hint>{{optimizerFunctionControl.value.info}}</mat-hint>
                 </mat-form-field>
             </div>
-            <div class="col-md-4 select">
+            <div class="col-sm select">
                 <h6>Loss function</h6>
-                <mat-form-field appearance="fill">
+                <mat-form-field class="mat-form" appearance="fill">
                     <mat-label><b>Favorite loss fun.</b></mat-label>
                     <mat-select [formControl]="lossFunctionControl" name="lossFunctionControl">
                         <mat-option>--</mat-option>
@@ -46,38 +45,35 @@
                     <mat-hint>{{lossFunctionControl.value.info}}</mat-hint>
                 </mat-form-field>
             </div>
-        </div>
-        <hr>
-        <div> 
-            <h4>Test data ratio</h4>
-            <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
-        </div>
-        <br>
-        <hr>
-        <div class="row justify-content-center" style="width: inherit;">
-            <h6>Metrics</h6>
-            <mat-form-field appearance="fill" style="width: 100%;">
-                <mat-label><b>Favorite function</b></mat-label>
-                <mat-select [formControl]="metricsControl" name="metricsControl" multiple>
-                    <mat-option *ngFor="let item of metrics" [value]="item">
-                    {{item.name}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="metricsControl.hasError('required')">Please choose some metrics</mat-error>
-                <mat-hint>{{metricsControl.value.info}}</mat-hint>
-            </mat-form-field>
+            <div class="col-sm ">
+                <h6>Metrics</h6>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Favorite function</b></mat-label>
+                    <mat-select [formControl]="metricsControl" name="metricsControl" multiple>
+                        <mat-option *ngFor="let item of metrics" [value]="item">
+                        {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="metricsControl.hasError('required')">Please choose some metrics</mat-error>
+                    <mat-hint>{{metricsControl.value.info}}</mat-hint>
+                </mat-form-field>
+            </div>
         </div>
         <div class="row justify-content-center">
-            <div class="col-md-5">
+            <div class="col-sm select"> 
+                <h6>Test data ratio</h6>
+                <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
+            </div>
+            <div class="col-sm-2">
                 <h6>Number of epochs</h6>
-                <ngx-number-spinner
+                <ngx-number-spinner 
                 name="epochs"
                 [value]="numberOfEpochs"
                 (change)="changeEpoch($event)" 
                 [min]="0">
                 </ngx-number-spinner>
             </div>
-            <div class="col-md-5">
+            <div class="col-sm-2">
                 <h6>Learning rate</h6>
                 <ngx-number-spinner
                 name="rate"
@@ -88,9 +84,9 @@
                 </ngx-number-spinner>
             </div>
         </div>
-        <br><br>
+        <br>
         <div id="button" style="display: inline-flex;">
-            <button type="button" class="btn btn-primary" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || activationFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid">Start</button>
+            <button class="btn btn-primary btn-circle btn-sm" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || activationFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon>play_arrow</mat-icon></button>
             <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
                 <div class="miniLoader">
                     <div class="miniLoader">
@@ -99,6 +95,7 @@
                 </div>
             </div>
         </div>
+
         <br>
     </form>
 </div>
