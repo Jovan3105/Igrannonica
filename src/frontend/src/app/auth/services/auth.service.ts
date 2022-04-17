@@ -39,6 +39,7 @@ export class AuthService {
         const user = response;
         if(user.success){
           this.jwtService.storeTokens(user.data); //ubacuje token u localstorage
+          this.updatemenu.next();
           //window.location.reload()
         }
       })

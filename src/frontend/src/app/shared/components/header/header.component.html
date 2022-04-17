@@ -8,43 +8,31 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto" id="dugmici">
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/dashboard']" routerLinkActive="active">Trening</a>
+            <a class="nav-link" [routerLink]="['/training']" routerLinkActive="active">Trening</a>
           </li> 
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/datasets']" routerLinkActive="active">Datasetovi</a>
           </li> 
         </ul>
-      </div>
-
-      <div class="justify-content-end" *ngIf="displayLoginElement">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item" *ngIf="displayLoginElement">
+        <ul class="navbar-nav navbar-right" *ngIf="displayLoginElement">
+          <li class="nav-item">
             <a class="nav-link" [routerLink]="['/register']" routerLinkActive="active">Register</a>
           </li>
-          <li class="nav-item" *ngIf="displayLoginElement">
+          <li class="nav-item">
             <a class="nav-link" [routerLink]="['/login']" routerLinkActive="active">Login</a>
           </li>
         </ul>
-      </div>
-
-      <div class="justify-content-end" *ngIf="!displayLoginElement && user$">
-        <ul class="navbar-nav me-auto">
+        <ul class="navbar-nav navbar-right" *ngIf="!displayLoginElement && user$">
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/api/my-profile']" routerLinkActive="active">
               <img src="{{(user$ | async).image}}" alt="profile-picture" style="height: 40px; width: 40px;">
                {{(user$ | async).username}}
             </a>
           </li>
-        </ul>
-        
-      </div>
-      <div class="justify-content-end" *ngIf="!displayLoginElement">
-        <ul class="navbar-nav me-auto">
           <li class="nav-item">
             <a class="nav-link" (click)="doLogout()">Logout</a>
           </li>
         </ul>
       </div>
-
     </div>
   </nav>

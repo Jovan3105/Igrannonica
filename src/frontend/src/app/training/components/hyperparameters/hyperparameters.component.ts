@@ -1,9 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
 import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
+
 
 @Component({
   selector: 'app-hyperparameters',
@@ -61,9 +62,10 @@ export class HyperparametersComponent implements OnInit
     }
   };
 
-  ngOnInit(): void {
+  ngOnInit(): void 
+  {
   }
-
+  
   startTrainingObserver:any = {
     next: (response:any) => { 
       console.log("dashboard > DashboardComponent > startTrainingObserver > next:")
@@ -109,3 +111,4 @@ export class HyperparametersComponent implements OnInit
 
   }
 }
+

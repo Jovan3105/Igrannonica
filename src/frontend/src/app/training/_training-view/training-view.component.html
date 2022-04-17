@@ -1,5 +1,5 @@
 <div>
-    <button class="btn btn-primary float-start ms-4 my-5" [disabled]="backButtonDisable">Back</button>
+    <button class="btn btn-primary float-start ms-4 my-5" [disabled]="backButtonDisable" (click)="OnBackClick()">Back</button>
     <button id="nextButton" type="button" class="btn btn-primary float-end me-5 my-5" [disabled]="nextButtonDisable" (click)="OnNextClick()">Next</button>
 </div>
 
@@ -50,7 +50,8 @@
                 (click)="onUndo()" 
                 [disabled]="undoDisabled" 
                 id="undoButton">Undo</button>&nbsp;
-                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>
+                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>&nbsp;&nbsp;
+                
             </div>
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)"
@@ -69,13 +70,14 @@
             <h4>Statistical Indicators for Categorical Data</h4>
             <app-show-table #catIndicators id="categorical">
             </app-show-table>
-            <img [src]="corrMatrixSource" style="height: auto;width: 80%;">
+            <img [src]="corrMatrixSource" style="height: auto;width: 70%;">
         </div>
         <div class="col-sm">
             <app-labels #Labels id="labelCards" [ngStyle]="{'visibility': labelsVisibility}" 
             (checkEvent)="changeColomnVisibility($event)" 
             (labelEvent)="onSelectedLabel($event)"></app-labels>
         </div>
+
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -95,11 +97,11 @@
     </div>
 </div>
 
-<div id="second" class="row mx-auto" style="width: 1200px;" [ngStyle]="{'display': secondVisibility}">
+<div id="second" class="container" style="overflow: hidden; width: 1200px;" [ngStyle]="{'display': secondVisibility}">
     <app-hyperparameters [featuresLabel]="featuresLabel"></app-hyperparameters>
     <!-- Deo kada se klikne na dugme -->
     <!-- <div class="options">
         <input>
     </div> -->
-    
+    <app-chart></app-chart>
 </div>
