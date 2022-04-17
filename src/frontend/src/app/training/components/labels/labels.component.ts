@@ -90,7 +90,9 @@ export class LabelsComponent implements OnInit {
 
     var values;
     var tempHeader = [];
-
+    var features: HeaderDict[] = [];
+    var label:HeaderDict[] = [];
+    
     if (this.headers)
     {
 
@@ -98,8 +100,11 @@ export class LabelsComponent implements OnInit {
       {
         if (this.checkboxCheckedArray[i]) tempHeader.push(this.headers[i]);
       }
-      var features = tempHeader.filter(element => element.key != this.selectedLabel.key);
-      var label = this.headers.filter(element => element.key == this.selectedLabel.key);
+      if (this.selectedLabel) 
+      {
+        features = tempHeader.filter(element => element.key != this.selectedLabel.key);
+        label = this.headers.filter(element => element.key == this.selectedLabel.key);
+      }
       
       values = {
         "features":features,

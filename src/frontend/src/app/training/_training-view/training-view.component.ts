@@ -23,6 +23,8 @@ export class TrainingViewComponent implements OnInit {
   metricsArrayToSend: any[] = [];
   //visibilityTrigger: boolean = false;
 
+  viewIndicator:View;
+  uploadDisplay:string = "block";
   loaderDisplay:string = "none";
   containerVisibility:string = "hidden";
   nextButtonDisable:boolean = true;
@@ -34,12 +36,10 @@ export class TrainingViewComponent implements OnInit {
   labelsVisibility:string = "visible";
   mainTableDisplay:string = "block";
   firstVisibility:string = "block";
-  secondVisibility:string = "none";
+  secondDisplay:string = "none";
   loaderMiniDisplay:string = "none";
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
-  fileUploadDisable:boolean = false;
-  linkUploadDisable:boolean = false;
 
   constructor(
     private datasetService: DatasetService, 
@@ -48,6 +48,7 @@ export class TrainingViewComponent implements OnInit {
     private domSanitizer: DomSanitizer
     ) {
     this.datasetId = -1;
+    this.viewIndicator = View.PREVIEW;
   }
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
@@ -164,6 +165,9 @@ export class TrainingViewComponent implements OnInit {
 
   hideElements()
   {
+    this.viewIndicator = View.PREVIEW;
+    this.uploadDisplay = "none";
+    this.firstVisibility = "block";
     this.loaderDisplay = "block";
     this.containerVisibility = "hidden";
     this.labelsVisibility = "hidden";
@@ -176,18 +180,22 @@ export class TrainingViewComponent implements OnInit {
     this.containerVisibility = "visible";
     this.labelsVisibility = "visible";
     this.nextButtonDisable = false;
+    this.backButtonDisable = false;
   }
 
-  onFileSelected(event:Event)
+  onFileSelected(file:File)
   {
     this.hideElements();
 
     if (this.form.get('file')) this.form.delete('file');
 
-    const element = event.currentTarget as HTMLInputElement;
-    let fileList: FileList | null = element.files;
-
-
+    //const element = event.currentTarget as HTMLInputElement;
+    //let fileList: FileList | null = element.files;
+    
+    this.form.append('file', file);
+      this.datasetService.uploadDatasetFile(this.form)
+        .subscribe(this.uploadObserver);
+    /*
     if (fileList && fileList?.length > 0) {
 
       var file = fileList[0];
@@ -195,19 +203,19 @@ export class TrainingViewComponent implements OnInit {
       this.form.append('file', file);
       this.datasetService.uploadDatasetFile(this.form)
         .subscribe(this.uploadObserver);
-    }
+    }*/
   }
 
-  onShowDataClick() {
+  onShowDataClick(datasetURL:string) {
 
     this.hideElements();
 
-    if (this.datasetURL == null || this.datasetURL == "")
+    if (datasetURL == null || datasetURL == "")
       console.log("problem: dataset-url");
     else {
-      this.req["datasetSource"] = this.datasetURL
+      this.req["datasetSource"] = datasetURL
   
-      this.datasetService.uploadDatasetFileWithLink(this.datasetURL).subscribe(this.uploadObserver);
+      this.datasetService.uploadDatasetFileWithLink(datasetURL).subscribe(this.uploadObserver);
     }
   }
 
@@ -257,7 +265,6 @@ export class TrainingViewComponent implements OnInit {
       this.deleteButtonDisplay = "none";
       this.labelsVisibility = "hidden";
       this.mainTableDisplay = "none";
-      this.fileUploadDisable = this.linkUploadDisable = true;
     }
     else
     {
@@ -266,35 +273,55 @@ export class TrainingViewComponent implements OnInit {
       this.deleteButtonDisplay = "inline";
       this.labelsVisibility = "visible";
       this.mainTableDisplay = "block";
-      this.fileUploadDisable = this.linkUploadDisable  = false;
     }
     this.toggledButton = !this.toggledButton
   }
 
 
   OnNextClick() {
-
-    var temp = this.labels.getValues(); // Cuva se objekat sa odabranim feature-ima i labelom
-
-    if (temp!.label.length > 0){
-      this.featuresLabel = temp;
-      console.log(this.featuresLabel);
-      //Pokreni modal
-      this.firstVisibility = "none";
-      this.secondVisibility = "block";
-      this.backButtonDisable = false;
-      
+    if (this.viewIndicator == View.UPLOAD)
+    {
+        this.uploadDisplay = "none";
+        this.firstVisibility = "block";
+        this.viewIndicator = View.PREVIEW;
+        this.backButtonDisable = false;
     }
-    else{
-      alert("Nisi izabrao izlaz!");
+    else if (this.viewIndicator == View.PREVIEW)
+    {
+      var temp = this.labels.getValues(); // Cuva se objekat sa odabranim feature-ima i labelom
+      console.log(temp);
+      if (temp!.label!.length > 0){
+        this.featuresLabel = temp;
+        console.log(this.featuresLabel);
+        //Pokreni modal
+        this.firstVisibility = "none";
+        this.secondDisplay = "block";
+        this.viewIndicator = View.TRAINING;
+        
+      }
+      else
+      {
+        console.log("Izlazi alert");
+        alert("Nisi izabrao izlaz!");
+      }
     }
-
   }
 
   OnBackClick(){
-    this.firstVisibility = "block";
-    this.secondVisibility = "none";
-    this.backButtonDisable = true;
+    if (this.viewIndicator == View.PREVIEW)
+    {
+      this.firstVisibility = "none";
+      this.uploadDisplay = "block";
+      this.backButtonDisable = true;
+      this.viewIndicator = View.UPLOAD;
+    }
+    else if(this.viewIndicator == View.TRAINING)
+    {
+      this.secondDisplay = "none";
+      this.firstVisibility = "block";
+      this.viewIndicator = View.PREVIEW;
+    }
+    
   }
 
   onSaveClick()
@@ -314,4 +341,10 @@ export class TrainingViewComponent implements OnInit {
   {
     this.dataTable.changeLabelColumn(data);
   }
+}
+
+enum View {
+  UPLOAD,
+  PREVIEW,
+  TRAINING
 }

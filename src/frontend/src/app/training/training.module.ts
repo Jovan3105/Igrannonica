@@ -23,6 +23,7 @@ import {NgxFilesizeModule} from 'ngx-filesize';
 import { ChartComponent } from './components/chart/chart.component';
 import { UploadComponent } from './components/upload/upload.component';
 import { DragAndDropDirective } from './services/drag-and-drop.directive';
+import { DatasetInfoComponent } from './components/dataset-info/dataset-info.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { DragAndDropDirective } from './services/drag-and-drop.directive';
     TrainingViewComponent,
     ChartComponent,
     UploadComponent,
-    DragAndDropDirective
+    DragAndDropDirective,
+    DatasetInfoComponent
   ],
   imports: [
     CommonModule,

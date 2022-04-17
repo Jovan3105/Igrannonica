@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { AuthService } from 'src/app/auth/services/auth.service';
+
+
 
 @Component({
   selector: 'app-upload',
@@ -8,9 +11,21 @@ import { Component, OnInit } from '@angular/core';
 export class UploadComponent implements OnInit {
 
   file?:File;
-  constructor() { }
+  datasetURL:string;
+  isLoggedIn:boolean;
+  @Output() linkEvent: EventEmitter<string>; //podizanje event-a kada se salje link
+  @Output() uploadEvent: EventEmitter<File>; //podizanje event-a kada se salje file
 
-  ngOnInit(): void {
+  constructor(private authService : AuthService) {
+    this.datasetURL = "";
+    this.linkEvent = new EventEmitter<string>();
+    this.uploadEvent = new EventEmitter<File>();
+    this.isLoggedIn = this.authService.isLoggedIn();
+   }
+
+  ngOnInit(): void 
+  {
+
   }
 
   fileHandler(event:Event)
@@ -25,7 +40,19 @@ export class UploadComponent implements OnInit {
 
     }
   }
-  onFileDropped(file:File){
+
+  onFileDropped(file:File)
+  {
     this.file = file;
+  }
+
+  uploadClick()
+  {
+    this.uploadEvent.emit(this.file);
+  }
+  
+  linkClick()
+  {
+    this.linkEvent.emit(this.datasetURL);
   }
 }
