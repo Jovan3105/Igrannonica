@@ -5,6 +5,16 @@
 Igrannonica je Veb aplikacija za izučavanje osnovnih principa funkcionisanja veštačkih neuronskih mreža kroz interaktivan
 rad.
 
+## Demo
+
+Demo aplikacije se može pronaći na sledećem [linku](softeng.pmf.kg.ac.rs:10081).
+
+Korišćeni portovi:
+* [backend](softeng.pmf.kg.ac.rs:10080): 10080
+* [frontend](softeng.pmf.kg.ac.rs:10081): 10081
+* [mikroservis](softeng.pmf.kg.ac.rs:10082/docs): 10082
+* postgresSQL: 5432
+
 ## Potrebni paketi i programi
 
 * .NET 6
@@ -12,13 +22,39 @@ rad.
 * npm `8.3.1`
 * Angular CLI `13.2.5`
 * PostgreSQL `14.2`
-* Npgsql `v3.2.6-3`
 * Python `3.10`
 * Pip
 * Pipenv `2022.1.8`
 
-## Uputstvo za instalaciju i pokretanje
 
+## Pokretanje na (linux) serveru
+
+Podrazumeva se da je trenutni radni direktorijum lični direktorijum tima.
+
+**Napomena**: za prikaz svih procesa koji su pokrenuti od korisnika `Regresis` moguće je koristiti komandu:
+```
+myproc
+```
+
+#### Pokretnje frontend-a
+ ```
+cd deployment/front
+node app.js &
+ ```
+
+#### Pokretnje mikroservisa
+ ```
+cd ../ann
+pipenv run server &
+ ```
+ 
+#### Pokretanje backend-a
+```
+cd ../back
+./backend &
+```
+
+## Uputstvo za build-ovanje
 ### Instalacija
 
 1. Instaliranje [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)-a
@@ -46,7 +82,7 @@ rad.
     pipenv install .
     ```
     **Napomena**: podrazumeva se da nije bilo promena radnog direktorijuma i međuvremenu. Poslednju komandu je potrebno izvršiti u `ann-microservice` folderu
-
+    
 ### Pokretanje
 
 Nakon instalacije svih potrebnih programa i paketa projekat se može pokrenuti.
@@ -55,22 +91,23 @@ Nakon instalacije svih potrebnih programa i paketa projekat se može pokrenuti.
  ```
 cd src
 cd front
-cd ng serve --open
+ng serve --open
  ```
 
 #### Pokretnje mikroservisa
  ```
-cd src
+cd ..
 cd ann-microservice
 pipenv run server
  ```
  
 #### Pokretanje backend-a
 ```
-cd src
+cd ..
 cd backend
 dotnet run
 ```
+
 
 ## Za developere
 
