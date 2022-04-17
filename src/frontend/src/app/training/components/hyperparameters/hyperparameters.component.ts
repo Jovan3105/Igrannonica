@@ -19,7 +19,6 @@ export class HyperparametersComponent implements OnInit
   loaderMiniDisplay:string = "none";
 
   constructor(private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
-  
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -66,15 +65,16 @@ export class HyperparametersComponent implements OnInit
   ngOnInit(): void 
   {
   }
-  
-  startTrainingObserver:any = {
+
+  beginTrainingObserver = {
     next: (response:any) => { 
-      console.log("dashboard > DashboardComponent > startTrainingObserver > next:")
+      console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver > next:")
       console.log(response)
-        
+      
+      this.loaderMiniDisplay = 'none'; // TODO 
     },
     error: (err: Error) => {
-      console.log("dashboard > DashboardComponent > startTrainingObserver > error:")
+      console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
       console.log(err)
     }
   };
@@ -93,96 +93,84 @@ export class HyperparametersComponent implements OnInit
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
     var trainingService=this.trainingService;
-    var featureL = this.featuresLabel;
-    let subject = new WebSocket('ws://localhost:7220'); // TODO promeniti zbog prod (izmestiti u env)
-    let connId = "";
+    let connectionID = "";
 
-    subject.onopen = function (evt){
-      console.log("opened conn");
-    }
-
-    subject.onmessage= function (evt) {
-
-      var dataArr=evt.data.split(" ",2)
-      if(dataArr[0]=="ConnID:"){
-          connId=dataArr[1];
-          objtoSend["ClientConnID"] = connId;
-          trainingService.sendDataForTraining(objtoSend).subscribe();
-          console.log(connId);
-      }
-      else if(dataArr[0]=="Odstupanje:"){
-        //desava nesto sa grafikom
-        console.log(dataArr[1]);
-      }
-      console.log(evt.data);
-    }
-
-    subject.onclose=function(evt){
-      console.log("connection closed");
-    }
-    //subject.close(); //zatbara socket
-
-
-    var nizF=[]
-
+    
+    // izdvajanje naziva feature-a u poseban niz
+    var featuresStr = []
     for (let index = 0; index < this.featuresLabel['features'].length; index++) {
       const element = this.featuresLabel['features'][index];
-
-      nizF.push(element["name"]);
-
+      featuresStr.push(element["name"]);
     }
-
-    console.log(this.featuresLabel['label'] );
-
-    var nizL=[]
-    for (let index = 0; index < this.featuresLabel['label'] .length; index++) {
+      
+    // izdvajanje naziva feature-a u poseban niz
+    var lablesStr = []
+    for (let index = 0; index < this.featuresLabel['label'].length; index++) {
       const element = this.featuresLabel['label'][index];
-
-      nizL.push(element["name"]);
-
+      lablesStr.push(element["name"]);
     }
 
-    var objtoSend={
+    var trainingRequestPayload = {
       DatasetID             : this.datasetId,
-      ClientConnID          : connId,
+      ClientConnID          : connectionID,
       ProblemType           : "regression",
-      Layers                : [/**/
+      Layers                : [// TODO hardcoded, ispraviti kada se doda vizuelizacija i izbor arhitekture
         { 
           index : 0,
           units : 32,
-          weight_initializer : "HeUniform",
+          weight_initializer  : "HeUniform",
           activation_function : this.activationFunctionControl.value.codename,
         },
         { 
           index : 1,
           units : 8,
-          weight_initializer : "HeUniform",
+          weight_initializer  : "HeUniform",
           activation_function : this.activationFunctionControl.value.codename,
         },
         { 
           index : 2,
           units : 1,
-          weight_initializer : "HeUniform",
+          weight_initializer  : "HeUniform",
           activation_function : this.activationFunctionControl.value.codename,
         }
       ],
-      Features              : nizF,
-      Labels                : nizL,
+      Features              : featuresStr,
+      Labels                : lablesStr,
       Metrics               : this.metricsArrayToSend,
       LossFunction          : this.lossFunctionControl.value.codename,
-      TestDatasetSize       : this.sliderValue/100,
-      ValidationDatasetSize : 0.2,
+      TestDatasetSize       : this.sliderValue / 100,
+      ValidationDatasetSize : 0.2, // TODO hardcoded, promeniti kada se implementira UI komponenta
       Epochs                : this.numberOfEpochs,
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate
     }
-    console.log(connId);
-    console.log(JSON.stringify(nizL))
-    // this.trainingService.sendDataForTraining(objtoSend).subscribe(this.startTrainingObserver)
+    let subject = new WebSocket('ws://localhost:7220'); // TODO promeniti zbog prod (izmestiti u env)
 
-    let conn = function(evt:any){
-      console.log("connnnnected");
+    subject.onopen = function (evt){
+      console.log("Socket connection is established");
+    }
+    let _this = this
+    
+    subject.onmessage = function (evt) {
+      var dataArr = evt.data.split(" ", 2)
 
+      // proveri da li je rec o dodeli ID-a
+      if(dataArr[0] == "ConnID:") {
+        connectionID = dataArr[1];
+        trainingRequestPayload["ClientConnID"] = connectionID;
+        trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.beginTrainingObserver);
+        console.log(`My connection ID: ${connectionID}`);
+      }
+      else {
+        // TODO iskoristiti za vizuelizaciju
+        let epoch_stats = JSON.parse(evt.data)
+        console.log(epoch_stats);
+      }
+    }
+
+    //  subject.close(); //zatvara socket
+    subject.onclose = function(evt){
+      console.log("Connection is terminated");
     }
   }
 }

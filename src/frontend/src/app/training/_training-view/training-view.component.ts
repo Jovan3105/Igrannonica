@@ -137,17 +137,6 @@ export class TrainingViewComponent implements OnInit {
     }
   };
 
-  startTrainingObserver:any = {
-    next: (response:any) => { 
-      console.log("dashboard > DashboardComponent > startTrainingObserver > next:")
-      console.log(response)
-        
-    },
-    error: (err: Error) => {
-      console.log("dashboard > DashboardComponent > startTrainingObserver > error:")
-      console.log(err)
-    }
-  };
   fetchCorrMatrixObserver:any = {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > next:")
@@ -236,19 +225,23 @@ export class TrainingViewComponent implements OnInit {
     if (indicator) this.undoDisabled = false;
     else this.undoDisabled = true;
   }
+
   enableUndoDeleted(indicator:boolean)
   {
     if(indicator) this.undoDeletedDisabled = false;
     else this.undoDeletedDisabled = true;
   }
+
   onUndo()
   {
     this.dataTable.onUndo();
   }
+
   onUndoDeleted()
   {
     this.dataTable.onUndoDeleted();
   }
+
   toggleTables(event:any){
     
     if(this.toggledButton)
