@@ -6,7 +6,7 @@ from pydantic import AnyHttpUrl
 from models.models import NNLayer
 from services.training_service import train_model
 from services.dataprep_service import get_basic_info
-from services.shared_service import log, read_json_data, make_socket_connection
+from services.shared_service import log, read_json_data
 from helpers.metric_helper import Metric
 from helpers.optimizer_helper import Optimizer
 from helpers.loss_func_helper import LossFunction
@@ -39,8 +39,6 @@ async def begin_training(
     optimizer        : Optimizer = Body(Optimizer.Adam),
     learning_rate    : float = Body(0.1)
     ):
-    
-    my_client_id = make_socket_connection()
 
     log(f"Feature list={features}; Label list={labels}; Metric list={metrics}; Layer list: {layers}")
 
@@ -114,7 +112,6 @@ async def begin_training(
         dataset_headers=dataset_headers,
         cont_cols_set=cont_cols_set, 
         cat_cols_set=cat_cols_set,
-        my_client_id=my_client_id,
         client_conn_id=client_conn_id
         )
 

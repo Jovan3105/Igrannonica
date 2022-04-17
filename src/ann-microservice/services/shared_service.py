@@ -1,11 +1,12 @@
 import io
 import json
+import logging
 import asyncio
+import threading
 import websockets
 import urllib, base64
 import pandas as pd
 import matplotlib.pyplot as plt
-import logging
 
 import config
 
@@ -34,23 +35,29 @@ def log(output):
     else:
         LOGGER.info(output)
  
-async def make_socket_connection():
-    ''' 
-    Kreira konekciju i vraca client id za dati socket conn
-    '''
 
+async def send_msg(dest_id, msg):
     async with websockets.connect(uri = BACKEND_WEB_SOCKET_URI) as websocket:
-        return await websocket.recv()
-
-
-async def send_msg(my_id, dest_id, msg):
-    
-    async with websockets.connect(uri = BACKEND_WEB_SOCKET_URI) as websocket:
-        socket_message["From"] = my_id
+        socket_message["From"] = await websocket.recv()
         socket_message["To"] = dest_id
         socket_message["Message"] = msg
 
-        await websocket.send(json.dumps(obj))
+        await websocket.send(json.dumps(socket_message))
+
+# # #
+
+def run_async(func, *args, **kwargs):
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+    if loop and loop.is_running():
+        thread = RunThread(func, args, kwargs)
+        thread.start()
+        thread.join()
+        return thread.result
+    else:
+        return asyncio.run(func(*args, **kwargs))
 
 # # #
 
@@ -75,5 +82,13 @@ def read_json_data(url):
     return json.loads(json_data)
 
 #################################################################
+# # # Classes     
+class RunThread(threading.Thread):
+    def __init__(self, func, args, kwargs):
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+        super().__init__()
 
-#asyncio.get_event_loop().run_until_complete(make_connection()) # hide-ovano jer pri ucitavanju inicira kreiranje socket-a
+    def run(self):
+        self.result = asyncio.run(self.func(*self.args, **self.kwargs))
