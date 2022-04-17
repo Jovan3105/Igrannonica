@@ -1,0 +1,43 @@
+<h3>Choose a dataset</h3>
+<div class="uploadContainer">
+    <mat-tab-group mat-align-tabs="center" animationDuration="0ms">
+        <mat-tab label="Public dataset">
+            Public dataset
+        </mat-tab>
+        <mat-tab label="Link">
+            <div class="mx-auto" style="width: 80%;text-align: center;">
+                <label for="dataset-url" class="form-label">Dataset URL</label><br>
+                <input type="text" class="form-control" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
+            </div>
+            <button type="submit" class="btn btn-primary"><mat-icon>navigate_next</mat-icon></button>
+        </mat-tab>
+        <mat-tab label="Upload">
+            <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event)">
+                <input type="file" accept=".csv" class="file-input" #fileDrop id="file-drop" (change)="fileHandler($event)">
+                <img src="assets/resources/icon-upload.svg" width="5%">
+                <h5>Drag and drop file here</h5>
+                <h5>or</h5>
+                <h5 style="color:dodgerblue">click to upload</h5>
+            </div>
+            <div class="files-list" *ngIf="file">
+
+                <div class="row">
+                    <div id="file-icon" class="col-sm-2">
+                        <img class="img-icon" src="assets/resources/file-icon.svg" alt="file">
+                    </div>
+                    <div class="col-sm-8" id="info">
+                        <p class="file-name" style="font-weight: bold;">{{file.name}}</p>
+                        <p class="file-size" style="color: #38424c;">{{file.size | filesize}}</p>    
+                    </div>   
+                </div>
+
+            </div>
+            <div style="text-align: end;">
+                <button id="next" class="btn btn-primary" [disabled]="file==null"><mat-icon>navigate_next</mat-icon></button>
+            </div>
+        </mat-tab>
+        <mat-tab label="Private dataset">
+            Private dataset
+        </mat-tab>
+      </mat-tab-group>
+</div>
