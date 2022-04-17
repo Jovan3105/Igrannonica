@@ -7,6 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
 import { ShowTableComponent } from '../components/show-table/show-table.component';
+import { webSocket } from "rxjs/webSocket";
 
 @Component({
   selector: 'app-training-view',

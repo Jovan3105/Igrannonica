@@ -42,7 +42,7 @@ namespace backend.WS
                     {
                         string id = _manager.GetAllSockets().FirstOrDefault(s => s.Value == webSocket).Key;
                         _manager.GetAllSockets().TryRemove(id, out WebSocket sock);
-                        Console.WriteLine("Managed Connections: " + _manager.GetAllSockets().Count.ToString());
+                        Console.WriteLine("Closed Connection: " + _manager.GetAllSockets().Count.ToString());
 
                         await sock.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
 

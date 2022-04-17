@@ -25,6 +25,7 @@ REGRESSION_METRICS = [
 
 @router.post("")
 async def begin_training(
+    client_conn_id   : str = Body(...),
     stored_dataset   : AnyHttpUrl = Body("http://localhost:7220/Datasets/0/129/weight-height.json"),
     problem_type     : str = Body('regression'),
     layers           : List[NNLayer] = Body(...),
@@ -38,7 +39,7 @@ async def begin_training(
     optimizer        : Optimizer = Body(Optimizer.Adam),
     learning_rate    : float = Body(0.1)
     ):
-    
+
     log(f"Feature list={features}; Label list={labels}; Metric list={metrics}; Layer list: {layers}")
 
     # Read data #
@@ -110,7 +111,8 @@ async def begin_training(
         optimizer=optimizer,
         dataset_headers=dataset_headers,
         cont_cols_set=cont_cols_set, 
-        cat_cols_set=cat_cols_set
+        cat_cols_set=cat_cols_set,
+        client_conn_id=client_conn_id
         )
 
     return { "true-pred" : [f"{left} | {right}" for left,right in zip( [x[0] for x in true], [x[0] for x in pred] )] }
