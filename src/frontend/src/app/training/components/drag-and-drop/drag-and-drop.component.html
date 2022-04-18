@@ -1,7 +1,137 @@
 <div cdkDropList cdkDropListOrientation="horizontal" class="example-list" (cdkDropListDropped)="drop($event)">
-    <div class="example-box" *ngFor="let timePeriod of timePeriods" cdkDrag>{{timePeriod}}</div>
+    <!--<div class="example-box" *ngFor="let timePeriod of timePeriods" cdkDrag>{{timePeriod}}</div>-->
+
+
+
+
+
+
+
+    <div cdkDrag class="card bg-light mb-3" style="max-width: 18rem;">
+        <div cdkDragHandle class="card-header d-flex justify-content-end">
+            <button type=" button " class="btn-close " aria-label="Close ">
+            </button>
+        </div>
+        <div class="card-body ">
+            <h5>Units</h5>
+            <ngx-number-spinner name="units " [min]="0 ">
+            </ngx-number-spinner>
+            <br>
+            <div class="col-sm select">
+                <h5>Activation function</h5>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Favorite function</b></mat-label>
+                    <mat-select name="activationFunctionControl">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of timePeriods" [value]="item">
+                            {{item}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-sm select">
+                <h5>Weight intializer</h5>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Favorite initializer</b></mat-label>
+                    <mat-select name="weightInitializerControl">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of timePeriods" [value]="item">
+                            {{item}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <div cdkDrag class="card bg-light mb-3" style="max-width: 18rem;">
+        <div cdkDragHandle class="card-header d-flex justify-content-end">
+            <button type=" button " class="btn-close " aria-label="Close ">
+            </button>
+        </div>
+        <div class="card-body ">
+            <h5>Units</h5>
+            <ngx-number-spinner name="units " [min]="0 ">
+            </ngx-number-spinner>
+            <br>
+            <div class="col-sm select">
+                <h5>Activation function</h5>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Favorite function</b></mat-label>
+                    <mat-select name="activationFunctionControl">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of timePeriods" [value]="item">
+                            {{item}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-sm select">
+                <h5>Weight intializer</h5>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Favorite initializer</b></mat-label>
+                    <mat-select name="weightInitializerControl">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of timePeriods" [value]="item">
+                            {{item}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+        </div>
+    </div>
+    <div cdkDrag class="card bg-light mb-3" style="max-width: 18rem;">
+        <div cdkDragHandle class="card-header d-flex justify-content-end">
+            <button type=" button " class="btn-close " aria-label="Close ">
+            </button>
+        </div>
+        <div class="card-body ">
+            <h5>Units</h5>
+            <ngx-number-spinner name="units " [min]="0 ">
+            </ngx-number-spinner>
+            <br>
+            <div class="col-sm select">
+                <h5>Activation function</h5>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Favorite function</b></mat-label>
+                    <mat-select name="activationFunctionControl">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of timePeriods" [value]="item">
+                            {{item}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-sm select">
+                <h5>Weight intializer</h5>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Favorite initializer</b></mat-label>
+                    <mat-select name="weightInitializerControl">
+                        <mat-option>--</mat-option>
+                        <mat-option *ngFor="let item of timePeriods" [value]="item">
+                            {{item}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+
+
 </div>
 
+<!--
 <div cdkDrag class="card bg-light mb-3" style="max-width: 18rem;">
     <div cdkDragHandle class="card-header d-flex justify-content-end">
         <button type=" button " class="btn-close " aria-label="Close ">
@@ -39,3 +169,5 @@
 
     </div>
 </div>
+
+-->
