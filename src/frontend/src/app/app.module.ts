@@ -20,7 +20,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-
+import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -44,6 +44,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     BrowserAnimationsModule,
     NgxSliderModule,
     NgxMatSelectSearchModule,
+    NgChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent],

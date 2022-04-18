@@ -166,7 +166,7 @@ namespace backend.Controllers
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
             
             var url = _microserviceBaseURL + "/dataset/stat-indicators";
-            var donwloadUrl = CreateDatasetURL(dataset.UserID, datasetId, dataset.FileName);
+            var donwloadUrl = CreateDatasetURL(_configuration, dataset.UserID, datasetId, dataset.FileName);
             var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
             var responseString = await response.Content.ReadAsStringAsync();
 
@@ -180,7 +180,7 @@ namespace backend.Controllers
             Dataset dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
 
             var url = _microserviceBaseURL + "/dataset/corr-matrix";
-            var donwloadUrl = CreateDatasetURL(dataset.UserID, datasetId, dataset.FileName);
+            var donwloadUrl = CreateDatasetURL(_configuration, dataset.UserID, datasetId, dataset.FileName);
 
             var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
             var responseString = await response.Content.ReadAsStringAsync();
@@ -197,7 +197,7 @@ namespace backend.Controllers
             if (dataset == null)
                 return BadRequest(new { Message = "No dataset with this id found" });
 
-            string url = CreateDatasetURL(userId, datasetId, dataset.FileName).Replace(_configuration["Addresses:Backend"], "~");
+            string url = CreateDatasetURL(_configuration, userId, datasetId, dataset.FileName).Replace(_configuration["Addresses:Backend"], "~");
             
             return LocalRedirect(url);
         }
@@ -216,7 +216,7 @@ namespace backend.Controllers
             { 
                 var microserviceURL = _microserviceBaseURL + "/data-preparation/modify";
 
-                string url = CreateDatasetURL(dataset.UserID, dataset.Id, dataset.FileName);
+                string url = CreateDatasetURL(_configuration, dataset.UserID, dataset.Id, dataset.FileName);
   
                 var response = await _client.PutAsJsonAsync(microserviceURL+ "?stored_dataset=" + url, data);
 
@@ -250,10 +250,10 @@ namespace backend.Controllers
             return $"{rootDirPath}/{filename}";
         }
 
-        private string CreateDatasetURL(int userID, int datasetID, string filename)
+        public static string CreateDatasetURL(IConfiguration configuration, int userID, int datasetID, string filename)
         {
-            string datasetsVirtPath = _configuration["VirtualFolderPaths:Datasets"];
-            string backendURL = _configuration["Addresses:Backend"];
+            string datasetsVirtPath = configuration["VirtualFolderPaths:Datasets"];
+            string backendURL = configuration["Addresses:Backend"];
             
             return $"{backendURL}/{datasetsVirtPath}/{userID}/{datasetID}/{filename}";
         }

@@ -14,11 +14,11 @@ import { TrainingService } from '../../services/training.service';
 export class HyperparametersComponent implements OnInit 
 {
   @Input() featuresLabel:any;
+  @Input() datasetId:any;
   
   loaderMiniDisplay:string = "none";
 
   constructor(private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
-  
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -65,15 +65,16 @@ export class HyperparametersComponent implements OnInit
   ngOnInit(): void 
   {
   }
-  
-  startTrainingObserver:any = {
+
+  beginTrainingObserver = {
     next: (response:any) => { 
-      console.log("dashboard > DashboardComponent > startTrainingObserver > next:")
+      console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver > next:")
       console.log(response)
-        
+      
+      this.loaderMiniDisplay = 'none'; // TODO 
     },
     error: (err: Error) => {
-      console.log("dashboard > DashboardComponent > startTrainingObserver > error:")
+      console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
       console.log(err)
     }
   };
@@ -91,24 +92,86 @@ export class HyperparametersComponent implements OnInit
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
-    this.trainingService.sendDataForTraining({
-      epochs: this.numberOfEpochs,
-      activationFunction: this.activationFunctionControl.value.codename,
-      features: this.featuresLabel['features'],
-      labels: this.featuresLabel['label'],
-      optimizer: this.optimizerFunctionControl.value.codename,
-      lossFunction: this.lossFunctionControl.value.codename,
-      testDataRatio: this.sliderValue/100,
-      learningRate: this.learningRate,
-      metrics: this.metricsArrayToSend
-    }).subscribe(this.startTrainingObserver);
-    // console.log("metric control "+ this.metricsControl.value[0].codename)
-    // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
-    // console.log("testDataRatio "+ this.sliderValue/100)
-    // console.log("metrics "+ this.metricsControl.value)
-    // console.log("lossFunction "+ this.lossFunctionControl.value.codename)
-    // console.log("metric array to send "+ this.metricsArrayToSend)
+    var trainingService=this.trainingService;
+    let connectionID = "";
 
+    
+    // izdvajanje naziva feature-a u poseban niz
+    var featuresStr = []
+    for (let index = 0; index < this.featuresLabel['features'].length; index++) {
+      const element = this.featuresLabel['features'][index];
+      featuresStr.push(element["name"]);
+    }
+      
+    // izdvajanje naziva feature-a u poseban niz
+    var lablesStr = []
+    for (let index = 0; index < this.featuresLabel['label'].length; index++) {
+      const element = this.featuresLabel['label'][index];
+      lablesStr.push(element["name"]);
+    }
+
+    var trainingRequestPayload = {
+      DatasetID             : this.datasetId,
+      ClientConnID          : connectionID,
+      ProblemType           : "regression",
+      Layers                : [// TODO hardcoded, ispraviti kada se doda vizuelizacija i izbor arhitekture
+        { 
+          index : 0,
+          units : 32,
+          weight_initializer  : "HeUniform",
+          activation_function : this.activationFunctionControl.value.codename,
+        },
+        { 
+          index : 1,
+          units : 8,
+          weight_initializer  : "HeUniform",
+          activation_function : this.activationFunctionControl.value.codename,
+        },
+        { 
+          index : 2,
+          units : 1,
+          weight_initializer  : "HeUniform",
+          activation_function : this.activationFunctionControl.value.codename,
+        }
+      ],
+      Features              : featuresStr,
+      Labels                : lablesStr,
+      Metrics               : this.metricsArrayToSend,
+      LossFunction          : this.lossFunctionControl.value.codename,
+      TestDatasetSize       : this.sliderValue / 100,
+      ValidationDatasetSize : 0.2, // TODO hardcoded, promeniti kada se implementira UI komponenta
+      Epochs                : this.numberOfEpochs,
+      Optimizer             : this.optimizerFunctionControl.value.codename,
+      LearningRate          : this.learningRate
+    }
+    let subject = new WebSocket('ws://localhost:7220'); // TODO promeniti zbog prod (izmestiti u env)
+
+    subject.onopen = function (evt){
+      console.log("Socket connection is established");
+    }
+    let _this = this
+    
+    subject.onmessage = function (evt) {
+      var dataArr = evt.data.split(" ", 2)
+
+      // proveri da li je rec o dodeli ID-a
+      if(dataArr[0] == "ConnID:") {
+        connectionID = dataArr[1];
+        trainingRequestPayload["ClientConnID"] = connectionID;
+        trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.beginTrainingObserver);
+        console.log(`My connection ID: ${connectionID}`);
+      }
+      else {
+        // TODO iskoristiti za vizuelizaciju
+        let epoch_stats = JSON.parse(evt.data)
+        console.log(epoch_stats);
+      }
+    }
+
+    //  subject.close(); //zatvara socket
+    subject.onclose = function(evt){
+      console.log("Connection is terminated");
+    }
   }
 }
 

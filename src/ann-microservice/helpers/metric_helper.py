@@ -33,8 +33,8 @@ class Metric(str, Enum):
     #RecallAtPrecision             = "RecallAtPrecision" required precision
     RootMeanSquaredError          = "RootMeanSquaredError"
     #SensitivityAtSpecificity      = "SensitivityAtSpecificity" required specificity
-    SparseCategoricalAccuracy     = "SparseCategoricalAccuracy"
-    SparseCategoricalCrossentropy = "SparseCategoricalCrossentropy"
+    #SparseCategoricalAccuracy     = "SparseCategoricalAccuracy"
+    #SparseCategoricalCrossentropy = "SparseCategoricalCrossentropy"
     #SparseTopKCategoricalAccuracy = "SparseTopKCategoricalAccuracy"
     #SpecificityAtSensitivity      = "SpecificityAtSensitivity" required sensitivity
     SquaredHinge                  = "SquaredHinge"
@@ -78,8 +78,8 @@ def map_metrics(metrics):
         #Metric.RecallAtPrecision             : tf.keras.metrics.RecallAtPrecision(), required precision
         Metric.RootMeanSquaredError          : tf.keras.metrics.RootMeanSquaredError(),
         #Metric.SensitivityAtSpecificity      : tf.keras.metrics.SensitivityAtSpecificity(), required specificity
-        Metric.SparseCategoricalAccuracy     : tf.keras.metrics.SparseCategoricalAccuracy(),
-        Metric.SparseCategoricalCrossentropy : tf.keras.metrics.SparseCategoricalCrossentropy(),
+        #Metric.SparseCategoricalAccuracy     : tf.keras.metrics.SparseCategoricalAccuracy(),
+        #Metric.SparseCategoricalCrossentropy : tf.keras.metrics.SparseCategoricalCrossentropy(),
         #Metric.SparseTopKCategoricalAccuracy : tf.keras.metrics.SparseTopKCategoricalAccuracy(),
         #Metric.SpecificityAtSensitivity      : tf.keras.metrics.SpecificityAtSensitivity(), required sensitivity
         Metric.SquaredHinge                  : tf.keras.metrics.SquaredHinge(),
