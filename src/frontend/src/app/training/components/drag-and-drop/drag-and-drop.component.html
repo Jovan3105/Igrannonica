@@ -3,10 +3,39 @@
 </div>
 
 <div cdkDrag class="card bg-light mb-3" style="max-width: 18rem;">
-    <div cdkDragHandle class="card-header">Header</div>
-    <div class="card-body">
-        <h5 class="card-title">Moze da se pomera samo kad se klikne na header
-        </h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    <div cdkDragHandle class="card-header align-items-end">
+        <button type=" button " class="btn-close " aria-label="Close ">
+        </button>
+    </div>
+    <div class="card-body ">
+        <h5>Units</h5>
+        <ngx-number-spinner name="units " [min]="0 ">
+        </ngx-number-spinner>
+        <br>
+        <div class="col-sm select">
+            <h5>Activation function</h5>
+            <mat-form-field class="mat-form" appearance="fill">
+                <mat-label><b>Favorite function</b></mat-label>
+                <mat-select name="activationFunctionControl">
+                    <mat-option>--</mat-option>
+                    <mat-option *ngFor="let item of timePeriods" [value]="item">
+                        {{item}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col-sm select">
+            <h5>Weight intializer</h5>
+            <mat-form-field class="mat-form" appearance="fill">
+                <mat-label><b>Favorite initializer</b></mat-label>
+                <mat-select name="weightInitializerControl">
+                    <mat-option>--</mat-option>
+                    <mat-option *ngFor="let item of timePeriods" [value]="item">
+                        {{item}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
     </div>
 </div>
