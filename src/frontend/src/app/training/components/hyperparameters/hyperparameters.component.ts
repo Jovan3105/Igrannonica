@@ -5,7 +5,6 @@ import { Options } from '@angular-slider/ngx-slider';
 import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 
-
 @Component({
   selector: 'app-hyperparameters',
   templateUrl: './hyperparameters.component.html',

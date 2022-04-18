@@ -1,0 +1,12 @@
+<div cdkDropList cdkDropListOrientation="horizontal" class="example-list" (cdkDropListDropped)="drop($event)">
+    <div class="example-box" *ngFor="let timePeriod of timePeriods" cdkDrag>{{timePeriod}}</div>
+</div>
+
+<div cdkDrag class="card bg-light mb-3" style="max-width: 18rem;">
+    <div cdkDragHandle class="card-header">Header</div>
+    <div class="card-body">
+        <h5 class="card-title">Moze da se pomera samo kad se klikne na header
+        </h5>
+        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    </div>
+</div>

@@ -43,7 +43,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     MatSelectModule,
     BrowserAnimationsModule,
     NgxSliderModule,
-    NgxMatSelectSearchModule,
+    NgxMatSelectSearchModule
   ],
   providers: [],
   bootstrap: [AppComponent],

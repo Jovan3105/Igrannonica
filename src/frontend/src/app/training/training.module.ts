@@ -19,7 +19,8 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { TrainingViewComponent } from './_training-view/training-view.component';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartComponent } from './components/chart/chart.component';
-
+import { DragAndDropComponent } from './components/drag-and-drop/drag-and-drop.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { ChartComponent } from './components/chart/chart.component';
     ShowTableComponent,
     HyperparametersComponent,
     TrainingViewComponent,
-    ChartComponent
+    ChartComponent,
+    DragAndDropComponent
   ],
   imports: [
     CommonModule,
@@ -41,7 +43,8 @@ import { ChartComponent } from './components/chart/chart.component';
     NgxMatSelectSearchModule,
     NgMultiSelectDropDownModule,
     MatIconModule,
-    NgChartsModule
+    NgChartsModule,
+    DragDropModule
   ],
   exports:[
     LabelsComponent,
