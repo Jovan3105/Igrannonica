@@ -13,6 +13,7 @@ export class UploadComponent implements OnInit {
   file?:File;
   datasetURL:string;
   isLoggedIn:boolean;
+  showDragAndDrop:boolean;
   @Output() linkEvent: EventEmitter<string>; //podizanje event-a kada se salje link
   @Output() uploadEvent: EventEmitter<File>; //podizanje event-a kada se salje file
 
@@ -21,6 +22,7 @@ export class UploadComponent implements OnInit {
     this.linkEvent = new EventEmitter<string>();
     this.uploadEvent = new EventEmitter<File>();
     this.isLoggedIn = this.authService.isLoggedIn();
+    this.showDragAndDrop = true;
    }
 
   ngOnInit(): void 
@@ -39,6 +41,7 @@ export class UploadComponent implements OnInit {
       this.file = fileList[0];
 
     }
+    this.showDragAndDrop = false;
   }
 
   onFileDropped(file:File)
@@ -54,5 +57,10 @@ export class UploadComponent implements OnInit {
   linkClick()
   {
     this.linkEvent.emit(this.datasetURL);
+  }
+  removeFile()
+  {
+    this.file = undefined;
+    this.showDragAndDrop = true;
   }
 }

@@ -11,36 +11,45 @@ h3
     margin:auto;
     border-radius: 10px;
 }
-.dropzone, .files-list{
+#div-upload
+{
+    margin:auto;
+    padding-top: 2%;
+    width: 80%;
+}
+.dropzone{
     padding: 2rem;
     border:dashed 1.5px #979797;
     margin:4px auto;
 }
 .dropzone{
-    width: 80%;
     position: relative;
     margin-bottom: 10px;
     text-align: center;
     
 }
 .files-list{
-    width: 40%;
-    height: fit-content;
+    padding: 2rem;
+    border:solid 1.5px #979797;
+    margin:4px auto;
+    border-radius: 10px;
 }
 
-#file-icon{
+.file-icon{
     border-radius: 20.5px;
     background-color:white;
     display: flex;
     justify-content: center;
 }
+.img-icon
+{
+    width: auto;
+}
 
-.delete-button{
+#delete-button{
     color:white;
     background-color: #db202f;
     border-radius: 10.5px;
-    width: 60%;
-    height: fit-content;
 }
 .file-input{
     opacity: 0;
