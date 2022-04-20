@@ -74,11 +74,11 @@ builder.Services.AddWebSocketServerConnectionManager();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 // TODO koristi se za prod
-builder.WebHost.ConfigureKestrel((context, serverOptions) =>
-    {
-        serverOptions.Listen(IPAddress.Any, 10079);
-    }
-);
+// builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+//     {
+//         serverOptions.Listen(IPAddress.Any, 10079);
+//     }
+// );
 
 var app = builder.Build();
 
