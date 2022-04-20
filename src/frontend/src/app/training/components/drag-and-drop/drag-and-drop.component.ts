@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Component, OnInit, Output, EventEmitter, Input, NgIterable } from '@angular/core';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-drag-and-drop',
   templateUrl: './drag-and-drop.component.html',
@@ -9,25 +9,25 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 export class DragAndDropComponent implements OnInit {
 
+  @Output() addLayerEvent = new EventEmitter();
+  @Output() dropLayerEvent = new EventEmitter();
+  @Output() removeLayerEvent = new EventEmitter();
+  @Input() layers!:any[];
+  @Input() activationFunctions!:any[];
+
   constructor() { }
-  layers= [
-    {"units":4,"af":"ReLu"},
-    {"units":7,"af":"ReLu"},
-    {"units":1,"af":"ReLu"}
-  ];
+  
 
   drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
+    this.dropLayerEvent.emit(event);
   }
 
   removeLayer(index:number){
-
-    this.layers.splice(index, 1);
-
+    this.removeLayerEvent.emit(index);
   }
 
   addLayer(){
-    this.layers.push({"units":1,"af":"ReLu"});
+    this.addLayerEvent.emit();
   }
 
   ngOnInit(): void {

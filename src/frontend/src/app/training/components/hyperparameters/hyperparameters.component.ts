@@ -4,6 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
 import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -64,6 +65,24 @@ export class HyperparametersComponent implements OnInit
   ngOnInit(): void 
   {
   }
+
+  layers= [
+    {"units":4,"af":"ReLu"},
+    {"units":2,"af":"ReLu"}
+  ];
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
+  }
+
+  removeLayer(index:number){
+    this.layers.splice(index, 1);
+  }
+  
+
+  addLayer(){
+    this.layers.push({"units":1,"af":"ReLu"});
+  }
   
   startTrainingObserver:any = {
     next: (response:any) => { 
@@ -99,7 +118,8 @@ export class HyperparametersComponent implements OnInit
       lossFunction: this.lossFunctionControl.value.codename,
       testDataRatio: this.sliderValue/100,
       learningRate: this.learningRate,
-      metrics: this.metricsArrayToSend
+      metrics: this.metricsArrayToSend,
+      layers: this.layers
     }).subscribe(this.startTrainingObserver);
     // console.log("metric control "+ this.metricsControl.value[0].codename)
     // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)

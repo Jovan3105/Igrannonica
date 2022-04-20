@@ -86,8 +86,9 @@
             </div>
         </div>
         <br>
-
-        <app-drag-and-drop></app-drag-and-drop>
+        <mat-label>Layers</mat-label>
+        <br><br>
+        <app-drag-and-drop [layers]="layers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
 
     </form>
 </div>
