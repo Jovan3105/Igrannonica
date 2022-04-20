@@ -40,8 +40,7 @@
                 (click)="onUndo()" 
                 [disabled]="undoDisabled" 
                 id="undoButton">Undo</button>&nbsp;
-                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>&nbsp;&nbsp;
-                
+                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>&nbsp;&nbsp;      
             </div>
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)"
@@ -62,12 +61,11 @@
             </app-show-table>
             <img [src]="corrMatrixSource" style="height: auto;width: 70%;">
         </div>
-        <div class="col-sm">
+        <div class="col-sm-3">
             <app-labels #Labels id="labelCards" [ngStyle]="{'visibility': labelsVisibility}" 
             (checkEvent)="changeColomnVisibility($event)" 
             (labelEvent)="onSelectedLabel($event)"></app-labels>
         </div>
-
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

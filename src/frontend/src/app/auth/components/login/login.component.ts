@@ -38,8 +38,6 @@ export class LoginComponent implements OnInit {
       }
     };
     this.authService.login(f.value).subscribe(loginObserver);
-    console.log(f.value);  // { first: '', last: '' }
-    console.log(f.valid);  // false
   }
 
 }

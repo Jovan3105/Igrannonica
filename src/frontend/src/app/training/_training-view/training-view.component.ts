@@ -8,6 +8,8 @@ import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
 import { ShowTableComponent } from '../components/show-table/show-table.component';
 import { webSocket } from "rxjs/webSocket";
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 
 @Component({
   selector: 'app-training-view',
@@ -41,12 +43,15 @@ export class TrainingViewComponent implements OnInit {
   loaderMiniDisplay:string = "none";
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
+  dialogTitle:string = "";
+  dialogMessage:string = "";
 
   constructor(
     private datasetService: DatasetService, 
     private headersService: HeadersService, 
     private trainingService: TrainingService, 
-    private domSanitizer: DomSanitizer
+    private domSanitizer: DomSanitizer,
+    public dialog: MatDialog
     ) {
     this.datasetId = -1;
     this.viewIndicator = View.PREVIEW;
@@ -295,8 +300,12 @@ export class TrainingViewComponent implements OnInit {
       }
       else
       {
-        console.log("Izlazi alert");
-        alert("Nisi izabrao izlaz!");
+        this.dialogTitle = "Alert";
+        this.dialogMessage = "You have to choose the label";
+
+        this.dialog.open(DialogComponent,{
+          data: { title: this.dialogTitle, message:this.dialogMessage },
+        });
       }
     }
   }
