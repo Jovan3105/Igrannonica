@@ -5,6 +5,7 @@ import { Options } from '@angular-slider/ngx-slider';
 import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -67,7 +68,25 @@ export class HyperparametersComponent implements OnInit
   {
   }
 
-  beginTrainingObserver = {
+  layers= [
+    {"units":4,"af":"ReLu"},
+    {"units":2,"af":"ReLu"}
+  ];
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
+  }
+
+  removeLayer(index:number){
+    this.layers.splice(index, 1);
+  }
+  
+
+  addLayer(){
+    this.layers.push({"units":1,"af":"ReLu"});
+  }
+  
+  startTrainingObserver:any = {
     next: (response:any) => { 
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver > next:")
       console.log(response)
@@ -95,6 +114,24 @@ export class HyperparametersComponent implements OnInit
     this.loaderMiniDisplay = "block";
     var trainingService=this.trainingService;
     let connectionID = "";
+    this.trainingService.sendDataForTraining({
+      epochs: this.numberOfEpochs,
+      activationFunction: this.activationFunctionControl.value.codename,
+      features: this.featuresLabel['features'],
+      labels: this.featuresLabel['label'],
+      optimizer: this.optimizerFunctionControl.value.codename,
+      lossFunction: this.lossFunctionControl.value.codename,
+      testDataRatio: this.sliderValue/100,
+      learningRate: this.learningRate,
+      metrics: this.metricsArrayToSend,
+      layers: this.layers
+    }).subscribe(this.startTrainingObserver);
+    // console.log("metric control "+ this.metricsControl.value[0].codename)
+    // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
+    // console.log("testDataRatio "+ this.sliderValue/100)
+    // console.log("metrics "+ this.metricsControl.value)
+    // console.log("lossFunction "+ this.lossFunctionControl.value.codename)
+    // console.log("metric array to send "+ this.metricsArrayToSend)
 
     
     // izdvajanje naziva feature-a u poseban niz
@@ -159,7 +196,7 @@ export class HyperparametersComponent implements OnInit
       if(dataArr[0] == "ConnID:") {
         connectionID = dataArr[1];
         trainingRequestPayload["ClientConnID"] = connectionID;
-        trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.beginTrainingObserver);
+        trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
       }
       else {

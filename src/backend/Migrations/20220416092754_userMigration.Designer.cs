@@ -12,7 +12,7 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20220330163157_userMigration")]
+    [Migration("20220416092754_userMigration")]
     partial class userMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -21,10 +21,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      builder =>
-                      {
-                          builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-                      });
+        builder =>
+        {
+            builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        });
 });
 
 ConfigurationManager configuration = builder.Configuration;
@@ -81,7 +81,6 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 // );
 
 var app = builder.Build();
-
 
 // Primena migracija u prilikom pokretanja //
 using (var scope = app.Services.CreateScope())
