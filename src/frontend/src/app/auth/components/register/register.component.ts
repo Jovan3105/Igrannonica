@@ -24,6 +24,7 @@ export class RegisterComponent implements OnInit {
   }
   onSubmit(f: NgForm) {
     
+    this.loaderDisplay = "block";
     if(f.controls['email'].value <= 320){
       console.log("Predugacak email");
       return;
@@ -37,14 +38,14 @@ export class RegisterComponent implements OnInit {
         //userOrEmail_AlreadyExists
         if(err['error'] instanceof ProgressEvent ){
           this.serverErrorDisplay = "block";
-          f.controls['username'].setValue(null)
-          f.controls['email'].setValue(null)
-          f.controls['password'].setValue(null)
-          f.controls['registerConfirmPassword'].setValue(null)
-          this.loaderDisplay = "none";
+          //f.controls['username'].setValue(null)
+          //f.controls['email'].setValue(null)
+          //f.controls['password'].setValue(null)
+          //f.controls['registerConfirmPassword'].setValue(null)
           setTimeout(() => {
-            this.serverErrorDisplay = "none";
-          }, 2000);
+            //this.serverErrorDisplay = "none";
+            this.loaderDisplay = "none";
+          }, 3000);
         }
         else{
           err['error']['data']['errors'].forEach( (item:any) => {
@@ -53,14 +54,14 @@ export class RegisterComponent implements OnInit {
               this.loaderDisplay = "none";
               setTimeout(() => {
                 this.usernameExistsDisplay = "none";
-              }, 2000);
+              }, 3000);
             }
             if(item['code'] == "email_AlreadyExists"){
               this.emailExistsDisplay = "block";
               this.loaderDisplay = "none";
               setTimeout(() => {
                 this.emailExistsDisplay = "none";
-              }, 2000);
+              }, 3000);
             }
           });
         }
@@ -69,8 +70,6 @@ export class RegisterComponent implements OnInit {
     };
     f.form.removeControl('registerConfirmPassword'); // izbacivanje registerConfirmPassword iz objekta forme
     this.authService.register(f.value).subscribe(registerObserver);
-    console.log(f.value);  // { first: '', last: '' }
-    console.log(f.valid);  // false
   }
   onPasswordChange(f: NgForm) {
     if(!f.controls['password'].hasError('required') && f.controls['password'].value == f.controls['registerConfirmPassword'].value){
