@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../shared/shared.module';
-import { MatIconModule } from '@angular/material/icon';
-import {MatDialogModule} from '@angular/material/dialog';
+
 
 import { TrainingRoutingModule } from './training-routing.module';
 import { LabelsComponent } from './components/labels/labels.component';
@@ -20,10 +19,12 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { TrainingViewComponent } from './_training-view/training-view.component';
 import { NgChartsModule } from 'ng2-charts';
-import {NgxFilesizeModule} from 'ngx-filesize';
+import { NgxFilesizeModule } from 'ngx-filesize';
 import { ChartComponent } from './components/chart/chart.component';
-import { UploadComponent } from './components/upload/upload.component';
 import { DragAndDropDirective } from './services/drag-and-drop.directive';
+import { StatsComponent } from './components/stats/stats.component';
+import { ModifyDatasetComponent } from './components/modify-dataset/modify-dataset.component';
+import { UploadComponent } from './components/upload/upload.component';
 import { DatasetInfoComponent } from './components/dataset-info/dataset-info.component';
 
 
@@ -36,7 +37,9 @@ import { DatasetInfoComponent } from './components/dataset-info/dataset-info.com
     ChartComponent,
     UploadComponent,
     DragAndDropDirective,
-    DatasetInfoComponent
+    DatasetInfoComponent,
+    StatsComponent,
+    ModifyDatasetComponent
   ],
   imports: [
     CommonModule,
@@ -49,7 +52,6 @@ import { DatasetInfoComponent } from './components/dataset-info/dataset-info.com
     NgxSliderModule,
     NgxMatSelectSearchModule,
     NgMultiSelectDropDownModule,
-    MatIconModule,
     NgChartsModule,
     MatTabsModule,
     NgxFilesizeModule
