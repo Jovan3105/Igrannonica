@@ -271,9 +271,8 @@ export class ShowTableComponent implements OnInit {
   }
 
   //Lock-uje kolonu koja je odabrana za label tako da ne moze da se hide-uje iz tabele
-  changeLabelColumn(data:{id:number,pred:number | null }){
-
-    console.log(data);
+  changeLabelColumn(data:{id:number,pred:number | null })
+  {
     if (data.pred != null)
     {
       this.columnDefs.forEach(element=>{
@@ -298,7 +297,6 @@ export class ShowTableComponent implements OnInit {
     }
 
     this.changeColomnVisibility(data.id.toString(),true);
-    console.log(this.columnDefs);
     this.gridApi.setColumnDefs(this.columnDefs);
   }
 }

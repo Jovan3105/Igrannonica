@@ -1,5 +1,6 @@
 import { Component, DoCheck, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
+import { User } from 'src/app/auth/models';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { JwtService } from 'src/app/core/services/jwt.service';
 import { UserService } from 'src/app/core/services/user.service';
@@ -11,11 +12,15 @@ import { UserService } from 'src/app/core/services/user.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-
-  constructor(public service: AuthService, public jwtService : JwtService, public userService: UserService) { }
-
-  user$!:Observable<any>;
+  
+  user:User | undefined;
+  user$:Observable<User>;
   displayLoginElement = false;
+
+  constructor(public service: AuthService, public jwtService : JwtService, public userService: UserService) 
+  {
+    this.user$ = new Observable<User>();
+  }
 
   ngOnInit(): void {
 
@@ -32,9 +37,18 @@ export class HeaderComponent implements OnInit {
         this.displayLoginElement = false;
         var decodedToken = this.jwtService.getDecodedAccessToken();
         var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
-        //console.log(this.service.getUser(id));
-    
+
       this.user$ = this.userService.getUser(id);
+
+      /*
+      .subscribe({
+        next: (response:any) => 
+        {
+          this.user = response;
+        }
+      }
+      
+     );*/
     }
     else this.displayLoginElement = true;
   }
