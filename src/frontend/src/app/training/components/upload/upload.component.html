@@ -21,9 +21,9 @@
                 <div class="col-sm-5 dropzone" *ngIf="showDragAndDrop" appDragAndDrop (fileDropped)="onFileDropped($event)">
                     <input type="file" accept=".csv" class="file-input" #fileDrop id="file-drop" (change)="fileHandler($event)">
                     <img src="assets/resources/icon-upload.svg" width="10%">
-                    <h5>Drag and drop file here</h5>
-                    <h5>or</h5>
-                    <h5 style="color:dodgerblue">click to upload</h5>
+                    <p>Drag and drop file here</p>
+                    <p>or</p>
+                    <p style="color:dodgerblue">click to upload</p>
                 </div>
                 <div class="col-sm-5 files-list" *ngIf="file">
                     <div class="row">

@@ -8,10 +8,13 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto" id="dugmici">
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/training']" routerLinkActive="active">Trening</a>
+            <a class="nav-link" [routerLink]="['/home']" routerLinkActive="active">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/training']" routerLinkActive="active">Training</a>
           </li> 
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/datasets']" routerLinkActive="active">Datasetovi</a>
+            <a class="nav-link" [routerLink]="['/datasets']" routerLinkActive="active">Datasets</a>
           </li>
         </ul>
         <ul class="navbar-nav navbar-right" *ngIf="displayLoginElement">
