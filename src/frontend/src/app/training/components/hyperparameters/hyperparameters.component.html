@@ -3,6 +3,16 @@
     <form #form>
         <br>
         <div class="row justify-content-center">
+            <div id="button" class="col-sm">
+                <button class="btn btn-primary btn-circle btn-sm" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || activationFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon>play_arrow</mat-icon></button>
+                <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
+                    <div class="miniLoader">
+                        <div class="miniLoader">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-sm select">
                 <h6>Activation function</h6>
                 <mat-form-field class="mat-form" appearance="fill">
@@ -76,21 +86,8 @@
             </div>
         </div>
         <br>
+
         <app-drag-and-drop></app-drag-and-drop>
-        <br>
-        <div id="button" style="display: inline-flex;">
-            <button class="btn btn-primary btn-circle btn-sm" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || activationFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon>play_arrow</mat-icon></button>
-            <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
-                <div class="miniLoader">
-                    <div class="miniLoader">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <br>
-
 
     </form>
 </div>
