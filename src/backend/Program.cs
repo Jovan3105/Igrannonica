@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
 using System.Net.WebSockets;
 using System.Text;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Net;
 
 var MyAllowSpecificOrigins = "MyAllowSpecificOrigins";
 
@@ -23,26 +25,21 @@ builder.Services.AddCors(options =>
                       {
                           builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                       });
-    
 });
 
 ConfigurationManager configuration = builder.Configuration;
-// Add services to the container.
-//builder.Services.AddSignalR();
+
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<UserContext>(options => {
     // User
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-     
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); 
 });
 
 builder.Services.AddDbContext<DatasetContext>(options => {
     // Dataset
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-
 });
-//builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<UserContext>().AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -76,8 +73,28 @@ builder.Services.AddWebSocketServerConnectionManager();
 // Email sender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
+// TODO koristi se za prod
+builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+    {
+        serverOptions.Listen(IPAddress.Any, 10079);
+    }
+);
+
 var app = builder.Build();
 
+
+// Primena migracija u prilikom pokretanja //
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<UserContext>();
+    db.Database.Migrate();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DatasetContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -99,7 +116,6 @@ app.UseStaticFiles(new StaticFileOptions()
     }
 });
 
-app.UseHttpsRedirection();
 var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(2)

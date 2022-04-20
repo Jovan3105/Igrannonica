@@ -54,7 +54,7 @@ def parse_dataset(
             skipinitialspace = True
             )
             
-        df = df.fillna('') # TODO proveriti
+        df = df.dropna() # TODO proveriti
 
         log('Parsing completed.')
 

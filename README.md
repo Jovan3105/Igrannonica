@@ -10,7 +10,7 @@ rad.
 Demo aplikacije se može pronaći na sledećem [linku](softeng.pmf.kg.ac.rs:10081).
 
 Korišćeni portovi:
-* [backend](softeng.pmf.kg.ac.rs:10080): 10080
+* [backend](softeng.pmf.kg.ac.rs:10080): 10079
 * [frontend](softeng.pmf.kg.ac.rs:10081): 10081
 * [mikroservis](softeng.pmf.kg.ac.rs:10082/docs): 10082
 * postgresSQL: 5432

@@ -4,7 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
 import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
-
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -17,6 +17,7 @@ export class HyperparametersComponent implements OnInit
   @Input() datasetId:any;
   
   loaderMiniDisplay:string = "none";
+  readonly backendSocketUrl = environment.backendSocketUrl;
 
   constructor(private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
 
@@ -144,7 +145,7 @@ export class HyperparametersComponent implements OnInit
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate
     }
-    let subject = new WebSocket('ws://localhost:7220'); // TODO promeniti zbog prod (izmestiti u env)
+    let subject = new WebSocket(this.backendSocketUrl); // TODO promeniti zbog prod (izmestiti u env)
 
     subject.onopen = function (evt){
       console.log("Socket connection is established");
