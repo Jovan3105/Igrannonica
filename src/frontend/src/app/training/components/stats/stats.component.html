@@ -1,0 +1,30 @@
+<div class="stats-container">
+    <mat-tab-group mat-align-tabs="center" animationDuration="0ms">
+        <mat-tab label="Basic Info">
+            <div class="tab-container">
+                <h4>Basic Info</h4>
+                <app-show-table #basicInfo></app-show-table>
+            </div>
+        </mat-tab>
+        <mat-tab label="Numerical Data">
+            <div class="tab-container">
+                <h4>Statistical Indicators for Numerical Data</h4>
+                <app-show-table #numIndicators></app-show-table>
+            </div>
+        </mat-tab>
+        <mat-tab label="Categorical Data">
+            <div  class="tab-container">
+                <h4>Statistical Indicators for Categorical Data</h4>
+                <app-show-table #catIndicators></app-show-table>
+            </div>
+        </mat-tab>
+        <mat-tab label="Correlation Matrix">
+            <div class="tab-container">
+                <h4>Correlation Matrix</h4>
+                <img [src]="corrMatrixSource" style="height: auto;width: 70%;">
+            </div>
+            
+        </mat-tab>
+      </mat-tab-group>
+</div>
+

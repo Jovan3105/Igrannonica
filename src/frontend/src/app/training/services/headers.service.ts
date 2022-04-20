@@ -26,16 +26,15 @@ export class HeadersService {
     return newHeader;
   }
 
-  getInfoHeader(data: Array<any>)
+  getInfoStatsHeader(data: Array<HeaderDict>)
   {
     var newHeader = new Array<HeaderDict>();
     var temp;
     //console.log(data);
     if (!data.length) return newHeader; 
-    if (data.length >= 1)
-      temp = Object.getOwnPropertyNames(data[0]);
-    else 
-      temp = Object.getOwnPropertyNames(data);
+    
+    temp = Object.getOwnPropertyNames(data[0]);
+  
     for (let i=0; i<temp.length; i++)
     {
       newHeader.push(new HeaderDict(i,temp[i]));
