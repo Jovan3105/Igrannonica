@@ -11,6 +11,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 export class UploadComponent implements OnInit {
 
   file?:File;
+  fileName?:string;
   datasetURL:string;
   isLoggedIn:boolean;
   showDragAndDrop:boolean;
@@ -52,11 +53,13 @@ export class UploadComponent implements OnInit {
   uploadClick()
   {
     this.uploadEvent.emit(this.file);
+    this.fileName = this.file?.name;
   }
   
   linkClick()
   {
     this.linkEvent.emit(this.datasetURL);
+    this.fileName = this.datasetURL.split("/").pop();
   }
   removeFile()
   {
