@@ -1,13 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { Check, ModifiedData, TableIndicator } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
-import { TrainingService } from '../services/training.service';
-import { DomSanitizer } from '@angular/platform-browser';
 import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
 import { ShowTableComponent } from '../components/show-table/show-table.component';
 import { webSocket } from "rxjs/webSocket";
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
+import { StatsComponent } from '../components/stats/stats.component';
+import { UploadComponent } from '../components/upload/upload.component';
 
 @Component({
   selector: 'app-training-view',
@@ -24,6 +25,8 @@ export class TrainingViewComponent implements OnInit {
   metricsArrayToSend: any[] = [];
   //visibilityTrigger: boolean = false;
 
+  viewIndicator:View;
+  uploadDisplay:string = "block";
   loaderDisplay:string = "none";
   containerVisibility:string = "hidden";
   nextButtonDisable:boolean = true;
@@ -32,31 +35,34 @@ export class TrainingViewComponent implements OnInit {
   datasetURL:string = "";
   statsTableDisplay:string = "none";
   deleteButtonDisplay:string = "inline";
-  labelsVisibility:string = "visible";
+  labelsDisplay:string = "block";
   mainTableDisplay:string = "block";
-  firstVisibility:string = "block";
-  secondVisibility:string = "none";
+  firstVisibility:string = "none";
+  secondDisplay:string = "none";
   loaderMiniDisplay:string = "none";
+  navButtonsDisplay:string = "block";
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
-  fileUploadDisable:boolean = false;
-  linkUploadDisable:boolean = false;
+  dialogTitle:string = "";
+  dialogMessage:string = "";
+  fileName?:string = "";
+  basicInfo:string = "";
 
   constructor(
     private datasetService: DatasetService, 
-    private headersService: HeadersService, 
-    private trainingService: TrainingService, 
-    private domSanitizer: DomSanitizer
+    private headersService: HeadersService,
+    public dialog: MatDialog
     ) {
     this.datasetId = -1;
+    this.viewIndicator = View.PREVIEW;
   }
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
+  @ViewChild('upload') private upload!:UploadComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
-  @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
   @ViewChild('dataSetInformation') private dataSetInformation!: ShowTableComponent;
-  @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
   @ViewChild('Labels') private labels!: LabelsComponent;
+  @ViewChild('Stats') private stats!:StatsComponent;
 
   public form: FormData = new FormData();
   
@@ -84,6 +90,7 @@ export class TrainingViewComponent implements OnInit {
       this.datasetId = response;
 
       this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+      this.fileName = this.upload.file?.name;
     },
     error: (err: Error) => {
       console.log("### error@uploadObserver")
@@ -101,11 +108,7 @@ export class TrainingViewComponent implements OnInit {
       this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], headerDataTable);
 
       this.labels.onDatasetSelected(headerDataTable);
-
-      this.dataSetInformation.setPaginationEnabled(false);
-      this.dataSetInformation.setTableStyle("height: 100px;");
-      var headerInfo = this.headersService.getInfoHeader([response['basicInfo']]);
-      this.dataSetInformation.prepareTable(TableIndicator.INFO, [response['basicInfo']], headerInfo) 
+      this.stats.showInfo([response['basicInfo']]);
       
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
@@ -119,17 +122,8 @@ export class TrainingViewComponent implements OnInit {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchStatsDataObserver > next:")
         //console.log(response)
-
-        var headerContinuous = this.headersService.getInfoHeader(response['continuous']);
-        this.numIndicators.setPaginationEnabled(false);
-        this.numIndicators.setTableStyle("height: 400px;");
-        this.numIndicators.prepareTable(TableIndicator.STATS, response['continuous'], headerContinuous) 
-
-        var headerCategorical = this.headersService.getInfoHeader(response['categorical']);
-        this.catIndicators.setPaginationEnabled(false);
-        this.catIndicators.setTableStyle("height: 250px;");
-        this.catIndicators.prepareTable(TableIndicator.STATS, response['categorical'], headerCategorical) 
-        
+        this.stats.showTables(response);
+   
     },
     error: (err: Error) => {
       console.log("dashboard > DashboardComponent > fetchStatsDataObserver > error:")
@@ -140,8 +134,9 @@ export class TrainingViewComponent implements OnInit {
   fetchCorrMatrixObserver:any = {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > next:")
+        this.stats.showMatrix(response);
         //console.log(response)
-        this.corrMatrixSource = this.domSanitizer.bypassSecurityTrustUrl(response);
+        
     },
     error: (err: Error) => {
       console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > error:")
@@ -154,30 +149,40 @@ export class TrainingViewComponent implements OnInit {
 
   hideElements()
   {
+    this.viewIndicator = View.PREVIEW;
+    this.uploadDisplay = "none";
+    this.firstVisibility = "none";
     this.loaderDisplay = "block";
     this.containerVisibility = "hidden";
-    this.labelsVisibility = "hidden";
+    this.labelsDisplay = "none";
+    this.navButtonsDisplay = "none";
     this.nextButtonDisable = true;
   }
 
   showElements()
   {
+    this.firstVisibility = "block";
     this.loaderDisplay = "none";
     this.containerVisibility = "visible";
-    this.labelsVisibility = "visible";
+    this.labelsDisplay = "block";
+    this.navButtonsDisplay = "block";
     this.nextButtonDisable = false;
+    this.backButtonDisable = false;
   }
 
-  onFileSelected(event:Event)
+  onFileSelected(file:File)
   {
     this.hideElements();
 
     if (this.form.get('file')) this.form.delete('file');
 
-    const element = event.currentTarget as HTMLInputElement;
-    let fileList: FileList | null = element.files;
-
-
+    //const element = event.currentTarget as HTMLInputElement;
+    //let fileList: FileList | null = element.files;
+    
+    this.form.append('file', file);
+      this.datasetService.uploadDatasetFile(this.form)
+        .subscribe(this.uploadObserver);
+    /*
     if (fileList && fileList?.length > 0) {
 
       var file = fileList[0];
@@ -185,19 +190,19 @@ export class TrainingViewComponent implements OnInit {
       this.form.append('file', file);
       this.datasetService.uploadDatasetFile(this.form)
         .subscribe(this.uploadObserver);
-    }
+    }*/
   }
 
-  onShowDataClick() {
+  onShowDataClick(datasetURL:string) {
 
     this.hideElements();
 
-    if (this.datasetURL == null || this.datasetURL == "")
+    if (datasetURL == null || datasetURL == "")
       console.log("problem: dataset-url");
     else {
-      this.req["datasetSource"] = this.datasetURL
+      this.req["datasetSource"] = datasetURL
   
-      this.datasetService.uploadDatasetFileWithLink(this.datasetURL).subscribe(this.uploadObserver);
+      this.datasetService.uploadDatasetFileWithLink(datasetURL).subscribe(this.uploadObserver);
     }
   }
 
@@ -249,46 +254,69 @@ export class TrainingViewComponent implements OnInit {
       event.currentTarget.innerHTML = "Show table";
       this.statsTableDisplay = "block";
       this.deleteButtonDisplay = "none";
-      this.labelsVisibility = "hidden";
+      this.labelsDisplay = "none";
       this.mainTableDisplay = "none";
-      this.fileUploadDisable = this.linkUploadDisable = true;
     }
     else
     {
       event.currentTarget.innerHTML = "Show stats"
       this.statsTableDisplay = "none";
       this.deleteButtonDisplay = "inline";
-      this.labelsVisibility = "visible";
+      this.labelsDisplay = "block";
       this.mainTableDisplay = "block";
-      this.fileUploadDisable = this.linkUploadDisable  = false;
     }
     this.toggledButton = !this.toggledButton
   }
 
 
   OnNextClick() {
-
-    var temp = this.labels.getValues(); // Cuva se objekat sa odabranim feature-ima i labelom
-
-    if (temp!.label.length > 0){
-      this.featuresLabel = temp;
-      console.log(this.featuresLabel);
-      //Pokreni modal
-      this.firstVisibility = "none";
-      this.secondVisibility = "block";
-      this.backButtonDisable = false;
-      
+    if (this.viewIndicator == View.UPLOAD)
+    {
+        this.uploadDisplay = "none";
+        this.firstVisibility = "block";
+        this.viewIndicator = View.PREVIEW;
+        this.backButtonDisable = false;
     }
-    else{
-      alert("Nisi izabrao izlaz!");
-    }
+    else if (this.viewIndicator == View.PREVIEW)
+    {
+      var temp = this.labels.getValues(); // Cuva se objekat sa odabranim feature-ima i labelom
+      console.log(temp);
+      if (temp!.label!.length > 0){
+        this.featuresLabel = temp;
+        console.log(this.featuresLabel);
+        //Pokreni modal
+        this.firstVisibility = "none";
+        this.secondDisplay = "block";
+        this.viewIndicator = View.TRAINING;
+        
+      }
+      else
+      {
+        this.dialogTitle = "Alert";
+        this.dialogMessage = "You have to choose the label";
 
+        this.dialog.open(DialogComponent,{
+          data: { title: this.dialogTitle, message:this.dialogMessage },
+        });
+      }
+    }
   }
 
   OnBackClick(){
-    this.firstVisibility = "block";
-    this.secondVisibility = "none";
-    this.backButtonDisable = true;
+    if (this.viewIndicator == View.PREVIEW)
+    {
+      this.firstVisibility = "none";
+      this.uploadDisplay = "block";
+      this.backButtonDisable = true;
+      this.viewIndicator = View.UPLOAD;
+    }
+    else if(this.viewIndicator == View.TRAINING)
+    {
+      this.secondDisplay = "none";
+      this.firstVisibility = "block";
+      this.viewIndicator = View.PREVIEW;
+    }
+    
   }
 
   onSaveClick()
@@ -308,4 +336,10 @@ export class TrainingViewComponent implements OnInit {
   {
     this.dataTable.changeLabelColumn(data);
   }
+}
+
+enum View {
+  UPLOAD,
+  PREVIEW,
+  TRAINING
 }

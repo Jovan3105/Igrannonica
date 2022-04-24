@@ -34,6 +34,7 @@
     "jwt-decode": "^3.1.2",
     "ng-multiselect-dropdown": "^0.3.8",
     "ng2-charts": "^3.0.9",
+    "ngx-filesize": "^2.0.16",
     "ngx-mat-select-search": "^4.0.2",
     "ngx-number-spinner": "^2.2.1",
     "ngx-papaparse": "^5.0.0",

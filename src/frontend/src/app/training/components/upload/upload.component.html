@@ -1,0 +1,56 @@
+<h3>Choose dataset</h3>
+<div class="dataset-container">
+    <mat-tab-group mat-align-tabs="center" animationDuration="0ms">
+        <mat-tab label="Public dataset">
+            <div class="dropzone">
+                We are working on it!
+            </div>
+        </mat-tab>
+        <mat-tab label="Link">
+            <div class="mx-auto" style="width: 80%;">
+                <h5>Dataset URL</h5>
+                <input type="text" class="form-control" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
+                <app-dataset-info></app-dataset-info>
+            </div>
+            <div style="text-align: end;">
+                <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
+            </div>
+        </mat-tab>
+        <mat-tab label="Upload">
+            <div id="div-upload" class="row">
+                <div class="col-sm-5 dropzone" *ngIf="showDragAndDrop" appDragAndDrop (fileDropped)="onFileDropped($event)">
+                    <input type="file" accept=".csv" class="file-input" #fileDrop id="file-drop" (change)="fileHandler($event)">
+                    <img src="assets/resources/icon-upload.svg" width="10%">
+                    <p>Drag and drop file here</p>
+                    <p>or</p>
+                    <p style="color:dodgerblue">click to upload</p>
+                </div>
+                <div class="col-sm-5 files-list" *ngIf="file">
+                    <div class="row">
+                        <div class="col-sm-2 file-icon">
+                            <img class="img-icon" src="assets/resources/file-icon.svg" alt="file">
+                        </div>
+                        <div class="col-sm-8" id="info">
+                            <p class="file-name" style="font-weight: bold;">{{file.name}}</p>
+                            <p class="file-size" style="color: #38424c;">{{file.size | filesize}}</p>    
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btn-primary" id="delete-button" (click)="removeFile()"><mat-icon>delete</mat-icon></button>
+                        </div>    
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <app-dataset-info></app-dataset-info>
+                </div>
+            </div>
+            <div style="text-align: end;">
+                <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
+            </div>
+        </mat-tab>
+        <mat-tab label="Private dataset">
+            <div class="dropzone">
+                We are working on it!
+            </div>
+        </mat-tab>
+      </mat-tab-group>
+</div>

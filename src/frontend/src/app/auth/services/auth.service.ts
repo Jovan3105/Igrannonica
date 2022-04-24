@@ -69,13 +69,12 @@ export class AuthService {
   }
 
   register(model: any){
-    var circle = document.getElementById('circle')
-    console.log(model);
+
     let headers = new HttpHeaders({
       'confirmEmailUrl': this.confirmEmailUrl
     });
     let options = {headers: headers};   
-    circle!.style.display = "block";
+
     return this.http.post(this.registerUrl, model, options).pipe(
       map((response:any) => {
         if(response.success){
@@ -83,9 +82,7 @@ export class AuthService {
           var forma = document.getElementById('blok');
           var uspesnaRegistracijaMessage = document.getElementById('uspesnaRegistracijaMessage')
           forma!.style.display = "none";
-          circle!.style.display = "block";
-            
-          circle!.style.display = "none";
+
           
           uspesnaRegistracijaMessage!.style.display = "block";
           var hide_button = () => {
@@ -93,7 +90,7 @@ export class AuthService {
               const user = response;
               uspesnaRegistracijaMessage.style.display = "none";
               //this.doLoginUser(user.username,user.data.token);
-              this.router.navigateByUrl('/');
+              this.router.navigateByUrl('/login');
             }
             
           }
