@@ -1,5 +1,11 @@
-<h1 mat-dialog-title>Modify 'Title' dataset</h1>
+<h1 mat-dialog-title>Modify '{{ title }}' dataset</h1>
 <div mat-dialog-content>
+  <button type="button" class="btn btn-danger" 
+  id="deleteButton">Delete selected</button>&nbsp;
+  <button type="button" class="btn btn-secondary" 
+  id="undoButton">Undo</button>&nbsp;
+  <button id="updateMainTable" type="button" class="btn btn-primary">Apply Changes</button>&nbsp;
+  <app-show-table #modifyTable></app-show-table>
 </div>
 <div mat-dialog-actions align="end">
   <button mat-button mat-dialog-close [mat-dialog-close]="true">Cancel</button>

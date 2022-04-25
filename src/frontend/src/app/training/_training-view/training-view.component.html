@@ -26,7 +26,7 @@
         <h4>{{fileName}}</h4>
         <button type="button" class="btn btn-secondary" 
         (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
-        <button id="modify-table" type="button" class="btn btn-primary">Modify dataset</button>
+        <button id="modify-table" type="button" class="btn btn-primary" (click)="openModifyDialog()">Modify dataset</button>
     </div>
     
     <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility, 'text-align':'center'}">

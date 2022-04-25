@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Check, ModifiedData, TableIndicator } from '../models/table_models';
+import { Check, HeaderDict, ModifiedData, TableIndicator } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
 import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
 import { ShowTableComponent } from '../components/show-table/show-table.component';
-import { webSocket } from "rxjs/webSocket";
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
+import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
 
 @Component({
   selector: 'app-training-view',
@@ -48,6 +48,8 @@ export class TrainingViewComponent implements OnInit {
   fileName?:string = "";
   basicInfo:string = "";
 
+  headerDataTable:HeaderDict[];
+
   constructor(
     private datasetService: DatasetService, 
     private headersService: HeadersService,
@@ -55,6 +57,7 @@ export class TrainingViewComponent implements OnInit {
     ) {
     this.datasetId = -1;
     this.viewIndicator = View.PREVIEW;
+    this.headerDataTable = [];
   }
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
@@ -104,10 +107,10 @@ export class TrainingViewComponent implements OnInit {
 
       //console.log(response)
       
-      var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
-      this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], headerDataTable);
+      this.headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
+      this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], this.headerDataTable);
 
-      this.labels.onDatasetSelected(headerDataTable);
+      this.labels.onDatasetSelected(this.headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
       
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
@@ -318,7 +321,12 @@ export class TrainingViewComponent implements OnInit {
     }
     
   }
-
+  openModifyDialog(){
+    
+    this.dialog.open(ModifyDatasetComponent,{
+      data: { title: this.fileName, table_data: this.dataTable.data, header: this.dataTable.headers },
+    });
+  }
   onSaveClick()
   {
 

@@ -26,8 +26,8 @@ export class ShowTableComponent implements OnInit {
   @Output() undoEvent; //event koji se dize kada treba dis/enable undo dugme
   @Output() deleteEvent; //event koji se dize kada treba dis/enable undo deleted dugme
 
-  columnDefs: ColDef[] = [];
-  rowData: any = [];
+  columnDefs: ColDef[];
+  rowData: any;
   public rowSelection;
   public paginationPageSize;
   tableStyle:string;
@@ -80,8 +80,8 @@ export class ShowTableComponent implements OnInit {
     this.indicator = indicator;
     this.headers = headers;
 
-    this.columnDefs = [];
-    this.rowData = [];
+    //this.columnDefs = [];
+    //this.rowData = [];
 
     if(this.indicator == TableIndicator.DATA_MANIPULATION)
     {
