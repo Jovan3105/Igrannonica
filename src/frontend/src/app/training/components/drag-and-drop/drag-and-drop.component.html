@@ -1,38 +1,36 @@
 <div cdkDropList cdkDropListOrientation="horizontal" class="example-list" (cdkDropListDropped)="drop($event)">
-    <div style="min-width: 250px;" class="card bg-light mb-3" *ngFor="let layer of layers; let i=index" cdkDrag>
+    <div style="width: 130px;min-width: 130px;" class="card bg-light mb-3" *ngFor="let layer of layers; let i=index" cdkDrag>
         <div cdkDragHandle class="card-header d-flex justify-content-end">
             <button type=" button " class="btn-close " aria-label="Close " (click)="removeLayer(i)">
             </button>
         </div>
-        <div class="card-body ">
-            <h5>Units</h5>
-            <ngx-number-spinner name="units" [value]="layer.units" [min]="1">
-            </ngx-number-spinner>
-            <br>
-            <div class="select">
-                <h5>Activation function</h5>
-                <mat-form-field class="mat-form" appearance="fill">
-                    <mat-label><b>Favorite function</b></mat-label>
-                    <mat-select name="activationFunctionControl">
-                        <mat-option *ngFor="let item of activationFunctions" [value]="item">
-                            {{item.name}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+        <div class="card-body">
+            <div class="row justify-content-center">
+                <h6>Number of neurons</h6>
+                <input type="number" name="units" class="form-control" [value]="layer.units" [min]="1">
             </div>
-            <div class="select">
-                <h5>Weight intializer</h5>
-                <mat-form-field class="mat-form" appearance="fill">
-                    <mat-label><b>Favorite initializer</b></mat-label>
-                    <mat-select name="weightInitializerControl">
-                        <mat-option>--</mat-option>
-                    </mat-select>
-                </mat-form-field>
+            <div class="row justify-content-center">
+                <h6>Activation function</h6>
+                <select class=" form-select " aria-label="Default select example ">
+                    <option selected>Open this select menu</option>
+                    <option value="1 ">One</option>
+                    <option value="2 ">Two</option>
+                    <option value="3 ">Three</option>
+                  </select>
+            </div>
+            <div class="row justify-content-center">
+                <h6>Weight intializer</h6>
+                <select class=" form-select " aria-label="Default select example ">
+                    <option selected>Open this select menu</option>
+                    <option value="1 ">One</option>
+                    <option value="2 ">Two</option>
+                    <option value="3 ">Three</option>
+                  </select>
             </div>
 
         </div>
     </div>
 
-    <button class="btn btn-primary btn-circle btn-sm" type="button" (click)="addLayer()"><mat-icon>add</mat-icon></button>
+    <button class="btn btn-primary btn-circle btn-sm " type="button " (click)="addLayer() "><mat-icon>add</mat-icon></button>
 
 </div>

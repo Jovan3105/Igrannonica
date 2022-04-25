@@ -3,89 +3,89 @@
     <form #form>
         <br>
         <div class="row justify-content-center">
-            <div id="button" class="col-sm">
-                <button class="btn btn-primary btn-circle btn-sm" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || activationFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon>play_arrow</mat-icon></button>
-                <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
-                    <div class="miniLoader">
+            <div id="button" class="col-md-2 col-sm-12">
+                <div class="row">
+                    <button class="btn btn-primary col-md-12 round-circle btn-lg" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || activationFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon>play_arrow</mat-icon></button>
+                    <div id="miniCircle" [ngStyle]="{'display': loaderMiniDisplay}">
                         <div class="miniLoader">
+                            <div class="miniLoader">
 
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="row justify-content-center">
+                    <h3>Epoch: 000,000,000</h3>
+                </div>
             </div>
-            <div class="col-sm select">
-                <h6>Activation function</h6>
-                <mat-form-field class="mat-form" appearance="fill">
-                    <mat-label><b>Favorite function</b></mat-label>
-                    <mat-select [formControl]="activationFunctionControl" name="activationFunctionControl">
-                        <mat-option *ngFor="let item of activationFunctions" [value]="item">
-                            {{item.name}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="activationFunctionControl.hasError('required')">Please choose a activation function</mat-error>
-                    <mat-hint>{{activationFunctionControl.value.info}}</mat-hint>
-                </mat-form-field>
-            </div>
-            <div class="col-sm select">
-                <h6>Optimizer</h6>
-                <mat-form-field class="mat-form" appearance="fill">
-                    <mat-label><b>Favorite optimizer</b></mat-label>
-                    <mat-select [formControl]="optimizerFunctionControl" name="optimizerFunctionControl">
-                        <mat-option *ngFor="let item of optimizerFunctions" [value]="item">
-                            {{item.name}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="optimizerFunctionControl.hasError('required')">Please choose an optimizer</mat-error>
-                    <mat-hint>{{optimizerFunctionControl.value.info}}</mat-hint>
-                </mat-form-field>
-            </div>
-            <div class="col-sm select">
-                <h6>Loss function</h6>
-                <mat-form-field class="mat-form" appearance="fill">
-                    <mat-label><b>Favorite loss fun.</b></mat-label>
-                    <mat-select [formControl]="lossFunctionControl" name="lossFunctionControl">
-                        <mat-option *ngFor="let item of lossFunctions" [value]="item">
-                            {{item.name}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="lossFunctionControl.hasError('required')">Please choose a loss function</mat-error>
-                    <mat-hint>{{lossFunctionControl.value.info}}</mat-hint>
-                </mat-form-field>
-            </div>
-            <div class="col-sm ">
-                <h6>Metrics</h6>
-                <mat-form-field class="mat-form" appearance="fill">
-                    <mat-label><b>Favorite function</b></mat-label>
-                    <mat-select [formControl]="metricsControl" name="metricsControl" multiple>
-                        <mat-option *ngFor="let item of metrics" [value]="item">
-                            {{item.name}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="metricsControl.hasError('required')">Please choose some metrics</mat-error>
-                    <mat-hint>{{metricsControl.value.info}}</mat-hint>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-sm select">
-                <h6>Test data ratio</h6>
-                <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
-            </div>
-            <div class="col-sm-2">
-                <h6>Number of epochs</h6>
-                <ngx-number-spinner name="epochs" [value]="numberOfEpochs" (change)="changeEpoch($event)" [min]="0">
-                </ngx-number-spinner>
-            </div>
-            <div class="col-sm-2">
-                <h6>Learning rate</h6>
-                <ngx-number-spinner name="rate" [value]="learningRate" (change)="changeRate($event)" [min]="0.1" [step]="0.1">
-                </ngx-number-spinner>
+            <div class="col-md-10 col-sm-12">
+                <div class="row">
+                    <div class="col-md-3 col-sm-12 select">
+                        <h5>Optimizer</h5>
+                        <mat-form-field class="mat-form" appearance="fill">
+                            <mat-select [formControl]="optimizerFunctionControl" name="optimizerFunctionControl">
+                                <mat-option *ngFor="let item of optimizerFunctions" [value]="item">
+                                    {{item.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="optimizerFunctionControl.hasError('required')">Please choose an optimizer</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12 select">
+                        <h5>Loss function</h5>
+                        <mat-form-field class="mat-form" appearance="fill">
+                            <mat-select [formControl]="lossFunctionControl" name="lossFunctionControl">
+                                <mat-option *ngFor="let item of lossFunctions" [value]="item">
+                                    {{item.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="lossFunctionControl.hasError('required')">Please choose a loss function</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12 select">
+                        <h5>Problem type</h5>
+                        <mat-form-field class="mat-form" appearance="fill">
+                            <mat-select [formControl]="lossFunctionControl" name="lossFunctionControl">
+                                <mat-option *ngFor="let item of lossFunctions" [value]="item">
+                                    {{item.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="lossFunctionControl.hasError('required')">Please choose a problem type</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-3 col-sm-12 select">
+                        <h5>Metrics</h5>
+                        <mat-form-field class="mat-form" appearance="fill">
+                            <mat-select [formControl]="metricsControl" name="metricsControl" multiple>
+                                <mat-option *ngFor="let item of metrics" [value]="item">
+                                    {{item.name}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="metricsControl.hasError('required')">Please choose some metrics</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
             </div>
         </div>
         <br>
-        <mat-label>Layers</mat-label>
-        <br><br>
-        <app-drag-and-drop [layers]="layers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
-
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-sm-12 select">
+                <h5>Ratio of training to set data</h5>
+                <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
+            </div>
+            <div class="col-md-2">
+                <h5>Number of epochs</h5>
+                <input type="number" class="form-control" name="epochs" [value]="numberOfEpochs" [min]="0">
+            </div>
+            <div class="col-md-2 col-sm-12">
+                <h5>Learning rate</h5>
+                <input type="number" class="form-control" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
+            </div>
+        </div>
+        <br>
+        <div class="row justify-content-center">
+            <mat-label>Layers</mat-label>
+            <app-drag-and-drop [layers]="layers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
+        </div>
     </form>
 </div>

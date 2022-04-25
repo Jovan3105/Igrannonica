@@ -33,7 +33,7 @@ export class HyperparametersComponent implements OnInit
   metricsControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
 
-  numberOfEpochs: number = 4;
+  numberOfEpochs: number = 1000;
   learningRate: number = 0.1;
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
