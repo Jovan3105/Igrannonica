@@ -13,6 +13,8 @@ using System.Net.WebSockets;
 using System.Text;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Net;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 var MyAllowSpecificOrigins = "MyAllowSpecificOrigins";
 
@@ -79,20 +81,25 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 //         serverOptions.Listen(IPAddress.Any, 10079);
 //     }
 // );
-
 var app = builder.Build();
+
+
 
 // Primena migracija u prilikom pokretanja //
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<UserContext>();
-    db.Database.Migrate();
+
+    if (!(db.Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).Exists())
+        db.Database.Migrate();
 }
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DatasetContext>();
-    db.Database.Migrate();
+
+    if(! (db.Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).Exists())
+        db.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline.
