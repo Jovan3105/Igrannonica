@@ -27,7 +27,7 @@ export class HyperparametersComponent implements OnInit
   lossFunctions: Hyperparameter[] = Constants.LOSS_FUNCTIONS;
   metrics: Hyperparameter[] = Constants.METRICS;
 
-  activationFunctionControl = new FormControl('', Validators.required);
+  //activationFunctionControl = new FormControl('', Validators.required);
   optimizerFunctionControl = new FormControl('', Validators.required);
   lossFunctionControl = new FormControl('', Validators.required);
   metricsControl = new FormControl('', Validators.required);
@@ -116,7 +116,7 @@ export class HyperparametersComponent implements OnInit
     let connectionID = "";
     this.trainingService.sendDataForTraining({
       epochs: this.numberOfEpochs,
-      activationFunction: this.activationFunctionControl.value.codename,
+      //activationFunction: this.activationFunctionControl.value.codename,
       features: this.featuresLabel['features'],
       labels: this.featuresLabel['label'],
       optimizer: this.optimizerFunctionControl.value.codename,
@@ -157,19 +157,19 @@ export class HyperparametersComponent implements OnInit
           index : 0,
           units : 32,
           weight_initializer  : "HeUniform",
-          activation_function : this.activationFunctionControl.value.codename,
+          activation_function : "ReLu",
         },
         { 
           index : 1,
           units : 8,
           weight_initializer  : "HeUniform",
-          activation_function : this.activationFunctionControl.value.codename,
+          activation_function : "ReLu",
         },
         { 
           index : 2,
           units : 1,
           weight_initializer  : "HeUniform",
-          activation_function : this.activationFunctionControl.value.codename,
+          activation_function : "ReLu",
         }
       ],
       Features              : featuresStr,
