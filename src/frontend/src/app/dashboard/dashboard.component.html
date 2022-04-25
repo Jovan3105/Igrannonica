@@ -20,22 +20,27 @@
         Page Three
     </div>
 </div> -->
+<script src="src\assets\js\particles.js"></script>
 <html style="overflow-x: inherit;">
 
     <body>
 
-
-        <header class="w3-container w3-red w3-center" style="padding:128px 16px">
-        <h1 class="w3-margin w3-jumbo">WELCOME</h1>
-        <p class="w3-xlarge">Start</p>
-        <div class="sonar-wrapper w3-padding-large w3-large w3-margin-top">
-            <div class="sonar-emitter" [routerLink]="['/training']"> 
-                <i class="bi bi-arrow-right-circle"></i>
-                <div class="sonar-wave"></div>
-                
-            </div>
+        <div class="row">
+            <canvas id=c class="col-md-12 col-sm-12">
+                <div style="z-index: -1;">
+                    <h1 class="w3-margin w3-jumbo">WELCOME</h1>
+                    <p class="w3-xlarge">Start</p>
+                    <div class="sonar-wrapper w3-padding-large w3-large w3-margin-top">
+                        <div class="sonar-emitter" [routerLink]="['/training']"> 
+                            <i class="bi bi-arrow-right-circle"></i>
+                            <div class="sonar-wave"></div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </canvas> 
         </div>
-        </header>
+        
 
         <div class="w3-row-padding w3-padding-64 w3-container">
         <div class="w3-content">
