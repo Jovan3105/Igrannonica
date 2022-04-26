@@ -84,8 +84,22 @@ namespace backend.Controllers
         public async Task<ActionResult<string>> uploadWithLink(String url)
         { // TODO dodati user id u request
             var microserviceURL = _microserviceBaseURL + "/data-preparation/parse";
-            var response = await _client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", url));
-            var responseString = await response.Content.ReadAsStringAsync();
+
+            string responseString = null;
+            
+            try
+             {
+                var response = await _client.GetAsync(string.Format(microserviceURL + "?dataset_source={0}", url));
+                response.EnsureSuccessStatusCode();
+                responseString = await response.Content.ReadAsStringAsync();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");	
+                Console.WriteLine("Message :{0} ", e.Message);
+
+                return BadRequest(new ResponseToRequest(false, "TODO", "Provided input is not a valid link!", "link_Invalid"));
+            }
 
             Dataset dataset = new Dataset();
             dataset.UserID = 0; // TODO privremeno
@@ -132,9 +146,21 @@ namespace backend.Controllers
             multipartFormContent.Add(fileStreamContent, name: "dataset_source", fileName: file.FileName);
 
             var url = _microserviceBaseURL + "/data-preparation/parse-file";
-            var response = await _client.PostAsync(url, multipartFormContent);
 
-            var responseString = await response.Content.ReadAsStringAsync();
+            string responseString = null;
+            try 
+            {
+                var response = await _client.PostAsync(url, multipartFormContent);
+                response.EnsureSuccessStatusCode();
+                responseString = await response.Content.ReadAsStringAsync();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");	
+                Console.WriteLine("Message :{0} ", e.Message);
+
+                return BadRequest(new ResponseToRequest(false, "TODO", "An error occured while uploading a file", "fileUpload_UnknownError"));
+            }
 
             // Sacuvaj parsirane podatke u bazu i na fs //
 
@@ -167,8 +193,22 @@ namespace backend.Controllers
             
             var url = _microserviceBaseURL + "/dataset/stat-indicators";
             var donwloadUrl = CreateDatasetURL(_configuration, dataset.UserID, datasetId, dataset.FileName);
-            var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
-            var responseString = await response.Content.ReadAsStringAsync();
+            
+            string responseString = null;
+
+            try
+            {
+                var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
+                response.EnsureSuccessStatusCode();
+                responseString = await response.Content.ReadAsStringAsync();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");	
+                Console.WriteLine("Message :{0} ", e.Message);
+
+                return BadRequest(new ResponseToRequest(false, "TODO", "An error occured while fetching statistical indicators", "stats_UnknownError"));
+            }
 
             return Ok(responseString);
         }
@@ -182,8 +222,21 @@ namespace backend.Controllers
             var url = _microserviceBaseURL + "/dataset/corr-matrix";
             var donwloadUrl = CreateDatasetURL(_configuration, dataset.UserID, datasetId, dataset.FileName);
 
-            var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
-            var responseString = await response.Content.ReadAsStringAsync();
+            string responseString = null;
+
+            try 
+            {
+                var response = await _client.GetAsync($"{url}?stored_dataset={donwloadUrl}");
+                response.EnsureSuccessStatusCode();
+                responseString = await response.Content.ReadAsStringAsync();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");	
+                Console.WriteLine("Message :{0} ", e.Message);
+
+                return BadRequest(new ResponseToRequest(false, "TODO", "An error occured while fetching correlation matrix", "corrMat_UnknownError"));
+            }
 
             return Ok(responseString);
         }
@@ -218,20 +271,25 @@ namespace backend.Controllers
 
                 string url = CreateDatasetURL(_configuration, dataset.UserID, dataset.Id, dataset.FileName);
   
-                var response = await _client.PutAsJsonAsync(microserviceURL+ "?stored_dataset=" + url, data);
+                string responseString = null;
 
-                var responseString = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    var response = await _client.PutAsJsonAsync(microserviceURL + "?stored_dataset=" + url, data);
+                    response.EnsureSuccessStatusCode();
+                    responseString = await response.Content.ReadAsStringAsync();
+                }
+                catch(HttpRequestException e)
+                {
+                    Console.WriteLine("\nException Caught!");	
+                    Console.WriteLine("Message :{0} ", e.Message);
 
-                if (responseString == "error")
-                {
-                    return BadRequest(new { Message = "Error on microservice" });
+                    return BadRequest(new ResponseToRequest(false, "TODO", "An error occured while modifying dataset", "datasetModify_UnknownError"));
                 }
-                else 
-                {
-                    StreamWriter f = new(dataset.Path);
-                    f.Write(responseString);
-                    f.Close();
-                }
+
+                StreamWriter f = new(dataset.Path);
+                f.Write(responseString);
+                f.Close();
 
                 return Ok(new { Message = "OK" } );
             }
