@@ -1,6 +1,7 @@
 .grid-wrapper{
     margin:auto;
     animation: fadein 1s;
+    text-align:center;
 }
 @keyframes fadein {
     from { opacity: 0; }

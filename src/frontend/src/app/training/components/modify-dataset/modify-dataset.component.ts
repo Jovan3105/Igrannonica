@@ -1,5 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild, ViewChildren } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { HeaderDict, TableIndicator } from '../../models/table_models';
 import { ShowTableComponent } from '../show-table/show-table.component';
 
@@ -8,27 +7,63 @@ import { ShowTableComponent } from '../show-table/show-table.component';
   templateUrl: './modify-dataset.component.html',
   styleUrls: ['./modify-dataset.component.css']
 })
-export class ModifyDatasetComponent implements OnInit, AfterViewInit {
+export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('modifyTable') private modifyTable!: ShowTableComponent;
-  @Input() title:string;
   @Input() table_data:any;
-  @Input() header:HeaderDict[];
+  @Input() header:HeaderDict[] = [];
+  @Input() undoDisabled:boolean = true;
 
-  constructor(@Inject(MAT_DIALOG_DATA) data: { title: string, table_data: any, header:HeaderDict[] }, private cd: ChangeDetectorRef) 
+  constructor(private cd: ChangeDetectorRef) 
   {
-    this.title = data.title;
-    this.table_data = data.table_data;
-    this.header = data.header;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+
+    this.table_data = changes['table_data'].currentValue;
+    this.header = changes['header'].currentValue;
+    this.refreshView();
   }
 
   ngOnInit(): void 
   {
   }
 
+  refreshView()
+  {
+    if (this.modifyTable) this.modifyTable.prepareTable(TableIndicator.DATA_MANIPULATION, this.table_data, this.header);
+  }
+
   ngAfterViewInit() {
-    this.modifyTable.prepareTable(TableIndicator.DATA_MANIPULATION, this.table_data, this.header);
+    this.refreshView();
 
     this.cd.detectChanges();
+  }
+  onRemoveSelected()
+  {
+    this.modifyTable.onRemoveSelected();
+  }
+  onUndo()
+  {
+    this.modifyTable.onUndo();
+  }
+
+  enableUndo(indicator:boolean)
+  {
+    if (indicator) this.undoDisabled = false;
+    else this.undoDisabled = true;
+  }
+
+  getEditedCells()
+  {
+    return this.modifyTable.editedCells;
+  }
+  getDeletedRows()
+  {
+    return this.modifyTable.deletedRows;
+  }
+  getDeletedCols()
+  {
+    return this.modifyTable.deletedCols;
   }
 }

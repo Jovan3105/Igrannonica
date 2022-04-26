@@ -9,11 +9,9 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class ChartComponent implements OnInit {
 
-  chartDisplay:string;
-  constructor() 
-  {
-    this.chartDisplay = "none";
-  }
+  chartDisplay:string = "none";
+  
+  constructor() {}
 
   ngOnInit(): void {
   }

@@ -29,6 +29,7 @@ export class LabelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.headers = null;
     this.pred = null;
     this.selectedLabel = null;
     //this.labelEvent = new EventEmitter<{id:number,pred:number}>();

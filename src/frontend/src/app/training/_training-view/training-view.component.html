@@ -26,30 +26,14 @@
         <h4>{{fileName}}</h4>
         <button type="button" class="btn btn-secondary" 
         (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
-        <button id="modify-table" type="button" class="btn btn-primary" (click)="openModifyDialog()">Modify dataset</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifyModal" (click)="modalOpen()">
+        Modify dataset
+        </button>
     </div>
-    
-    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility, 'text-align':'center'}">
-        <!-- ova dva dugmeta prave problem -->
+    <br><br>
+    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility}">
+
         <div class="col-sm-9" id="block">
-            <div class="mx-auto" id="buttons" [ngStyle]="{'margin-bottom':'5px','text-align':'left'}" >
-                <button type="button" class="btn btn-danger" 
-                (click)="onRemoveSelected()" 
-                [ngStyle]="{'display': deleteButtonDisplay}" 
-                id="deleteButton">Delete selected</button>&nbsp;
-                <button type="button" class="btn btn-secondary" 
-                (click)="onUndo()" 
-                [disabled]="undoDisabled" 
-                id="undoButton">Undo</button>&nbsp;
-                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>&nbsp;
-                <!--
-                 <p>{{basicInfo}}</p>
-               <button type="button" class="btn btn-secondary" 
-                (click)="onUndoDeleted()" 
-                [disabled]="undoDeletedDisabled" 
-                id="undoDeletedButton">Undo deleted</button>&nbsp;
-                -->
-            </div>
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)"
             (undoEvent)="enableUndo($event)"
@@ -68,18 +52,42 @@
             (labelEvent)="onSelectedLabel($event)"></app-labels>
         </div>
 
-        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id="modifyModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg"  style="max-width: 80%;">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel">Modify '{{fileName}}' dataset</h5>
+                  <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()" aria-label="Close"
+                  id="modal-close">
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.data" [header]="dataTable.headers"></app-modify-dataset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationSave()">Modify</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <div class="modal fade" id="secondModal" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">Nastavi dalje</h5>
+                        <h5 class="modal-title" id="staticBackdropLabel">Confirmation</h5>
                     </div>
-                    <div class="modal-body">
-                        Da li zelite sigurno da nastavite dalje?
+                    <div class="modal-body" *ngIf="!confirmation">
+                        Are you sure that you want to cancel changes? This proccess cannot be undone.
+                    </div>
+                    <div class="modal-body" *ngIf="confirmation">
+                        Are you sure that you want to save changes? This proccess cannot be undone.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ne</button>
-                        <button type="button" class="btn btn-primary" (click)="OnNextClick()">Da</button>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modifyModal">No</button>
+                        <button type="button"  *ngIf="!confirmation" class="btn btn-primary" data-bs-dismiss="modal" (click)="OnModalClose()">Yes</button>
+                        <button type="button" class="btn btn-primary" *ngIf="confirmation" data-bs-dismiss="modal" (click)="OnModalSave()">Yes</button>
                     </div>
                 </div>
             </div>

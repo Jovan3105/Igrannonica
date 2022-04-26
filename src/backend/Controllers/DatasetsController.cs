@@ -220,9 +220,9 @@ namespace backend.Controllers
   
                 var response = await _client.PutAsJsonAsync(microserviceURL+ "?stored_dataset=" + url, data);
 
-                var responseString = await response.Content.ReadAsStringAsync();
+                string responseString = await response.Content.ReadAsStringAsync();
 
-                if (responseString == "error")
+                if (string.Equals(responseString, "\"error\""))
                 {
                     return BadRequest(new { Message = "Error on microservice" });
                 }

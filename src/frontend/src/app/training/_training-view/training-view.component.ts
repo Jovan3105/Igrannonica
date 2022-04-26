@@ -9,6 +9,7 @@ import { DialogComponent } from 'src/app/shared/components/dialog/dialog.compone
 import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
 import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-training-view',
@@ -17,7 +18,7 @@ import { ModifyDatasetComponent } from '../components/modify-dataset/modify-data
 })
 export class TrainingViewComponent implements OnInit {
 
-  datasetId:number;
+  datasetId:number = -1;
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
   learningRate: number = 0.1;
@@ -47,8 +48,8 @@ export class TrainingViewComponent implements OnInit {
   dialogMessage:string = "";
   fileName?:string = "";
   basicInfo:string = "";
-
-  headerDataTable:HeaderDict[];
+  modalDisplay:boolean = false;
+  confirmation:boolean = false;
 
   constructor(
     private datasetService: DatasetService, 
@@ -57,7 +58,6 @@ export class TrainingViewComponent implements OnInit {
     ) {
     this.datasetId = -1;
     this.viewIndicator = View.PREVIEW;
-    this.headerDataTable = [];
   }
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
@@ -66,6 +66,7 @@ export class TrainingViewComponent implements OnInit {
   @ViewChild('dataSetInformation') private dataSetInformation!: ShowTableComponent;
   @ViewChild('Labels') private labels!: LabelsComponent;
   @ViewChild('Stats') private stats!:StatsComponent;
+  @ViewChild('modifyModal') private modifyModal!:ModifyDatasetComponent;
 
   public form: FormData = new FormData();
   
@@ -107,10 +108,10 @@ export class TrainingViewComponent implements OnInit {
 
       //console.log(response)
       
-      this.headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
-      this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], this.headerDataTable);
+      var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
+      this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
 
-      this.labels.onDatasetSelected(this.headerDataTable);
+      this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
       
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
@@ -204,7 +205,7 @@ export class TrainingViewComponent implements OnInit {
       console.log("problem: dataset-url");
     else {
       this.req["datasetSource"] = datasetURL
-  
+      
       this.datasetService.uploadDatasetFileWithLink(datasetURL).subscribe(this.uploadObserver);
     }
   }
@@ -213,7 +214,9 @@ export class TrainingViewComponent implements OnInit {
   {
     this.dataTable.onRemoveSelected();
   }
-  
+  modalOpen(){
+    this.modalDisplay = true;
+  }
   onApplyChanges()
   {
     var req:ModifiedData = new ModifiedData(this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
@@ -245,11 +248,6 @@ export class TrainingViewComponent implements OnInit {
     this.dataTable.onUndo();
   }
 
-  onUndoDeleted()
-  {
-    this.dataTable.onUndoDeleted();
-  }
-
   toggleTables(event:any){
     
     if(this.toggledButton)
@@ -270,7 +268,6 @@ export class TrainingViewComponent implements OnInit {
     }
     this.toggledButton = !this.toggledButton
   }
-
 
   OnNextClick() {
     if (this.viewIndicator == View.UPLOAD)
@@ -324,14 +321,43 @@ export class TrainingViewComponent implements OnInit {
   openModifyDialog(){
     
     this.dialog.open(ModifyDatasetComponent,{
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      height: '100%',
+      width: '100%',
+      panelClass: 'full-screen-modal',
       data: { title: this.fileName, table_data: this.dataTable.data, header: this.dataTable.headers },
     });
   }
-  onSaveClick()
+  confirmationCancel()
   {
+    this.confirmation = false;
+  }
+  confirmationSave(){
+    this.confirmation = true;
+  }
+  OnModalClose()
+  {
+    this.modifyModal.refreshView();
+  }
+  OnModalSave()
+  {
+    this.modalDisplay = false;
+    this.hideElements();
+    var req:ModifiedData = new ModifiedData(this.modifyModal.getEditedCells(), this.modifyModal.getDeletedRows(), this.modifyModal.getDeletedCols());
+
+    this.datasetService.modifyDataset(this.datasetId, req).subscribe(
+      {
+        next: (response:any) =>{
+          //console.log(response);
+          
+          this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+          }
+      }
+    )
 
   }
-  
+
   changeColomnVisibility(checkChange: Check) {
     this.dataTable.changeColomnVisibility(checkChange.id.toString(), checkChange.visible);
   }

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
-import { Check, EditedCell, HeaderDict, TableIndicator } from '../../models/table_models';
+import { Check, EditedCell, HeaderDict, TableIndicator, UndoData, undoType } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
 @Component({
@@ -16,11 +16,13 @@ export class ShowTableComponent implements OnInit {
   private gridApi!: GridApi;
   private columnApi!: ColumnApi;
   private colIds:string[];
+  readonly LIMIT:number = 50; //limit undo niza
 
   indicator?:TableIndicator;
   editedCells:EditedCell[];
   deletedRows:number[];
   deletedCols:number[];
+  undoData : UndoData[] = [];
   
   @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
   @Output() undoEvent; //event koji se dize kada treba dis/enable undo dugme
@@ -80,14 +82,15 @@ export class ShowTableComponent implements OnInit {
     this.indicator = indicator;
     this.headers = headers;
 
-    //this.columnDefs = [];
-    //this.rowData = [];
+    this.columnDefs = [];
+    this.rowData = [];
 
     if(this.indicator == TableIndicator.DATA_MANIPULATION)
     {
       this.deletedRows = [];
       this.deletedCols = [];
       this.editedCells = [];
+      this.undoData = [];
     }
 
     this.setColumnDefs(indicator);
@@ -95,26 +98,28 @@ export class ShowTableComponent implements OnInit {
     for (let row of data) {
       this.rowData.push({... row});
     }
-    this.tableService.resetVisibility(this.columnApi,this.colIds);
+    if (indicator == TableIndicator.PREVIEW) this.tableService.resetVisibility(this.columnApi,this.colIds);
   }
 
   onCellValueChanged(params:CellValueChangedEvent)
   {
-    //console.log(params.node);  
-    var editedCellIndex;
-    var row = parseInt(params.node.id!);
+    console.log(params);
+    var editedCellIndex; 
+    var row = params.rowIndex!;
     var colId = parseInt(params.column.getColId());
 
-    var newValue = this.tableService.onCellValueChanged(params,this.rowData,this.headers);
+    var newValue = this.tableService.onCellValueChanged(this.gridApi, params,params.data,this.headers);
 
     if (newValue != undefined)
     {
+      console.log(newValue);
+      this.addUndoElement(new UndoData(undoType.EDIT,params));
       if ((editedCellIndex = this.editedCells.findIndex(element => element.col == colId && element.row == row)) != -1) //ukoliko vec postoji u objektu
       {
-        console.log(row);
         if (this.data[row][this.headers[colId].name] == newValue) //provera da se ne salje originalna vrednost za izmenu
         { 
           this.editedCells.splice(editedCellIndex,1);
+          //console.log("Napisao si oridjidji vrednost")
         }
         else 
           this.editedCells[editedCellIndex].value = newValue.toString();
@@ -125,12 +130,7 @@ export class ShowTableComponent implements OnInit {
     }
     
     //console.log(this.editedCells);
-    if(this.gridApi.getCurrentUndoSize()) 
-    {
-      //console.log("Ima nesto za menjanje");
-      this.undoEvent.emit(true);
-    }
-    else this.undoEvent.emit(false);
+    this.emitUndoEvent();
  }
 
   setRowData(rowData:any[]){
@@ -140,7 +140,7 @@ export class ShowTableComponent implements OnInit {
   setColumnDefs(indicator:TableIndicator)
   {
     this.colIds = [];
-    if (indicator == TableIndicator.DATA_MANIPULATION)
+    if (indicator == TableIndicator.DATA_MANIPULATION || indicator == TableIndicator.PREVIEW)
     {
       for (let header of this.headers) 
       {
@@ -150,18 +150,17 @@ export class ShowTableComponent implements OnInit {
           flex: 1,
           field: header.name,
           filter: 'agTextColumnFilter',
-          editable: true,
+          editable: indicator == TableIndicator.DATA_MANIPULATION ? true : false,
           resizable: true,
           sortable: true,
           minWidth: 100,
-          lockVisible:false
+          lockVisible: indicator == TableIndicator.DATA_MANIPULATION ? true : false
         }
         this.columnDefs.push(col);
       }
     }
     else if (indicator == TableIndicator.INFO || indicator == TableIndicator.STATS)
     {
-      
       if (indicator == TableIndicator.STATS) //postavi indicator kao prvu kolonu
       {
         const index = this.headers.findIndex((element) => element.name == "indicator");
@@ -188,51 +187,81 @@ export class ShowTableComponent implements OnInit {
   {
     const selectedData = this.gridApi.getSelectedRows();
     const res = this.gridApi.applyTransaction({ remove: selectedData });
-    var editedCellIndex;
 
-    for (let sData of selectedData) 
+    this.addUndoElement(new UndoData(undoType.DELETE,res?.remove));
+
+    for (let sData of res?.remove!) 
     {
-      var index = this.rowData.indexOf(sData, 0);
-      this.deletedRows.push(index);
-      while((editedCellIndex = this.editedCells.findIndex(element => element.row == index)) != -1)
-      {
-        console.log(editedCellIndex);
-        this.editedCells.splice(editedCellIndex,1);
-
-      }
+      this.deletedRows.push(sData.childIndex);
     }
 
-    console.log(this.deletedRows);
-    console.log(this.rowData);
-    if (this.deletedRows.length) this.deleteEvent.emit(true);
-    else this.deleteEvent.emit(false);
+    this.emitUndoEvent();
   }
 
   onUndo()
   {
-    this.gridApi.undoCellEditing();
-    if(this.gridApi.getCurrentUndoSize()) 
+
+    if (this.undoData.length)
     {
-      //console.log("Ima nesto za menjanje");
-      this.undoEvent.emit(true);
+      const res = this.undoData.pop();
+
+      if (res?.type == undoType.EDIT)
+      {
+        var data = res.data;
+        
+        data.node.data[data.column.colDef.field] = data.oldValue;
+
+        this.gridApi.applyTransaction({ update: [data.node.data] });
+
+        var index = this.editedCells.findIndex(x => x.row == data.rowIndex && x.col == data.column.getColId());
+        
+        if (index != -1) 
+        {     
+          if (this.data[data.rowIndex][data.column.colDef.field] == data.oldValue) 
+          {
+            //ukoliko je vraceno na originalnu vrednost, izbacuje se iz niza
+            this.editedCells.splice(index,1);
+          }
+          else
+            this.editedCells[index].value = data.oldValue.toString();
+        }
+        else{ //ukoliko se sa originalne vrednosti uradi undo na promenjenu, potrebno je ponovo dodati vrednost u edited niz
+          this.editedCells.push(new EditedCell(data.rowIndex,parseInt(data.column.getColId()),data.oldValue.toString()));
+        }
+      }
+      else
+      {
+        var data = res?.data;
+        data.forEach((element: any) => {
+          this.gridApi.applyTransaction({ add: [element.data], addIndex: parseInt(element.childIndex) });
+          var index = this.deletedRows.findIndex(x => x == element.childIndex);
+          this.deletedRows.splice(index,1);
+
+        });
+      }
+      //console.log(this.editedCells);
+      this.emitUndoEvent();
     }
-    else this.undoEvent.emit(false)
   }
 
-  onUndoDeleted()
+  addUndoElement(element:UndoData)
   {
-    /*
-    this.gridApi.applyTransaction({ add: this.tempDeleted });
-    
-    for (let temp of this.tempDeleted) 
+    if (this.undoData.length == this.LIMIT)
     {
-      var index = this.rowData.indexOf(temp, 0);
-      this.deletedRows.splice(this.deletedRows.indexOf(index),1);
+      this.undoData.shift();
+      this.undoData.push(element);
+      return;
     }
+    this.undoData.push(element);
+  }
 
-    console.log(this.tempDeleted);
-    console.log(this.deletedRows);
-    this.deleteEvent.emit(false);*/
+  emitUndoEvent()
+  {
+    if (this.undoData.length)
+    {
+      this.undoEvent.emit(true);
+    }
+    else this.undoEvent.emit(false);
   }
 
   //Kada se promeni u checkboxu, mora da se prikaze ili sakrije i u tabeli
