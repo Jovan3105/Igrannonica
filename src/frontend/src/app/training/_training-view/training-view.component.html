@@ -30,7 +30,6 @@
     </div>
     
     <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility, 'text-align':'center'}">
-        <!-- ova dva dugmeta prave problem -->
         <div class="col-sm-9" id="block">
             <div class="mx-auto" id="buttons" [ngStyle]="{'margin-bottom':'5px','text-align':'left'}" >
                 <button type="button" class="btn btn-danger" 
@@ -41,7 +40,7 @@
                 (click)="onUndo()" 
                 [disabled]="undoDisabled" 
                 id="undoButton">Undo</button>&nbsp;
-                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>&nbsp;
+                <button id="updateMainTable" type="button" class="btn btn-primary" (click)="onApplyChanges()">Apply Changes</button>&nbsp;;&nbsp;
                 <!--
                  <p>{{basicInfo}}</p>
                <button type="button" class="btn btn-secondary" 
@@ -67,7 +66,6 @@
             (checkEvent)="changeColomnVisibility($event)" 
             (labelEvent)="onSelectedLabel($event)"></app-labels>
         </div>
-
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

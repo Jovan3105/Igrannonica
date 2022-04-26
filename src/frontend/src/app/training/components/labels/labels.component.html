@@ -7,7 +7,7 @@
             [checked]="checkboxCheckedArray[i]" 
             [disabled]="checkboxDisabledArray[i]" id="inputCheckbox{{header.key}}" 
             (change)= "onCheckChange($event)">
-            <label class="form-check-label" for="inputCheckbox{{header.key}}">
+            <label class="form-check-label word-wrap" for="inputCheckbox{{header.key}}">
               "{{header.name}}" ( {{header.type}} )
             </label>
           </div>
@@ -21,7 +21,7 @@
         <select [(ngModel)]="selectedLabel" #selectLabel class="form-select" aria-label="Odabir izlaza" 
         (change)="onSelectLabel()">
           <option [ngValue]="null" disabled>Choose target variable</option>
-          <option *ngFor="let header of headers;" [ngValue]="header">
+          <option class="word-wrap" *ngFor="let header of headers;" [ngValue]="header">
             "{{header.name}}" ({{header.type}})</option>
         </select>
     </div>

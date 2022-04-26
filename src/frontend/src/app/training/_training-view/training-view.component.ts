@@ -118,6 +118,7 @@ export class TrainingViewComponent implements OnInit {
 
     }
   };
+
   fetchStatsDataObserver:any = {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchStatsDataObserver > next:")
@@ -194,7 +195,6 @@ export class TrainingViewComponent implements OnInit {
   }
 
   onShowDataClick(datasetURL:string) {
-
     this.hideElements();
 
     if (datasetURL == null || datasetURL == "")
@@ -332,7 +332,7 @@ export class TrainingViewComponent implements OnInit {
     this.labels.changeCheckbox(checkChange)
   } 
 
-  onSelectedLabel(data:{id:number,pred:number | null})
+  onSelectedLabel(data:{id: number, pred: number | null})
   {
     this.dataTable.changeLabelColumn(data);
   }
