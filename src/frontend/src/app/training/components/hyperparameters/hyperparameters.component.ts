@@ -112,20 +112,20 @@ export class HyperparametersComponent implements OnInit
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
-    var trainingService=this.trainingService;
+    // var trainingService=this.trainingService;
     let connectionID = "";
-    this.trainingService.sendDataForTraining({
-      epochs: this.numberOfEpochs,
-      activationFunction: this.activationFunctionControl.value.codename,
-      features: this.featuresLabel['features'],
-      labels: this.featuresLabel['label'],
-      optimizer: this.optimizerFunctionControl.value.codename,
-      lossFunction: this.lossFunctionControl.value.codename,
-      testDataRatio: this.sliderValue/100,
-      learningRate: this.learningRate,
-      metrics: this.metricsArrayToSend,
-      layers: this.layers
-    }).subscribe(this.startTrainingObserver);
+    // this.trainingService.sendDataForTraining({
+    //   epochs: this.numberOfEpochs,
+    //   activationFunction: this.activationFunctionControl.value.codename,
+    //   features: this.featuresLabel['features'],
+    //   labels: this.featuresLabel['label'],
+    //   optimizer: this.optimizerFunctionControl.value.codename,
+    //   lossFunction: this.lossFunctionControl.value.codename,
+    //   testDataRatio: this.sliderValue/100,
+    //   learningRate: this.learningRate,
+    //   metrics: this.metricsArrayToSend,
+    //   layers: this.layers
+    // }).subscribe(this.startTrainingObserver);
     // console.log("metric control "+ this.metricsControl.value[0].codename)
     // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
     // console.log("testDataRatio "+ this.sliderValue/100)
@@ -196,7 +196,7 @@ export class HyperparametersComponent implements OnInit
       if(dataArr[0] == "ConnID:") {
         connectionID = dataArr[1];
         trainingRequestPayload["ClientConnID"] = connectionID;
-        trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
+        _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
       }
       else {
