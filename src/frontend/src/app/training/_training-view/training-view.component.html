@@ -31,14 +31,18 @@
         </button>
     </div>
     <br><br>
-    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'clear': 'both', 'visibility': containerVisibility}">
-
-        <div class="col-sm-9" id="block">
+    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'visibility': containerVisibility}">
+        <div class="col-lg-9">
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)"
             (undoEvent)="enableUndo($event)"
             (deleteEvent)="enableUndoDeleted($event)">
             </app-show-table><br>
+        </div>
+        <div class="col-lg-3">
+            <app-labels #Labels id="labelCards" [ngStyle]="{'display': labelsDisplay}" 
+            (checkEvent)="changeColomnVisibility($event)" 
+            (labelEvent)="onSelectedLabel($event)"></app-labels>
         </div>
         <div [ngStyle]="{'display':statsTableDisplay}">
             <app-stats #Stats></app-stats>
@@ -46,12 +50,6 @@
             <app-show-table #dataSetInformation id="basicInfo"></app-show-table>-->
             <br>
         </div>
-        <div class="col-sm-3">
-            <app-labels #Labels id="labelCards" [ngStyle]="{'display': labelsDisplay}" 
-            (checkEvent)="changeColomnVisibility($event)" 
-            (labelEvent)="onSelectedLabel($event)"></app-labels>
-        </div>
-
         <div class="modal fade" id="modifyModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg"  style="max-width: 80%;">
               <div class="modal-content">

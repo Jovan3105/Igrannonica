@@ -7,6 +7,7 @@
     from { opacity: 0; }
     to   { opacity: 1; }
 }
+/*
 .panel-table {
     display:table;
     text-align: center;
@@ -60,7 +61,7 @@
 }
 .panel-table > .panel-footer > .tr > .td:last-child {
     border-radius: 0 0 4px 0;
-}
+}*/
 #buttons{
     display: inline-flex;
     margin-bottom: 10px;

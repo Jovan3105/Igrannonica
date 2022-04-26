@@ -168,7 +168,8 @@ export class TrainingViewComponent implements OnInit {
     this.firstVisibility = "block";
     this.loaderDisplay = "none";
     this.containerVisibility = "visible";
-    this.labelsDisplay = "block";
+    if (this.statsTableDisplay == "block") this.labelsDisplay = "none";
+    else this.labelsDisplay = "block";
     this.navButtonsDisplay = "block";
     this.nextButtonDisable = false;
     this.backButtonDisable = false;
