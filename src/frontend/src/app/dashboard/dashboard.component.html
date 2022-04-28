@@ -26,19 +26,23 @@
     <body>
 
         <div class="row">
-            <canvas id=c class="col-md-12 col-sm-12">
-                <div style="z-index: -1;">
+            <canvas id=c class="col-md-12 col-sm-12" style="padding: 0;">
+                
+            </canvas> 
+            <div style="position: absolute; bottom: 20%; text-align: center;">
+                <div style="color: #444a50;">
                     <h1 class="w3-margin w3-jumbo">WELCOME</h1>
                     <p class="w3-xlarge">Start</p>
-                    <div class="sonar-wrapper w3-padding-large w3-large w3-margin-top">
-                        <div class="sonar-emitter" [routerLink]="['/training']"> 
-                            <i class="bi bi-arrow-right-circle"></i>
-                            <div class="sonar-wave"></div>
-                            
-                        </div>
+                </div>
+                
+                <div class="sonar-wrapper w3-padding-large w3-large w3-margin-top">
+                    <div class="sonar-emitter" [routerLink]="['/training']"> 
+                        <i class="bi bi-arrow-right-circle"></i>
+                        <div class="sonar-wave"></div>
+                        
                     </div>
                 </div>
-            </canvas> 
+            </div>
         </div>
         
 
