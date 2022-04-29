@@ -41,8 +41,8 @@ function animation(){
         depth: 300,                                        // depth; distance from the screen to the root??
         focalLength: 310,
         vanishPoint: {
-            x: windowWidth / 2,
-            y: windowHeight / 2 
+            x: windowWidth * .7 ,
+            y: windowHeight * .45 
         } 
     },
     
@@ -344,8 +344,8 @@ function animation(){
     // EventListeners //
 
     window.addEventListener('resize', () => {
-        opts.vanishPoint.x = (windowWidth = canvas.width = window.innerWidth) / 2;
-        opts.vanishPoint.y = (windowHeight = canvas.height = window.innerHeight) / 2;
+        opts.vanishPoint.x = (windowWidth = canvas.width = window.innerWidth) * .7;
+        opts.vanishPoint.y = (windowHeight = canvas.height = window.innerHeight) * .45;
         ctx.fillRect(0, 0, windowWidth, windowHeight);
     });
 
