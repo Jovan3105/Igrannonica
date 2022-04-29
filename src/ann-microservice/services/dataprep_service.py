@@ -77,13 +77,22 @@ def get_column_types(df):
 
 def modify_dataset(dataset, data:models.ModifiedData):
     df = pd.DataFrame(dataset['parsedDataset'])
+    try:
+        for editRow in data.edited:
+            if (df.dtypes[editRow.col] == "int64"):
+                df.iloc[editRow.row, editRow.col] = int(editRow.value)
+            elif (df.dtypes[editRow.col] == "float64"):
+                df.iloc[editRow.row, editRow.col] = float(editRow.value)
+            else:
+                df.iloc[editRow.row, editRow.col] = editRow.value
+            
+        df.drop(data.deletedRows, inplace=True)
+    
+        df.drop(df.columns[data.deletedCols],axis=1,inplace=True)
 
-    for editRow in data.edited:
-        df.iloc[editRow.row, editRow.col] = editRow.value
+    except:
+        return 'error'
     
-    df.drop(data.deletedRows, inplace=True)
-    
-    df.drop(df.columns[data.deletedCols],axis=1,inplace=True)
 
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije
     dataset['basicInfo'] = get_basic_info(df)

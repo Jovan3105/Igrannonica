@@ -45,7 +45,24 @@ export class ModifiedData {
   }
 }
 
+export class UndoData{
+  type:undoType;
+  data:any;
+
+  constructor(type:undoType, data:any)
+  {
+    this.type = type;
+    this.data = data;
+  }
+}
+
+export enum undoType{
+  EDIT,
+  DELETE
+}
+
 export enum TableIndicator {
+  PREVIEW,
   DATA_MANIPULATION,
   INFO,
   STATS

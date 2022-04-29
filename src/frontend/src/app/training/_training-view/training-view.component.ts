@@ -1,14 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Check, ModifiedData, TableIndicator } from '../models/table_models';
+import { Check, HeaderDict, ModifiedData, TableIndicator } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
 import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
 import { ShowTableComponent } from '../components/show-table/show-table.component';
-import { webSocket } from "rxjs/webSocket";
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
+import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-training-view',
@@ -17,7 +18,7 @@ import { UploadComponent } from '../components/upload/upload.component';
 })
 export class TrainingViewComponent implements OnInit {
 
-  datasetId:number;
+  datasetId:number = -1;
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
   learningRate: number = 0.1;
@@ -47,6 +48,8 @@ export class TrainingViewComponent implements OnInit {
   dialogMessage:string = "";
   fileName?:string = "";
   basicInfo:string = "";
+  modalDisplay:boolean = false;
+  confirmation:boolean = false;
 
   constructor(
     private datasetService: DatasetService, 
@@ -63,6 +66,7 @@ export class TrainingViewComponent implements OnInit {
   @ViewChild('dataSetInformation') private dataSetInformation!: ShowTableComponent;
   @ViewChild('Labels') private labels!: LabelsComponent;
   @ViewChild('Stats') private stats!:StatsComponent;
+  @ViewChild('modifyModal') private modifyModal!:ModifyDatasetComponent;
 
   public form: FormData = new FormData();
   
@@ -105,7 +109,7 @@ export class TrainingViewComponent implements OnInit {
       //console.log(response)
       
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
-      this.dataTable.prepareTable(TableIndicator.DATA_MANIPULATION,response['parsedDataset'], headerDataTable);
+      this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
@@ -165,7 +169,8 @@ export class TrainingViewComponent implements OnInit {
     this.firstVisibility = "block";
     this.loaderDisplay = "none";
     this.containerVisibility = "visible";
-    this.labelsDisplay = "block";
+    if (this.statsTableDisplay == "block") this.labelsDisplay = "none";
+    else this.labelsDisplay = "block";
     this.navButtonsDisplay = "block";
     this.nextButtonDisable = false;
     this.backButtonDisable = false;
@@ -201,7 +206,7 @@ export class TrainingViewComponent implements OnInit {
       console.log("problem: dataset-url");
     else {
       this.req["datasetSource"] = datasetURL
-  
+      
       this.datasetService.uploadDatasetFileWithLink(datasetURL).subscribe(this.uploadObserver);
     }
   }
@@ -210,7 +215,9 @@ export class TrainingViewComponent implements OnInit {
   {
     this.dataTable.onRemoveSelected();
   }
-  
+  modalOpen(){
+    this.modalDisplay = true;
+  }
   onApplyChanges()
   {
     var req:ModifiedData = new ModifiedData(this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
@@ -242,11 +249,6 @@ export class TrainingViewComponent implements OnInit {
     this.dataTable.onUndo();
   }
 
-  onUndoDeleted()
-  {
-    this.dataTable.onUndoDeleted();
-  }
-
   toggleTables(event:any){
     
     if(this.toggledButton)
@@ -267,7 +269,6 @@ export class TrainingViewComponent implements OnInit {
     }
     this.toggledButton = !this.toggledButton
   }
-
 
   OnNextClick() {
     if (this.viewIndicator == View.UPLOAD)
@@ -318,12 +319,46 @@ export class TrainingViewComponent implements OnInit {
     }
     
   }
-
-  onSaveClick()
+  openModifyDialog(){
+    
+    this.dialog.open(ModifyDatasetComponent,{
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      height: '100%',
+      width: '100%',
+      panelClass: 'full-screen-modal',
+      data: { title: this.fileName, table_data: this.dataTable.data, header: this.dataTable.headers },
+    });
+  }
+  confirmationCancel()
   {
+    this.confirmation = false;
+  }
+  confirmationSave(){
+    this.confirmation = true;
+  }
+  OnModalClose()
+  {
+    this.modifyModal.refreshView();
+  }
+  OnModalSave()
+  {
+    this.modalDisplay = false;
+    this.hideElements();
+    var req:ModifiedData = new ModifiedData(this.modifyModal.getEditedCells(), this.modifyModal.getDeletedRows(), this.modifyModal.getDeletedCols());
+
+    this.datasetService.modifyDataset(this.datasetId, req).subscribe(
+      {
+        next: (response:any) =>{
+          //console.log(response);
+          
+          this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+          }
+      }
+    )
 
   }
-  
+
   changeColomnVisibility(checkChange: Check) {
     this.dataTable.changeColomnVisibility(checkChange.id.toString(), checkChange.visible);
   }

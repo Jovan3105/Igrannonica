@@ -1,7 +1,33 @@
-<div class="card" style="height: 350px;" *ngIf = "headers">
+<div class="card" style="height: 70%;" *ngIf = "headers">
     <h5 class="card-header">Choose features</h5>
     <div class="card-body" style="overflow-y: scroll;" tabindex="0">
-      <div *ngFor="let header of headers; index as i">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Include</th>
+            <th scope="col">Column Name</th>
+            <th scope="col">Type</th>
+          </tr>
+        </thead>
+        <tbody *ngFor="let header of headers; index as i">
+          <tr  class="form-check-label">
+            <th><input class="form-check-input" type="checkbox" [value]="header.key" 
+              [checked]="checkboxCheckedArray[i]" 
+              [disabled]="checkboxDisabledArray[i]" id="inputCheckbox{{header.key}}" 
+              (change)= "onCheckChange($event)"></th>
+            <td><label class="form-check-label" for="inputCheckbox{{header.key}}">
+              {{header.name}}
+            </label></td>
+            <td><label class="form-check-label" for="inputCheckbox{{header.key}}">
+              <select class="form-select" aria-label="Default select example">
+                <option>Categorical</option>
+                <option value="1" selected>Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
+              </select>
+            </label></td>
+          </tr>
+        </tbody>
+      </table>
+        <!--
         <div class="form-check">
             <input class="form-check-input" type="checkbox" [value]="header.key" 
             [checked]="checkboxCheckedArray[i]" 
@@ -10,19 +36,19 @@
             <label class="form-check-label word-wrap" for="inputCheckbox{{header.key}}">
               "{{header.name}}" ( {{header.type}} )
             </label>
-          </div>
-      </div>
+          </div>-->
     </div>
   </div>
 
-  <div class="card" style="height: 150px;" *ngIf = "headers">
+  <div class="card" style="height: 30%;" *ngIf = "headers">
     <h5 class="card-header">Choose target variable</h5>
     <div class="card-body">
         <select [(ngModel)]="selectedLabel" #selectLabel class="form-select" aria-label="Odabir izlaza" 
         (change)="onSelectLabel()">
           <option [ngValue]="null" disabled>Choose target variable</option>
           <option class="word-wrap" *ngFor="let header of headers;" [ngValue]="header">
-            "{{header.name}}" ({{header.type}})</option>
+            "{{header.name}}" ({{header.type}})"</option> <!-- TODO postaviti automatski tip -->
         </select>
     </div>
   </div>
+

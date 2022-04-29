@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CellValueChangedEvent, ColumnApi } from 'ag-grid-community';
+import { CellValueChangedEvent, ColumnApi, GridApi } from 'ag-grid-community';
 import { HeaderDict } from '../models/table_models';
 
 @Injectable({
@@ -9,9 +9,10 @@ export class TableService {
 
   constructor() { }
 
-  onCellValueChanged(params:CellValueChangedEvent, data:any, headers:HeaderDict[])
+  onCellValueChanged(gridApi: GridApi, params:CellValueChangedEvent, data:any, headers:HeaderDict[])
   {
     var colId = parseInt(params.column.getColId());
+    var rowId = params.rowIndex!;
     var newValue = params.newValue;
 
     if(headers[colId].type == "int64" || headers[colId].type == "float64")
@@ -19,8 +20,8 @@ export class TableService {
       if (isNaN(parseInt(newValue))) //postavio string za int ili float, ponistavanje izmene
       {
 
-        data[params.node.id!][headers[colId].name] = params.oldValue;
-        params.api.setRowData(data);
+        data[headers[colId].name] = params.oldValue;
+        gridApi.applyTransaction({ update: [data] });
 
         return;
 
@@ -28,21 +29,23 @@ export class TableService {
       if (headers[colId].type == "float64")
       {
         newValue = parseFloat(newValue);
-        data[params.node.id!][headers[colId].name] = newValue;
+        data[headers[colId].name] = newValue;
+        gridApi.applyTransaction({ update: [data] });
       } 
       if (headers[colId].type == "int64") 
       {
         if (parseFloat(newValue)%1 != 0)  //postavio float za int
         {
           newValue = Math.round(parseFloat(newValue)); //postavi zaokruzenu vrednost
-          data[params.node.id!][headers[colId].name] = newValue;
+          data[headers[colId].name] = newValue;
           
-          params.api.setRowData(data);
+          gridApi.applyTransaction({ update: [data] });
         }
         else
         {
           newValue = parseInt(newValue);
-          data[params.node.id!][headers[colId].name] = newValue
+          data[headers[colId].name] = newValue;
+          gridApi.applyTransaction({ update: [data] });
         } 
 
       }

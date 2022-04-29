@@ -81,7 +81,7 @@ async def modify(stored_dataset : AnyHttpUrl, modified_data : models.ModifiedDat
 
     dataset = read_json_data(stored_dataset)
     msg = modify_dataset(dataset, modified_data)
-    
+
     return msg
 
 

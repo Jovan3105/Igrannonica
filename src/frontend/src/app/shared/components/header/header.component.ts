@@ -14,16 +14,13 @@ import { UserService } from 'src/app/core/services/user.service';
 export class HeaderComponent implements OnInit {
   
   user:User | undefined;
-  user$:Observable<User>;
+  user$:Observable<User> | undefined;
   displayLoginElement = false;
 
-  constructor(public service: AuthService, public jwtService : JwtService, public userService: UserService) 
-  {
-    this.user$ = new Observable<User>();
-  }
+  constructor(public service: AuthService, public jwtService : JwtService, public userService: UserService) {}
 
   ngOnInit(): void {
-
+    this.user$ = new Observable<User>();
     this.service.updatemenu.subscribe(res => {
       this.MenuDisplay();
     });
