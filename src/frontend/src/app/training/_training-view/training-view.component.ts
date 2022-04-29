@@ -90,7 +90,7 @@ export class TrainingViewComponent implements OnInit {
       this.datasetId = response;
 
       this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
-      this.fileName = this.upload.file?.name;
+      this.fileName = this.upload.fileName;
     },
     error: (err: Error) => {
       console.log("### error@uploadObserver")
