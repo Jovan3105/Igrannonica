@@ -3,16 +3,19 @@ using backend.Data;
 using backend.Models;
 using backend.Services;
 using backend.WS;
+
+using System.IO;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
-using System.Net.WebSockets;
-using System.Text;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using System.Net;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -84,7 +87,7 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 var app = builder.Build();
 
 
-
+/*
 // Primena migracija u prilikom pokretanja //
 using (var scope = app.Services.CreateScope())
 {
@@ -100,7 +103,7 @@ using (var scope = app.Services.CreateScope())
 
     if(! (db.Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator).Exists())
         db.Database.Migrate();
-}
+}*/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -109,7 +112,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseStaticFiles();
+// kreiranje foldera za dataset-ove
+Directory.CreateDirectory(builder.Configuration["FileSystemRelativePaths:Datasets"]);
+
+app.UseStaticFiles(); // TODO proveriti da li je ova linija neophodna
 
 app.UseStaticFiles(new StaticFileOptions()
 {

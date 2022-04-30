@@ -308,6 +308,7 @@ namespace backend.Controllers
             return $"{rootDirPath}/{filename}";
         }
 
+        // TODO razmotriti mogucnost drugacije implementacije ove metode
         public static string CreateDatasetURL(IConfiguration configuration, int userID, int datasetID, string filename)
         {
             string datasetsVirtPath = configuration["VirtualFolderPaths:Datasets"];
