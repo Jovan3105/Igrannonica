@@ -1,70 +1,70 @@
 // Main function //
-function animation(){
+function animation() {
     canvas = document.getElementById("c");
 
     var windowWidth = canvas.width = window.innerWidth,
 
-    windowHeight = canvas.height = window.innerHeight,
-    ctx = canvas.getContext('2d'),
+        windowHeight = canvas.height = window.innerHeight,
+        ctx = canvas.getContext('2d'),
 
-    opts = {
-        range: 4000,
-        baseConnections: 3,
-        addedConnections: 5,
-        baseSize: 5,                                      // 
-        minSize: 1,                                       // 
-        dataToConnectionSize: .4,
-        sizeMultiplier: .7,
-        allowedDist: 50,
-        baseDist: 50,
-        addedDist: 30,
-        connectionAttempts: 10,
+        opts = {
+            range: 4000,
+            baseConnections: 3,
+            addedConnections: 5,
+            baseSize: 5, // 
+            minSize: 1, // 
+            dataToConnectionSize: .4,
+            sizeMultiplier: .7,
+            allowedDist: 50,
+            baseDist: 50,
+            addedDist: 30,
+            connectionAttempts: 10,
 
-        dataToConnections: 1,
-        baseSpeed: .005,                                   // base signal speed
-        addedSpeed: .005,                                  // added signal speed
-        baseGlowSpeed: .4,                                 // base neuron flickering speed
-        addedGlowSpeed: .4,                                // added neuron flickering speed
+            dataToConnections: 1,
+            baseSpeed: .005, // base signal speed
+            addedSpeed: .005, // added signal speed
+            baseGlowSpeed: .4, // base neuron flickering speed
+            addedGlowSpeed: .4, // added neuron flickering speed
 
-        rotVelX: .001,
-        rotVelY: .0009,
+            rotVelX: .001,
+            rotVelY: .0009,
 
-        repaintColor: '#111',                              // background color
-        connectionColor: 'hsla(174,63%,light%,alp)',
-        rootColor: 'hsla(214,31%,light%,alp)',             // color of root (centered) neuron
-        endColor: 'hsla(160,20%,light%,alp)',              // color of end (leaf) neurons
-        dataColor: 'hsla(40,80%,light%,alp)',              // color of the signal
+            repaintColor: '#111', // background color
+            connectionColor: 'hsla(174,63%,light%,alp)',
+            rootColor: 'hsla(214,31%,light%,alp)', // color of root (centered) neuron
+            endColor: 'hsla(160,20%,light%,alp)', // color of end (leaf) neurons
+            dataColor: 'hsla(40,80%,light%,alp)', // color of the signal
 
-        wireframeWidth: .1,                                // axon width
-        wireframeColor: '#88f',                            // axon color
+            wireframeWidth: .1, // axon width
+            wireframeColor: '#88f', // axon color
 
-        depth: 300,                                        // depth; distance from the screen to the root??
-        focalLength: 310,
-        vanishPoint: {
-            x: windowWidth * .7 ,
-            y: windowHeight * .45 
-        } 
-    },
-    
-    squareRange = opts.range * opts.range,
-    squareAllowed = opts.allowedDist * opts.allowedDist,
-    mostDistant = opts.depth + opts.range,
-    sinX = sinY = 0,
-    cosX = cosY = 0,
+            depth: 250, // depth; distance from the screen to the root??
+            focalLength: 270,
+            vanishPoint: {
+                x: windowWidth * .65,
+                y: windowHeight * .45
+            }
+        },
 
-    connections = [],
-    toDevelop = [],
-    data = [],
-    all = [],
-    tick = 0,
-    animating = false,
+        squareRange = opts.range * opts.range,
+        squareAllowed = opts.allowedDist * opts.allowedDist,
+        mostDistant = opts.depth + opts.range,
+        sinX = sinY = 0,
+        cosX = cosY = 0,
 
-    Tau = Math.PI * 2;
+        connections = [],
+        toDevelop = [],
+        data = [],
+        all = [],
+        tick = 0,
+        animating = false,
 
-    ctx.fillStyle = '#222';                                // Background color of initial message panel
-    ctx.fillRect(0, 0, windowWidth, windowHeight);         // Paint initial message panel
-    ctx.fillStyle = '#ccc';                                // Color of inital message
-    ctx.font = '50px Verdana';                             // Inital message font
+        Tau = Math.PI * 2;
+
+    ctx.fillStyle = '#222'; // Background color of initial message panel
+    ctx.fillRect(0, 0, windowWidth, windowHeight); // Paint initial message panel
+    ctx.fillStyle = '#ccc'; // Color of inital message
+    ctx.font = '50px Verdana'; // Inital message font
     ctx.fillText('Calculating Nodes', windowWidth / 2 - ctx.measureText('Calculating Nodes').width / 2, windowHeight / 2 - 15);
 
     window.setTimeout(init, 4); // to render the loading screen
@@ -107,18 +107,18 @@ function animation(){
         this.glowSpeed = opts.baseGlowSpeed + opts.addedGlowSpeed * Math.random();
     }
 
-    Connection.prototype.link = function () {
+    Connection.prototype.link = function() {
         if (this.size < opts.minSize)
             return this.isEnd = true;
 
         var links = [],
-        connectionsNum = opts.baseConnections + Math.random() * opts.addedConnections | 0,
-        attempt = opts.connectionAttempts,
+            connectionsNum = opts.baseConnections + Math.random() * opts.addedConnections | 0,
+            attempt = opts.connectionAttempts,
 
-        alpha,beta,len,
-        cosA,sinA,cosB,sinB,
-        pos = {},
-        passedExisting, passedBuffered;
+            alpha, beta, len,
+            cosA, sinA, cosB, sinB,
+            pos = {},
+            passedExisting, passedBuffered;
 
         while (links.length < connectionsNum && --attempt > 0) {
             alpha = Math.random() * Math.PI;
@@ -158,7 +158,7 @@ function animation(){
         else {
             for (var i = 0; i < links.length; ++i) {
                 var pos = links[i],
-                connection = new Connection(pos.x, pos.y, pos.z, this.size * opts.sizeMultiplier);
+                    connection = new Connection(pos.x, pos.y, pos.z, this.size * opts.sizeMultiplier);
 
                 this.links[i] = connection;
                 all.push(connection);
@@ -170,7 +170,7 @@ function animation(){
         }
     };
 
-    Connection.prototype.step = function () {
+    Connection.prototype.step = function() {
         this.setScreen();
         this.screen.color = (this.isEnd ? opts.endColor : opts.connectionColor).replace('light', 30 + tick * this.glowSpeed % 30).replace('alp', .2 + (1 - this.screen.z / mostDistant) * .8);
 
@@ -180,7 +180,7 @@ function animation(){
         }
     };
 
-    Connection.rootStep = function () {
+    Connection.rootStep = function() {
         this.setScreen();
         this.screen.color = opts.rootColor.replace('light', 30 + tick * this.glowSpeed % 30).replace('alp', (1 - this.screen.z / mostDistant) * .8);
 
@@ -190,14 +190,14 @@ function animation(){
         }
     };
 
-    Connection.prototype.draw = function () {
+    Connection.prototype.draw = function() {
         ctx.fillStyle = this.screen.color;
         ctx.beginPath();
         radius = this.screen.scale * this.size;
 
-        if(radius < 0)
+        if (radius < 0)
             radius = radius * -1; // fix negative value error
-        
+
         ctx.arc(this.screen.x, this.screen.y, radius, 0, Tau);
         ctx.fill();
     };
@@ -211,12 +211,12 @@ function animation(){
         this.setConnection(connection);
     }
 
-    Data.prototype.reset = function () {
+    Data.prototype.reset = function() {
         this.setConnection(connections[0]);
         this.ended = 2;
     };
-    
-    Data.prototype.step = function () {
+
+    Data.prototype.step = function() {
         this.proportion += this.speed;
 
         if (this.proportion < 1) {
@@ -224,8 +224,7 @@ function animation(){
             this.y = this.oy + this.dy * this.proportion;
             this.z = this.oz + this.dz * this.proportion;
             this.size = (this.os + this.ds * this.proportion) * opts.dataToConnectionSize;
-        } 
-        else
+        } else
             this.setConnection(this.nextConnection);
 
         this.screen.lastX = this.screen.x;
@@ -235,7 +234,7 @@ function animation(){
 
     };
 
-    Data.prototype.draw = function () {
+    Data.prototype.draw = function() {
         if (this.ended)
             return --this.ended; // not sre why the thing lasts 2 frames, but it does
 
@@ -247,7 +246,7 @@ function animation(){
         ctx.stroke();
     };
 
-    Data.prototype.setConnection = function (connection) {
+    Data.prototype.setConnection = function(connection) {
         if (connection.isEnd)
             this.reset();
         else {
@@ -274,10 +273,10 @@ function animation(){
         }
     };
 
-    Connection.prototype.setScreen = Data.prototype.setScreen = function () {
+    Connection.prototype.setScreen = Data.prototype.setScreen = function() {
         var x = this.x,
-        y = this.y,
-        z = this.z;
+            y = this.y,
+            z = this.z;
 
         // apply rotation on X axis
         var Y = y;
@@ -301,8 +300,8 @@ function animation(){
 
     function squareDist(a, b) {
         var x = b.x - a.x,
-        y = b.y - a.y,
-        z = b.z - a.z;
+            y = b.y - a.y,
+            z = b.z - a.z;
 
         return x * x + y * y + z * z;
     }
@@ -317,7 +316,7 @@ function animation(){
         ++tick;
 
         var rotX = tick * opts.rotVelX,
-        rotY = tick * opts.rotVelY;
+            rotY = tick * opts.rotVelY;
 
         cosX = Math.cos(rotX);
         sinX = Math.sin(rotX);
@@ -334,11 +333,11 @@ function animation(){
         ctx.beginPath();
         ctx.lineWidth = opts.wireframeWidth;
         ctx.strokeStyle = opts.wireframeColor;
-        all.map( (item) => item.step() );
+        all.map((item) => item.step());
         ctx.stroke();
         ctx.globalCompositeOperation = 'source-over';
-        all.sort( (a, b) => b.screen.z - a.screen.z );
-        all.map( (item) => item.draw() );
+        all.sort((a, b) => b.screen.z - a.screen.z);
+        all.map((item) => item.draw());
     }
 
     // EventListeners //
@@ -351,4 +350,3 @@ function animation(){
 
     window.addEventListener('click', init);
 }
-
