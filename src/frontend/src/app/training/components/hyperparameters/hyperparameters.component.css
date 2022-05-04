@@ -1,19 +1,16 @@
-.options{
+.options {
     margin: auto;
     margin-top: 100px;
-    border: 5px outset #8c8c8c;
     padding: 10px;
-    background-color: #f8f9fa85;
-    box-shadow: 10px 10px rgba(0,0,0,.15);
-    transition: all .4s ease;
-    border-radius: 0% 0% 0% 0% / 0% 0% 0% 0% ;
     height: auto;
     width: 80%;
     text-align: center;
 }
-.numberSpinner{
+
+.numberSpinner {
     width: 300px;
 }
+
 #miniCircle {
     /* position: relative;
     left: 20%;
@@ -21,29 +18,30 @@
     transform: translate(-50%,-50%);
 	width: 35px;
     height: 35px; */
-    margin-left: 50px;	
-}
-.miniLoader {
-    width: calc(100% - 0px);
-	height: calc(100% - 0px);
-	border: 8px solid #ffffff;
-	border-top: 8px solid #09f;
-	border-radius: 50%;
-	animation: rotate 1.5s linear infinite;
+    margin-left: 50px;
 }
 
-h4{
+.miniLoader {
+    width: calc(100% - 0px);
+    height: calc(100% - 0px);
+    border: 8px solid #ffffff;
+    border-top: 8px solid #09f;
+    border-radius: 50%;
+    animation: rotate 1.5s linear infinite;
+}
+
+h4 {
     text-align: center;
 }
-h6{
-    text-size-adjust: 80%;
-}
-.mat-form{
+
+.mat-form {
     transform: scale(0.8);
 }
-#button{
+
+#button {
     text-align: center;
 }
+
 .btn-circle.btn-sm {
     width: 80px;
     height: 80px;
@@ -52,8 +50,63 @@ h6{
     text-align: center;
 }
 
-#divChart{
-    display:block;
+#divChart {
+    display: block;
     width: 400px;
     height: 400px;
 }
+.Button {
+    perspective: 600px;
+    }
+    .Button.Button--start {
+      height: 45px;
+    }
+    .Button  button {
+    border-radius: 4px;
+    }
+    
+  
+  
+  button {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    box-shadow: 0px 0px 0px #750014;
+    background: radial-gradient(ellipse at center, #D60D2E 0%,#C20020 100%);
+    transition: transform 0.15s, box-shadow 0.15s;
+    transform: rotateX(0deg) translateY(0);
+    cursor: pointer;
+    -webkit-font-smoothing: antialiased;
+  }
+    button:hover {
+        box-shadow: 0px 5px 0px #750014;
+        border-radius: 8px;
+        transform: rotateX(30deg) translateY(0);
+    }
+    
+    button:hover:active {
+      text-shadow: 0 0 4px #AD001D;
+      box-shadow: 0 1px 0 #423847;
+      background: radial-gradient(ellipse at center, #FF002B 0%,#ED0028 100%);
+      transition: transform 0.05s, box-shadow 0.05s;
+      transform: rotateX(30deg) translateY(4px);
+    }
+    button:disabled{
+        opacity: 0.7;
+        box-shadow: 0px 0px 0px #750014;
+        border-radius: 8px;
+        transform: rotateX(0) translateY(0);
+        pointer-events: none;
+    }
+    
+    span {
+      position: relative;
+      font-size: 21px;
+      color: white;
+      text-transform: uppercase;
+      transform: translate3d(0,0,0);
+    }
+  

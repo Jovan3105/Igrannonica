@@ -16,8 +16,7 @@
     </div>
 </div>
 <div [ngStyle]="{'display': uploadDisplay}">
-    <app-upload #upload (linkEvent)="onShowDataClick($event)" 
-                (uploadEvent)="onFileSelected($event)"></app-upload>
+    <app-upload #upload (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
     <br><br>
 </div>
 
@@ -93,7 +92,7 @@
     </div>
 </div>
 
-<div id="second" class="container" style=" width: 1200px;" [ngStyle]="{'display': secondDisplay}">
+<div id="second" class="container-flex" [ngStyle]="{'display': secondDisplay}">
     <app-hyperparameters [featuresLabel]="featuresLabel" [datasetId]="datasetId"></app-hyperparameters>
     <!-- Deo kada se klikne na dugme -->
     <!-- <div class="options">
