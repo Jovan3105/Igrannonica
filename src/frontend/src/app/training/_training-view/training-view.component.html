@@ -38,7 +38,7 @@
             (deleteEvent)="enableUndoDeleted($event)">
             </app-show-table><br>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-3" style="padding:0em 0.3em;">
             <app-labels #Labels id="labelCards" [ngStyle]="{'display': labelsDisplay}" 
             (checkEvent)="changeColomnVisibility($event)" 
             (labelEvent)="onSelectedLabel($event)"></app-labels>

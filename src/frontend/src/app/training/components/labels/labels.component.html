@@ -1,32 +1,33 @@
-<div class="card" style="height: 70%;" *ngIf = "headers">
+<div class="card" style="height: 27rem;" *ngIf = "headers">
     <h5 class="card-header">Choose features</h5>
-    <div class="card-body" style="overflow-y: scroll;" tabindex="0">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th scope="col">Include</th>
-            <th scope="col">Column Name</th>
-            <th scope="col">Type</th>
-          </tr>
-        </thead>
-        <tbody *ngFor="let header of headers; index as i">
-          <tr  class="form-check-label">
-            <th><input class="form-check-input" type="checkbox" [value]="header.key" 
-              [checked]="checkboxCheckedArray[i]" 
-              [disabled]="checkboxDisabledArray[i]" id="inputCheckbox{{header.key}}" 
-              (change)= "onCheckChange($event)"></th>
-            <td><label class="form-check-label" for="inputCheckbox{{header.key}}">
-              {{header.name}}
-            </label></td>
-            <td><label class="form-check-label" for="inputCheckbox{{header.key}}">
-              <select class="form-select" aria-label="Default select example">
-                <option>Categorical</option>
-                <option value="1" selected>Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
-              </select>
-            </label></td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card-body" style="overflow-y: auto;padding:0.5rem" tabindex="0">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Include</th>
+              <th scope="col">Column Name</th>
+              <th scope="col">Type</th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let header of headers; index as i" style="overflow-y:auto;">
+            <tr>
+              <td><input class="form-check-input" type="checkbox" [value]="header.key" 
+                [checked]="checkboxCheckedArray[i]" 
+                [disabled]="checkboxDisabledArray[i]" id="inputCheckbox{{header.key}}" 
+                (change)= "onCheckChange($event)"></td>
+              <td><label class="form-check-label custom-label" for="inputCheckbox{{header.key}}">
+                {{header.name}}
+              </label></td>
+              <td>
+                <select class="form-select" aria-label="Default select example">
+                  <option>Categorical</option>
+                  <option value="1" selected>Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
+                </select></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
         <!--
         <div class="form-check">
             <input class="form-check-input" type="checkbox" [value]="header.key" 
@@ -47,7 +48,7 @@
         (change)="onSelectLabel()">
           <option [ngValue]="null" disabled>Choose target variable</option>
           <option class="word-wrap" *ngFor="let header of headers;" [ngValue]="header">
-            "{{header.name}}" ({{header.type}})"</option> <!-- TODO postaviti automatski tip -->
+            {{header.name}}</option> <!-- TODO postaviti automatski tip -->
         </select>
     </div>
   </div>
