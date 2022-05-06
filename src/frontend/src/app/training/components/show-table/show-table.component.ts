@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle, CsvExportParams } from 'ag-grid-community';
 import { Check, EditedCell, HeaderDict, TableIndicator, UndoData, undoType } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
@@ -327,6 +327,9 @@ export class ShowTableComponent implements OnInit {
 
     this.changeColomnVisibility(data.id.toString(),true);
     this.gridApi.setColumnDefs(this.columnDefs);
+  }
+  downloadFile(){
+    this.gridApi.exportDataAsCsv();
   }
 }
 

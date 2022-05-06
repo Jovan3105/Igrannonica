@@ -27,7 +27,8 @@
         (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifyModal" (click)="modalOpen()">
         Modify dataset
-        </button>
+        </button>&nbsp;
+        <button type="button" class="btn btn-warning" (click)="downloadFile()">Download</button>
     </div>
     <br><br>
     <div class="row mx-auto" id="mainContainer" [ngStyle]="{'visibility': containerVisibility}">

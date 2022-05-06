@@ -371,6 +371,10 @@ export class TrainingViewComponent implements OnInit {
   {
     this.dataTable.changeLabelColumn(data);
   }
+  public downloadFile(){
+    this.dataTable.downloadFile();
+  }
+  
 }
 
 enum View {
