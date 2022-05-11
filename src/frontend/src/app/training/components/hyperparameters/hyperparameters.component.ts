@@ -33,6 +33,7 @@ export class HyperparametersComponent implements OnInit
   metricsControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
 
+  problemType: string = "regression";
   numberOfEpochs: number = 1000;
   learningRate: number = 0.1;
   corrMatrixSource: any;
@@ -100,12 +101,11 @@ export class HyperparametersComponent implements OnInit
   };
 
   changeEpoch(value: number): void {
-    //console.log(value);
-    this.numberOfEpochs = value;
+    //this.numberOfEpochs = value;
   }
   changeRate(value: number): void {
     value = +value.toFixed(2)
-    this.learningRate = value;
+    //this.learningRate = value;
   }
   
   TrainingClick(){
@@ -126,7 +126,7 @@ export class HyperparametersComponent implements OnInit
     //   metrics: this.metricsArrayToSend,
     //   layers: this.layers
     // }).subscribe(this.startTrainingObserver);
-    // console.log("metric control "+ this.metricsControl.value[0].codename)
+    console.log(this.metricsControl)
     // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
     // console.log("testDataRatio "+ this.sliderValue/100)
     // console.log("metrics "+ this.metricsControl.value)
@@ -148,10 +148,17 @@ export class HyperparametersComponent implements OnInit
       lablesStr.push(element["name"]);
     }
 
+    // izdvajanje codename metrika-a u poseban niz
+    for (let index = 0; index < this.metricsControl.value.length; index++) {
+      const element = this.metricsControl.value[index];
+      this.metricsArrayToSend.push(element["codename"]);
+    }
+    //console.log(this.metricsArrayToSend)
+
     var trainingRequestPayload = {
       DatasetID             : this.datasetId,
       ClientConnID          : connectionID,
-      ProblemType           : "regression",
+      ProblemType           : this.problemType,
       Layers                : [// TODO hardcoded, ispraviti kada se doda vizuelizacija i izbor arhitekture
         { 
           index : 0,
@@ -183,7 +190,8 @@ export class HyperparametersComponent implements OnInit
       LearningRate          : this.learningRate
     }
     let subject = new WebSocket(this.backendSocketUrl); // TODO promeniti zbog prod (izmestiti u env)
-
+    console.log(trainingRequestPayload)
+    console.log(this.lossFunctionControl)
     subject.onopen = function (evt){
       console.log("Socket connection is established");
     }

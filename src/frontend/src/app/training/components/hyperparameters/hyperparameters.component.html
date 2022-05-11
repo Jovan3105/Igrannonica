@@ -26,43 +26,58 @@
             <div class="col-md-10 col-sm-12">
                 <div class="row">
                     <div class="col-md-3 col-sm-12 justify-content-center d-flex align-items-center">
-                        <div>
-                            <h5 class="mb-0">Problem type</h5>
-                            <select class="form-select col-md-11 col-sm-11" name="lossFunctionControl">
-                                    <option *ngFor="let item of lossFunctions" [value]="item">
-                                        {{item.name}}
-                                    </option>
-                                </select>
+                        <div class="col-md-12 col-sm-12">
+                            <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
+                                <mat-label><b>Problem type</b></mat-label>
+                                <mat-select class="col-md-12 col-sm-12" [(ngModel)]="problemType" name="problemType">
+                                    <mat-option value="regression">
+                                        Regression
+                                    </mat-option>
+                                    <mat-option value="classification" selected>
+                                        Classification
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="metricsControl.hasError('required')">Please choose some metrics</mat-error>
+                            </mat-form-field>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12 justify-content-center d-flex align-items-center">
-                        <div>
-                            <h5 class="mb-0">Metrics</h5>
-                            <select class="form-select col-md-11 col-sm-11" [formControl]="metricsControl" name="metricsControl " multiple>
-                                    <option *ngFor="let item of metrics " [value]="item ">
+                        <div class="col-md-12 col-sm-12">
+                            <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
+                                <mat-label><b>Metrics</b></mat-label>
+                                <mat-select class="col-md-12 col-sm-12" [formControl]="metricsControl" name="metricsControl" multiple>
+                                    <mat-option *ngFor="let item of metrics" [value]="item">
                                         {{item.name}}
-                                    <option>
-                                </select>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="metricsControl.hasError('required')">Please choose some metrics</mat-error>
+                            </mat-form-field>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12 justify-content-center d-flex align-items-center ">
                         <div class="col-md-12 col-sm-12">
-                            <h5 class="mb-0 ">Optimizer</h5>
-                            <select class="form-select col-md-11 col-sm-11" [formControl]="optimizerFunctionControl " name="optimizerFunctionControl ">
-                                    <option *ngFor="let item of optimizerFunctions " [value]="item ">
+                            <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
+                                <mat-label><b>Optimizer</b></mat-label>
+                                <mat-select class="col-md-12 col-sm-12" [formControl]="optimizerFunctionControl" name="optimizerFunctionControl">
+                                    <mat-option *ngFor="let item of optimizerFunctions" [value]="item">
                                         {{item.name}}
-                                    </option>
-                                </select>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="optimizerFunctionControl.hasError('required')">Please choose an optimizer</mat-error>
+                            </mat-form-field>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12 justify-content-center d-flex align-items-center ">
                         <div class="col-md-12 col-sm-12">
-                            <h5 class="mb-0 ">Loss function</h5>
-                            <select class="form-select col-md-11 col-sm-11" [formControl]="lossFunctionControl " name="lossFunctionControl ">
-                                    <option *ngFor="let item of lossFunctions " [value]="item ">
+                            <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
+                                <mat-label><b>Loss function</b></mat-label>
+                                <mat-select class="col-md-12 col-sm-12" [formControl]="lossFunctionControl" name="lossFunctionControl">
+                                    <mat-option *ngFor="let item of lossFunctions" [value]="item">
                                         {{item.name}}
-                                    </option>
-                                </select>
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="lossFunctionControl.hasError('required')">Please choose a loss function</mat-error>
+                            </mat-form-field>
                         </div>
                     </div>
                 </div>
@@ -73,26 +88,26 @@
             <div class="col-md-8 col-sm-12 justify-content-center d-flex align-items-center ">
                 <div style="width: 100%; ">
                     <h5 class="pb-0 ">Ratio of training to test data</h5>
-                    <ngx-slider [(value)]="sliderValue " [options]="sliderOptions " id="rangeSlider "></ngx-slider>
+                    <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
                 </div>
             </div>
             <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
                 <div>
                     <h5 class="mb-0 ">Number of epochs</h5>
-                    <input type="number " class="form-control " name="epochs " [value]="numberOfEpochs " [min]="0 ">
+                    <input type="number" class="form-control" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
                 </div>
             </div>
             <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
                 <div>
                     <h5 class=" mb-0 ">Learning rate</h5>
-                    <input type="number " class="form-control " name="rate " [value]="learningRate " [min]="0.1 " [step]="0.1 ">
+                    <input type="number" class="form-control" (ngModelChange)="changeRate($event)" [(ngModel)]="learningRate" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
                 </div>
             </div>
         </div>
         <br>
         <div class="row collapse.show justify-content-center d-flex align-items-center ">
             <h5 class="mb-0 ">Layers</h5>
-            <app-drag-and-drop [layers]="layers " [activationFunctions]="activationFunctions " (addLayerEvent)="addLayer() " (dropLayerEvent)="drop($event) " (removeLayerEvent)="removeLayer($event) "></app-drag-and-drop>
+            <app-drag-and-drop [layers]="layers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
         </div>
     </form>
 </div>

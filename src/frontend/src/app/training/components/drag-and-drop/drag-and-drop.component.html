@@ -10,24 +10,29 @@
                 <input type="number" name="units" class="form-control" [value]="layer.units" [min]="1">
             </div>
             <div class="row justify-content-center">
-                <h6 class="mb-0">Activation function</h6>
-                <select class=" form-select " aria-label="Default select example ">
-                    <option selected>Open this select menu</option>
-                    <option value="1 ">One</option>
-                    <option value="2 ">Two</option>
-                    <option value="3 ">Three</option>
-                  </select>
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Activation function</b></mat-label>
+                    <mat-select name="activationFunctionControl">
+                        <mat-option *ngFor="let item of activationFunctions" [value]="item">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                    <!-- <mat-error *ngIf="activationFunctionControl.hasError('required')">Please choose a activation function</mat-error> -->
+                </mat-form-field>
             </div>
-            <div class="row justify-content-center">
-                <h6 class="mb-0">Weight intializer</h6>
-                <select class=" form-select " aria-label="Default select example ">
-                    <option selected>Open this select menu</option>
-                    <option value="1 ">One</option>
-                    <option value="2 ">Two</option>
-                    <option value="3 ">Three</option>
-                  </select>
-            </div>
+                        <!-- [formControl]="activationFunctionControl" -->
 
+            <div class="row justify-content-center">
+                <mat-form-field class="mat-form" appearance="fill">
+                    <mat-label><b>Weight initializer</b></mat-label>
+                    <mat-select  name="activationFunctionControl">
+                        <mat-option *ngFor="let item of activationFunctions" [value]="item">
+                            {{item.name}}
+                        </mat-option>
+                    </mat-select>
+                    <!-- <mat-error *ngIf="activationFunctionControl.hasError('required')">Please choose a activation function</mat-error> -->
+                </mat-form-field>
+            </div>
         </div>
     </div>
 
