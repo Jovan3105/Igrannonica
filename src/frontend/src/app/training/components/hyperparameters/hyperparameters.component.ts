@@ -6,6 +6,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { throwIfEmpty } from 'rxjs';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -26,6 +27,7 @@ export class HyperparametersComponent implements OnInit
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
   lossFunctions: Hyperparameter[] = Constants.LOSS_FUNCTIONS;
   metrics: Hyperparameter[] = Constants.METRICS;
+  weightInitializers: Hyperparameter[] = Constants.WEIGHT_INITIALIZERS;
 
   //activationFunctionControl = new FormControl('', Validators.required);
   optimizerFunctionControl = new FormControl('', Validators.required);
@@ -70,9 +72,27 @@ export class HyperparametersComponent implements OnInit
   }
 
   layers= [
-    {"units":4,"af":"ReLu"},
-    {"units":2,"af":"ReLu"}
+    { 
+      index : 0,
+      units : 32,
+      weight_initializer  : "HeUniform",
+      activation_function : "ReLu",
+    },
+    { 
+      index : 1,
+      units : 8,
+      weight_initializer  : "HeUniform",
+      activation_function : "ReLu",
+    }
   ];
+
+  epoches_data:{epoch: number,loss: number,mean_absolute_error: number,val_loss: number,val_mean_absolute_error: number}[]=[];
+
+  loss_arr:number[]=[];
+  val_loss_arr:number[]=[];
+  epoches_arr:number[]=[0];
+
+  prikaz:string="none";
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
@@ -84,7 +104,24 @@ export class HyperparametersComponent implements OnInit
   
 
   addLayer(){
-    this.layers.push({"units":1,"af":"ReLu"});
+    this.layers.push({ 
+      index : this.layers.length-1,
+      units : 12,
+      weight_initializer  : "HeUniform",
+      activation_function : "ReLu",
+    });
+  }
+
+  changeWeight(selected:string,index:number)
+  {
+    this.layers[index].weight_initializer=selected;
+  }
+
+  changeActivation(event:[string,number])
+  {
+    this.layers[event[1]].activation_function=event[0];
+    console.log(this.layers);
+    console.log(this.layers);
   }
   
   startTrainingObserver:any = {
@@ -159,26 +196,7 @@ export class HyperparametersComponent implements OnInit
       DatasetID             : this.datasetId,
       ClientConnID          : connectionID,
       ProblemType           : this.problemType,
-      Layers                : [// TODO hardcoded, ispraviti kada se doda vizuelizacija i izbor arhitekture
-        { 
-          index : 0,
-          units : 32,
-          weight_initializer  : "HeUniform",
-          activation_function : "ReLu",
-        },
-        { 
-          index : 1,
-          units : 8,
-          weight_initializer  : "HeUniform",
-          activation_function : "ReLu",
-        },
-        { 
-          index : 2,
-          units : 1,
-          weight_initializer  : "HeUniform",
-          activation_function : "ReLu",
-        }
-      ],
+      Layers                : this.layers,
       Features              : featuresStr,
       Labels                : lablesStr,
       Metrics               : this.metricsArrayToSend,
@@ -206,11 +224,18 @@ export class HyperparametersComponent implements OnInit
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
+        _this.epoches_data=[];
+        _this.prikaz="block";
       }
       else {
         // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
         console.log(epoch_stats);
+        _this.epoches_data.push(epoch_stats);
+        // TODO srediti da se salje samo element a ne ceo niz
+        _this.loss_arr=_this.epoches_data.map(a => a.loss);
+        _this.val_loss_arr=_this.epoches_data.map(a => a.val_loss);
+        _this.epoches_arr=_this.epoches_data.map(a => a.epoch);
       }
     }
 

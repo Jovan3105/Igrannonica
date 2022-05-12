@@ -10,23 +10,23 @@
                 <input type="number" name="units" class="form-control" [value]="layer.units" [min]="1">
             </div>
             <div class="row justify-content-center">
-                <mat-form-field class="mat-form" appearance="fill">
+                <mat-form-field style="width: 130px;min-width: 130px;height: 80%;margin: 0px;font-size: 10px;padding: 5px;" class="mat-form" appearance="fill">
                     <mat-label><b>Activation function</b></mat-label>
                     <mat-select name="activationFunctionControl">
-                        <mat-option *ngFor="let item of activationFunctions" [value]="item">
+                        <mat-option (onSelectionChange)="selectActivation([item.codename,i])" *ngFor="let item of activationFunctions" [value]="item">
                             {{item.name}}
                         </mat-option>
                     </mat-select>
                     <!-- <mat-error *ngIf="activationFunctionControl.hasError('required')">Please choose a activation function</mat-error> -->
                 </mat-form-field>
             </div>
-                        <!-- [formControl]="activationFunctionControl" -->
+            <!-- [formControl]="activationFunctionControl" -->
 
-            <div class="row justify-content-center">
-                <mat-form-field class="mat-form" appearance="fill">
+            <div class="row justify-content-center" style="position: relative;top: -15px;margin-bottom: -30px;">
+                <mat-form-field style="width: 130px;min-width: 130px;height: 80%;margin: 0px;font-size: 10px;padding: 5px;" class="mat-form" appearance="fill">
                     <mat-label><b>Weight initializer</b></mat-label>
-                    <mat-select  name="activationFunctionControl">
-                        <mat-option *ngFor="let item of activationFunctions" [value]="item">
+                    <mat-select name="weightInitializatorControl">
+                        <mat-option *ngFor="let item of weightInitializers" [value]="item">
                             {{item.name}}
                         </mat-option>
                     </mat-select>

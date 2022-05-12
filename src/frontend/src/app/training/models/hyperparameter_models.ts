@@ -73,4 +73,21 @@ export class Constants{
       {name: 'True Negatives', info: 'TrueNegatives!', codename: 'TrueNegatives'},
       {name: 'True Positives', info: 'TruePositives!', codename: 'TruePositives'},
     ];
+
+    static readonly WEIGHT_INITIALIZERS: Hyperparameter[] = [
+      {name: 'Constant', info: 'Constant!', codename: 'Constant'},
+      {name: 'Glorot Normal', info: 'GlorotNormal!', codename: 'GlorotNormal'},
+      {name: 'Glorot Uniform', info: 'GlorotUniform!', codename: 'GlorotUniform'},
+      {name: 'HeNormal', info: 'HeNormal!', codename: 'HeNormal'},
+      {name: 'HeUniform', info: 'HeUniform!', codename: 'HeUniform'},
+      {name: 'Identity', info: 'Identity!', codename: 'Identity'},
+      {name: 'Lecun Normal', info: 'LecunNormal!', codename: 'LecunNormal'},
+      {name: 'Lecun Uniform', info: 'LecunUniform!', codename: 'LecunUniform'},
+      {name: 'Ones', info: 'OnesExpOnesonential!', codename: 'Ones'},
+      {name: 'Orthogonal', info: 'Orthogonal!', codename: 'Orthogonal'},
+      {name: 'Random Normal', info: 'RandomNormal!', codename: 'RandomNormal'},
+      {name: 'Random Uniform', info: 'RandomUniform!', codename: 'RandomUniform'},
+      {name: 'Truncated Normall', info: 'TruncatedNormal!', codename: 'TruncatedNormal'},
+      {name: 'Zeros', info: 'Zeros!', codename: 'Zeros'},
+    ];
 }
