@@ -6,6 +6,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { throwIfEmpty } from 'rxjs';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -73,6 +74,12 @@ export class HyperparametersComponent implements OnInit
     {"units":4,"af":"ReLu"},
     {"units":2,"af":"ReLu"}
   ];
+
+  epoches_data=[{"epoch": 718,"loss": -388.0931091308594,"mean_absolute_error": 153.77066040039062,"val_loss": -704.5148315429688,"val_mean_absolute_error": 126.18904113769531}];
+
+  loss_arr=this.epoches_data.map(a => a.loss);
+  val_loss_arr=this.epoches_data.map(a => a.val_loss);
+  epoches_arr=this.epoches_data.map(a => a.epoch);
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
@@ -206,11 +213,17 @@ export class HyperparametersComponent implements OnInit
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
+        _this.epoches_data=[];
       }
       else {
         // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
         console.log(epoch_stats);
+        _this.epoches_data.push(epoch_stats);
+        // TODO srediti da se salje samo element a ne ceo niz
+        _this.loss_arr=_this.epoches_data.map(a => a.loss);
+        _this.val_loss_arr=_this.epoches_data.map(a => a.val_loss);
+        _this.epoches_arr=_this.epoches_data.map(a => a.epoch);
       }
     }
 

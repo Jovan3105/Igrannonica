@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ChartConfiguration, ChartType } from 'chart.js';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Chart, ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
@@ -9,18 +9,34 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class ChartComponent implements OnInit {
 
-  chartDisplay:string = "none";
-  
+  chartDisplay:string = "block";
+
+  @Input() epoch!:number[];
+  @Input() loss!:number[];
+  @Input() val_loss!:number[];
+
+  niz:number[]=[1,7,8,9];
+
   constructor() {}
 
   ngOnInit(): void {
   }
 
+  ngOnChanges()
+  {
+    // TODO modifikovati da prima samo element i onda dodati u niz ovde
+    this.lineChartData.datasets[0].data=this.loss;
+      this.lineChartData.datasets[1].data=this.val_loss;
+      this.lineChartData.labels=this.epoch;
+      this.chart?.chart?.update();
+  }
+
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
-        data: [ 65, 59, 80, 81, 56, 55, 40 ],
-        label: 'Series A',
+        // data: this.epoches_data.map(a => a.loss),
+        data: [],
+        label: 'Loss',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -30,19 +46,8 @@ export class ChartComponent implements OnInit {
         fill: 'origin',
       },
       {
-        data: [ 28, 48, 40, 19, 86, 27, 90 ],
-        label: 'Series B',
-        backgroundColor: 'rgba(77,83,96,0.2)',
-        borderColor: 'rgba(77,83,96,1)',
-        pointBackgroundColor: 'rgba(77,83,96,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(77,83,96,1)',
-        fill: 'origin',
-      },
-      {
-        data: [ 180, 480, 770, 90, 1000, 270, 400 ],
-        label: 'Series C',
+        data: [],
+        label: 'Validation loss',
         yAxisID: 'y-axis-1',
         backgroundColor: 'rgba(255,0,0,0.3)',
         borderColor: 'red',
@@ -52,8 +57,19 @@ export class ChartComponent implements OnInit {
         pointHoverBorderColor: 'rgba(148,159,177,0.8)',
         fill: 'origin',
       }
+      // {
+      //   data: [],
+      //   label: 'Validation loss',
+      //   backgroundColor: 'rgba(77,83,96,0.2)',
+      //   borderColor: 'rgba(77,83,96,1)',
+      //   pointBackgroundColor: 'rgba(77,83,96,1)',
+      //   pointBorderColor: '#fff',
+      //   pointHoverBackgroundColor: '#fff',
+      //   pointHoverBorderColor: 'rgba(77,83,96,1)',
+      //   fill: 'origin',
+      // }
     ],
-    labels: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July' ]
+    labels: []
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -85,7 +101,8 @@ export class ChartComponent implements OnInit {
     }
   };
 
-  public lineChartType: ChartType = 'line';
+  public lineChartType: ChartType = 'line'; 
+  
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 

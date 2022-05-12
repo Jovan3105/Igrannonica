@@ -110,4 +110,5 @@
             <app-drag-and-drop [layers]="layers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
         </div>
     </form>
+    <app-chart class="col-md-12 col-sm-12 col-lg-12" [epoch]="epoches_arr" [loss]="loss_arr" [val_loss]="val_loss_arr"></app-chart>
 </div>

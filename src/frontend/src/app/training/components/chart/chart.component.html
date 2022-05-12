@@ -1,6 +1,3 @@
-<div [ngStyle]="{'display': chartDisplay, 'width':'400px'}">
-    <canvas baseChart width="400px" height="400px"
-                [data]="lineChartData"
-                [options]="lineChartOptions"
-                [type]="lineChartType"></canvas>
+<div class="col-md-12 col-sm-12" [ngStyle]="{'display': chartDisplay, 'width':'400px'}">
+    <canvas baseChart class="col-md-12 col-sm-12" [data]="lineChartData" [options]="lineChartOptions" [type]="lineChartType"></canvas>
 </div>
