@@ -33,9 +33,7 @@
     <div class="row mx-auto" id="mainContainer" [ngStyle]="{'visibility': containerVisibility}">
         <div class="col-lg">
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
-            (hideEvent)="changeCheckBox($event)"
-            (undoEvent)="enableUndo($event)"
-            (deleteEvent)="enableUndoDeleted($event)">
+            (hideEvent)="changeCheckBox($event)">
             </app-show-table><br>
         </div>
         <div class="col-lg-4" style="padding:0em 0.3em;">
@@ -56,7 +54,7 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="staticBackdropLabel">Modify '{{fileName}}' dataset</h5>
                         <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()" aria-label="Close" id="modal-close">
-                  </button>
+                        </button>
                     </div>
                     <div class="modal-body">
                         <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.data" [header]="dataTable.headers"></app-modify-dataset>

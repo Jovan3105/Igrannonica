@@ -9,7 +9,7 @@ import { ShowTableComponent } from '../show-table/show-table.component';
 })
 export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges {
 
-  @ViewChild('modifyTable') private modifyTable!: ShowTableComponent;
+  @ViewChild('modifyTable') public modifyTable!: ShowTableComponent;
   @Input() table_data:any;
   @Input() header:HeaderDict[] = [];
   @Input() undoDisabled:boolean = true;

@@ -27,7 +27,7 @@
             </ul>
             <ul class="navbar-nav navbar-right" *ngIf="!displayLoginElement && user$">
                 <li class="nav-item">
-                    <a class="nav-link user-select-none" id="username">
+                    <a class="nav-link disabled">
                         <!--[routerLink]="['/api/my-profile']" routerLinkActive="active"-->
                         {{(user$ | async)?.username}}
                     </a>
