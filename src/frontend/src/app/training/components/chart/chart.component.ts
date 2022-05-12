@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Chart, ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
@@ -9,11 +9,12 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class ChartComponent implements OnInit {
 
-  chartDisplay:string = "block";
+  chartDisplay:string = "none";
 
   @Input() epoch!:number[];
   @Input() loss!:number[];
   @Input() val_loss!:number[];
+  @Input() prikaz!:string;
 
   constructor() {}
 
@@ -27,6 +28,7 @@ export class ChartComponent implements OnInit {
       this.lineChartData.datasets[1].data=this.val_loss;
       this.lineChartData.labels=this.epoch;
       this.chart?.chart?.update();
+      this.chartDisplay=this.prikaz;
   }
 
   public lineChartData: ChartConfiguration['data'] = {

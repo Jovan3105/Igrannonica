@@ -19,7 +19,7 @@
                 </div>
                 <div class="row justify-content-center d-flex align-items-center">
                     <div>
-                        <h3>Epoch: 000,000,000</h3>
+                        <h3>Epoch: {{epoches_arr[epoches_arr.length-1]}}</h3>
                     </div>
                 </div>
             </div>
@@ -107,8 +107,8 @@
         <br>
         <div class="row collapse.show justify-content-center d-flex align-items-center ">
             <h5 class="mb-0 ">Layers</h5>
-            <app-drag-and-drop [layers]="layers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
+            <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (changeActivationEvent)="changeActivation($event)" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
         </div>
     </form>
-    <app-chart class="col-md-12 col-sm-12 col-lg-12" [epoch]="epoches_arr" [loss]="loss_arr" [val_loss]="val_loss_arr"></app-chart>
+    <app-chart class="col-md-12 col-sm-12 col-lg-12" [prikaz]="prikaz" [epoch]="epoches_arr" [loss]="loss_arr" [val_loss]="val_loss_arr"></app-chart>
 </div>
