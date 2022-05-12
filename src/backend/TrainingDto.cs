@@ -8,8 +8,8 @@ namespace backend
         public int DatasetID { get; set; }
         public string ProblemType { get; set; }
         public Layer[] Layers { get; set; } = Array.Empty<Layer>();
-        public string[] Features { get; set; }
-        public string[] Labels { get; set; }
+        public Column[] Features { get; set; }
+        public Column[] Labels { get; set; }
         public string[] Metrics { get; set; }
         public string LossFunction { get; set; }
         public float TestDatasetSize { get; set; }

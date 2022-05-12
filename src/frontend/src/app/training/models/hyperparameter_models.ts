@@ -74,3 +74,14 @@ export class Constants{
       {name: 'True Positives', info: 'TruePositives!', codename: 'TruePositives'},
     ];
 }
+
+export class Column {
+  name: string;
+  encoder: string;
+  // type: string;
+
+  constructor(name: string, encoder: string) {
+    this.name = name;
+    this.encoder = encoder;
+  }
+}
