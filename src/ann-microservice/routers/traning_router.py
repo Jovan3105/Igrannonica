@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Body
 from typing import Optional, List
 from pydantic import AnyHttpUrl
 
-from models.models import NNLayer
+from models.models import NNLayer, Column
 from services.training_service import train_model
 from services.dataprep_service import get_basic_info
 from services.shared_service import log, read_json_data
@@ -29,8 +29,8 @@ async def begin_training(
     stored_dataset   : AnyHttpUrl = Body("http://localhost:7220/Datasets/0/129/weight-height.json"),
     problem_type     : str = Body('regression'),
     layers           : List[NNLayer] = Body(...),
-    features         : List[str] = Body(...),
-    labels           : List[str] = Body(...),
+    features         : List[Column] = Body(...),
+    labels           : List[Column] = Body(...),
     metrics          : List[Metric] = Body([Metric.MeanAbsoluteError]),
     loss_function    : LossFunction = Body(LossFunction.MeanAbsoluteError),
     test_size        : float = Body(0.25),
@@ -65,12 +65,12 @@ async def begin_training(
     # Validate feature and label lists #
 
     for feature in features:
-        if feature not in dataset_headers:
-            raise HTTPException(status_code=400, detail=f"Invalid feature: {feature}")
+        if feature.name not in dataset_headers:
+            raise HTTPException(status_code=400, detail=f"Invalid feature: {feature.name}")
         
     for label in labels:
-        if label not in dataset_headers:
-            raise HTTPException(status_code=400, detail=f"Invalid label: {label}")
+        if label.name not in dataset_headers:
+            raise HTTPException(status_code=400, detail=f"Invalid label: {label.name}")
 
     # Validate metric list #
 

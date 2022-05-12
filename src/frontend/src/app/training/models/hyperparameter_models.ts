@@ -91,3 +91,14 @@ export class Constants{
       {name: 'Zeros', info: 'Zeros!', codename: 'Zeros'},
     ];
 }
+
+export class Column {
+  name: string;
+  encoder: string;
+  // type: string;
+
+  constructor(name: string, encoder: string) {
+    this.name = name;
+    this.encoder = encoder;
+  }
+}

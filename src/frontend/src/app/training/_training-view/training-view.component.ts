@@ -50,6 +50,7 @@ export class TrainingViewComponent implements OnInit {
   basicInfo:string = "";
   modalDisplay:boolean = false;
   confirmation:boolean = false;
+  columnEncodings: string[] = [];
 
   constructor(
     private datasetService: DatasetService, 
@@ -70,6 +71,7 @@ export class TrainingViewComponent implements OnInit {
 
   public form: FormData = new FormData();
   
+  colEncodings: string[] = [];
   public featuresLabel:any;
   //activateModal:boolean = false;
 
@@ -373,6 +375,10 @@ export class TrainingViewComponent implements OnInit {
   }
   public downloadFile(){
     this.dataTable.downloadFile();
+  }
+
+  getSelectedEncoding() {
+    return this.labels.selectedEncodings;
   }
   
 }
