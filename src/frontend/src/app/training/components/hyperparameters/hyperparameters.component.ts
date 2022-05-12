@@ -16,6 +16,7 @@ export class HyperparametersComponent implements OnInit
 {
   @Input() featuresLabel:any;
   @Input() datasetId:any;
+  @Input() colEncodings:any;
   
   loaderMiniDisplay:string = "none";
   readonly backendSocketUrl = environment.backendSocketUrl;
@@ -139,7 +140,7 @@ export class HyperparametersComponent implements OnInit
     for (let index = 0; index < this.featuresLabel['features'].length; index++) {
       const element = this.featuresLabel['features'][index];
       // TODO hardcoded
-      features.push(new Column(element["name"], "OneHot"));
+      features.push(new Column(element["name"], this.colEncodings[index]));
     } 
       
     // izdvajanje naziva label-a u poseban niz
@@ -147,7 +148,7 @@ export class HyperparametersComponent implements OnInit
     for (let index = 0; index < this.featuresLabel['label'].length; index++) {
       const element = this.featuresLabel['label'][index];
       // TODO hardcoded
-      lables.push(new Column(element["name"], "None"));
+      lables.push(new Column(element["name"], this.colEncodings[index]));
     } 
 
     // izdvajanje codename-ova metrika u poseban niz

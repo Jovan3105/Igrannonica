@@ -14,6 +14,7 @@ export class LabelsComponent implements OnInit {
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
   selectedLabel:any = null;
+  selectedEncodings:string[];
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
 
@@ -25,7 +26,7 @@ export class LabelsComponent implements OnInit {
     this.labelEvent = new EventEmitter<{id:number,pred:number | null}>();
     this.checkboxCheckedArray = new Array<boolean>();
     this.checkboxDisabledArray = new Array<boolean>();
-
+    this.selectedEncodings = new Array<string>();
   }
 
   ngOnInit(): void {
@@ -44,6 +45,7 @@ export class LabelsComponent implements OnInit {
     for(let i = 0; i<headers.length; i++) {
       this.checkboxCheckedArray.push(true);
       this.checkboxDisabledArray.push(false);
+      this.selectedEncodings.push("None");
     };
   }
 
@@ -98,9 +100,12 @@ export class LabelsComponent implements OnInit {
     {
 
       for(let i=0; i<this.headers.length; i++)
-      {
-        if (this.checkboxCheckedArray[i]) tempHeader.push(this.headers[i]);
-      }
+        if (this.checkboxCheckedArray[i]) 
+        {
+          tempHeader.push(this.headers[i]);
+          //this.selectedEncodings =
+        }
+
       if (this.selectedLabel) 
       {
         features = tempHeader.filter(element => element.key != this.selectedLabel.key);

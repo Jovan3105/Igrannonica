@@ -8,6 +8,7 @@
               <th scope="col">Include</th>
               <th scope="col">Column Name</th>
               <th scope="col">Type</th>
+              <th scope="col">Encoding</th> <!-- TODO dodati *ngIf i disable-ovati kada je numericki tip -->
             </tr>
           </thead>
           <tbody *ngFor="let header of headers; index as i" style="overflow-y:auto;">
@@ -21,9 +22,18 @@
               </label></td>
               <td>
                 <select class="form-select" aria-label="Default select example">
-                  <option>Categorical</option>
-                  <option value="1" selected>Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
-                </select></td>
+                  <option value="categorical">Categorical</option>
+                  <option value="numerical" selected>Numerical</option> <!--TODO postaviti automatski selected u odnosu na tip-->
+                </select>
+              </td>
+              <td>
+                <select class="form-select" aria-label="Default select example" [(ngModel)]="selectedEncodings" name="selectedEncodings">
+                  <option value="None" selected>None</option><!-- TODO izmestiti listu encoding-a -->
+                  <option value="OneHot">One Hot</option>
+                  <option value="Ordinal">Ordinal</option> 
+                  <option value="Label">Label</option> 
+                </select>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -45,7 +55,7 @@
     <h5 class="card-header">Choose target variable</h5>
     <div class="card-body">
         <select [(ngModel)]="selectedLabel" #selectLabel class="form-select" aria-label="Odabir izlaza" 
-        (change)="onSelectLabel()">
+        (change)="onSelectLabel()"><!-- TODO povecati font za aria-label -->
           <option [ngValue]="null" disabled>Choose target variable</option>
           <option class="word-wrap" *ngFor="let header of headers;" [ngValue]="header">
             {{header.name}}</option> <!-- TODO postaviti automatski tip -->
