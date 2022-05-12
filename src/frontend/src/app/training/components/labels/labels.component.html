@@ -21,8 +21,8 @@
               </label></td>
               <td>
                 <select class="form-select" aria-label="Default select example">
-                  <option>Categorical</option>
-                  <option value="1" selected>Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
+                  <option value="1" [selected]="header.type =='object'">Categorical</option>
+                  <option value="2" [selected]="header.type =='int64' || header.type =='float64'">Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
                 </select></td>
             </tr>
           </tbody>

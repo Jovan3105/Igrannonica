@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CellStyle, CsvExportParams } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CsvExportParams, } from 'ag-grid-community';
 import { Check, EditedCell, HeaderDict, TableIndicator, UndoData, undoType } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
@@ -17,7 +17,7 @@ export class ShowTableComponent implements OnInit {
   private columnApi!: ColumnApi;
   private colIds:string[];
   readonly LIMIT:number = 50; //limit undo niza
-
+ 
   indicator?:TableIndicator;
   editedCells:EditedCell[];
   deletedRows:number[];
@@ -183,10 +183,25 @@ export class ShowTableComponent implements OnInit {
     }
   }
   
+  removeRows(rowsToDelete:object[])
+  {
+    const res = this.gridApi.applyTransaction({remove:rowsToDelete});
+
+    return res;
+  }
+
+  updateRows(rowsToUpdate:object[])
+  {
+    const res = this.gridApi.applyTransaction({update:rowsToUpdate});
+
+    return res;
+  }
+  
   onRemoveSelected() 
   {
     const selectedData = this.gridApi.getSelectedRows();
-    const res = this.gridApi.applyTransaction({ remove: selectedData });
+  
+    const res = this.removeRows(selectedData);
 
     this.addUndoElement(new UndoData(undoType.DELETE,res?.remove));
 
@@ -211,7 +226,7 @@ export class ShowTableComponent implements OnInit {
         
         data.node.data[data.column.colDef.field] = data.oldValue;
 
-        this.gridApi.applyTransaction({ update: [data.node.data] });
+        this.updateRows([data.node.data]);
 
         var index = this.editedCells.findIndex(x => x.row == data.rowIndex && x.col == data.column.getColId());
         
@@ -328,6 +343,7 @@ export class ShowTableComponent implements OnInit {
     this.changeColomnVisibility(data.id.toString(),true);
     this.gridApi.setColumnDefs(this.columnDefs);
   }
+  
   downloadFile(){
     this.gridApi.exportDataAsCsv();
   }

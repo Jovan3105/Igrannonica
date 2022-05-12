@@ -27,7 +27,7 @@
             </ul>
             <ul class="navbar-nav navbar-right" *ngIf="!displayLoginElement && user$">
                 <li class="nav-item">
-                    <a class="nav-link user-select-none">
+                    <a class="nav-link disabled">
                         <!--[routerLink]="['/api/my-profile']" routerLinkActive="active"-->
                         <img src="{{(user$ | async)?.image}}" alt="profile-picture" style="height: 40px; width: 40px;"> {{(user$ | async)?.username}}
                     </a>

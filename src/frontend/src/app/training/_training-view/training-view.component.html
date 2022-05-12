@@ -34,9 +34,7 @@
     <div class="row mx-auto" id="mainContainer" [ngStyle]="{'visibility': containerVisibility}">
         <div class="col-lg-9">
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
-            (hideEvent)="changeCheckBox($event)"
-            (undoEvent)="enableUndo($event)"
-            (deleteEvent)="enableUndoDeleted($event)">
+            (hideEvent)="changeCheckBox($event)">
             </app-show-table><br>
         </div>
         <div class="col-lg-3" style="padding:0em 0.3em;">
@@ -60,7 +58,7 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.data" [header]="dataTable.headers"></app-modify-dataset>
+                  <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.rowData" [header]="dataTable.headers"></app-modify-dataset>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>

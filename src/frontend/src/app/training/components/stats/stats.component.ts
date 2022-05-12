@@ -17,7 +17,7 @@ export class StatsComponent implements OnInit {
   @ViewChild('basicInfo') private basicInfo!:ShowTableComponent;
   corrMatrixSource: any;
 
-  constructor(private headersService:HeadersService, private domSanitizer: DomSanitizer,) { }
+  constructor(private headersService:HeadersService, private domSanitizer: DomSanitizer) { }
 
   ngOnInit(): void 
   {

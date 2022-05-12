@@ -26,10 +26,10 @@ export class TrainingViewComponent implements OnInit {
   metricsArrayToSend: any[] = [];
   //visibilityTrigger: boolean = false;
 
-  viewIndicator:View;
+  viewIndicator:View = View.UPLOAD;
   uploadDisplay:string = "block";
   loaderDisplay:string = "none";
-  containerVisibility:string = "hidden";
+  containerVisibility:string = "visible";
   nextButtonDisable:boolean = true;
   backButtonDisable:boolean = true;
   displayTableButtons:string = "block";
@@ -54,11 +54,7 @@ export class TrainingViewComponent implements OnInit {
   constructor(
     private datasetService: DatasetService, 
     private headersService: HeadersService,
-    public dialog: MatDialog
-    ) {
-    this.datasetId = -1;
-    this.viewIndicator = View.PREVIEW;
-  }
+    public dialog: MatDialog) {}
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('upload') private upload!:UploadComponent;
@@ -154,21 +150,25 @@ export class TrainingViewComponent implements OnInit {
 
   hideElements()
   {
-    this.viewIndicator = View.PREVIEW;
-    this.uploadDisplay = "none";
+    if (this.viewIndicator == View.UPLOAD) 
+    {
+      this.viewIndicator = View.PREVIEW;
+      this.uploadDisplay = "none";
+      
+    }
     this.firstVisibility = "none";
     this.loaderDisplay = "block";
-    this.containerVisibility = "hidden";
-    this.labelsDisplay = "none";
+    //this.containerVisibility = "hidden";
+    //this.labelsDisplay = "none";
     this.navButtonsDisplay = "none";
     this.nextButtonDisable = true;
   }
 
   showElements()
   {
-    this.firstVisibility = "block";
     this.loaderDisplay = "none";
-    this.containerVisibility = "visible";
+    this.firstVisibility = "block";
+    //this.containerVisibility = "visible";
     if (this.statsTableDisplay == "block") this.labelsDisplay = "none";
     else this.labelsDisplay = "block";
     this.navButtonsDisplay = "block";
@@ -211,42 +211,8 @@ export class TrainingViewComponent implements OnInit {
     }
   }
 
-  onRemoveSelected() 
-  {
-    this.dataTable.onRemoveSelected();
-  }
   modalOpen(){
     this.modalDisplay = true;
-  }
-  onApplyChanges()
-  {
-    var req:ModifiedData = new ModifiedData(this.dataTable.editedCells, this.dataTable.deletedRows, this.dataTable.deletedCols);
-
-    console.log(req);
-    this.datasetService.modifyDataset(this.datasetId, req).subscribe(
-      {
-        next: (response:any) =>{
-          console.log(response);
-          }
-      }
-    )
-  }
-
-  enableUndo(indicator:boolean)
-  {
-    if (indicator) this.undoDisabled = false;
-    else this.undoDisabled = true;
-  }
-
-  enableUndoDeleted(indicator:boolean)
-  {
-    if(indicator) this.undoDeletedDisabled = false;
-    else this.undoDeletedDisabled = true;
-  }
-
-  onUndo()
-  {
-    this.dataTable.onUndo();
   }
 
   toggleTables(event:any){
@@ -255,7 +221,6 @@ export class TrainingViewComponent implements OnInit {
     {
       event.currentTarget.innerHTML = "Show table";
       this.statsTableDisplay = "block";
-      this.deleteButtonDisplay = "none";
       this.labelsDisplay = "none";
       this.mainTableDisplay = "none";
     }
@@ -263,7 +228,6 @@ export class TrainingViewComponent implements OnInit {
     {
       event.currentTarget.innerHTML = "Show stats"
       this.statsTableDisplay = "none";
-      this.deleteButtonDisplay = "inline";
       this.labelsDisplay = "block";
       this.mainTableDisplay = "block";
     }
@@ -319,17 +283,7 @@ export class TrainingViewComponent implements OnInit {
     }
     
   }
-  openModifyDialog(){
-    
-    this.dialog.open(ModifyDatasetComponent,{
-      maxWidth: '100vw',
-      maxHeight: '100vh',
-      height: '100%',
-      width: '100%',
-      panelClass: 'full-screen-modal',
-      data: { title: this.fileName, table_data: this.dataTable.data, header: this.dataTable.headers },
-    });
-  }
+
   confirmationCancel()
   {
     this.confirmation = false;
@@ -345,14 +299,38 @@ export class TrainingViewComponent implements OnInit {
   {
     this.modalDisplay = false;
     this.hideElements();
+    var tempEdited: object[] = [];
+
     var req:ModifiedData = new ModifiedData(this.modifyModal.getEditedCells(), this.modifyModal.getDeletedRows(), this.modifyModal.getDeletedCols());
+
+    req.edited.forEach(element =>{
+      this.dataTable.rowData[element.row][this.dataTable.headers[element.col].name] = this.modifyModal.modifyTable.rowData[element.row][this.modifyModal.modifyTable.headers[element.col].name];
+      tempEdited.push(this.dataTable.rowData[element.row]);
+    });
 
     this.datasetService.modifyDataset(this.datasetId, req).subscribe(
       {
         next: (response:any) =>{
           //console.log(response);
-          
-          this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+          console.log(req);
+          //var startMillis = new Date().getTime();
+          var tempDeleted :object[] = [];
+          req.deletedRows.forEach(element => {
+            //console.log(this.dataTable.rowData[element]);
+            tempDeleted.push(this.dataTable.rowData[element])
+            this.dataTable.rowData.splice(element,1);
+          });
+          this.dataTable.updateRows(tempEdited);
+          this.dataTable.removeRows(tempDeleted);
+
+          this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
+          this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
+          this.showElements();
+          //var endMillis = new Date().getTime();
+          //var duration = endMillis - startMillis;
+          //console.log('Transaction took ' + duration.toLocaleString() + 'ms');
+
+          //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
           }
       }
     )

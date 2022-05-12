@@ -6,10 +6,15 @@
 }
 .tab-container{
     padding-bottom:2%;
+    text-align: center;
 }
 h3,h4
 {
     margin-top: 2%;
     text-align: center;
     color:#38424c;
+}
+.corr-img{
+    height: auto;
+    width: 60%;
 }
