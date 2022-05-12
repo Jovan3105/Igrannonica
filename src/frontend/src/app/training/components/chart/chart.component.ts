@@ -15,8 +15,6 @@ export class ChartComponent implements OnInit {
   @Input() loss!:number[];
   @Input() val_loss!:number[];
 
-  niz:number[]=[1,7,8,9];
-
   constructor() {}
 
   ngOnInit(): void {
