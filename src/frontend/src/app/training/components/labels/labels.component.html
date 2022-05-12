@@ -1,5 +1,5 @@
 <div class="card" style="height: 27rem;" *ngIf = "headers">
-    <h5 class="card-header">Choose features</h5>
+    <h3 class="card-header mb-0">Choose features</h3>
     <div class="card-body" style="overflow-y: auto;padding:0.5rem" tabindex="0">
       <div class="table-responsive">
         <table class="table table-hover">
@@ -27,7 +27,7 @@
                 </select>
               </td>
               <td>
-                <select class="form-select" aria-label="Default select example" [(ngModel)]="selectedEncodings" name="selectedEncodings">
+                <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)"s>
                   <option value="None" selected>None</option><!-- TODO izmestiti listu encoding-a -->
                   <option value="OneHot">One Hot</option>
                   <option value="Ordinal">Ordinal</option> 
@@ -52,7 +52,7 @@
   </div>
 
   <div class="card" style="height: 30%;" *ngIf = "headers">
-    <h5 class="card-header">Choose target variable</h5>
+    <h3 class="card-header mb-0">Choose target variable</h3>
     <div class="card-body">
         <select [(ngModel)]="selectedLabel" #selectLabel class="form-select" aria-label="Odabir izlaza" 
         (change)="onSelectLabel()"><!-- TODO povecati font za aria-label -->

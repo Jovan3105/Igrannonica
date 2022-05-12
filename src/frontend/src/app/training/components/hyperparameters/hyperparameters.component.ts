@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
@@ -6,6 +6,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { TrainingViewComponent } from '../../_training-view/training-view.component';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -16,12 +17,11 @@ export class HyperparametersComponent implements OnInit
 {
   @Input() featuresLabel:any;
   @Input() datasetId:any;
-  @Input() colEncodings:any;
   
   loaderMiniDisplay:string = "none";
   readonly backendSocketUrl = environment.backendSocketUrl;
 
-  constructor(private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
+  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -134,13 +134,14 @@ export class HyperparametersComponent implements OnInit
     // console.log("lossFunction "+ this.lossFunctionControl.value.codename)
     // console.log("metric array to send "+ this.metricsArrayToSend)
 
+    let colEncodings: string[] = this.trainingViewComponent.getSelectedEncoding()
     
     // izdvajanje naziva feature-a u poseban niz
     var features = []
     for (let index = 0; index < this.featuresLabel['features'].length; index++) {
       const element = this.featuresLabel['features'][index];
       // TODO hardcoded
-      features.push(new Column(element["name"], this.colEncodings[index]));
+      features.push(new Column(element["name"], colEncodings[0]));
     } 
       
     // izdvajanje naziva label-a u poseban niz
@@ -148,7 +149,7 @@ export class HyperparametersComponent implements OnInit
     for (let index = 0; index < this.featuresLabel['label'].length; index++) {
       const element = this.featuresLabel['label'][index];
       // TODO hardcoded
-      lables.push(new Column(element["name"], this.colEncodings[index]));
+      lables.push(new Column(element["name"], colEncodings[0]));
     } 
 
     // izdvajanje codename-ova metrika u poseban niz

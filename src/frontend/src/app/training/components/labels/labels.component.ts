@@ -13,8 +13,9 @@ export class LabelsComponent implements OnInit {
   pred: number | null;
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
+  @Output() selectedEncodings:string[];
+  
   selectedLabel:any = null;
-  selectedEncodings:string[];
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
 
@@ -120,4 +121,12 @@ export class LabelsComponent implements OnInit {
     return values;
   }
 
+  onEncodingChange(index: number, encoding: string) {
+    if(this.selectedEncodings.length-1 < index) 
+      this.selectedEncodings.push(encoding), console.log('Dodat '+ encoding);
+    else {
+      this.selectedEncodings[index] = encoding;
+      console.log("Izmenjen " + index + " na " + encoding)
+    }
+  }
 }
