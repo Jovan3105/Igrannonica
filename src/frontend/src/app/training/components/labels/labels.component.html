@@ -27,9 +27,9 @@
                 </select>
               </td>
               <td>
-                <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)"s>
-                  <option value="None" selected>None</option><!-- TODO izmestiti listu encoding-a -->
-                  <option value="OneHot">One Hot</option>
+                <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)" [disabled]="header.type =='int64' || header.type =='float64'">
+                  <option value="None" [hidden]="header.type == 'object'" selected>None</option><!-- TODO izmestiti listu encoding-a -->
+                  <option value="OneHot" [selected]="header.type =='object'">One Hot</option>
                   <option value="Ordinal">Ordinal</option> 
                   <option value="Label">Label</option> 
                 </select>
