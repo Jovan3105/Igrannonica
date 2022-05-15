@@ -41,6 +41,7 @@ async def begin_training(
     ):
 
     log(f"Feature list={features}; Label list={labels}; Metric list={metrics}; Layer list: {layers}")
+    log(f"Loss function={loss_function}; Optimizer={optimizer}")
 
     # Read data #
 

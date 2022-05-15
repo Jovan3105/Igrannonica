@@ -155,26 +155,7 @@ export class HyperparametersComponent implements OnInit
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
-    // var trainingService=this.trainingService;
     let connectionID = "";
-    // this.trainingService.sendDataForTraining({
-    //   epochs: this.numberOfEpochs,
-    //   activationFunction: this.activationFunctionControl.value.codename,
-    //   features: this.featuresLabel['features'],
-    //   labels: this.featuresLabel['label'],
-    //   optimizer: this.optimizerFunctionControl.value.codename,
-    //   lossFunction: this.lossFunctionControl.value.codename,
-    //   testDataRatio: this.sliderValue/100,
-    //   learningRate: this.learningRate,
-    //   metrics: this.metricsArrayToSend,
-    //   layers: this.layers
-    // }).subscribe(this.startTrainingObserver);
-    console.log(this.metricsControl)
-    // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
-    // console.log("testDataRatio "+ this.sliderValue/100)
-    // console.log("metrics "+ this.metricsControl.value)
-    // console.log("lossFunction "+ this.lossFunctionControl.value.codename)
-    // console.log("metric array to send "+ this.metricsArrayToSend)
 
     let colEncodings: string[] = this.trainingViewComponent.getSelectedEncoding()
     
@@ -195,11 +176,8 @@ export class HyperparametersComponent implements OnInit
     } 
 
     // izdvajanje codename-ova metrika u poseban niz
-    for (let index = 0; index < this.metricsControl.value.length; index++) {
-      const element = this.metricsControl.value[index];
-      this.metricsArrayToSend.push(element["codename"]);
-    }
-    //console.log(this.metricsArrayToSend)
+    this.metricsArrayToSend = this.metricsControl.value.map(
+      (item:any)=>item['codename']);
 
     var trainingRequestPayload = {
       DatasetID             : this.datasetId,
