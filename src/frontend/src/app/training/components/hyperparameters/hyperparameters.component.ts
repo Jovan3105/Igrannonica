@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -35,6 +37,9 @@ export class HyperparametersComponent implements OnInit
   lossFunctionControl = new FormControl('', Validators.required);
   metricsControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
+
+  @ViewChild('metricSelect') metricSelect!: MatSelect;
+  @ViewChild('lossSelect') lossSelect!: MatSelect;
 
   problemType: string = "regression";
   numberOfEpochs: number = 1000;
@@ -247,6 +252,10 @@ export class HyperparametersComponent implements OnInit
     subject.onclose = function(evt){
       console.log("Connection is terminated");
     }
+  }
+  reset(){
+    this.metricSelect.options.forEach((data: MatOption) => data.deselect());
+    this.lossSelect.options.forEach((data: MatOption) => data.deselect());
   }
 }
 
