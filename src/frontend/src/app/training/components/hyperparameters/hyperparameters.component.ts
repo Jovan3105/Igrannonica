@@ -8,7 +8,6 @@ import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
-
 @Component({
   selector: 'app-hyperparameters',
   templateUrl: './hyperparameters.component.html',
@@ -171,11 +170,8 @@ export class HyperparametersComponent implements OnInit
     } 
 
     // izdvajanje codename-ova metrika u poseban niz
-    for (let index = 0; index < this.metricsControl.value.length; index++) {
-      const element = this.metricsControl.value[index];
-      this.metricsArrayToSend.push(element["codename"]);
-    }
-    //console.log(this.metricsArrayToSend)
+    this.metricsArrayToSend = this.metricsControl.value.map(
+      (item:any)=>item['codename']);
 
     var trainingRequestPayload = {
       DatasetID             : this.datasetId,

@@ -72,6 +72,7 @@ namespace backend.Controllers
                 layers          = trainingDto.Layers,
                 features        = trainingDto.Features,
                 labels          = trainingDto.Labels,
+                metrics         = trainingDto.Metrics,
                 loss_function   = trainingDto.LossFunction,
                 test_size       = trainingDto.TestDatasetSize,
                 validation_size = trainingDto.ValidationDatasetSize,
