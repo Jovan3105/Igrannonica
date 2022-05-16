@@ -13,6 +13,8 @@ export class LabelsComponent implements OnInit {
   pred: number | null;
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
+  @Output() selectedEncodings:string[];
+  
   selectedLabel:any = null;
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
@@ -25,7 +27,7 @@ export class LabelsComponent implements OnInit {
     this.labelEvent = new EventEmitter<{id:number,pred:number | null}>();
     this.checkboxCheckedArray = new Array<boolean>();
     this.checkboxDisabledArray = new Array<boolean>();
-
+    this.selectedEncodings = new Array<string>();
   }
 
   ngOnInit(): void {
@@ -44,6 +46,7 @@ export class LabelsComponent implements OnInit {
     for(let i = 0; i<headers.length; i++) {
       this.checkboxCheckedArray.push(true);
       this.checkboxDisabledArray.push(false);
+      this.selectedEncodings.push("None");
     };
   }
 
@@ -98,9 +101,12 @@ export class LabelsComponent implements OnInit {
     {
 
       for(let i=0; i<this.headers.length; i++)
-      {
-        if (this.checkboxCheckedArray[i]) tempHeader.push(this.headers[i]);
-      }
+        if (this.checkboxCheckedArray[i]) 
+        {
+          tempHeader.push(this.headers[i]);
+          //this.selectedEncodings =
+        }
+
       if (this.selectedLabel) 
       {
         features = tempHeader.filter(element => element.key != this.selectedLabel.key);
@@ -115,4 +121,12 @@ export class LabelsComponent implements OnInit {
     return values;
   }
 
+  onEncodingChange(index: number, encoding: string) {
+    if(this.selectedEncodings.length-1 < index) 
+      this.selectedEncodings.push(encoding), console.log('Dodat '+ encoding);
+    else {
+      this.selectedEncodings[index] = encoding;
+      console.log("Izmenjen " + index + " na " + encoding)
+    }
+  }
 }

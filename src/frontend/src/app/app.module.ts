@@ -21,11 +21,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { NgChartsModule } from 'ng2-charts';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent
+    DashboardComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -49,4 +51,5 @@ import { NgChartsModule } from 'ng2-charts';
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+}

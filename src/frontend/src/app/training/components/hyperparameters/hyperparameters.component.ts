@@ -1,11 +1,15 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { Constants, Hyperparameter } from '../../models/hyperparameter_models';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
 import { FormControl, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { throwIfEmpty } from 'rxjs';
+import { TrainingViewComponent } from '../../_training-view/training-view.component';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -20,20 +24,25 @@ export class HyperparametersComponent implements OnInit
   loaderMiniDisplay:string = "none";
   readonly backendSocketUrl = environment.backendSocketUrl;
 
-  constructor(private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
+  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
   lossFunctions: Hyperparameter[] = Constants.LOSS_FUNCTIONS;
   metrics: Hyperparameter[] = Constants.METRICS;
+  weightInitializers: Hyperparameter[] = Constants.WEIGHT_INITIALIZERS;
 
-  activationFunctionControl = new FormControl('', Validators.required);
+  //activationFunctionControl = new FormControl('', Validators.required);
   optimizerFunctionControl = new FormControl('', Validators.required);
   lossFunctionControl = new FormControl('', Validators.required);
   metricsControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
 
-  numberOfEpochs: number = 4;
+  @ViewChild('metricSelect') metricSelect!: MatSelect;
+  @ViewChild('lossSelect') lossSelect!: MatSelect;
+
+  problemType: string = "regression";
+  numberOfEpochs: number = 1000;
   learningRate: number = 0.1;
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
@@ -69,9 +78,27 @@ export class HyperparametersComponent implements OnInit
   }
 
   layers= [
-    {"units":4,"af":"ReLu"},
-    {"units":2,"af":"ReLu"}
+    { 
+      index : 0,
+      units : 32,
+      weight_initializer  : "HeUniform",
+      activation_function : "ReLu",
+    },
+    { 
+      index : 1,
+      units : 8,
+      weight_initializer  : "HeUniform",
+      activation_function : "ReLu",
+    }
   ];
+
+  epoches_data:{epoch: number,loss: number,mean_absolute_error: number,val_loss: number,val_mean_absolute_error: number}[]=[];
+
+  loss_arr:number[]=[];
+  val_loss_arr:number[]=[];
+  epoches_arr:number[]=[0];
+
+  prikaz:string="none";
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
@@ -83,7 +110,24 @@ export class HyperparametersComponent implements OnInit
   
 
   addLayer(){
-    this.layers.push({"units":1,"af":"ReLu"});
+    this.layers.push({ 
+      index : this.layers.length-1,
+      units : 12,
+      weight_initializer  : "HeUniform",
+      activation_function : "ReLu",
+    });
+  }
+
+  changeWeight(selected:string,index:number)
+  {
+    this.layers[index].weight_initializer=selected;
+  }
+
+  changeActivation(event:[string,number])
+  {
+    this.layers[event[1]].activation_function=event[0];
+    console.log(this.layers);
+    console.log(this.layers);
   }
   
   startTrainingObserver:any = {
@@ -100,80 +144,48 @@ export class HyperparametersComponent implements OnInit
   };
 
   changeEpoch(value: number): void {
-    //console.log(value);
-    this.numberOfEpochs = value;
+    //this.numberOfEpochs = value;
   }
   changeRate(value: number): void {
     value = +value.toFixed(2)
-    this.learningRate = value;
+    //this.learningRate = value;
   }
   
   TrainingClick(){
     //this.loaderDisplay = "block";
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
-    // var trainingService=this.trainingService;
     let connectionID = "";
-    // this.trainingService.sendDataForTraining({
-    //   epochs: this.numberOfEpochs,
-    //   activationFunction: this.activationFunctionControl.value.codename,
-    //   features: this.featuresLabel['features'],
-    //   labels: this.featuresLabel['label'],
-    //   optimizer: this.optimizerFunctionControl.value.codename,
-    //   lossFunction: this.lossFunctionControl.value.codename,
-    //   testDataRatio: this.sliderValue/100,
-    //   learningRate: this.learningRate,
-    //   metrics: this.metricsArrayToSend,
-    //   layers: this.layers
-    // }).subscribe(this.startTrainingObserver);
-    // console.log("metric control "+ this.metricsControl.value[0].codename)
-    // console.log("optimizer "+ this.optimizerFunctionControl.value.codename)
-    // console.log("testDataRatio "+ this.sliderValue/100)
-    // console.log("metrics "+ this.metricsControl.value)
-    // console.log("lossFunction "+ this.lossFunctionControl.value.codename)
-    // console.log("metric array to send "+ this.metricsArrayToSend)
 
+    let colEncodings: string[] = this.trainingViewComponent.getSelectedEncoding()
     
     // izdvajanje naziva feature-a u poseban niz
-    var featuresStr = []
+    var features = []
     for (let index = 0; index < this.featuresLabel['features'].length; index++) {
       const element = this.featuresLabel['features'][index];
-      featuresStr.push(element["name"]);
-    }
+      // TODO hardcoded
+      features.push(new Column(element["name"], colEncodings[7]));
+    } 
       
-    // izdvajanje naziva feature-a u poseban niz
-    var lablesStr = []
+    // izdvajanje naziva label-a u poseban niz
+    var lables = []
     for (let index = 0; index < this.featuresLabel['label'].length; index++) {
       const element = this.featuresLabel['label'][index];
-      lablesStr.push(element["name"]);
-    }
+      // TODO hardcoded
+      lables.push(new Column(element["name"], colEncodings[7]));
+    } 
+
+    // izdvajanje codename-ova metrika u poseban niz
+    this.metricsArrayToSend = this.metricsControl.value.map(
+      (item:any)=>item['codename']);
 
     var trainingRequestPayload = {
       DatasetID             : this.datasetId,
       ClientConnID          : connectionID,
-      ProblemType           : "regression",
-      Layers                : [// TODO hardcoded, ispraviti kada se doda vizuelizacija i izbor arhitekture
-        { 
-          index : 0,
-          units : 32,
-          weight_initializer  : "HeUniform",
-          activation_function : this.activationFunctionControl.value.codename,
-        },
-        { 
-          index : 1,
-          units : 8,
-          weight_initializer  : "HeUniform",
-          activation_function : this.activationFunctionControl.value.codename,
-        },
-        { 
-          index : 2,
-          units : 1,
-          weight_initializer  : "HeUniform",
-          activation_function : this.activationFunctionControl.value.codename,
-        }
-      ],
-      Features              : featuresStr,
-      Labels                : lablesStr,
+      ProblemType           : this.problemType,
+      Layers                : this.layers,
+      Features              : features,
+      Labels                : lables,
       Metrics               : this.metricsArrayToSend,
       LossFunction          : this.lossFunctionControl.value.codename,
       TestDatasetSize       : this.sliderValue / 100,
@@ -182,8 +194,9 @@ export class HyperparametersComponent implements OnInit
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate
     }
-    let subject = new WebSocket(this.backendSocketUrl); // TODO promeniti zbog prod (izmestiti u env)
-
+    let subject = new WebSocket(this.backendSocketUrl);
+    console.log(trainingRequestPayload)
+    console.log(this.lossFunctionControl)
     subject.onopen = function (evt){
       console.log("Socket connection is established");
     }
@@ -198,11 +211,18 @@ export class HyperparametersComponent implements OnInit
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
+        _this.epoches_data=[];
+        _this.prikaz="block";
       }
       else {
         // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
         console.log(epoch_stats);
+        _this.epoches_data.push(epoch_stats);
+        // TODO srediti da se salje samo element a ne ceo niz
+        _this.loss_arr=_this.epoches_data.map(a => a.loss);
+        _this.val_loss_arr=_this.epoches_data.map(a => a.val_loss);
+        _this.epoches_arr=_this.epoches_data.map(a => a.epoch);
       }
     }
 
@@ -210,6 +230,10 @@ export class HyperparametersComponent implements OnInit
     subject.onclose = function(evt){
       console.log("Connection is terminated");
     }
+  }
+  reset(){
+    this.metricSelect.options.forEach((data: MatOption) => data.deselect());
+    this.lossSelect.options.forEach((data: MatOption) => data.deselect());
   }
 }
 

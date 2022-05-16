@@ -1,0 +1,8 @@
+li.nav-item {
+    cursor: pointer;
+}
+
+#username:hover {
+    color: #9E9E9E;
+    cursor: default;
+}

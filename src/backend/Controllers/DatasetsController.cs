@@ -127,6 +127,9 @@ namespace backend.Controllers
         }
 
         [HttpPost]
+        [DisableRequestSizeLimit,
+        RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
         [Route("uploadFile")]
         public async Task<ActionResult<List<Dataset>>> uploadFile(IFormFile file)
         { // TODO dodati user id u request
@@ -308,6 +311,7 @@ namespace backend.Controllers
             return $"{rootDirPath}/{filename}";
         }
 
+        // TODO razmotriti mogucnost drugacije implementacije ove metode
         public static string CreateDatasetURL(IConfiguration configuration, int userID, int datasetID, string filename)
         {
             string datasetsVirtPath = configuration["VirtualFolderPaths:Datasets"];

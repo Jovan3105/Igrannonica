@@ -1,8 +1,29 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { CancelRegistrationComponent } from './auth/components/cancel-registration/cancel-registration.component';
+import { EmailVerifComponent } from './auth/components/email-verif/email-verif.component';
+import { LoginComponent } from './auth/components/login/login.component';
+import { RegisterComponent } from './auth/components/register/register.component';
+import { ResetPasswordComponent } from './auth/components/reset-password/reset-password.component';
+import { AuthGuard } from './core/guards/auth.guard';
+import { DashboardGuard } from './core/guards/dashboard.guard';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { CatalogComponent } from './datasets/components/catalog/catalog.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { TrainingViewComponent } from './training/_training-view/training-view.component';
 
 const routes: Routes = [
-  { path:'', redirectTo:'home', pathMatch: 'full' }
+  { path: '', redirectTo:'home', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent, canActivate: [AuthGuard] },
+  { path: 'register', component: RegisterComponent, canActivate:[AuthGuard]},
+  { path: 'reset-password', component: ResetPasswordComponent},
+  { path: 'verifyEmail', component:EmailVerifComponent},
+  { path: 'cancelRegistration', component:CancelRegistrationComponent},
+  { path: 'datasets', component:CatalogComponent },
+  { path: 'home', component: DashboardComponent },
+  { path: 'training', component: TrainingViewComponent, canActivate: [DashboardGuard] },
+  { path: 'not-found', component: PageNotFoundComponent},
+  { path: '**', redirectTo:'not-found'}
   // Kostur da ako bude bilo potrebe postavimo lazy-loading
   /*
   {
