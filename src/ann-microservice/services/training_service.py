@@ -4,7 +4,7 @@ import tensorflow as tf
 
 from tensorflow import keras
 from fastapi import HTTPException
-from sklearn.compose import make_column_transformer
+from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
@@ -47,13 +47,17 @@ def encode_and_scale(cont_features: [str], encoders_cols_dict: {str}, X_train, X
     if not 'Ordinal' in encoders_cols_dict:
         encoders_cols_dict['Ordinal'] = []
         
-    if not 'Label' in encoders_cols_dict:
-        encoders_cols_dict['Label'] = []
+    if not 'Binary' in encoders_cols_dict:
+        encoders_cols_dict['Binary'] = []
 
-    col_trans = make_column_transformer(
-        (MinMaxScaler(), cont_features),
-        (map_catcolencoder(CatColEncoder.OneHot), encoders_cols_dict['OneHot'])
-    )
+    col_trans = ColumnTransformer([
+        ("scaler", MinMaxScaler(), cont_features),
+        ("onehot", map_catcolencoder(CatColEncoder.OneHot), encoders_cols_dict['OneHot']),
+        ("ordinal", map_catcolencoder(CatColEncoder.Ordinal), encoders_cols_dict['Ordinal']),
+        ("binary", map_catcolencoder(CatColEncoder.Binary), encoders_cols_dict['Binary'])
+    ])
+
+    log(encoders_cols_dict)
 
     col_trans.fit(X_train)
 
@@ -82,7 +86,7 @@ def create_layer_array(nnlayers: NNLayer, problem_type: str, features: [str]):
 
     # Add output layer # TODO
 
-    output_layer_activation_func = ActivationFunction.Sigmoid
+    output_layer_activation_func = ActivationFunction.Linear
     
     if problem_type == 'classification':
         output_layer_activation_func = ActivationFunction.Softmax
@@ -150,13 +154,25 @@ def train_model(
     y = df[labels].copy()
     
     log("X")
-    print(X)
+    log(X)
 
     log("y")
-    print(y)
+    log(y)
 
     # Split dataset
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+
+    log("X_train")
+    log(X_train)
+
+    log("y_train")
+    log(y_train)
+
+    log("X_test")
+    log(X_test)
+
+    log("y_test")
+    log(y_test)
 
     # Scale (normalize) numerical and encode categorical data
     X_train_normal, X_test_normal, ct = encode_and_scale(cont_features, encoders_cols_dict, X_train, X_test)
@@ -188,13 +204,11 @@ def train_model(
     callback.init(client_conn_id)
 
     log("X_train_normal")
-    print(X_train_normal)
+    log(X_train_normal)
+    log(X_train_normal[0].shape)
 
-    log("X_test")
-    print(X_test)
-
-    log("y_train")
-    print(y_train)
+    log("X_test_normal")
+    log(X_test_normal)
 
     # Train the model
     history = model.fit(
