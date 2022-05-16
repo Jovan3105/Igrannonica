@@ -1,12 +1,13 @@
 from enum import Enum
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
+import category_encoders as ce
 
 class CatColEncoder(str, Enum):
     NoEncoder = "None"
     OneHot   = "OneHot"
     Ordinal  = "Ordinal"
-    Label    = "Label"
-
+    Binary    = "Binary" 
+    
     def __str__(self):
         return str(self.value)
 
@@ -14,7 +15,7 @@ def map_catcolencoder(catcolencoder):
     catcolencoder_switcher = {
         CatColEncoder.OneHot    : OneHotEncoder(handle_unknown='ignore'),
         CatColEncoder.Ordinal   : OrdinalEncoder(),
-        CatColEncoder.Label     : LabelEncoder()
+        CatColEncoder.Binary    : ce.BinaryEncoder()
     }
 
     try:         

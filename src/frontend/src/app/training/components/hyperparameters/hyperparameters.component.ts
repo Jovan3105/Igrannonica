@@ -178,7 +178,7 @@ export class HyperparametersComponent implements OnInit
     for (let index = 0; index < this.featuresLabel['features'].length; index++) {
       const element = this.featuresLabel['features'][index];
       // TODO hardcoded
-      features.push(new Column(element["name"], colEncodings[0]));
+      features.push(new Column(element["name"], colEncodings[7]));
     } 
       
     // izdvajanje naziva label-a u poseban niz
@@ -186,7 +186,7 @@ export class HyperparametersComponent implements OnInit
     for (let index = 0; index < this.featuresLabel['label'].length; index++) {
       const element = this.featuresLabel['label'][index];
       // TODO hardcoded
-      lables.push(new Column(element["name"], colEncodings[0]));
+      lables.push(new Column(element["name"], colEncodings[7]));
     } 
 
     // izdvajanje codename-ova metrika u poseban niz

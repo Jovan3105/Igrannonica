@@ -19,6 +19,7 @@ tensorflow = "*"
 matplotlib = "*"
 sklearn = "*"
 seaborn = "*"
+category-encoders = "*"
 
 [dev-packages]
 waitress = "*"
