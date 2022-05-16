@@ -82,7 +82,7 @@ def create_layer_array(nnlayers: NNLayer, problem_type: str, features: [str]):
 
     # Add output layer # TODO
 
-    output_layer_activation_func = ActivationFunction.Sigmoid
+    output_layer_activation_func = ActivationFunction.Linear
     
     if problem_type == 'classification':
         output_layer_activation_func = ActivationFunction.Softmax
