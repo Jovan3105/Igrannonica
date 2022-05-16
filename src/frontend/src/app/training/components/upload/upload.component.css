@@ -6,16 +6,15 @@ h3
 }
 
 .dataset-container{
-    width: 70%;
+    width: 75%;
     background-color: #e4eae2;
     margin:auto;
     border-radius: 10px;
 }
 #div-upload
 {
-    margin:auto;
-    padding-top: 2%;
-    width: 80%;
+    padding-top: 1rem;
+    width: 85%;
 }
 .dropzone{
     padding: 2rem;
@@ -36,20 +35,24 @@ h3
 }
 
 .file-icon{
-    border-radius: 20.5px;
+    border-radius: 1rem;
     background-color:white;
     display: flex;
-    justify-content: center;
 }
-.img-icon
-{
-    width: auto;
+.row{
+    hyphens: auto;
+    word-wrap: break-word;
 }
+.file-name{
+    font-weight: bold;
+    font-size: 1em;
+}
+
 
 #delete-button{
     color:white;
     background-color: #db202f;
-    border-radius: 10.5px;
+    border-radius: 0.5rem;
 }
 .file-input{
     opacity: 0;
