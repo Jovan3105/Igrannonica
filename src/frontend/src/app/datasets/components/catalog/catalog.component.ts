@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DatasetService } from 'src/app/training/services/dataset.service';
 
 @Component({
   selector: 'app-catalog',
@@ -7,9 +8,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CatalogComponent implements OnInit {
 
-  constructor() { }
+  constructor(private datasetService:DatasetService) {}
 
   ngOnInit(): void {
+    this.datasetService.getpublicDatasets().subscribe(this.publicDatasetsObserver);
+    console.log(this.datasetService);
   }
+
+  publicDatasets:any[]=[];
+
+  publicDatasetsObserver:any = {
+    next: (response:any) => { 
+      console.log("### next@publicDatasetsObserver");
+      console.log(response);
+      this.publicDatasets=response;
+    },
+    error: (err: Error) => {
+      console.log("### error@uploadObserver");
+      console.log(err);
+    }
+  };
+
 
 }

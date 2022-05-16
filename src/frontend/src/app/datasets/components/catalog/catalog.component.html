@@ -16,50 +16,10 @@
                 </div>
             </div>
 
-            <div class="dataset row">
+            <div class="dataset row" *ngFor="let publicDataset of publicDatasets">
                 <div class="col-md-12">
-                    <a href="#">Naziv dataseta</a>
-                    <p>Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis </p>
-                    <div class="tag">Tag 1</div>
-                    <div class="tag">Tag 2</div>
-                    <div class="tag">Tag 3</div>
-                    <div class="tag">Tag 4</div>
-                </div>
-            </div>
-            <div class="dataset row">
-                <div class="col-md-12">
-                    <a href="#">Naziv dataseta</a>
-                    <p>Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis </p>
-                    <div class="tag">Tag 1</div>
-                    <div class="tag">Tag 2</div>
-                    <div class="tag">Tag 3</div>
-                    <div class="tag">Tag 4</div>
-                </div>
-            </div>
-            <div class="dataset row">
-                <div class="col-md-12">
-                    <a href="#">Naziv dataseta</a>
-                    <p>Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis </p>
-                    <div class="tag">Tag 1</div>
-                    <div class="tag">Tag 2</div>
-                    <div class="tag">Tag 3</div>
-                    <div class="tag">Tag 4</div>
-                </div>
-            </div>
-            <div class="dataset row">
-                <div class="col-md-12">
-                    <a href="#">Naziv dataseta</a>
-                    <p>Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis </p>
-                    <div class="tag">Tag 1</div>
-                    <div class="tag">Tag 2</div>
-                    <div class="tag">Tag 3</div>
-                    <div class="tag">Tag 4</div>
-                </div>
-            </div>
-            <div class="dataset row">
-                <div class="col-md-12">
-                    <a href="#">Naziv dataseta</a>
-                    <p>Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis Opis opis </p>
+                    <a href="#">{{publicDataset.name}}</a>
+                    <p>{{publicDataset.description}}</p>
                     <div class="tag">Tag 1</div>
                     <div class="tag">Tag 2</div>
                     <div class="tag">Tag 3</div>
