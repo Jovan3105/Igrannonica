@@ -6,6 +6,17 @@ export class Hyperparameter
 }
 
 export class Constants{
+  
+    static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'Mean', codename: 'Mean'},
+      {name: 'Median', codename: 'Median'},
+    ];
+
+    static readonly MISSING_HANDLER_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'Most frequent', codename:'Frequent'},
+      {name: 'Fill with constant', codename:'Constant'},
+    ];
+
     static readonly ACTIVATION_FUNCTIONS: Hyperparameter[] = [
       {name: 'Sigmoid', info: 'Sigmoid!', codename: 'Sigmoid'},
       {name: 'ReLu', info: 'ReLu!', codename: 'ReLu'},

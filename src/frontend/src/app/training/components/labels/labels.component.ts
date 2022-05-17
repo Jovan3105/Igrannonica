@@ -1,4 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { Check, HeaderDict } from '../../models/table_models';
 
 
@@ -11,13 +12,18 @@ export class LabelsComponent implements OnInit {
 
   headers: HeaderDict[] | null;
   pred: number | null;
+  missing_categorical:Hyperparameter[] = Constants.MISSING_HANDLER_CATEGORICAL;
+  missing_numerical:Hyperparameter[] = Constants.MISSING_HANDLER_NUMERICAL;
+  @Input() missing!: number;
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
   @Output() selectedEncodings:string[];
+  @Output() selectedTypes:string[];
   
   selectedLabel:any = null;
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
+  showMissingColumn:boolean = false;
 
   constructor() {
 
@@ -28,12 +34,15 @@ export class LabelsComponent implements OnInit {
     this.checkboxCheckedArray = new Array<boolean>();
     this.checkboxDisabledArray = new Array<boolean>();
     this.selectedEncodings = new Array<string>();
+    this.selectedTypes = new Array<string>();
   }
 
   ngOnInit(): void {
     this.headers = null;
     this.pred = null;
     this.selectedLabel = null;
+    if (this.missing > 0) this.showMissingColumn = true;
+    else this.showMissingColumn = false;
     //this.labelEvent = new EventEmitter<{id:number,pred:number}>();
     this.checkboxCheckedArray.splice(0,this.checkboxCheckedArray.length);
     this.checkboxDisabledArray.splice(0,this.checkboxDisabledArray.length);
@@ -128,5 +137,9 @@ export class LabelsComponent implements OnInit {
       this.selectedEncodings[index] = encoding;
       console.log("Izmenjen " + index + " na " + encoding)
     }
+  }
+  onTypeChange(type:string)
+  {
+    
   }
 }

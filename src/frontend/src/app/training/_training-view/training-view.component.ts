@@ -24,6 +24,7 @@ export class TrainingViewComponent implements OnInit {
   learningRate: number = 0.1;
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
+  missingValue:number = 0;
   //visibilityTrigger: boolean = false;
 
   viewIndicator:View = View.UPLOAD;
@@ -111,7 +112,8 @@ export class TrainingViewComponent implements OnInit {
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
-      
+      this.missingValue = response['basicInfo']['missing'];
+
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },

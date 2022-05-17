@@ -9,6 +9,7 @@
               <th scope="col">Column Name</th>
               <th scope="col">Type</th>
               <th scope="col">Encoding</th> <!-- TODO dodati *ngIf i disable-ovati kada je numericki tip -->
+              <th scope="col" *ngIf="showMissingColumn">Fill Missing Values With</th>
             </tr>
           </thead>
           <tbody *ngFor="let header of headers; index as i" style="overflow-y:auto;">
@@ -21,9 +22,9 @@
                 {{header.name}}
               </label></td>
               <td>
-                <select class="form-select" aria-label="Default select example">
-                  <option value="1" [selected]="header.type =='object'">Categorical</option>
-                  <option value="2" [selected]="header.type =='int64' || header.type =='float64'">Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
+                <select class="form-select" #typeSelection aria-label="Default select example" (change)="onTypeChange(typeSelection.value)">
+                  <option value="Categorical" [selected]="header.type =='object' || header.type =='bool'">Categorical</option>
+                  <option value="Numerical" [selected]="header.type =='int64' || header.type =='float64'">Numerical</option> 
                 </select>
               </td>
               <td>
@@ -32,6 +33,18 @@
                   <option value="OneHot">One Hot</option>
                   <option value="Ordinal">Ordinal</option> 
                   <option value="Label">Label</option> 
+                </select>
+              </td>
+              <td *ngIf="showMissingColumn">
+                <select class="form-select" aria-label="Default select example" *ngIf="typeSelection.value == 'Categorical'">
+                  <option *ngFor="let handler of missing_categorical" [value]="handler">
+                    {{handler.name}}
+                  </option>
+                </select>
+                <select class="form-select" aria-label="Default select example" *ngIf="typeSelection.value == 'Numerical'">
+                  <option *ngFor="let handler of missing_numerical" [value]="handler">
+                    {{handler.name}}
+                  </option>
                 </select>
               </td>
             </tr>
