@@ -15,9 +15,10 @@ export class LabelsComponent implements OnInit {
   @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
   @Output() selectedEncodings:string[];
   
-  selectedLabel:any = null;
+  targetColumn:any = null;
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
+  dataTypeArray:boolean[];
 
   constructor() {
 
@@ -27,16 +28,17 @@ export class LabelsComponent implements OnInit {
     this.labelEvent = new EventEmitter<{id:number,pred:number | null}>();
     this.checkboxCheckedArray = new Array<boolean>();
     this.checkboxDisabledArray = new Array<boolean>();
+    this.dataTypeArray = new Array<boolean>();
     this.selectedEncodings = new Array<string>();
   }
 
   ngOnInit(): void {
     this.headers = null;
     this.pred = null;
-    this.selectedLabel = null;
+    this.targetColumn = null;
     //this.labelEvent = new EventEmitter<{id:number,pred:number}>();
-    this.checkboxCheckedArray.splice(0,this.checkboxCheckedArray.length);
-    this.checkboxDisabledArray.splice(0,this.checkboxDisabledArray.length);
+    this.checkboxCheckedArray = new Array<boolean>();
+    this.checkboxDisabledArray = new Array<boolean>();
   }
 
   onDatasetSelected(headers: Array<HeaderDict>) 
@@ -79,21 +81,18 @@ export class LabelsComponent implements OnInit {
       this.checkboxCheckedArray[this.pred] = true;
     }
 
-    if (this.checkboxCheckedArray[this.selectedLabel.key]) 
-      this.checkboxCheckedArray[this.selectedLabel.key] = false;
+    if (this.checkboxCheckedArray[this.targetColumn.key]) 
+      this.checkboxCheckedArray[this.targetColumn.key] = false;
 
-    this.checkboxDisabledArray[this.selectedLabel.key] = true;
-    this.labelEvent.emit({id:parseInt(this.selectedLabel.key),pred:this.pred});
-    this.pred = parseInt(this.selectedLabel.key);
-    
+    this.checkboxDisabledArray[this.targetColumn.key] = true;
+    this.labelEvent.emit({id:parseInt(this.targetColumn.key),pred:this.pred});
+    this.pred = parseInt(this.targetColumn.key);
   }
 
-  getValues(){
-
+  getChoosenCols(){
     var values;
-    var tempHeader = [];
-    var features: HeaderDict[] = [];
-    var label:HeaderDict[] = [];
+    var features: any = [];
+    var label: any;
     
     if (this.headers)
     {
@@ -101,14 +100,22 @@ export class LabelsComponent implements OnInit {
       for(let i=0; i<this.headers.length; i++)
         if (this.checkboxCheckedArray[i]) 
         {
-          tempHeader.push(this.headers[i]);
-          //this.selectedEncodings =
+          features.push({
+            "name"     : this.headers[i].name,
+            "type"     : this.dataTypeArray[i],
+            "encoding" : this.selectedEncodings[i]
+          });
         }
 
-      if (this.selectedLabel) 
+      if (this.targetColumn) 
       {
-        features = tempHeader.filter(element => element.key != this.selectedLabel.key);
-        label = this.headers.filter(element => element.key == this.selectedLabel.key);
+        let id = this.targetColumn.key;
+        let lblName = this.headers.filter(element => element.key == this.targetColumn.key)[0].name;
+        label = {
+          "name": lblName,
+          "type": this.dataTypeArray[id],
+          "encoding" : this.selectedEncodings[id]
+        } 
       }
       
       values = {

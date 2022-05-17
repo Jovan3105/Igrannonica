@@ -156,6 +156,8 @@ export class HyperparametersComponent implements OnInit
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
     let connectionID = "";
+
+    let colEncodings: string[] = this.trainingViewComponent.getSelectedEncoding()
     
     // izdvajanje naziva feature-a u poseban niz
     var features = []

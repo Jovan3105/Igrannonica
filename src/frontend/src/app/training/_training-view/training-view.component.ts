@@ -67,7 +67,7 @@ export class TrainingViewComponent implements OnInit {
   public form: FormData = new FormData();
   
   colEncodings: string[] = [];
-  public featuresLabel:any;
+  public choosenInAndOutCols:any;
   //activateModal:boolean = false;
 
   req : any = {
@@ -233,11 +233,13 @@ export class TrainingViewComponent implements OnInit {
     }
     else if (this.viewIndicator == View.PREVIEW)
     {
-      var temp = this.labels.getValues(); // Cuva se objekat sa odabranim feature-ima i labelom
-      console.log(temp);
-      if (temp!.label!.length > 0){
-        this.featuresLabel = temp;
-        console.log(this.featuresLabel);
+      var choosenInAndOutCols = this.labels.getChoosenCols(); 
+      console.log("choosenInAndOutCols")
+      console.log(choosenInAndOutCols)
+      
+      if (choosenInAndOutCols!.label! !== undefined ){
+        this.choosenInAndOutCols = choosenInAndOutCols;
+        
         //Pokreni modal
         this.firstVisibility = "none";
         this.secondDisplay = "block";
@@ -330,7 +332,7 @@ export class TrainingViewComponent implements OnInit {
     this.labels.changeCheckbox(checkChange)
   } 
 
-  onSelectedLabel(data:{id: number, pred: number | null})
+  onSelectedTargetColumn(data:{id: number, pred: number | null})
   {
     this.dataTable.changeLabelColumn(data);
   }

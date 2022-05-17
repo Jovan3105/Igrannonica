@@ -22,13 +22,13 @@
               </label></td>
               <td>
                 <select class="form-select" aria-label="Default select example">
-                  <option value="1" [selected]="header.type =='object'">Categorical</option>
-                  <option value="2" [selected]="header.type =='int64' || header.type =='float64'">Numerical</option> <!--TO DO postaviti automatski selected u odnosu na tip-->
+                  <option value="cat" [selected]="header.type =='object'">Categorical</option>
+                  <option value="num" [selected]="header.type =='int64' || header.type =='float64'">Numerical</option> <!--TODO postaviti automatski selected u odnosu na tip-->
                 </select>
               </td>
               <td>
-                <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)"s>
-                  <option value="None" selected>None</option><!-- TODO izmestiti listu encoding-a -->
+                <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)">
+                  <option value="None" selected>Not Allowed</option><!-- TODO izmestiti listu encoding-a -->
                   <option value="OneHot">One Hot</option>
                   <option value="Ordinal">Ordinal</option> 
                   <option value="Binary">Binary</option> 
@@ -54,12 +54,12 @@
   <div class="card" style="height: 30%;" *ngIf = "headers">
     <h3 class="card-header mb-0">Choose target variable</h3>
     <div class="card-body">
-        <select [(ngModel)]="selectedLabel" #selectLabel class="form-select" aria-label="Odabir izlaza" 
-        (change)="onSelectLabel()"><!-- TODO povecati font za aria-label -->
-          <option [ngValue]="null" disabled>Choose target variable</option>
-          <option class="word-wrap" *ngFor="let header of headers;" [ngValue]="header">
-            {{header.name}}</option> <!-- TODO postaviti automatski tip -->
-        </select>
-    </div>
+      <select [(ngModel)]="targetColumn" #selectLabel class="form-select" aria-label="Odabir izlaza" 
+      (change)="onSelectLabel()"><!-- TODO povecati font za aria-label -->
+        <option [ngValue]="null" disabled>Choose target variable</option>
+        <option class="word-wrap" *ngFor="let header of headers;" [ngValue]="header">
+          {{header.name}}</option> <!-- TODO postaviti automatski tip -->
+      </select>
   </div>
+</div>
 
