@@ -94,7 +94,7 @@
             <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
                 <div>
                     <h5 class="mb-0 ">Number of epochs</h5>
-                    <input type="number" class="form-control" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
+                    <input type="number" class="form-control" (ngModelChange)="changeEpoch($event)" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
                 </div>
             </div>
             <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
@@ -110,5 +110,5 @@
             <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (changeActivationEvent)="changeActivation($event)" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
         </div>
     </form>
-    <app-chart class="col-md-12 col-sm-12 col-lg-12" [prikaz]="prikaz" [epoch]="epoches_arr" [loss]="loss_arr" [mean_absolute_error]="mean_absolute_error_arr" [val_mean_absolute_error]="val_mean_absolute_error_arr" [val_loss]="val_loss_arr"></app-chart>
+    <app-chart class="col-md-12 col-sm-12 col-lg-12" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>
 </div>

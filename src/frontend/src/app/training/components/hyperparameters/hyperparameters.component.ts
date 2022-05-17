@@ -51,7 +51,7 @@ export class HyperparametersComponent implements OnInit
   sliderOptions: Options = {
     floor: 10,
     ceil: 90,
-    step: 10,
+    step: 5,
     showSelectionBar: true,
     getSelectionBarColor: (value: number): string => {
       if (value <= 25) {
@@ -92,12 +92,12 @@ export class HyperparametersComponent implements OnInit
     }
   ];
 
-  epoches_data:{epoch: number,loss: number,mean_absolute_error: number,val_loss: number,val_mean_absolute_error: number}[]=[];
+  epoches_data:any[]=[];
 
-  loss_arr:number[]=[];
-  val_loss_arr:number[]=[];
-  mean_absolute_error_arr:number[]=[];
-  val_mean_absolute_error_arr:number[]=[];
+  selected_metric="loss";
+
+  training_arr:number[]=[];
+  val_arr:number[]=[];
   epoches_arr:number[]=[0];
 
   prikaz:string="none";
@@ -129,7 +129,6 @@ export class HyperparametersComponent implements OnInit
   {
     this.layers[event[1]].activation_function=event[0];
     console.log(this.layers);
-    console.log(this.layers);
   }
   
   startTrainingObserver:any = {
@@ -146,7 +145,7 @@ export class HyperparametersComponent implements OnInit
   };
 
   changeEpoch(value: number): void {
-    //this.numberOfEpochs = value;
+    this.numberOfEpochs = value;
   }
   changeRate(value: number): void {
     value = +value.toFixed(2)
@@ -213,20 +212,21 @@ export class HyperparametersComponent implements OnInit
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
+        _this.numberOfEpochs=200;
         _this.epoches_data=[];
+        _this.training_arr=[];
+        _this.val_arr=[];
         _this.prikaz="inline-block";
       }
       else {
         // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
-        console.log(epoch_stats);
+        //console.log(epoch_stats);
         _this.epoches_data.push(epoch_stats);
         // TODO srediti da se salje samo element a ne ceo niz
-        _this.loss_arr=_this.epoches_data.map(a => a.loss);
-        _this.val_loss_arr=_this.epoches_data.map(a => a.val_loss);
-        _this.mean_absolute_error_arr=_this.epoches_data.map(a => a.mean_absolute_error);
-        _this.val_mean_absolute_error_arr=_this.epoches_data.map(a => a.val_mean_absolute_error);
-        _this.epoches_arr=_this.epoches_data.map(a => a.epoch);
+        _this.training_arr=_this.epoches_data.map(a=>a[_this.selected_metric]);
+        _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.selected_metric]);
+        _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
       }
     }
 

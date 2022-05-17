@@ -12,11 +12,10 @@ export class ChartComponent implements OnInit {
   chartDisplay:string = "none";
 
   @Input() epoch!:number[];
-  @Input() loss!:number[];
-  @Input() val_loss!:number[];
-  @Input() mean_absolute_error!:number[];
-  @Input() val_mean_absolute_error!:number[];
+  @Input() training!:number[];
+  @Input() val!:number[];
   @Input() prikaz!:string;
+  @Input() numberOfEpochs!:number;
 
   constructor() {}
 
@@ -26,24 +25,21 @@ export class ChartComponent implements OnInit {
   ngOnChanges()
   {
     // TODO modifikovati da prima samo element i onda dodati u niz ovde
-    this.lineChartDataLoss.datasets[0].data=this.loss;
-    this.lineChartDataLoss.datasets[1].data=this.val_loss;
-    this.lineChartDataLoss.labels=this.epoch;
-    this.lineChartDataMeanAbsoluteError.datasets[0].data=this.mean_absolute_error;
-    this.lineChartDataMeanAbsoluteError.datasets[1].data=this.val_mean_absolute_error;
-    this.lineChartDataMeanAbsoluteError.labels=this.epoch;
-    this.charts?.forEach((child) => {
-      child.chart?.update();
-  });
+    this.lineChartData.datasets[0].data=this.training;
+    this.lineChartData.datasets[1].data=this.val;
+    this.lineChartData.labels=this.epoch;
+    this.chart?.chart?.update();
+    this.lineChartOptions!.scales!["x"]!.max=this.numberOfEpochs;
     this.chartDisplay=this.prikaz;
+    
   }
 
-  public lineChartDataLoss: ChartConfiguration['data'] = {
+  public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
         // data: this.epoches_data.map(a => a.loss),
         data: [],
-        label: 'Loss',
+        label: 'Training',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -51,10 +47,11 @@ export class ChartComponent implements OnInit {
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(148,159,177,0.8)',
         fill: 'origin',
+        spanGaps:true
       },
       {
         data: [],
-        label: 'Validation Loss',
+        label: 'Validation',
         yAxisID: 'y-axis-1',
         backgroundColor: 'rgba(255,0,0,0.3)',
         borderColor: 'red',
@@ -63,47 +60,7 @@ export class ChartComponent implements OnInit {
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(148,159,177,0.8)',
         fill: 'origin',
-      }
-      // {
-      //   data: [],
-      //   label: 'Validation loss',
-      //   backgroundColor: 'rgba(77,83,96,0.2)',
-      //   borderColor: 'rgba(77,83,96,1)',
-      //   pointBackgroundColor: 'rgba(77,83,96,1)',
-      //   pointBorderColor: '#fff',
-      //   pointHoverBackgroundColor: '#fff',
-      //   pointHoverBorderColor: 'rgba(77,83,96,1)',
-      //   fill: 'origin',
-      // }
-    ],
-    labels: []
-  };
-
-  public lineChartDataMeanAbsoluteError: ChartConfiguration['data'] = {
-    datasets: [
-      {
-        // data: this.epoches_data.map(a => a.loss),
-        data: [],
-        label: 'Mean Absolute Error',
-        backgroundColor: 'rgba(148,159,177,0.2)',
-        borderColor: 'rgba(148,159,177,1)',
-        pointBackgroundColor: 'rgba(148,159,177,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-        fill: 'origin',
-      },
-      {
-        data: [],
-        label: 'Validation Mean Absolute Error',
-        yAxisID: 'y-axis-1',
-        backgroundColor: 'rgba(255,0,0,0.3)',
-        borderColor: 'red',
-        pointBackgroundColor: 'rgba(148,159,177,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-        fill: 'origin',
+        spanGaps:true
       }
       // {
       //   data: [],
@@ -121,14 +78,22 @@ export class ChartComponent implements OnInit {
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
+    animation:false,
     elements: {
       line: {
         tension: 0.5
-      }
+      },
+      point: {
+        radius: 0 // default to disabled in all datasets
+    }
     },
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
-      x: {},
+      x: {
+        type: 'linear',
+        min: 0,
+        max: 1
+      },
       'y-axis-0':
         {
           position: 'left',
@@ -143,6 +108,7 @@ export class ChartComponent implements OnInit {
         }
       }
     },
+    
 
     plugins: {
       legend: { display: true },
@@ -152,6 +118,6 @@ export class ChartComponent implements OnInit {
   public lineChartType: ChartType = 'line'; 
   
 
-  @ViewChildren(BaseChartDirective) charts?: QueryList<BaseChartDirective>;
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
 }
