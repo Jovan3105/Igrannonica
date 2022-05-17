@@ -22,13 +22,13 @@
                 {{header.name}}
               </label></td>
               <td>
-                <select class="form-select" #typeSelection aria-label="Default select example" (change)="onTypeChange(typeSelection.value)">
+                <select class="form-select" #typeSelection aria-label="Default select example" (change)="onTypeChange(typeSelection.value,i)" >
                   <option value="Categorical" [selected]="header.type =='object' || header.type =='bool'">Categorical</option>
                   <option value="Numerical" [selected]="header.type =='int64' || header.type =='float64'">Numerical</option> 
                 </select>
               </td>
               <td>
-                <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)"s>
+                <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)" [disabled]="encodingDisabledArray[i]">
                   <option value="None" selected>None</option><!-- TODO izmestiti listu encoding-a -->
                   <option value="OneHot">One Hot</option>
                   <option value="Ordinal">Ordinal</option> 

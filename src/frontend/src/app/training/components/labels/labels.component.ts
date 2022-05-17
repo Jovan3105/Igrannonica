@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { Check, HeaderDict } from '../../models/table_models';
 
@@ -24,6 +24,7 @@ export class LabelsComponent implements OnInit {
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
   showMissingColumn:boolean = false;
+  encodingDisabledArray: boolean[];
 
   constructor() {
 
@@ -35,6 +36,7 @@ export class LabelsComponent implements OnInit {
     this.checkboxDisabledArray = new Array<boolean>();
     this.selectedEncodings = new Array<string>();
     this.selectedTypes = new Array<string>();
+    this.encodingDisabledArray = new Array<boolean>();
   }
 
   ngOnInit(): void {
@@ -56,6 +58,9 @@ export class LabelsComponent implements OnInit {
       this.checkboxCheckedArray.push(true);
       this.checkboxDisabledArray.push(false);
       this.selectedEncodings.push("None");
+      if(headers[i].type=="numerical")
+        this.encodingDisabledArray.push(true);
+      else this.encodingDisabledArray.push(false);
     };
   }
 
@@ -138,8 +143,13 @@ export class LabelsComponent implements OnInit {
       console.log("Izmenjen " + index + " na " + encoding)
     }
   }
-  onTypeChange(type:string)
+  onTypeChange(type:string,i:number)
   {
-    
+    console.log(type)
+    if(type=="Numerical"){
+      this.encodingDisabledArray[i] = true;
+    }
+    else
+    this.encodingDisabledArray[i] = false;
   }
 }
