@@ -9,7 +9,6 @@ import { DialogComponent } from 'src/app/shared/components/dialog/dialog.compone
 import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
 import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
-import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-training-view',
@@ -137,8 +136,8 @@ export class TrainingViewComponent implements OnInit {
   fetchCorrMatrixObserver:any = {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > next:")
-        this.stats.showMatrix(response);
         //console.log(response)
+        this.stats.showMatrix(response);
         
     },
     error: (err: Error) => {
@@ -183,22 +182,10 @@ export class TrainingViewComponent implements OnInit {
     this.hideElements();
 
     if (this.form.get('file')) this.form.delete('file');
-
-    //const element = event.currentTarget as HTMLInputElement;
-    //let fileList: FileList | null = element.files;
     
     this.form.append('file', file);
       this.datasetService.uploadDatasetFile(this.form)
         .subscribe(this.uploadObserver);
-    /*
-    if (fileList && fileList?.length > 0) {
-
-      var file = fileList[0];
-
-      this.form.append('file', file);
-      this.datasetService.uploadDatasetFile(this.form)
-        .subscribe(this.uploadObserver);
-    }*/
   }
 
   onShowDataClick(datasetURL:string) {
@@ -255,7 +242,6 @@ export class TrainingViewComponent implements OnInit {
         this.firstVisibility = "none";
         this.secondDisplay = "block";
         this.viewIndicator = View.TRAINING;
-        
       }
       else
       {
@@ -290,13 +276,16 @@ export class TrainingViewComponent implements OnInit {
   {
     this.confirmation = false;
   }
+  
   confirmationSave(){
     this.confirmation = true;
   }
+
   OnModalClose()
   {
     this.modifyModal.refreshView();
   }
+
   OnModalSave()
   {
     this.modalDisplay = false;
@@ -313,24 +302,18 @@ export class TrainingViewComponent implements OnInit {
     this.datasetService.modifyDataset(this.datasetId, req).subscribe(
       {
         next: (response:any) =>{
-          //console.log(response);
-          console.log(req);
-          //var startMillis = new Date().getTime();
           var tempDeleted :object[] = [];
           req.deletedRows.forEach(element => {
-            //console.log(this.dataTable.rowData[element]);
             tempDeleted.push(this.dataTable.rowData[element])
             this.dataTable.rowData.splice(element,1);
           });
+          
           this.dataTable.updateRows(tempEdited);
           this.dataTable.removeRows(tempDeleted);
 
           this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
           this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
           this.showElements();
-          //var endMillis = new Date().getTime();
-          //var duration = endMillis - startMillis;
-          //console.log('Transaction took ' + duration.toLocaleString() + 'ms');
 
           //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
           }
@@ -351,6 +334,7 @@ export class TrainingViewComponent implements OnInit {
   {
     this.dataTable.changeLabelColumn(data);
   }
+
   public downloadFile(){
     this.dataTable.downloadFile();
   }

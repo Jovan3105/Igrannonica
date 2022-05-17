@@ -11,7 +11,7 @@ export class LabelsComponent implements OnInit {
 
   headers: HeaderDict[] | null;
   pred: number | null;
-  @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
+  @Output() checkEvent: EventEmitter<Check>;                                //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
   @Output() selectedEncodings:string[];
   
@@ -50,9 +50,9 @@ export class LabelsComponent implements OnInit {
     };
   }
 
+  // poziva se kada se klikne na checkbox
   onCheckChange(event: any) 
   {
-    //console.log("Podigao se event kad se klikne");
     if (event.target.checked)
     {
       this.checkboxCheckedArray[event.target.value] = true;
@@ -65,16 +65,14 @@ export class LabelsComponent implements OnInit {
     
   }
 
+  // poziva se kada se kad se hide-uje iz tabele
   changeCheckbox(checkChange:Check)
   {
-    //console.log("Podigao se event kad se hideuje iz tabele");
-    console.log(checkChange);
     this.checkboxCheckedArray[checkChange.id] = !this.checkboxCheckedArray[checkChange.id];
   }
 
   onSelectLabel()
   {
-
     if (this.pred != null)
     {
       this.checkboxDisabledArray[this.pred] = false;
@@ -118,6 +116,7 @@ export class LabelsComponent implements OnInit {
         "label":label
       }
     }
+
     return values;
   }
 

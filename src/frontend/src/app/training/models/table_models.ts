@@ -18,7 +18,6 @@ export class HeaderDict {
     this.name = name;
     this.type = type;
   }
-
 }
 
 export class EditedCell {
@@ -33,6 +32,7 @@ export class EditedCell {
     this.value = value;
   }
 }
+
 export class ModifiedData {
   edited: EditedCell[];
   deletedRows: number[];
