@@ -16,9 +16,7 @@ from helpers.loss_func_helper import LossFunction
 router = APIRouter(prefix="/training")
 REGRESSION_METRICS = [
     Metric.LogCoshError, Metric.MeanAbsoluteError, Metric.MeanAbsolutePercentageError, Metric.MeanSquaredError, 
-    Metric.MeanSquaredLogarithmicError, Metric.Poisson, Metric.RootMeanSquaredError,
-    Metric.Mean, # TODO proveriti
-    Metric.Sum   # TODO proveriti
+    Metric.MeanSquaredLogarithmicError, Metric.Poisson, Metric.RootMeanSquaredError
     ]
 
 #################################################################
