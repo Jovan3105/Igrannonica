@@ -29,8 +29,8 @@
         </button>&nbsp;
         <button type="button" class="btn btn-warning" (click)="downloadFile()">Download</button>
     </div>
-    <br><br>
-    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'visibility': containerVisibility}">
+
+    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'display': mainContainerDisplay}">
         <div class="col-lg">
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)">
@@ -41,12 +41,6 @@
             (checkEvent)="changeColomnVisibility($event)" 
             (labelEvent)="onSelectedLabel($event)"
             ></app-labels>
-        </div>
-        <div [ngStyle]="{'display':statsTableDisplay}">
-            <app-stats #Stats></app-stats>
-            <!--<h4>Basic Info</h4>
-            <app-show-table #dataSetInformation id="basicInfo"></app-show-table>-->
-            <br>
         </div>
         <div class="modal fade" id="modifyModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" style="max-width: 80%;">
@@ -87,6 +81,12 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="stats-view" [ngStyle]="{'display':statsTableDisplay}">
+        <app-stats #Stats></app-stats>
+        <!--<h4>Basic Info</h4>
+        <app-show-table #dataSetInformation id="basicInfo"></app-show-table>-->
+        <br>
     </div>
 </div>
 
