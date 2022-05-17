@@ -18,7 +18,7 @@ import { MatOption } from '@angular/material/core';
 })
 export class HyperparametersComponent implements OnInit 
 {
-  @Input() featuresLabel:any;
+  @Input() choosenInAndOutCols:any;
   @Input() datasetId:any;
   
   loaderMiniDisplay:string = "none";
@@ -156,24 +156,18 @@ export class HyperparametersComponent implements OnInit
     //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
     let connectionID = "";
-
-    let colEncodings: string[] = this.trainingViewComponent.getSelectedEncoding()
     
     // izdvajanje naziva feature-a u poseban niz
     var features = []
-    for (let index = 0; index < this.featuresLabel['features'].length; index++) {
-      const element = this.featuresLabel['features'][index];
-      // TODO hardcoded
-      features.push(new Column(element["name"], colEncodings[0]));
+    for (let index = 0; index < this.choosenInAndOutCols['features'].length; index++) {
+      const element = this.choosenInAndOutCols['features'][index];
+      features.push(new Column(element["name"], element["encoding"]));
     } 
       
     // izdvajanje naziva label-a u poseban niz
     var lables = []
-    for (let index = 0; index < this.featuresLabel['label'].length; index++) {
-      const element = this.featuresLabel['label'][index];
-      // TODO hardcoded
-      lables.push(new Column(element["name"], colEncodings[0]));
-    } 
+    const element = this.choosenInAndOutCols['label'];
+    lables.push(new Column(element["name"], element["encoding"]));
 
     // izdvajanje codename-ova metrika u poseban niz
     this.metricsArrayToSend = this.metricsControl.value.map(
