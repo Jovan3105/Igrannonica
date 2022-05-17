@@ -58,7 +58,7 @@ export class LabelsComponent implements OnInit {
       this.checkboxCheckedArray.push(true);
       this.checkboxDisabledArray.push(false);
       this.selectedEncodings.push("None");
-      if(headers[i].type=="numerical")
+      if(headers[i].type=="int64" || headers[i].type=="float64")
         this.encodingDisabledArray.push(true);
       else this.encodingDisabledArray.push(false);
     };
