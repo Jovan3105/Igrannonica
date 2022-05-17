@@ -101,7 +101,7 @@ export class HyperparametersComponent implements OnInit
   epoches_arr:number[]=[0];
 
   prikaz:string="none";
-
+  started:boolean=false;
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
   }
@@ -118,6 +118,13 @@ export class HyperparametersComponent implements OnInit
       weight_initializer  : "HeUniform",
       activation_function : "ReLu",
     });
+  }
+
+  changeMetric(codename:string)
+  {
+    this.selected_metric=codename;
+    this.training_arr=this.epoches_data.map(a=>a[this.selected_metric]);
+    this.val_arr=this.epoches_data.map(a=>a["val_"+this.selected_metric]);
   }
 
   changeWeight(selected:string,index:number)
@@ -212,11 +219,11 @@ export class HyperparametersComponent implements OnInit
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
-        _this.numberOfEpochs=200;
         _this.epoches_data=[];
         _this.training_arr=[];
         _this.val_arr=[];
         _this.prikaz="inline-block";
+        _this.started=true;
       }
       else {
         // TODO iskoristiti za vizuelizaciju

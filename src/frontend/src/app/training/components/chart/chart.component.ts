@@ -16,6 +16,7 @@ export class ChartComponent implements OnInit {
   @Input() val!:number[];
   @Input() prikaz!:string;
   @Input() numberOfEpochs!:number;
+  @Input() started!:boolean;
 
   constructor() {}
 
@@ -29,8 +30,11 @@ export class ChartComponent implements OnInit {
     this.lineChartData.datasets[1].data=this.val;
     this.lineChartData.labels=this.epoch;
     this.chart?.chart?.update();
-    this.lineChartOptions!.scales!["x"]!.max=this.numberOfEpochs;
-    this.chartDisplay=this.prikaz;
+    if(this.started)
+    {
+      this.chartDisplay=this.prikaz;
+      this.started=false
+    }
     
   }
 
@@ -89,20 +93,14 @@ export class ChartComponent implements OnInit {
     },
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
-      x: {
-        type: 'linear',
-        min: 0,
-        max: 1
-      },
+      
       'y-axis-0':
         {
           position: 'left',
         },
       'y-axis-1': {
         position: 'right',
-        grid: {
-          color: 'rgba(255,0,0,0.3)',
-        },
+        
         ticks: {
           color: 'red'
         }

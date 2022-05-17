@@ -110,5 +110,11 @@
             <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (changeActivationEvent)="changeActivation($event)" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
         </div>
     </form>
-    <app-chart class="col-md-12 col-sm-12 col-lg-12" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>
+    <div *ngIf="metricsArrayToSend.length>0">
+        <button (click)="changeMetric('loss')">loss</button>
+    </div>
+    <div *ngFor="let metric of metricsArrayToSend">
+        <button (click)="changeMetric(metric)">{{metric}}</button>
+    </div>
+    <app-chart class="col-md-12 col-sm-12 col-lg-12" [started]="started" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>
 </div>
