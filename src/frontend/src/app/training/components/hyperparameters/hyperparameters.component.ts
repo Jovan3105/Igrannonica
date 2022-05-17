@@ -96,6 +96,8 @@ export class HyperparametersComponent implements OnInit
 
   loss_arr:number[]=[];
   val_loss_arr:number[]=[];
+  mean_absolute_error_arr:number[]=[];
+  val_mean_absolute_error_arr:number[]=[];
   epoches_arr:number[]=[0];
 
   prikaz:string="none";
@@ -212,7 +214,7 @@ export class HyperparametersComponent implements OnInit
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
         _this.epoches_data=[];
-        _this.prikaz="block";
+        _this.prikaz="inline-block";
       }
       else {
         // TODO iskoristiti za vizuelizaciju
@@ -222,6 +224,8 @@ export class HyperparametersComponent implements OnInit
         // TODO srediti da se salje samo element a ne ceo niz
         _this.loss_arr=_this.epoches_data.map(a => a.loss);
         _this.val_loss_arr=_this.epoches_data.map(a => a.val_loss);
+        _this.mean_absolute_error_arr=_this.epoches_data.map(a => a.mean_absolute_error);
+        _this.val_mean_absolute_error_arr=_this.epoches_data.map(a => a.val_mean_absolute_error);
         _this.epoches_arr=_this.epoches_data.map(a => a.epoch);
       }
     }

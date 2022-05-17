@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Chart, ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
@@ -14,6 +14,8 @@ export class ChartComponent implements OnInit {
   @Input() epoch!:number[];
   @Input() loss!:number[];
   @Input() val_loss!:number[];
+  @Input() mean_absolute_error!:number[];
+  @Input() val_mean_absolute_error!:number[];
   @Input() prikaz!:string;
 
   constructor() {}
@@ -24,14 +26,19 @@ export class ChartComponent implements OnInit {
   ngOnChanges()
   {
     // TODO modifikovati da prima samo element i onda dodati u niz ovde
-    this.lineChartData.datasets[0].data=this.loss;
-      this.lineChartData.datasets[1].data=this.val_loss;
-      this.lineChartData.labels=this.epoch;
-      this.chart?.chart?.update();
-      this.chartDisplay=this.prikaz;
+    this.lineChartDataLoss.datasets[0].data=this.loss;
+    this.lineChartDataLoss.datasets[1].data=this.val_loss;
+    this.lineChartDataLoss.labels=this.epoch;
+    this.lineChartDataMeanAbsoluteError.datasets[0].data=this.mean_absolute_error;
+    this.lineChartDataMeanAbsoluteError.datasets[1].data=this.val_mean_absolute_error;
+    this.lineChartDataMeanAbsoluteError.labels=this.epoch;
+    this.charts?.forEach((child) => {
+      child.chart?.update();
+  });
+    this.chartDisplay=this.prikaz;
   }
 
-  public lineChartData: ChartConfiguration['data'] = {
+  public lineChartDataLoss: ChartConfiguration['data'] = {
     datasets: [
       {
         // data: this.epoches_data.map(a => a.loss),
@@ -47,7 +54,48 @@ export class ChartComponent implements OnInit {
       },
       {
         data: [],
-        label: 'Validation loss',
+        label: 'Validation Loss',
+        yAxisID: 'y-axis-1',
+        backgroundColor: 'rgba(255,0,0,0.3)',
+        borderColor: 'red',
+        pointBackgroundColor: 'rgba(148,159,177,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+        fill: 'origin',
+      }
+      // {
+      //   data: [],
+      //   label: 'Validation loss',
+      //   backgroundColor: 'rgba(77,83,96,0.2)',
+      //   borderColor: 'rgba(77,83,96,1)',
+      //   pointBackgroundColor: 'rgba(77,83,96,1)',
+      //   pointBorderColor: '#fff',
+      //   pointHoverBackgroundColor: '#fff',
+      //   pointHoverBorderColor: 'rgba(77,83,96,1)',
+      //   fill: 'origin',
+      // }
+    ],
+    labels: []
+  };
+
+  public lineChartDataMeanAbsoluteError: ChartConfiguration['data'] = {
+    datasets: [
+      {
+        // data: this.epoches_data.map(a => a.loss),
+        data: [],
+        label: 'Mean Absolute Error',
+        backgroundColor: 'rgba(148,159,177,0.2)',
+        borderColor: 'rgba(148,159,177,1)',
+        pointBackgroundColor: 'rgba(148,159,177,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+        fill: 'origin',
+      },
+      {
+        data: [],
+        label: 'Validation Mean Absolute Error',
         yAxisID: 'y-axis-1',
         backgroundColor: 'rgba(255,0,0,0.3)',
         borderColor: 'red',
@@ -104,6 +152,6 @@ export class ChartComponent implements OnInit {
   public lineChartType: ChartType = 'line'; 
   
 
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  @ViewChildren(BaseChartDirective) charts?: QueryList<BaseChartDirective>;
 
 }
