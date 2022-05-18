@@ -8,6 +8,7 @@ using backend.Controllers;
 using backend.Data;
 using Newtonsoft.Json;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
@@ -30,6 +31,7 @@ namespace backend.Controllers
             _httpContext = httpContext;
         }
 
+
         [HttpPost]
         public async Task<ActionResult<string>> sendS(string algorithm, string epoha)
         {
@@ -48,14 +50,14 @@ namespace backend.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
             return Ok(responseString);
         }
-        
 
+        [Authorize]
         [HttpPost]
         [Route("begin_training")]
         public async Task<ActionResult<string>> beginTraining(TrainingDto trainingDto)
         {
-            //var userID = 0;  // TODO user id je harcoded dok se ne sredi problem sa njim
-            var userID = _httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value;
+           // var userID = 0;  // TODO user id je harcoded dok se ne sredi problem sa njim
+            var userID = Convert.ToInt32( _httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value);
 
             var dataset = await this.datasetContext.Datasets.FindAsync(trainingDto.DatasetID);
 

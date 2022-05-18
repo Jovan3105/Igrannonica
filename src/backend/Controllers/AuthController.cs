@@ -27,12 +27,14 @@ namespace backend.Controllers
 
         private readonly UserContext userContext;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContext;
         //private const int _expirationMinutes = 5;
 
-        public AuthController(UserContext userContext,IConfiguration configuration)
+        public AuthController(UserContext userContext, IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             this.userContext = userContext;
             _configuration = configuration;
+            _httpContext = httpContext;
         }
 
         Services.EmailSender emailSender = new Services.EmailSender();
