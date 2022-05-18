@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace backend.Models
 {
-    public class User 
+    public class User
     { 
         [Key]
         public int Id {  get; set; }
@@ -16,5 +16,6 @@ namespace backend.Models
         public string RefreshToken { get; set; }  = string.Empty;
         public DateTime RefreshTokenExpires { get; set; }
         public bool VerifiedEmail { get; set; }
+        public string Role { get; set; } = "User";
     }
 }

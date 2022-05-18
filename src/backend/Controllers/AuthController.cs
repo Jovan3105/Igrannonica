@@ -208,6 +208,7 @@ namespace backend.Controllers
                             new Claim(ClaimTypes.Name,user.Username),
                             new Claim(ClaimTypes.Email,user.Email),
                             new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
+                            new Claim(ClaimTypes.Role,"User"),
                             new Claim("message","Logging in...")
                         };
 

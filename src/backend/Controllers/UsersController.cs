@@ -22,7 +22,7 @@ namespace backend.Controllers
             _httpContext = httpContext;
 
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Object>> getUserByID(int id)
         {
@@ -43,7 +43,7 @@ namespace backend.Controllers
             };
             return p;
         }
-        
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<User>>> getUsers()
         {
@@ -56,7 +56,7 @@ namespace backend.Controllers
            
             return Ok(await this.userContext.Users.ToListAsync());
         }
-        [Authorize]
+       
         [HttpDelete]
         public async Task<ActionResult> deleteUser(int id) // TODO dodati id u path kao userID
         {
