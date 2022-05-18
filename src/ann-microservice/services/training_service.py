@@ -8,8 +8,10 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
+from constants import ProblemType
 from models.models import NNLayer, Column
 from services.shared_service import log, send_msg, run_async
+from services.datastat_service import get_stat_indicators
 from helpers.weight_init_helper import map_weight_init
 from helpers.metric_helper import map_metrics, Metric
 from helpers.optimizer_helper import map_optimizer, Optimizer
@@ -19,53 +21,59 @@ from helpers.encoder_helper import map_catcolencoder, CatColEncoder
 
 #################################################################
 
-def make_encoder_col_dict(features: Column, labels: Column, cont_features: [str]):
-    encoders = {}
+# Makes dictionary with information about colums should be encoded with given encoder
+def make_encoder_col_dict(features: Column, labels: Column, cont_cols: dict):
+    encoders = {'features': {}, 'labels': {}}
 
-    for feature in features:
-        if not feature.name in cont_features:
-            if not feature.encoder in encoders:
-                encoders[feature.encoder] = [feature.name]
-            else:
-                encoders[feature.encoder] += [feature.name]
-
-    # for label in labels:
-            # if not label.encoder in encoders:
-            #     encoders[label.encoder] = [label.name]
-            # else:
-            #     encoders[label.encoder] += [label.name]
+    for group_name, col_group in [ ('features', features), ('labels', labels) ]:
+        for col in col_group:
+            if not col.name in cont_cols[group_name]:
+                if not col.encoder in encoders[group_name]:
+                    encoders[group_name][col.encoder] = [col.name]
+                else:
+                    encoders[group_name][col.encoder] += [col.name]
 
     return encoders
 
 # # #
 
-def encode_and_scale(cont_features: [str], encoders_cols_dict: {str}, X_train, X_test):
+def encode_and_scale(cont_cols: dict, encoders_cols_dict: {str}, X, y):
+    col_transformers = {}
+    log(encoders_cols_dict, 'encoders_cols_dict')
+
+    for i in ['features', 'labels']:
+        if not 'OneHot' in encoders_cols_dict[i]:
+            encoders_cols_dict[i]['OneHot'] = []
+            
+        if not 'Ordinal' in encoders_cols_dict[i]:
+            encoders_cols_dict[i]['Ordinal'] = []
+            
+        if not 'Binary' in encoders_cols_dict[i]:
+            encoders_cols_dict[i]['Binary'] = []
+
+        log(i)
+        log(encoders_cols_dict[i]['OneHot'])
+        log(encoders_cols_dict[i]['Ordinal'])
+        log(encoders_cols_dict[i]['Binary'])
+
+        col_transformers[i] = ColumnTransformer([
+            ("scaler", MinMaxScaler(), cont_cols[i]),
+            ("onehot", map_catcolencoder(CatColEncoder.OneHot), encoders_cols_dict[i]['OneHot']),
+            ("ordinal", map_catcolencoder(CatColEncoder.Ordinal), encoders_cols_dict[i]['Ordinal']),
+            ("binary", map_catcolencoder(CatColEncoder.Binary), encoders_cols_dict[i]['Binary'])
+        ])
+
+    X_preprocessed = col_transformers['features'].fit_transform(X)
+    log(X_preprocessed, "X_preprocessed")
     
-    if not 'OneHot' in encoders_cols_dict:
-        encoders_cols_dict['OneHot'] = []
-        
-    if not 'Ordinal' in encoders_cols_dict:
-        encoders_cols_dict['Ordinal'] = []
-        
-    if not 'Binary' in encoders_cols_dict:
-        encoders_cols_dict['Binary'] = []
+    y_preprocessed = col_transformers['labels'].fit_transform(y)
+    log(y_preprocessed, "y_preprocessed")
 
-    col_trans = ColumnTransformer([
-        ("scaler", MinMaxScaler(), cont_features),
-        ("onehot", map_catcolencoder(CatColEncoder.OneHot), encoders_cols_dict['OneHot']),
-        ("ordinal", map_catcolencoder(CatColEncoder.Ordinal), encoders_cols_dict['Ordinal']),
-        ("binary", map_catcolencoder(CatColEncoder.Binary), encoders_cols_dict['Binary'])
-    ])
-
-    log(encoders_cols_dict)
-
-    col_trans.fit(X_train)
-
-    return col_trans.transform(X_train), col_trans.transform(X_test), col_trans
+    return X_preprocessed, y_preprocessed, col_transformers
 
 # # #
 
-def create_layer_array(nnlayers: NNLayer, problem_type: str, features: [str]):
+def create_layer_array(nnlayers: NNLayer, problem_type: str, features: [str], num_of_classes: int, target_encoding: str):
     layers = []
 
     nnlayers.sort(key=lambda nn_layer: nn_layer.index)
@@ -87,13 +95,22 @@ def create_layer_array(nnlayers: NNLayer, problem_type: str, features: [str]):
     # Add output layer # TODO
 
     output_layer_activation_func = ActivationFunction.Linear
+    output_units = 1
     
-    if problem_type == 'classification':
-        output_layer_activation_func = ActivationFunction.Softmax
+    if problem_type == ProblemType.CLASSIFICATION:
+        output_units = num_of_classes
+        
+        if num_of_classes == 2 and target_encoding != 'Label':
+            output_layer_activation_func = ActivationFunction.Sigmoid
+        else:
+            output_layer_activation_func = ActivationFunction.Softmax
+
+
+    log(f'Output layer: af={output_layer_activation_func}; unites: {output_units};')
 
     layers.append(
         keras.layers.Dense(
-            units=1, # TODO layer.units, 
+            units=output_units, 
             activation=map_activation_function(output_layer_activation_func), 
             kernel_initializer=map_weight_init(layer.weight_initializer)
             ))
@@ -122,64 +139,64 @@ def train_model(
     client_conn_id  : str
     ):
     
-    log(f"features: {features}")
-    log(f"labels: {labels}")
+    log(features, 'features: ')
+    log(labels, "labels")
 
-    cont_features = list(set([feature.name for feature in features ]) & cont_cols_set)
+    cont_cols = {}
+    cont_cols['features'] = list(set([feature.name for feature in features ]) & cont_cols_set)
+    cont_cols['labels'] = list(set([label.name for label in labels ]) & cont_cols_set)
 
-    # cont_features = list(set(features) & cont_cols_set)
-    # cat_features = [] #list(set(features) & cat_cols_set)
+    log(cont_cols, "cont_cols = ")
 
-    #cont_labels = list(set(labels) & cont_cols_set)
-    #cat_labels = list(set(labels) & cat_cols_set)
-
-    log(f"cont_features = {cont_features} "#| cat_features = {cat_features} " 
-    #    + f"| cont_labels = {cont_labels} | cat_labels = {cat_labels}"
-        )
+    target_encoder = labels[0].encoder
 
     # Get dict with list of cols to encode with specific encoder
-    encoders_cols_dict = make_encoder_col_dict(features, labels, cont_features)
-    log(f"encoders_cols_dict: {encoders_cols_dict}")
+    encoders_cols_dict = make_encoder_col_dict(features, labels, cont_cols)
+    log(encoders_cols_dict, 'encoders_cols_dict')
 
     # Make a list of strings from Column lists #
     
     features = [ feature.name for feature in features ]
     labels   = [ label.name for label in labels ]
 
-    # Prepare dataframe
-    #df = df.dropna()
+    # Get number of classes #
+
+    unique_vals = -1 # skip counting if it is numerical
+    num_of_classes = -1
+
+    if problem_type == ProblemType.CLASSIFICATION:
+        unique_vals = df.nunique()
+
+        # current implementation allowes only one output variable
+        num_of_classes = unique_vals[labels[0]]
+        log(f"num_of_classes for column {labels[0]} is {num_of_classes}")
 
     # Separate labels from features
     X = df[features].copy()
     y = df[labels].copy()
     
-    log("X")
-    log(X)
-
-    log("y")
-    log(y)
-
-    # Split dataset
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
-
-    log("X_train")
-    log(X_train)
-
-    log("y_train")
-    log(y_train)
-
-    log("X_test")
-    log(X_test)
-
-    log("y_test")
-    log(y_test)
+    log(X, 'X')
+    log(y, 'y')
 
     # Scale (normalize) numerical and encode categorical data
-    X_train_normal, X_test_normal, ct = encode_and_scale(cont_features, encoders_cols_dict, X_train, X_test)
+    X_preprocessed, y_preprocessed, cts = encode_and_scale(cont_cols, encoders_cols_dict, X, y)
+
+    log(X_preprocessed, 'X_preprocessed')
+    log(X_preprocessed[0].shape)
+
+    log(y_preprocessed, 'y_preprocessed')
+
+    # Split dataset
+    X_train, X_test, y_train, y_test = train_test_split(X_preprocessed, y_preprocessed, test_size=test_size)
+
+    log(X_train, 'X_train')
+    log(y_train, 'y_train')
+    log(X_test, 'X_test')
+    log(y_test, 'y_test')
     
     # Make a model #
-
-    layers = create_layer_array(layers, problem_type, features)
+    
+    layers = create_layer_array(layers, problem_type, features, num_of_classes, target_encoder)
     model = tf.keras.Sequential(layers)
 
     #model.summary()
@@ -191,28 +208,21 @@ def train_model(
     loss_function = map_loss_function(loss_function)
 
     # Map metric key-code list to actual tf merics
-    metrics = map_metrics(metrics)
+    tf_metrics = map_metrics(metrics)
 
     # Configure the model 
     model.compile(
         optimizer=optimizer,
         loss=loss_function,
-        metrics=metrics
+        metrics=tf_metrics
     )
 
     callback = CustomCallback()
     callback.init(client_conn_id)
 
-    log("X_train_normal")
-    log(X_train_normal)
-    log(X_train_normal[0].shape)
-
-    log("X_test_normal")
-    log(X_test_normal)
-
     # Train the model
     history = model.fit(
-        X_train_normal,
+        X_train,
         y_train,
         epochs=epochs,
         # Suppress logging.
@@ -222,16 +232,37 @@ def train_model(
         callbacks=[callback]
     )
 
-    #plot_loss(history, y_train[0], train_labels[0].min(), y_train[0].max())
+    y_pred = model.predict(X_train)
 
-    y_pred = model.predict(X_train_normal)
+    log(y_pred, 'y_pred')
 
-    score = model.evaluate(X_test_normal, y_test)
+    score = model.evaluate(
+        X_test,
+        y_test,
+        # Suppress logging.
+        verbose=1,
+        callbacks=[callback]
+    )
 
-    log(f'Test loss: {score[0]}') 
-    log(f'Test accuracy: {score[1]}')
+    # Inverse scaler or encoder transformation #
 
-    return y_test.values.tolist(), y_pred.tolist()
+    input_actual_values = None 
+    pred_actual_values  = None
+
+    if target_encoder == CatColEncoder.NoEncoder.value:
+        used_scaler = cts['labels'].named_transformers_['scaler']
+        
+        input_actual_values = used_scaler.inverse_transform(y_test)
+        pred_actual_values  = used_scaler.inverse_transform(y_pred)
+    else:
+        used_encoder = cts['labels'].named_transformers_[target_encoder.lower()]
+
+        input_actual_values = used_encoder.inverse_transform(y_test)
+        pred_actual_values  = used_encoder.inverse_transform(y_pred)
+
+    log(list(zip(map(lambda x: x.value, metrics), score)), 'Testing score: ')
+
+    return input_actual_values.ravel(), pred_actual_values.ravel()
 
 
 #################################################################
@@ -246,7 +277,6 @@ class CustomCallback(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         epoch += 1 # increase for 1 because it is 0-based
         keys = list(logs.keys())
-        log(f"\nEnd epoch {epoch} of training; got log keys: {keys}")
 
         epoch_report = {"epoch" : epoch}
         for key in keys:
