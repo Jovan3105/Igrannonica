@@ -26,7 +26,7 @@ async def get_parsed_dataset(
 
     '''
 
-    df  = parse_dataset(
+    df, column_types   = parse_dataset(
         dataset_source,
         delimiter = delimiter, 
         lineterminator = lineterminator, 
@@ -36,7 +36,6 @@ async def get_parsed_dataset(
         )
 
     parsed_dataset = df.to_dict('records')
-    column_types = get_column_types(df)
     basic_info = get_basic_info(df)
 
     return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info}
@@ -56,7 +55,7 @@ async def parse_dataset_file(
     Parsira dataset **dataset_source** koji je upload-ovan.
 
     '''
-    df  = parse_dataset(
+    df, column_types  = parse_dataset(
         dataset_source,
         delimiter = delimiter, 
         lineterminator = lineterminator, 
@@ -66,7 +65,6 @@ async def parse_dataset_file(
         )
 
     parsed_dataset = df.to_dict('records')
-    column_types = get_column_types(df)
     basic_info = get_basic_info(df)
 
     return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info}

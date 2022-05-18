@@ -109,10 +109,10 @@ export class ShowTableComponent implements OnInit {
     var colId = parseInt(params.column.getColId());
 
     var newValue = this.tableService.onCellValueChanged(this.gridApi, params,params.data,this.headers);
-
-    if (newValue != undefined)
+    //console.log(newValue);
+    if (newValue !== undefined)
     {
-      console.log(newValue);
+      //console.log(newValue);
       this.addUndoElement(new UndoData(undoType.EDIT,params));
       if ((editedCellIndex = this.editedCells.findIndex(element => element.col == colId && element.row == row)) != -1) //ukoliko vec postoji u objektu
       {
@@ -122,11 +122,11 @@ export class ShowTableComponent implements OnInit {
           //console.log("Napisao si oridjidji vrednost")
         }
         else 
-          this.editedCells[editedCellIndex].value = newValue.toString();
+          this.editedCells[editedCellIndex].value = newValue? newValue.toString() : "";
 
       }
       else 
-        this.editedCells.push(new EditedCell(row,colId,newValue.toString()));
+        this.editedCells.push(new EditedCell(row,colId,newValue? newValue.toString() : ""));
     }
     
     //console.log(this.editedCells);

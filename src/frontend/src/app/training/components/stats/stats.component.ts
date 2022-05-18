@@ -16,6 +16,8 @@ export class StatsComponent implements OnInit {
   @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
   @ViewChild('basicInfo') private basicInfo!:ShowTableComponent;
   corrMatrixSource: any;
+  showImage:boolean = false;
+  previewImage:boolean = false;
 
   constructor(private headersService:HeadersService, private domSanitizer: DomSanitizer) { }
 
@@ -46,5 +48,15 @@ export class StatsComponent implements OnInit {
     this.basicInfo.setTableStyle("height: 100px;");
     var headerInfo = this.headersService.getInfoStatsHeader(response);
     this.basicInfo.prepareTable(TableIndicator.INFO, response, headerInfo) 
+  }
+  openImage()
+  {
+    this.showImage = true;
+    this.previewImage = true;
+  }
+  closeImage()
+  {
+    this.showImage = false;
+    this.previewImage = false;
   }
 }

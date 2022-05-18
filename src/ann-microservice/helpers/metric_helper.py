@@ -3,45 +3,43 @@ import tensorflow as tf
 
 class Metric(str, Enum):
     # AUC
-    Accuracy                      = "Accuracy"
-    BinaryAccuracy                = "BinaryAccuracy"
-    BinaryCrossentropy            = "BinaryCrossentropy"
+    Accuracy                      = "accuracy"
+    BinaryAccuracy                = "binary_accuracy"
+    BinaryCrossentropy            = "binary_crossentropy"
     #BinaryIoU   = "BinaryIoU"
-    CategoricalAccuracy           = "CategoricalAccuracy"
-    CategoricalCrossentropy       = "CategoricalCrossentropy"
-    CategoricalHinge              = "CategoricalHinge"
-    FalseNegatives                = "FalseNegatives"
-    FalsePositives                = "FalsePositives"
-    Hinge                         = "Hinge"
+    CategoricalAccuracy           = "categorical_accuracy"
+    CategoricalCrossentropy       = "categorical_crossentropy"
+    CategoricalHinge              = "categorical_hinge"
+    FalseNegatives                = "false_negatives"
+    FalsePositives                = "false_positives"
+    Hinge                         = "hinge"
     #IoU = "IoU"
-    KLDivergence                  = "KLDivergence"
-    LogCoshError                  = "LogCoshError"
-    Mean                          = "Mean"
-    MeanAbsoluteError             = "MeanAbsoluteError"
-    MeanAbsolutePercentageError   = "MeanAbsolutePercentageError"
+    KLDivergence                  = "kullback_leibler_divergence"
+    LogCoshError                  = "logcosh"
+    MeanAbsoluteError             = "mean_absolute_error"
+    MeanAbsolutePercentageError   = "mean_absolute_percentage_error"
     #MeanIoU      = "MeanIoU"
     #MeanRelativeError             = "MeanRelativeError" required normalizer
-    MeanSquaredError              = "MeanSquaredError"
-    MeanSquaredLogarithmicError   = "MeanSquaredLogarithmicError"
+    MeanSquaredError              = "mean_squared_error"
+    MeanSquaredLogarithmicError   = "mean_squared_logarithmic_error"
     #MeanTensor
     #OneHotIoU
     #OneHotMeanIoU
-    Poisson                       = "Poisson"
-    Precision                     = "Precision"
+    Poisson                       = "poisson"
+    Precision                     = "precision"
     #PrecisionAtRecall             = "PrecisionAtRecall" required recall
-    Recall                        = "Recall"
+    Recall                        = "recall"
     #RecallAtPrecision             = "RecallAtPrecision" required precision
-    RootMeanSquaredError          = "RootMeanSquaredError"
+    RootMeanSquaredError          = "root_mean_squared_error"
     #SensitivityAtSpecificity      = "SensitivityAtSpecificity" required specificity
     #SparseCategoricalAccuracy     = "SparseCategoricalAccuracy"
     #SparseCategoricalCrossentropy = "SparseCategoricalCrossentropy"
     #SparseTopKCategoricalAccuracy = "SparseTopKCategoricalAccuracy"
     #SpecificityAtSensitivity      = "SpecificityAtSensitivity" required sensitivity
-    SquaredHinge                  = "SquaredHinge"
-    Sum                           = "Sum"
+    SquaredHinge                  = "squared_hinge"
     #TopKCategoricalAccuracy       = "TopKCategoricalAccuracy"
-    TrueNegatives                 = "TrueNegatives"
-    TruePositives                 = "TruePositives"
+    TrueNegatives                 = "true_negatives"
+    TruePositives                 = "true_positives"
 
     def __str__(self):
         return str(self.value)
@@ -61,7 +59,6 @@ def map_metrics(metrics):
         #Metric.IoU : tf.keras.metrics.IoU(),
         Metric.KLDivergence                  : tf.keras.metrics.KLDivergence(),
         Metric.LogCoshError                  : tf.keras.metrics.LogCoshError(),
-        Metric.Mean                          : tf.keras.metrics.Mean(),
         Metric.MeanAbsoluteError             : tf.keras.metrics.MeanAbsoluteError(),
         Metric.MeanAbsolutePercentageError   : tf.keras.metrics.MeanAbsolutePercentageError(),
         #Metric.MeanIoU      : tf.keras.metrics.MeanIoU(),
@@ -83,7 +80,6 @@ def map_metrics(metrics):
         #Metric.SparseTopKCategoricalAccuracy : tf.keras.metrics.SparseTopKCategoricalAccuracy(),
         #Metric.SpecificityAtSensitivity      : tf.keras.metrics.SpecificityAtSensitivity(), required sensitivity
         Metric.SquaredHinge                  : tf.keras.metrics.SquaredHinge(),
-        Metric.Sum                           : tf.keras.metrics.Sum(),
         #Metric.TopKCategoricalAccuracy       : tf.keras.metrics.TopKCategoricalAccuracy(),
         Metric.TrueNegatives                 : tf.keras.metrics.TrueNegatives(),
         Metric.TruePositives                 : tf.keras.metrics.TruePositives()
