@@ -34,7 +34,7 @@
                 <option value="Numerical" [selected]="header.type =='int64' || header.type =='float64'">Numerical</option> 
               </select>
             </td>
-            <td>
+            <td> <!-- NAPOMENA: redosled opcija mora da se poklapa sa redosledom u modelima -->
               <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)" [disabled]="encodingDisabledArray[i]">
                 <option value="None" [hidden]="!encodingDisabledArray[i]" [selected]="encodingDisabledArray[i]">Not Allowed</option><!-- TODO izmestiti listu encoding-a -->
                 <option value="OneHot" [selected]="!encodingDisabledArray[i]">One Hot</option>

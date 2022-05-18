@@ -9,9 +9,9 @@ export class Hyperparameter
 export class Constants{
 
   static readonly ENCODING_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
-      {name: 'Binary', codename: 'Binary'},
       {name: 'One Hot', codename: 'OneHot'},
-      {name: 'Ordinal', codename: 'Ordinal'}
+      {name: 'Ordinal', codename: 'Ordinal'},
+      {name: 'Label', codename: 'Label'}
     ];
 
     static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
