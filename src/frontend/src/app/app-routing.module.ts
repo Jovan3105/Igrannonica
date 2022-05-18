@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AdminPanelComponent } from './admin-panel/admin-panel.component';
 import { CancelRegistrationComponent } from './auth/components/cancel-registration/cancel-registration.component';
 import { EmailVerifComponent } from './auth/components/email-verif/email-verif.component';
 import { LoginComponent } from './auth/components/login/login.component';
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent},
   { path: 'verifyEmail', component:EmailVerifComponent},
   { path: 'cancelRegistration', component:CancelRegistrationComponent},
+  { path: 'admin-panel', component:AdminPanelComponent},
   { path: 'datasets', component:CatalogComponent },
   { path: 'home', component: DashboardComponent },
   { path: 'training', component: TrainingViewComponent, canActivate: [DashboardGuard] },
