@@ -82,7 +82,9 @@ def modify_dataset(dataset, data:models.ModifiedData):
     df = pd.DataFrame(dataset['parsedDataset'])
     try:
         for editRow in data.edited:
-            if (dataset['columnTypes'][editRow.col] == "int64"):
+            if (editRow.value == ""):
+                df.iloc[editRow.row, editRow.col] = np.nan
+            elif (dataset['columnTypes'][editRow.col] == "int64"):
                 df.iloc[editRow.row, editRow.col] = int(editRow.value)
             elif (dataset['columnTypes'][editRow.col] == "float64"):
                 df.iloc[editRow.row, editRow.col] = float(editRow.value)
