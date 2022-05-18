@@ -1,12 +1,18 @@
 export class Hyperparameter
 {
-    name?:string;
+    name!:string;
     info?:string;
-    codename?:String;
+    codename!:string;
 }
 
 export class Constants{
-  
+
+  static readonly ENCODING_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'One Hot', codename: 'OneHot'},
+      {name: 'Ordinal', codename: 'Ordinal'},
+      {name: 'Label', codename: 'Label'}
+    ];
+
     static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
       {name: 'Mean', codename: 'Mean'},
       {name: 'Median', codename: 'Median'},

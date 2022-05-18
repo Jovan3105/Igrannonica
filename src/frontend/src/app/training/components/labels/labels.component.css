@@ -9,3 +9,9 @@ input[type="checkbox"] {
     transform:scale(1.5, 1.5);
     cursor: pointer;
 }
+.missing-column{
+    width: 100%;
+}
+tbody select{
+    width: auto;
+}

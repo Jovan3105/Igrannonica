@@ -17,6 +17,13 @@ export class TableService {
 
     if(headers[colId].type == "int64" || headers[colId].type == "float64")
     {
+      if (newValue == "") //uneo je praznu vrednost
+      {
+        data[headers[colId].name] = undefined;
+        gridApi.applyTransaction({ update: [data] });
+
+        return null;
+      }
       if (isNaN(parseInt(newValue))) //postavio string za int ili float, ponistavanje izmene
       {
 

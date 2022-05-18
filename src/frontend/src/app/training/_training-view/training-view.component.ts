@@ -105,7 +105,7 @@ export class TrainingViewComponent implements OnInit {
     next: (response:any) => { 
       this.showElements();
 
-      //console.log(response)
+      console.log(response)
       
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
