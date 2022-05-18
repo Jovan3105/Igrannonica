@@ -20,6 +20,23 @@ export class HeaderDict {
   }
 }
 
+export class FeaturesColumn{
+  key:number;
+  name:string;
+  type:string;
+  encoding:string;
+  missing?:string;
+
+  constructor(key: number, name: string, type: string, encoding:string = "None", missing:string ="None") {
+    this.key = key;
+    this.name = name;
+    this.type = type;
+    this.encoding = encoding;
+    this.missing = missing;
+
+  }
+}
+
 export class EditedCell {
 
   row: number;

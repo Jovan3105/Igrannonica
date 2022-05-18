@@ -23,12 +23,13 @@ export class TrainingViewComponent implements OnInit {
   learningRate: number = 0.1;
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
+  missingValue:number = 0;
   //visibilityTrigger: boolean = false;
 
   viewIndicator:View = View.UPLOAD;
   uploadDisplay:string = "block";
   loaderDisplay:string = "none";
-  containerVisibility:string = "visible";
+  mainContainerDisplay:string = "flex";
   nextButtonDisable:boolean = true;
   backButtonDisable:boolean = true;
   displayTableButtons:string = "block";
@@ -103,14 +104,15 @@ export class TrainingViewComponent implements OnInit {
     next: (response:any) => { 
       this.showElements();
 
-      //console.log(response)
+      console.log(response)
       
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
-      
+      this.missingValue = response['basicInfo']['missing'];
+
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },
@@ -210,15 +212,17 @@ export class TrainingViewComponent implements OnInit {
     {
       event.currentTarget.innerHTML = "Show table";
       this.statsTableDisplay = "block";
-      this.labelsDisplay = "none";
-      this.mainTableDisplay = "none";
+      //this.labelsDisplay = "none";
+      //this.mainTableDisplay = "none";
+      this.mainContainerDisplay = "none";
     }
     else
     {
       event.currentTarget.innerHTML = "Show stats"
       this.statsTableDisplay = "none";
-      this.labelsDisplay = "block";
-      this.mainTableDisplay = "block";
+      //this.labelsDisplay = "block";
+      //this.mainTableDisplay = "block";
+      this.mainContainerDisplay = "flex";
     }
     this.toggledButton = !this.toggledButton
   }

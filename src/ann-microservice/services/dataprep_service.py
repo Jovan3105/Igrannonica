@@ -54,16 +54,19 @@ def parse_dataset(
             skipinitialspace = True
             )
             
-        df = df.dropna() # TODO proveriti
+        colTypesList = get_column_types(df)
+
+        #df = df.fillna(np.NaN) # TODO proveriti
+        df = df.replace(np.nan, None)
 
         log('Parsing completed.')
 
-    return df
+    return df, colTypesList
 
 # # #
 
 def get_basic_info(df):
-    missingValuesEntireDF = int(df.isnull().sum().sum())
+    missingValuesEntireDF = int(df.isnull().sum().sum()) #df.value_counts()["NaN"]
     nrows, ncols = df.shape
 
     return { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
@@ -79,9 +82,11 @@ def modify_dataset(dataset, data:models.ModifiedData):
     df = pd.DataFrame(dataset['parsedDataset'])
     try:
         for editRow in data.edited:
-            if (df.dtypes[editRow.col] == "int64"):
+            if (editRow.value == ""):
+                df.iloc[editRow.row, editRow.col] = np.nan
+            elif (dataset['columnTypes'][editRow.col] == "int64"):
                 df.iloc[editRow.row, editRow.col] = int(editRow.value)
-            elif (df.dtypes[editRow.col] == "float64"):
+            elif (dataset['columnTypes'][editRow.col] == "float64"):
                 df.iloc[editRow.row, editRow.col] = float(editRow.value)
             else:
                 df.iloc[editRow.row, editRow.col] = editRow.value

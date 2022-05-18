@@ -42,6 +42,8 @@ export class HyperparametersComponent implements OnInit
   @ViewChild('lossSelect') lossSelect!: MatSelect;
 
   problemType: string = "regression";
+  selectedNumerical: string = "false";
+  selectedCategorical: string = "false"
   numberOfEpochs: number = 1000;
   learningRate: number = 0.1;
   corrMatrixSource: any;
@@ -152,8 +154,6 @@ export class HyperparametersComponent implements OnInit
   }
   
   TrainingClick(){
-    //this.loaderDisplay = "block";
-    //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
     let connectionID = "";
     

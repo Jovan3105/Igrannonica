@@ -1,12 +1,29 @@
 export class Hyperparameter
 {
-    name?:string;
+    name!:string;
     info?:string;
-    codename?:String;
+    codename!:string;
     type?:String;
 }
 
 export class Constants{
+
+  static readonly ENCODING_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'Binary', codename: 'Binary'},
+      {name: 'One Hot', codename: 'OneHot'},
+      {name: 'Ordinal', codename: 'Ordinal'}
+    ];
+
+    static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'Mean', codename: 'Mean'},
+      {name: 'Median', codename: 'Median'},
+    ];
+
+    static readonly MISSING_HANDLER_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'Most frequent', codename:'Frequent'},
+      {name: 'Fill with constant', codename:'Constant'},
+    ];
+
     static readonly ACTIVATION_FUNCTIONS: Hyperparameter[] = [
       {name: 'Sigmoid', info: 'Sigmoid!', codename: 'Sigmoid'},
       {name: 'ReLu', info: 'ReLu!', codename: 'ReLu'},
