@@ -54,7 +54,8 @@ def parse_dataset(
             skipinitialspace = True
             )
             
-        df = df.dropna() # TODO proveriti
+        #df = df.fillna(np.NaN) # TODO proveriti
+        df = df.astype(object).replace(np.nan, None)
 
         log('Parsing completed.')
 
@@ -63,7 +64,7 @@ def parse_dataset(
 # # #
 
 def get_basic_info(df):
-    missingValuesEntireDF = int(df.isnull().sum().sum())
+    missingValuesEntireDF = int(df.isnull().sum().sum()) #df.value_counts()["NaN"]
     nrows, ncols = df.shape
 
     return { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
