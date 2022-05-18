@@ -17,15 +17,17 @@ namespace backend.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly DatasetContext datasetContext;
+        private readonly IHttpContextAccessor _httpContext;
 
         private static readonly HttpClient client = new HttpClient();
         private static string _microserviceBaseURL;
 
-        public TrainingController(DatasetContext datasetContext, IConfiguration configuration)
+        public TrainingController(DatasetContext datasetContext, IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             this.datasetContext = datasetContext;
             _configuration = configuration;
             _microserviceBaseURL = _configuration["Addresses:Microservice"];
+            _httpContext = httpContext;
         }
 
         [HttpPost]
@@ -52,7 +54,8 @@ namespace backend.Controllers
         [Route("begin_training")]
         public async Task<ActionResult<string>> beginTraining(TrainingDto trainingDto)
         {
-            var userID = 0;  // TODO user id je harcoded dok se ne sredi problem sa njim
+            //var userID = 0;  // TODO user id je harcoded dok se ne sredi problem sa njim
+            var userID = _httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value;
 
             var dataset = await this.datasetContext.Datasets.FindAsync(trainingDto.DatasetID);
 

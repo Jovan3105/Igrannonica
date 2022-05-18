@@ -13,13 +13,14 @@ namespace backend.Controllers
     {
         private readonly UserContext userContext;
         private readonly IConfiguration _configuration;
-        
+        private readonly IHttpContextAccessor _httpContext;
 
-        public UsersController(UserContext userContext, IConfiguration configuration)
+        public UsersController(UserContext userContext, IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             this.userContext = userContext;
             _configuration = configuration;
-            
+            _httpContext = httpContext;
+
         }
 
         [HttpGet("{id}")]
@@ -42,9 +43,17 @@ namespace backend.Controllers
             };
             return p;
         }
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<User>>> getUsers()
         {
+
+
+            string str = Request.Headers["Authorization"];
+            var userId = _httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value;
+
+
+            Console.WriteLine(userId+"\n\n\n\n\n\n\n\n");
             return Ok(await this.userContext.Users.ToListAsync());
         }
 
@@ -56,6 +65,7 @@ namespace backend.Controllers
             this.userContext.SaveChanges();
             return Ok();
         }
+
      
 
     }
