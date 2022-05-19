@@ -15,3 +15,20 @@ input[type="checkbox"] {
 tbody select{
     width: auto;
 }
+.constant-value{
+    text-align: center;
+}
+#constant-div{
+    border-radius: 0.2rem;
+    color: white;
+    height: 2rem;
+}
+#close-icon
+{
+    background-color:lightgrey ;
+    border-radius: 0.8rem;
+    cursor: pointer;
+}
+#constant-span{
+    width:100%;
+}

@@ -20,20 +20,19 @@ export class HeaderDict {
   }
 }
 
-export class FeaturesColumn{
-  key:number;
+export class ChosenColumn{
   name:string;
   type:string;
   encoding:string;
   missing?:string;
+  missingConstant?:string;
 
-  constructor(key: number, name: string, type: string, encoding:string = "None", missing:string ="None") {
-    this.key = key;
+  constructor(name: string, type: string, encoding:string = "None", missing:string ="None", missingConstant:string = "") {
     this.name = name;
     this.type = type;
     this.encoding = encoding;
     this.missing = missing;
-
+    this.missingConstant = missingConstant;
   }
 }
 

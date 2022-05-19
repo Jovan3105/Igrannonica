@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
@@ -10,15 +10,16 @@ import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
+import { ChosenColumn } from '../../models/table_models';
 
 @Component({
   selector: 'app-hyperparameters',
   templateUrl: './hyperparameters.component.html',
   styleUrls: ['./hyperparameters.component.css']
 })
-export class HyperparametersComponent implements OnInit 
+export class HyperparametersComponent implements OnInit, OnChanges 
 {
-  @Input() choosenInAndOutCols:any;
+  @Input() choosenInAndOutCols:{features:ChosenColumn[],label:ChosenColumn} | undefined = undefined;
   @Input() datasetId:any;
   
   loaderMiniDisplay:string = "none";
@@ -77,8 +78,15 @@ export class HyperparametersComponent implements OnInit
 
   ngOnInit(): void 
   {
+    
   }
-
+  ngOnChanges(changes: SimpleChanges): void 
+  { 
+    if (this.choosenInAndOutCols !== undefined && this.choosenInAndOutCols.label !== undefined)
+    {
+      this.problemType = this.choosenInAndOutCols.label.type == "Categorical"? "classification":"regression";
+    }
+  }
   layers= [
     { 
       index : 0,
@@ -159,14 +167,14 @@ export class HyperparametersComponent implements OnInit
     
     // izdvajanje naziva feature-a u poseban niz
     var features = []
-    for (let index = 0; index < this.choosenInAndOutCols['features'].length; index++) {
-      const element = this.choosenInAndOutCols['features'][index];
+    for (let index = 0; index < this.choosenInAndOutCols!['features'].length; index++) {
+      const element = this.choosenInAndOutCols!['features'][index];
       features.push(new Column(element["name"], element["encoding"]));
     } 
       
     // izdvajanje naziva label-a u poseban niz
     var lables = []
-    const element = this.choosenInAndOutCols['label'];
+    const element = this.choosenInAndOutCols!['label'];
     lables.push(new Column(element["name"], element["encoding"]));
 
     // izdvajanje codename-ova metrika u poseban niz
