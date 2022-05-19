@@ -1,6 +1,6 @@
 <h3 style="text-align: center;">Configure hyperparameters</h3>
 <div class="options" style="margin-top: 10px; ">
-    <form #form>
+    <form #formGroup>
         <br>
         <div class="row justify-content-center d-flex align-items-center">
             <div id="button" class="col-md-2 col-sm-12">
@@ -13,9 +13,8 @@
                             </div>
                         </div>
                     </div> -->
-                    <div class="Button Button--start">
-                        <button (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon style="color: white;">play_arrow</mat-icon></button>
-                    </div>
+                    <button class="btn btn-primary" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon style="color: white;">play_arrow</mat-icon></button>
+                    
                 </div>
                 <div class="row justify-content-center d-flex align-items-center">
                     <div>
@@ -45,8 +44,15 @@
                         <div class="col-md-12 col-sm-12">
                             <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
                                 <mat-label><b>Metrics</b></mat-label>
-                                <mat-select class="col-md-12 col-sm-12" #metricSelect [formControl]="metricsControl" name="metricsControl" multiple>
-                                    <mat-option *ngFor="let item of metrics" [value]="item" [hidden]="item.type!=problemType">
+                                <mat-select class="col-md-12 col-sm-12" #metricsSelect [formControl]="metricsControl" name="metricsControl" multiple>
+                                
+                                    <button mat-raised-button class="metricButtons text-sm w-50 " (click)="toggleAllSelection()">
+                                        Select All 
+                                    </button>
+                                    <button mat-raised-button class="metricButtons mat-primary fill text-sm w-50 " (click)="toggleAllDeselect()">
+                                        Deselect All
+                                    </button>
+                                    <mat-option *ngFor="let item of metrics" [value]="item" [hidden]="item.type!=problemType" (click)="optionClick()">
                                         {{item.name}}
                                     </mat-option>
                                 </mat-select>

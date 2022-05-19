@@ -1,5 +1,21 @@
 <div class="card" style="height: 27rem;" *ngIf = "headers">
-  <h3 class="card-header mb-0">Choose features</h3>
+  <div class="row card-header ms-0 me-0">
+    <h1 class="mb-0 col-sm-6">Choose features</h1>
+  </div>
+  <div class="row card-header ms-0 me-0">
+    <div class="btn col-sm-6 text-center selectAllButton" (click)="selectAll()">
+      <div class="text-nowrap" >
+        Select All 
+      </div>
+    </div>
+    <div class="btn col-sm-6 text-center unselectAllButton" (click)="unselectAll()">
+      <div class="text-nowrap">
+        Deselect All
+      </div>
+    </div>
+    
+  </div>
+  
   <div class="card-body" style="overflow-y: auto;padding:0.5rem" tabindex="0">
     <div class="table-responsive">
       <table class="table table-hover">

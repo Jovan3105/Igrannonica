@@ -22,6 +22,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   @Output() selectedTypes:string[];
   selectedMissingHandler:string[];
   
+  selectAllTrigger: boolean = false;
   targetColumn:any = null;
   checkboxCheckedArray:boolean[];
   checkboxDisabledArray:boolean[];
@@ -132,13 +133,14 @@ export class LabelsComponent implements OnInit, OnChanges {
       this.checkboxDisabledArray[this.pred] = false;
       this.checkboxCheckedArray[this.pred] = true;
     }
-
-    if (this.checkboxCheckedArray[this.targetColumn.key]) 
+    if(this.targetColumn!=null){
+      if (this.checkboxCheckedArray[this.targetColumn.key]) 
       this.checkboxCheckedArray[this.targetColumn.key] = false;
 
-    this.checkboxDisabledArray[this.targetColumn.key] = true;
-    this.labelEvent.emit({id:parseInt(this.targetColumn.key),pred:this.pred});
-    this.pred = parseInt(this.targetColumn.key);
+      this.checkboxDisabledArray[this.targetColumn.key] = true;
+      this.labelEvent.emit({id:parseInt(this.targetColumn.key),pred:this.pred});
+      this.pred = parseInt(this.targetColumn.key);
+    }
   }
 
   getChoosenCols(){
@@ -222,4 +224,15 @@ export class LabelsComponent implements OnInit, OnChanges {
   {
 
   }
+  selectAll(){
+    for (let index = 0; index < this.checkboxCheckedArray.length; index++) {
+      this.checkboxCheckedArray[index] = true;
+    }
+  }
+  unselectAll(){
+    for (let index = 0; index < this.checkboxCheckedArray.length; index++) {
+      this.checkboxCheckedArray[index] = false;
+    }
+  }
+      
 }

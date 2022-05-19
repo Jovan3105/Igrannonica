@@ -2,14 +2,14 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
-import { FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
-import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
+import { MatSelect } from '@angular/material/select';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -24,7 +24,7 @@ export class HyperparametersComponent implements OnInit
   loaderMiniDisplay:string = "none";
   readonly backendSocketUrl = environment.backendSocketUrl;
 
-  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
+  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer, private fb: FormBuilder) { }
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -32,15 +32,18 @@ export class HyperparametersComponent implements OnInit
   metrics: Hyperparameter[] = Constants.METRICS;
   weightInitializers: Hyperparameter[] = Constants.WEIGHT_INITIALIZERS;
 
+  formGroup!: FormGroup;
   //activationFunctionControl = new FormControl('', Validators.required);
   optimizerFunctionControl = new FormControl('', Validators.required);
   lossFunctionControl = new FormControl('', Validators.required);
   metricsControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
+  @ViewChild('allMetricsSelected') allMetricsSelected!: MatOption;
 
-  @ViewChild('metricSelect') metricSelect!: MatSelect;
+  @ViewChild('metricsSelect') metricsSelect!: MatSelect;
   @ViewChild('lossSelect') lossSelect!: MatSelect;
 
+  allSelected: boolean = false;
   problemType: string = "regression";
   selectedNumerical: string = "false";
   selectedCategorical: string = "false"
@@ -180,6 +183,10 @@ export class HyperparametersComponent implements OnInit
     // izdvajanje codename-ova metrika u poseban niz
     this.metricsArrayToSend = this.metricsControl.value.map(
       (item:any)=>item['codename']);
+    
+    
+    if(this.metricsArrayToSend[0] == undefined)
+      this.metricsArrayToSend.shift();
 
     var trainingRequestPayload = {
       DatasetID             : this.datasetId,
@@ -236,9 +243,29 @@ export class HyperparametersComponent implements OnInit
       console.log("Connection is terminated");
     }
   }
+
   reset(){
-    this.metricSelect.options.forEach((data: MatOption) => data.deselect());
+    this.metricsSelect.options.forEach((data: MatOption) => data.deselect());
     this.lossSelect.options.forEach((data: MatOption) => data.deselect());
   }
+
+  toggleAllSelection(){
+    this.metricsSelect.options.forEach( (item : MatOption) => {if(item.value.type == this.problemType)item.select()});
+  }
+
+  toggleAllDeselect(){
+    this.metricsSelect.options.forEach( (item : MatOption) => {item.deselect()});
+    
+  }
+
+  optionClick() {
+    let newStatus = true;
+    this.metricsSelect.options.forEach((item: MatOption) => {
+      if (!item.selected) {
+        newStatus = false;
+      }
+    });
+    this.allSelected = newStatus;
+  }  
 }
 
