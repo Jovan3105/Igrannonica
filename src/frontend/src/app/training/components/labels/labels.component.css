@@ -15,8 +15,11 @@ input[type="checkbox"] {
 tbody select{
     width: auto;
 }
-.constant-value{
+.missing-handler{
     text-align: center;
+}
+.missing-handler select{
+    width: 12rem;
 }
 #constant-div{
     border-radius: 0.2rem;

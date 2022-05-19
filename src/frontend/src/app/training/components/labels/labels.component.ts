@@ -221,12 +221,14 @@ export class LabelsComponent implements OnInit, OnChanges {
       this.encodingDisabledArray[i] = true;
       this.selectedTypes[i] = "Numerical";
       this.selectedEncodings[i] = "None";
+      this.selectedMissingHandler[i] = this.missing_numerical[0].codename;
     }
     else
     {
       this.encodingDisabledArray[i] = false;
       this.selectedTypes[i] = "Categorical";
       this.selectedEncodings[i] = "OneHot";
+      this.selectedMissingHandler[i] = this.missing_categorical[0].codename;
     }
       
   }
@@ -243,7 +245,7 @@ export class LabelsComponent implements OnInit, OnChanges {
           data: { title: dialogTitle, message: dialogMessage, input:true }
         });
       dialogRef.afterClosed().subscribe(result => {
-        
+
         if (result != undefined){
           this.constantsDisabledArray[index] = false;
           this.constantsChoosen.set(index, result);
