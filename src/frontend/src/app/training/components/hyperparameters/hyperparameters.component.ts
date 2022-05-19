@@ -53,7 +53,7 @@ export class HyperparametersComponent implements OnInit
   sliderOptions: Options = {
     floor: 10,
     ceil: 90,
-    step: 10,
+    step: 5,
     showSelectionBar: true,
     getSelectionBarColor: (value: number): string => {
       if (value <= 25) {
@@ -94,14 +94,16 @@ export class HyperparametersComponent implements OnInit
     }
   ];
 
-  epoches_data:{epoch: number,loss: number,mean_absolute_error: number,val_loss: number,val_mean_absolute_error: number}[]=[];
+  epoches_data:any[]=[];
 
-  loss_arr:number[]=[];
-  val_loss_arr:number[]=[];
+  selected_metric="loss";
+
+  training_arr:number[]=[];
+  val_arr:number[]=[];
   epoches_arr:number[]=[0];
 
   prikaz:string="none";
-
+  started:boolean=false;
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
   }
@@ -120,6 +122,13 @@ export class HyperparametersComponent implements OnInit
     });
   }
 
+  changeMetric(codename:string)
+  {
+    this.selected_metric=codename;
+    this.training_arr=this.epoches_data.map(a=>a[this.selected_metric]);
+    this.val_arr=this.epoches_data.map(a=>a["val_"+this.selected_metric]);
+  }
+
   changeWeight(selected:string,index:number)
   {
     this.layers[index].weight_initializer=selected;
@@ -128,7 +137,6 @@ export class HyperparametersComponent implements OnInit
   changeActivation(event:[string,number])
   {
     this.layers[event[1]].activation_function=event[0];
-    console.log(this.layers);
     console.log(this.layers);
   }
   
@@ -146,7 +154,7 @@ export class HyperparametersComponent implements OnInit
   };
 
   changeEpoch(value: number): void {
-    //this.numberOfEpochs = value;
+    this.numberOfEpochs = value;
   }
   changeRate(value: number): void {
     value = +value.toFixed(2)
@@ -206,17 +214,20 @@ export class HyperparametersComponent implements OnInit
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
         _this.epoches_data=[];
-        _this.prikaz="block";
+        _this.training_arr=[];
+        _this.val_arr=[];
+        _this.prikaz="inline-block";
+        _this.started=true;
       }
       else {
         // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
-        console.log(epoch_stats);
+        //console.log(epoch_stats);
         _this.epoches_data.push(epoch_stats);
         // TODO srediti da se salje samo element a ne ceo niz
-        _this.loss_arr=_this.epoches_data.map(a => a.loss);
-        _this.val_loss_arr=_this.epoches_data.map(a => a.val_loss);
-        _this.epoches_arr=_this.epoches_data.map(a => a.epoch);
+        _this.training_arr=_this.epoches_data.map(a=>a[_this.selected_metric]);
+        _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.selected_metric]);
+        _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
       }
     }
 

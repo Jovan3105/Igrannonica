@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Chart, ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
@@ -12,9 +12,11 @@ export class ChartComponent implements OnInit {
   chartDisplay:string = "none";
 
   @Input() epoch!:number[];
-  @Input() loss!:number[];
-  @Input() val_loss!:number[];
+  @Input() training!:number[];
+  @Input() val!:number[];
   @Input() prikaz!:string;
+  @Input() numberOfEpochs!:number;
+  @Input() started!:boolean;
 
   constructor() {}
 
@@ -24,11 +26,16 @@ export class ChartComponent implements OnInit {
   ngOnChanges()
   {
     // TODO modifikovati da prima samo element i onda dodati u niz ovde
-    this.lineChartData.datasets[0].data=this.loss;
-      this.lineChartData.datasets[1].data=this.val_loss;
-      this.lineChartData.labels=this.epoch;
-      this.chart?.chart?.update();
+    this.lineChartData.datasets[0].data=this.training;
+    this.lineChartData.datasets[1].data=this.val;
+    this.lineChartData.labels=this.epoch;
+    this.chart?.chart?.update();
+    if(this.started)
+    {
       this.chartDisplay=this.prikaz;
+      this.started=false
+    }
+    
   }
 
   public lineChartData: ChartConfiguration['data'] = {
@@ -36,7 +43,7 @@ export class ChartComponent implements OnInit {
       {
         // data: this.epoches_data.map(a => a.loss),
         data: [],
-        label: 'Loss',
+        label: 'Training',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -44,10 +51,11 @@ export class ChartComponent implements OnInit {
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(148,159,177,0.8)',
         fill: 'origin',
+        spanGaps:true
       },
       {
         data: [],
-        label: 'Validation loss',
+        label: 'Validation',
         yAxisID: 'y-axis-1',
         backgroundColor: 'rgba(255,0,0,0.3)',
         borderColor: 'red',
@@ -56,6 +64,7 @@ export class ChartComponent implements OnInit {
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(148,159,177,0.8)',
         fill: 'origin',
+        spanGaps:true
       }
       // {
       //   data: [],
@@ -73,28 +82,31 @@ export class ChartComponent implements OnInit {
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
+    animation:false,
     elements: {
       line: {
         tension: 0.5
-      }
+      },
+      point: {
+        radius: 0 // default to disabled in all datasets
+    }
     },
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
-      x: {},
+      
       'y-axis-0':
         {
           position: 'left',
         },
       'y-axis-1': {
         position: 'right',
-        grid: {
-          color: 'rgba(255,0,0,0.3)',
-        },
+        
         ticks: {
           color: 'red'
         }
       }
     },
+    
 
     plugins: {
       legend: { display: true },
