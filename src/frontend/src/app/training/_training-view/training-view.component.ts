@@ -68,7 +68,7 @@ export class TrainingViewComponent implements OnInit {
   public form: FormData = new FormData();
   
   colEncodings: string[] = [];
-  public choosenInAndOutCols:any;
+  public choosenInAndOutCols:any = undefined;
   //activateModal:boolean = false;
 
   req : any = {
@@ -241,10 +241,9 @@ export class TrainingViewComponent implements OnInit {
       console.log("choosenInAndOutCols")
       console.log(choosenInAndOutCols)
       
-      if (choosenInAndOutCols!.label! !== undefined ){
+      if (choosenInAndOutCols?.label !== undefined ){
         this.choosenInAndOutCols = choosenInAndOutCols;
-        
-        //Pokreni modal
+
         this.firstVisibility = "none";
         this.secondDisplay = "block";
         this.viewIndicator = View.TRAINING;
@@ -252,10 +251,10 @@ export class TrainingViewComponent implements OnInit {
       else
       {
         this.dialogTitle = "Alert";
-        this.dialogMessage = "You have to choose the label";
+        this.dialogMessage = "You have to choose target variable";
 
         this.dialog.open(DialogComponent,{
-          data: { title: this.dialogTitle, message:this.dialogMessage },
+          data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
         });
       }
     }

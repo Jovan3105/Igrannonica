@@ -9,19 +9,48 @@ input[type="checkbox"] {
     transform:scale(1.5, 1.5);
     cursor: pointer;
 }
+
 .missing-column{
     width: 100%;
 }
+
 tbody select{
     width: auto;
 }
+
 .selectAllButton:hover{
     background-color: #0d6efd;
     opacity: 0.8;
     color: white;
 }
+
 .unselectAllButton:hover{
     background-color: #0d6efd;
     opacity: 0.8;
     color: white;
+}
+
+.missing-handler{
+    text-align: center;
+}
+
+.missing-handler select{
+    width: 12rem;
+}
+
+#constant-div{
+    border-radius: 0.2rem;
+    color: white;
+    height: 2rem;
+}
+
+#close-icon
+{
+    background-color:lightgrey ;
+    border-radius: 0.8rem;
+    cursor: pointer;
+}
+
+#constant-span{
+    width:100%;
 }
