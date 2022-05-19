@@ -49,7 +49,8 @@ export class HyperparametersComponent implements OnInit
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
 
-  sliderValue: number = 80;
+  sliderValueTest: number = 80;
+  sliderValueValidation: number = 20;
   sliderOptions: Options = {
     floor: 10,
     ceil: 90,
@@ -190,8 +191,8 @@ export class HyperparametersComponent implements OnInit
       Labels                : lables,
       Metrics               : this.metricsArrayToSend,
       LossFunction          : this.lossFunctionControl.value.codename,
-      TestDatasetSize       : this.sliderValue / 100,
-      ValidationDatasetSize : 0.2, // TODO hardcoded, promeniti kada se implementira UI komponenta
+      TestDatasetSize       : this.sliderValueTest / 100,
+      ValidationDatasetSize : this.sliderValueValidation / 100,
       Epochs                : this.numberOfEpochs,
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate

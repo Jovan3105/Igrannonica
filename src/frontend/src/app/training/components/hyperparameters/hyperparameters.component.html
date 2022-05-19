@@ -88,25 +88,29 @@
             <div class="col-md-8 col-sm-12 justify-content-center d-flex align-items-center ">
                 <div style="width: 100%; ">
                     <h5 class="pb-0 ">Ratio of training to test data</h5>
-                    <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
+                    <ngx-slider [(value)]="sliderValueTest" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
+                    <h5 class="pb-0 ">Validation percentage from remaining data</h5>
+                    <ngx-slider [(value)]="sliderValueValidation" [options]="sliderOptions" id="rangeSlider1"></ngx-slider>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
-                <div>
-                    <h5 class="mb-0 ">Number of epochs</h5>
-                    <input type="number" class="form-control" (ngModelChange)="changeEpoch($event)" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
+            <div class="col-md-4 mt-3 col-sm-12">
+                <div class="row mt-3 justify-content-center d-flex align-items-center ">
+                    <div>
+                        <h5 class="mb-0 ">Number of epochs</h5>
+                        <input type="number" class="form-control" (ngModelChange)="changeEpoch($event)" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
-                <div>
-                    <h5 class=" mb-0 ">Learning rate</h5>
-                    <input type="number" class="form-control" (ngModelChange)="changeRate($event)" [(ngModel)]="learningRate" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
+                <div class="row mt-3 justify-content-center d-flex align-items-center ">
+                    <div>
+                        <h5 class=" mb-0 ">Learning rate</h5>
+                        <input type="number" class="form-control" (ngModelChange)="changeRate($event)" [(ngModel)]="learningRate" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
+                    </div>
                 </div>
             </div>
         </div>
         <br>
         <div class="row collapse.show justify-content-center d-flex align-items-center ">
-            <h5 class="mb-0 ">Layers</h5>
+            <h5 class="mb-0 ">Hidden layers</h5>
             <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (changeActivationEvent)="changeActivation($event)" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
         </div>
     </form>
