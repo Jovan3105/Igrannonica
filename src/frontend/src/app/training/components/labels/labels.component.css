@@ -54,3 +54,10 @@ tbody select{
 #constant-span{
     width:100%;
 }
+
+.trim-content {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 50px;
+  }
