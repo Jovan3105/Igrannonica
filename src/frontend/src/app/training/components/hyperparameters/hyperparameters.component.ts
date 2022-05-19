@@ -129,17 +129,6 @@ export class HyperparametersComponent implements OnInit
     this.training_arr=this.epoches_data.map(a=>a[this.selected_metric]);
     this.val_arr=this.epoches_data.map(a=>a["val_"+this.selected_metric]);
   }
-
-  changeWeight(selected:string,index:number)
-  {
-    this.layers[index].weight_initializer=selected;
-  }
-
-  changeActivation(event:[string,number])
-  {
-    this.layers[event[1]].activation_function=event[0];
-    console.log(this.layers);
-  }
   
   startTrainingObserver:any = {
     next: (response:any) => { 
