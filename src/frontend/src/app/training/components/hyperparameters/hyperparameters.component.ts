@@ -89,6 +89,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
     if (this.choosenInAndOutCols !== undefined && this.choosenInAndOutCols.label !== undefined)
     {
       this.problemType = this.choosenInAndOutCols.label.type == "Categorical"? "classification":"regression";
+      this.reset();
     }
   }
   layers= [
