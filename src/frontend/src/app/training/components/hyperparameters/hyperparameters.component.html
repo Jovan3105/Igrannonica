@@ -93,35 +93,39 @@
         <div class="row collapse.show justify-content-center ">
             <div class="col-md-8 col-sm-12 justify-content-center d-flex align-items-center ">
                 <div style="width: 100%; ">
-                    <h5 class="pb-0 ">Ratio of training to test data</h5>
-                    <ngx-slider [(value)]="sliderValue" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
+                    <h4 class="pb-0 mb-0">What percentage of dataset should be used for testing?</h4>
+                    <ngx-slider [(value)]="sliderValueTest" [options]="sliderOptions" id="rangeSlider"></ngx-slider>
+                    <h4 class="pb-0 mb-0 mt-3">What percentage of remaining data should be used for validation?</h4>
+                    <ngx-slider [(value)]="sliderValueValidation" [options]="sliderOptions" id="rangeSlider1"></ngx-slider>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
-                <div>
-                    <h5 class="mb-0 ">Number of epochs</h5>
-                    <input type="number" class="form-control" (ngModelChange)="changeEpoch($event)" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
+            <div class="col-md-4 mt-3 col-sm-12">
+                <div class="row mt-3 justify-content-center d-flex align-items-center ">
+                    <div>
+                        <h5 class="mb-0 ">Number of epochs</h5>
+                        <input type="number" class="form-control" (ngModelChange)="changeEpoch($event)" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-2 col-sm-12 justify-content-center d-flex align-items-center ">
-                <div>
-                    <h5 class=" mb-0 ">Learning rate</h5>
-                    <input type="number" class="form-control" (ngModelChange)="changeRate($event)" [(ngModel)]="learningRate" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
+                <div class="row mt-3 justify-content-center d-flex align-items-center ">
+                    <div>
+                        <h5 class=" mb-0 ">Learning rate</h5>
+                        <input type="number" class="form-control" (ngModelChange)="changeRate($event)" [(ngModel)]="learningRate" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
+                    </div>
                 </div>
             </div>
         </div>
         <br>
         <div class="row collapse.show justify-content-center d-flex align-items-center ">
-            <h5 class="mb-0 ">Layers</h5>
-            <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (changeActivationEvent)="changeActivation($event)" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
+            <h5 class="mb-0 ">Hidden layers</h5>
+            <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
         </div>
     </form>
     <div class="row">
         <div class="col-md-3 col-sm-3 col-lg-3" *ngIf="metricsArrayToSend.length>0">
-            <button type="button" class="btn" (click)="changeMetric('loss')">loss</button>
+            <button type="button" class="btn" (click)="changeGraphMetric('loss')">loss</button>
         </div>
         <div class="col-md-3 col-sm-3 col-lg-3" *ngFor="let metric of metricsArrayToSend">
-            <button type="button" class="btn p-1 m-1" (click)="changeMetric(metric)">{{metric}}</button>
+            <button type="button" class="btn p-1 m-1" (click)="changeGraphMetric(metric)">{{metric}}</button>
         </div>
     </div>
     <app-chart class="row" [started]="started" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>

@@ -53,7 +53,8 @@ export class HyperparametersComponent implements OnInit, OnChanges
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
 
-  sliderValue: number = 80;
+  sliderValueTest: number = 20;
+  sliderValueValidation: number = 20;
   sliderOptions: Options = {
     floor: 10,
     ceil: 90,
@@ -107,7 +108,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   epoches_data:any[]=[];
 
-  selected_metric="loss";
+  graph_metric="loss";
 
   training_arr:number[]=[];
   val_arr:number[]=[];
@@ -133,22 +134,11 @@ export class HyperparametersComponent implements OnInit, OnChanges
     });
   }
 
-  changeMetric(codename:string)
+  changeGraphMetric(codename:string)
   {
-    this.selected_metric=codename;
-    this.training_arr=this.epoches_data.map(a=>a[this.selected_metric]);
-    this.val_arr=this.epoches_data.map(a=>a["val_"+this.selected_metric]);
-  }
-
-  changeWeight(selected:string,index:number)
-  {
-    this.layers[index].weight_initializer=selected;
-  }
-
-  changeActivation(event:[string,number])
-  {
-    this.layers[event[1]].activation_function=event[0];
-    console.log(this.layers);
+    this.graph_metric=codename;
+    this.training_arr=this.epoches_data.map(a=>a[this.graph_metric]);
+    this.val_arr=this.epoches_data.map(a=>a["val_"+this.graph_metric]);
   }
   
   startTrainingObserver:any = {
@@ -205,8 +195,8 @@ export class HyperparametersComponent implements OnInit, OnChanges
       Labels                : lables,
       Metrics               : this.metricsArrayToSend,
       LossFunction          : this.lossFunctionControl.value.codename,
-      TestDatasetSize       : this.sliderValue / 100,
-      ValidationDatasetSize : 0.2, // TODO hardcoded, promeniti kada se implementira UI komponenta
+      TestDatasetSize       : this.sliderValueTest / 100,
+      ValidationDatasetSize : this.sliderValueValidation / 100,
       Epochs                : this.numberOfEpochs,
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate
@@ -237,11 +227,11 @@ export class HyperparametersComponent implements OnInit, OnChanges
       else {
         // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
-        //console.log(epoch_stats);
+        console.log(epoch_stats);
         _this.epoches_data.push(epoch_stats);
         // TODO srediti da se salje samo element a ne ceo niz
-        _this.training_arr=_this.epoches_data.map(a=>a[_this.selected_metric]);
-        _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.selected_metric]);
+        _this.training_arr=_this.epoches_data.map(a=>a[_this.graph_metric]);
+        _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
         _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
       }
     }
