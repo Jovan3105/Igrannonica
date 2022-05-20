@@ -89,3 +89,10 @@ h3
 .mat-icon{
     display: flex;
 }
+.nextButton{
+    text-align: end;
+    text-align: end;
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px 10px;
+}

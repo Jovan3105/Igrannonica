@@ -12,7 +12,7 @@
                 <input type="text" class="form-control" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
                 <app-dataset-info></app-dataset-info>
             </div>
-            <div style="text-align: end;">
+            <div class="nextButton">
                 <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
             </div>
         </mat-tab>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
             </div>
-            <div style="text-align: end; text-align: end; display: flex; justify-content: flex-end; margin: 10px 10px;">
+            <div class="nextButton">
                 <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
             </div>
         </mat-tab>
