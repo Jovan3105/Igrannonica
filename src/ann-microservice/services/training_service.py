@@ -279,7 +279,23 @@ class CustomCallback(keras.callbacks.Callback):
         keys = list(logs.keys())
 
         epoch_report = {"epoch" : epoch}
+        new_key = None
         for key in keys:
-            epoch_report[key] = logs[key]
+            if 'true_positives' in key:
+                new_key = 'true_positives'
+            elif 'true_negatives' in key:
+                new_key = 'true_negatives'
+            elif 'false_negatives' in key:
+                new_key = 'false_negatives'
+            elif 'false_positives' in key:
+                new_key = 'false_positives'
+            elif 'precision' in key:
+                new_key = 'precision'
+            elif 'recall' in key:
+                new_key = 'recall'
+            else:
+                new_key = key
+
+            epoch_report[new_key] = logs[key]
             
         run_async( send_msg, self.client_conn_id, epoch_report)
