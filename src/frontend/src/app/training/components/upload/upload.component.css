@@ -36,8 +36,9 @@ h3
 
 .file-icon{
     border-radius: 1rem;
-    background-color:white;
+    /* background-color:white; */
     display: flex;
+    justify-content: center;
 }
 .row{
     hyphens: auto;
@@ -85,3 +86,6 @@ h3
         height: 14px;
     }
 }*/
+.mat-icon{
+    display: flex;
+}

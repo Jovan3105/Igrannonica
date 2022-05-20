@@ -36,7 +36,7 @@
                                     <p class="file-name">{{file.name}}</p>
                                     <p class="file-size" style="color: #38424c;">{{file.size | filesize}}</p>
                                 </div>
-                                <div class="col-lg-2" style="text-align: center;">
+                                <div class="col-lg-2" style="text-align: center; display: flex; justify-content: center; align-items: center;">
                                     <button type="button" class="btn btn-primary" id="delete-button" (click)="removeFile()"><mat-icon>delete</mat-icon></button>
                                 </div>
                             </div>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
             </div>
-            <div style="text-align: end;">
+            <div style="text-align: end; text-align: end; display: flex; justify-content: flex-end; margin: 10px 10px;">
                 <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
             </div>
         </mat-tab>
