@@ -96,3 +96,13 @@ h3
     justify-content: flex-end;
     margin: 10px 10px;
 }
+.col-sm-1{
+    background: rgba(255, 255, 255, 0.7)
+}
+.col-sm-1:hover{
+    border: 2px dotted #0d6efd;
+}
+.csv-text{
+    font-size: 0.8vw;
+}
+  
