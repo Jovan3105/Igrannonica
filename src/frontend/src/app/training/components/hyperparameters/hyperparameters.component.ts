@@ -140,8 +140,8 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   changeGraphMetric(codename:string)
   {
-    if(this.timesClicked>0 && (codename=="false_negatives" || codename=="false_positives" || codename=="precision" || codename=="recall" || codename=="true_negatives" || codename=="true_positived"))
-          this.graph_metric=codename+"_"+this.timesClicked;
+    if(this.timesClicked>0 && (codename=="false_negatives" || codename=="false_positives" || codename=="precision" || codename=="recall" || codename=="true_negatives" || codename=="true_positives"))
+          this.graph_metric=codename+"_"+this.timesClicked.toString();
     else
       this.graph_metric=codename;
     this.training_arr=this.epoches_data.map(a=>a[this.graph_metric]);
