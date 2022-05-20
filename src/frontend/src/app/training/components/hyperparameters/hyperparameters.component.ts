@@ -136,14 +136,9 @@ export class HyperparametersComponent implements OnInit, OnChanges
     });
   }
 
-  timesClicked:number=-1;
-
   changeGraphMetric(codename:string)
   {
-    if(this.timesClicked>0 && (codename=="false_negatives" || codename=="false_positives" || codename=="precision" || codename=="recall" || codename=="true_negatives" || codename=="true_positives"))
-          this.graph_metric=codename+"_"+this.timesClicked.toString();
-    else
-      this.graph_metric=codename;
+    this.graph_metric=codename;
     this.training_arr=this.epoches_data.map(a=>a[this.graph_metric]);
     this.val_arr=this.epoches_data.map(a=>a["val_"+this.graph_metric]);
   }
@@ -231,7 +226,6 @@ export class HyperparametersComponent implements OnInit, OnChanges
         _this.val_arr=[];
         _this.prikaz="inline-block";
         _this.started=true;
-        _this.timesClicked+=1;
       }
       else {
         // TODO iskoristiti za vizuelizaciju
@@ -243,7 +237,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
         _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
         _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
         if(_this.training_arr.length==_this.numberOfEpochs)
-          _this.collapse="block";
+        _this.collapse="block";
       }
     }
 
