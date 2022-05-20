@@ -114,6 +114,8 @@ export class HyperparametersComponent implements OnInit, OnChanges
   val_arr:number[]=[];
   epoches_arr:number[]=[0];
 
+  collapse:string="block";
+
   prikaz:string="none";
   started:boolean=false;
   drop(event: CdkDragDrop<string[]>) {
@@ -136,7 +138,10 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   changeGraphMetric(codename:string)
   {
-    this.graph_metric=codename;
+    if(codename=="false_negatives" || codename=="false_positives" || codename=="precision" || codename=="recall" || codename=="true_negatives" || codename=="true_positived")
+      this.graph_metric=codename+"_4";
+    else
+      this.graph_metric=codename;
     this.training_arr=this.epoches_data.map(a=>a[this.graph_metric]);
     this.val_arr=this.epoches_data.map(a=>a["val_"+this.graph_metric]);
   }
@@ -218,6 +223,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
+        _this.collapse="none";
         _this.epoches_data=[];
         _this.training_arr=[];
         _this.val_arr=[];
@@ -233,6 +239,8 @@ export class HyperparametersComponent implements OnInit, OnChanges
         _this.training_arr=_this.epoches_data.map(a=>a[_this.graph_metric]);
         _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
         _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
+        if(_this.training_arr.length==_this.numberOfEpochs)
+          _this.collapse="block";
       }
     }
 
