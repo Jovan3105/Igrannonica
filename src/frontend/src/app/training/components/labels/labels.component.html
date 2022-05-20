@@ -51,11 +51,11 @@
               </select>
             </td>
             <td> <!-- NAPOMENA: redosled opcija mora da se poklapa sa redosledom u modelima -->
-              <select class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)" [disabled]="encodingDisabledArray[i]">
+              <select [hidden]="targetColumn && targetColumn.key == headers[i].key" class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)" [disabled]="encodingDisabledArray[i]">
                 <option value="None" [hidden]="!encodingDisabledArray[i]" [selected]="encodingDisabledArray[i]">Not Allowed</option><!-- TODO izmestiti listu encoding-a -->
                 <option value="OneHot" [selected]="!encodingDisabledArray[i]">One Hot</option>
                 <option value="Ordinal">Ordinal</option> 
-                <option value="Binary">Binary</option> 
+                <option  value="Binary">Binary</option> 
               </select>
             </td>
             <td class="missing-handler" *ngIf="showMissingColumn">

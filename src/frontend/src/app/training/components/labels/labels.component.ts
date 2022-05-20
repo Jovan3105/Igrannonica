@@ -146,6 +146,9 @@ export class LabelsComponent implements OnInit, OnChanges {
       this.checkboxDisabledArray[this.targetColumn.key] = true;
       this.labelEvent.emit({id:parseInt(this.targetColumn.key),pred:this.pred});
       this.pred = parseInt(this.targetColumn.key);
+
+      if(this.selectedEncodings[this.targetColumn.key] == 'Binary')
+        this.selectedEncodings[this.targetColumn.key] = 'OneHot';
     }
   }
 
