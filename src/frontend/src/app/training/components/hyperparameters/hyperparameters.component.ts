@@ -172,7 +172,6 @@ export class HyperparametersComponent implements OnInit, OnChanges
   TrainingClick(){
     this.loaderMiniDisplay = "block";
     let connectionID = "";
-    this.timesClicked+=1;
     
     // izdvajanje naziva feature-a u poseban niz
     var features = []
@@ -232,6 +231,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
         _this.val_arr=[];
         _this.prikaz="inline-block";
         _this.started=true;
+        _this.timesClicked+=1;
       }
       else {
         // TODO iskoristiti za vizuelizaciju
