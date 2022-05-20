@@ -55,5 +55,9 @@ h6{
     position: relative;
     text-align: left;
 }
-
-    
+#mainContainer{
+    margin-top:2rem;
+}
+.stats-view{
+    margin-top:2rem;
+}

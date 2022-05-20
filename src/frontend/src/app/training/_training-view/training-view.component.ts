@@ -9,7 +9,6 @@ import { DialogComponent } from 'src/app/shared/components/dialog/dialog.compone
 import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
 import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
-import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-training-view',
@@ -24,12 +23,13 @@ export class TrainingViewComponent implements OnInit {
   learningRate: number = 0.1;
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
+  missingValue:number = 0;
   //visibilityTrigger: boolean = false;
 
   viewIndicator:View = View.UPLOAD;
   uploadDisplay:string = "block";
   loaderDisplay:string = "none";
-  containerVisibility:string = "visible";
+  mainContainerDisplay:string = "flex";
   nextButtonDisable:boolean = true;
   backButtonDisable:boolean = true;
   displayTableButtons:string = "block";
@@ -68,7 +68,7 @@ export class TrainingViewComponent implements OnInit {
   public form: FormData = new FormData();
   
   colEncodings: string[] = [];
-  public featuresLabel:any;
+  public choosenInAndOutCols:any = undefined;
   //activateModal:boolean = false;
 
   req : any = {
@@ -104,14 +104,15 @@ export class TrainingViewComponent implements OnInit {
     next: (response:any) => { 
       this.showElements();
 
-      //console.log(response)
+      console.log(response)
       
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
-      
+      this.missingValue = response['basicInfo']['missing'];
+
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },
@@ -137,8 +138,8 @@ export class TrainingViewComponent implements OnInit {
   fetchCorrMatrixObserver:any = {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchCorrMatrixObserver > next:")
-        this.stats.showMatrix(response);
         //console.log(response)
+        this.stats.showMatrix(response);
         
     },
     error: (err: Error) => {
@@ -183,22 +184,10 @@ export class TrainingViewComponent implements OnInit {
     this.hideElements();
 
     if (this.form.get('file')) this.form.delete('file');
-
-    //const element = event.currentTarget as HTMLInputElement;
-    //let fileList: FileList | null = element.files;
     
     this.form.append('file', file);
       this.datasetService.uploadDatasetFile(this.form)
         .subscribe(this.uploadObserver);
-    /*
-    if (fileList && fileList?.length > 0) {
-
-      var file = fileList[0];
-
-      this.form.append('file', file);
-      this.datasetService.uploadDatasetFile(this.form)
-        .subscribe(this.uploadObserver);
-    }*/
   }
 
   onShowDataClick(datasetURL:string) {
@@ -223,15 +212,17 @@ export class TrainingViewComponent implements OnInit {
     {
       event.currentTarget.innerHTML = "Show table";
       this.statsTableDisplay = "block";
-      this.labelsDisplay = "none";
-      this.mainTableDisplay = "none";
+      //this.labelsDisplay = "none";
+      //this.mainTableDisplay = "none";
+      this.mainContainerDisplay = "none";
     }
     else
     {
       event.currentTarget.innerHTML = "Show stats"
       this.statsTableDisplay = "none";
-      this.labelsDisplay = "block";
-      this.mainTableDisplay = "block";
+      //this.labelsDisplay = "block";
+      //this.mainTableDisplay = "block";
+      this.mainContainerDisplay = "flex";
     }
     this.toggledButton = !this.toggledButton
   }
@@ -246,24 +237,24 @@ export class TrainingViewComponent implements OnInit {
     }
     else if (this.viewIndicator == View.PREVIEW)
     {
-      var temp = this.labels.getValues(); // Cuva se objekat sa odabranim feature-ima i labelom
-      console.log(temp);
-      if (temp!.label!.length > 0){
-        this.featuresLabel = temp;
-        console.log(this.featuresLabel);
-        //Pokreni modal
+      var choosenInAndOutCols = this.labels.getChoosenCols(); 
+      console.log("choosenInAndOutCols")
+      console.log(choosenInAndOutCols)
+      
+      if (choosenInAndOutCols?.label !== undefined ){
+        this.choosenInAndOutCols = choosenInAndOutCols;
+
         this.firstVisibility = "none";
         this.secondDisplay = "block";
         this.viewIndicator = View.TRAINING;
-        
       }
       else
       {
         this.dialogTitle = "Alert";
-        this.dialogMessage = "You have to choose the label";
+        this.dialogMessage = "You have to choose target variable";
 
         this.dialog.open(DialogComponent,{
-          data: { title: this.dialogTitle, message:this.dialogMessage },
+          data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
         });
       }
     }
@@ -290,13 +281,16 @@ export class TrainingViewComponent implements OnInit {
   {
     this.confirmation = false;
   }
+  
   confirmationSave(){
     this.confirmation = true;
   }
+
   OnModalClose()
   {
     this.modifyModal.refreshView();
   }
+
   OnModalSave()
   {
     this.modalDisplay = false;
@@ -313,24 +307,18 @@ export class TrainingViewComponent implements OnInit {
     this.datasetService.modifyDataset(this.datasetId, req).subscribe(
       {
         next: (response:any) =>{
-          //console.log(response);
-          console.log(req);
-          //var startMillis = new Date().getTime();
           var tempDeleted :object[] = [];
           req.deletedRows.forEach(element => {
-            //console.log(this.dataTable.rowData[element]);
             tempDeleted.push(this.dataTable.rowData[element])
             this.dataTable.rowData.splice(element,1);
           });
+          
           this.dataTable.updateRows(tempEdited);
           this.dataTable.removeRows(tempDeleted);
 
           this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
           this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
           this.showElements();
-          //var endMillis = new Date().getTime();
-          //var duration = endMillis - startMillis;
-          //console.log('Transaction took ' + duration.toLocaleString() + 'ms');
 
           //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
           }
@@ -347,10 +335,11 @@ export class TrainingViewComponent implements OnInit {
     this.labels.changeCheckbox(checkChange)
   } 
 
-  onSelectedLabel(data:{id: number, pred: number | null})
+  onSelectedTargetColumn(data:{id: number, pred: number | null})
   {
     this.dataTable.changeLabelColumn(data);
   }
+
   public downloadFile(){
     this.dataTable.downloadFile();
   }

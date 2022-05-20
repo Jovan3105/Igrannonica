@@ -48,6 +48,7 @@ export class UploadComponent implements OnInit {
   onFileDropped(file:File)
   {
     this.file = file;
+    this.showDragAndDrop = false;
   }
 
   uploadClick()

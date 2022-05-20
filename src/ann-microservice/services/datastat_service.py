@@ -86,7 +86,7 @@ def get_corr_matrix(df, diagonal=False):
     cmap = "Spectral" #sns.diverging_palette(230, 20, as_cmap=True)
 
     # Draw the heatmap with the mask and correct aspect ratio
-    heatmap = sns.heatmap(corr, mask=mask, cmap=cmap, center=0,
+    heatmap = sns.heatmap(corr, mask=mask, cmap=cmap, center=0, annot=True,
         square=True, linewidths=.5, cbar_kws={"shrink": 1}, fmt='.5f')
 
     uri = figure_to_uri(figure)

@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Body
 from typing import Optional, List
 from pydantic import AnyHttpUrl
 
+from constants import ProblemType
 from models.models import NNLayer, Column
 from services.training_service import train_model
 from services.dataprep_service import get_basic_info
@@ -16,9 +17,7 @@ from helpers.loss_func_helper import LossFunction
 router = APIRouter(prefix="/training")
 REGRESSION_METRICS = [
     Metric.LogCoshError, Metric.MeanAbsoluteError, Metric.MeanAbsolutePercentageError, Metric.MeanSquaredError, 
-    Metric.MeanSquaredLogarithmicError, Metric.Poisson, Metric.RootMeanSquaredError,
-    Metric.Mean, # TODO proveriti
-    Metric.Sum   # TODO proveriti
+    Metric.MeanSquaredLogarithmicError, Metric.Poisson, Metric.RootMeanSquaredError
     ]
 
 #################################################################
@@ -27,7 +26,7 @@ REGRESSION_METRICS = [
 async def begin_training(
     client_conn_id   : str = Body(...),
     stored_dataset   : AnyHttpUrl = Body("http://localhost:7220/Datasets/0/129/weight-height.json"),
-    problem_type     : str = Body('regression'),
+    problem_type     : str = Body(ProblemType.REGRESSION),
     layers           : List[NNLayer] = Body(...),
     features         : List[Column] = Body(...),
     labels           : List[Column] = Body(...),
@@ -40,8 +39,8 @@ async def begin_training(
     learning_rate    : float = Body(0.1)
     ):
 
-    log(f"Feature list={features}; Label list={labels}; Metric list={metrics}; Layer list: {layers}")
-    log(f"Loss function={loss_function}; Optimizer={optimizer}")
+    log(f"Feature list={features};\n Label list={labels};\n Metric list={metrics};\n Layer list: {layers}")
+    log(f"Loss function={loss_function};\n Optimizer={optimizer};\n Problem type: {problem_type}")
 
     # Read data #
 
@@ -60,7 +59,9 @@ async def begin_training(
 
     # Validate problem type #
 
-    if problem_type not in ['classification', 'regression']:
+    log([ProblemType.CLASSIFICATION, ProblemType.REGRESSION], 'types')
+
+    if problem_type not in [ProblemType.CLASSIFICATION, ProblemType.REGRESSION]:
         raise HTTPException(status_code=400, detail=f"Invalid problem type: {problem_type}")
 
     # Validate feature and label lists #
@@ -75,8 +76,8 @@ async def begin_training(
 
     # Validate metric list #
 
-    problem_is_regression = problem_type == 'regression'
-    problem_is_classification = problem_type == 'classification'
+    problem_is_regression = problem_type == ProblemType.REGRESSION
+    problem_is_classification = problem_type == ProblemType.CLASSIFICATION
     invalid_choices = []
 
     for metric in metrics:
@@ -116,4 +117,4 @@ async def begin_training(
         client_conn_id=client_conn_id
         )
 
-    return { "true-pred" : [f"{left} | {right}" for left,right in zip( [x[0] for x in true], [x[0] for x in pred] )] }
+    return { "true-pred" : [f"{left} | {right}" for left,right in zip(true,pred) ] }

@@ -18,7 +18,22 @@ export class HeaderDict {
     this.name = name;
     this.type = type;
   }
+}
 
+export class ChosenColumn{
+  name:string;
+  type:string;
+  encoding:string;
+  missing?:string;
+  missingConstant?:string;
+
+  constructor(name: string, type: string, encoding:string = "None", missing:string ="None", missingConstant:string = "") {
+    this.name = name;
+    this.type = type;
+    this.encoding = encoding;
+    this.missing = missing;
+    this.missingConstant = missingConstant;
+  }
 }
 
 export class EditedCell {
@@ -33,6 +48,7 @@ export class EditedCell {
     this.value = value;
   }
 }
+
 export class ModifiedData {
   edited: EditedCell[];
   deletedRows: number[];

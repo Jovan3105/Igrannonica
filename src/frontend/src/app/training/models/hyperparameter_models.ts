@@ -1,12 +1,29 @@
 export class Hyperparameter
 {
-    name?:string;
+    name!:string;
     info?:string;
-    codename?:String;
+    codename!:string;
     type?:String;
 }
 
 export class Constants{
+
+  static readonly ENCODING_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'One Hot', codename: 'OneHot'},
+      {name: 'Ordinal', codename: 'Ordinal'},
+      {name: 'Binary', codename: 'Binary'}
+    ];
+
+    static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'Mean', codename: 'Mean'},
+      {name: 'Median', codename: 'Median'},
+    ];
+
+    static readonly MISSING_HANDLER_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+      {name: 'Most frequent', codename:'Frequent'},
+      {name: 'Fill with constant', codename:'Constant'},
+    ];
+
     static readonly ACTIVATION_FUNCTIONS: Hyperparameter[] = [
       {name: 'Sigmoid', info: 'Sigmoid!', codename: 'Sigmoid'},
       {name: 'ReLu', info: 'ReLu!', codename: 'ReLu'},
@@ -50,29 +67,28 @@ export class Constants{
       {name: 'Squared Hinge', info: 'SquaredHinge!', codename: 'SquaredHinge', type: 'classification'},
     ];
     static readonly METRICS : Hyperparameter[] = [
-      {name: 'Accuracy', info: 'Accuracy!', codename: 'Accuracy', type: 'classification'},
-      {name: 'Binary Accuracy', info: 'BinaryAccuracy!', codename: 'BinaryAccuracy', type: 'classification'},
-      {name: 'Categorical Accuracy', info: 'CategoricalAccuracy!', codename: 'CategoricalAccuracy', type: 'classification'},
-      {name: 'Categorical Hinge', info: 'CategoricalHinge!', codename: 'CategoricalHinge', type: 'classification'},
-      {name: 'False Negatives', info: 'FalseNegatives!', codename: 'FalseNegatives', type: 'classification'},
-      {name: 'Hinge', info: 'Hinge!', codename: 'Hinge', type: 'classification'},
-      {name: 'False Positives', info: 'FalsePositives!', codename: 'FalsePositives', type: 'classification'},
-      {name: 'KL Divergence', info: 'KLDivergence!', codename: 'KLDivergence', type: 'classification'},
-      {name: 'Mean Absolute Error', info: 'MeanAbsoluteError!', codename: 'MeanAbsoluteError', type: 'regression'},
-      {name: 'Mean Absolute Percentage Error', info: 'MeanAbsolutePercentageError!', codename: 'MeanAbsolutePercentageError', type: 'regression'},
-      {name: 'Mean Squared Error', info: 'MeanSquaredError!', codename: 'MeanSquaredError', type: 'regression'},
-      {name: 'Mean Squared Logarithmic Error', info: 'MeanSquaredLogarithmicError!', codename: 'MeanSquaredLogarithmicError', type: 'regression'},
-      {name: 'Poisson', info: 'Poisson!', codename: 'Poisson', type: 'regression'},
-      //{name: 'Sparse Categorical Crossentropy', info: 'SparseCategoricalCrossentropy!', codename: 'SparseCategoricalCrossentropy'},
-      {name: 'Log Cosh Error', info: 'LogCoshError!', codename: 'LogCoshError', type: 'regression'},
-      {name: 'Precision', info: 'Precision!', codename: 'Precision', type: 'classification'},
-      {name: 'Recall', info: 'Recall!', codename: 'Recall', type: 'classification'},
-      {name: 'Root MeanSquared Error', info: 'RootMeanSquaredError!', codename: 'RootMeanSquaredError', type: 'regression'},
-      //{name: 'Sparse Categorical Accuracy', info: 'SparseCategoricalAccuracy!', codename: 'SparseCategoricalAccuracy'},
-      {name: 'Sum', info: 'Sum!', codename: 'Sum', type: 'regression'},
-      {name: 'Squared Hinge', info: 'SquaredHinge!', codename: 'SquaredHinge', type: 'classification'},
-      {name: 'True Negatives', info: 'TrueNegatives!', codename: 'TrueNegatives', type: 'classification'},
-      {name: 'True Positives', info: 'TruePositives!', codename: 'TruePositives', type: 'classification'},
+      {name: 'Accuracy',                       info: 'Accuracy!',                    codename: 'accuracy',                       type: 'classification'},
+      {name: 'Binary Accuracy',                info: 'BinaryAccuracy!',              codename: 'binary_accuracy',                type: 'classification'},
+      {name: 'Binary Crossentropy',            info: 'BinaryCrossentropy!',          codename: 'binary_crossentropy',            type: 'classification'},
+      {name: 'Categorical Accuracy',           info: 'CategoricalAccuracy!',         codename: 'categorical_accuracy',           type: 'classification'},
+      {name: 'Categorical Crossentropy',       info: 'CategoricalCrossentropy!',     codename: 'categorical_crossentropy',       type: 'classification'},
+      {name: 'Categorical Hinge',              info: 'CategoricalHinge!',            codename: 'categorical_hinge',              type: 'classification'},
+      {name: 'False Negatives',                info: 'FalseNegatives!',              codename: 'false_negatives',                type: 'classification'},
+      {name: 'False Positives',                info: 'FalsePositives!',              codename: 'false_positives',                type: 'classification'},
+      {name: 'Hinge',                          info: 'Hinge!',                       codename: 'hinge',                          type: 'classification'},
+      {name: 'Kullback-Leibler Divergence',    info: 'KLDivergence!',                codename: 'kullback_leibler_divergence',    type: 'classification'},
+      {name: 'Log Cosh Error',                 info: 'LogCoshError!',                codename: 'logcosh',                        type: 'regression'},
+      {name: 'Mean Absolute Error',            info: 'MeanAbsoluteError!',           codename: 'mean_absolute_error',            type: 'regression'},
+      {name: 'Mean Absolute Percentage Error', info: 'MeanAbsolutePercentageError!', codename: 'mean_absolute_percentage_error', type: 'regression'},
+      {name: 'Mean Squared Error',             info: 'MeanSquaredError!',            codename: 'mean_squared_error',             type: 'regression'},
+      {name: 'Mean Squared Logarithmic Error', info: 'MeanSquaredLogarithmicError!', codename: 'mean_squared_logarithmic_error', type: 'regression'},
+      {name: 'Poisson',                        info: 'Poisson!',                     codename: 'poisson',                        type: 'regression'},
+      {name: 'Precision',                      info: 'Precision!',                   codename: 'precision',                      type: 'classification'},
+      {name: 'Recall',                         info: 'Recall!',                      codename: 'recall',                         type: 'classification'},
+      {name: 'Root MeanSquared Error',         info: 'RootMeanSquaredError!',        codename: 'root_mean_squared_error',        type: 'regression'},
+      {name: 'Squared Hinge',                  info: 'SquaredHinge!',                codename: 'squared_hinge',                  type: 'classification'},
+      {name: 'True Negatives',                 info: 'TrueNegatives!',               codename: 'true_negatives',                 type: 'classification'},
+      {name: 'True Positives',                 info: 'TruePositives!',               codename: 'true_positives',                 type: 'classification'},
     ];
 
     static readonly WEIGHT_INITIALIZERS: Hyperparameter[] = [

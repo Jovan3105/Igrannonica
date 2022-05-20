@@ -29,24 +29,19 @@
         </button>&nbsp;
         <button type="button" class="btn btn-warning" (click)="downloadFile()">Download</button>
     </div>
-    <br><br>
-    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'visibility': containerVisibility}">
+
+    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'display': mainContainerDisplay}">
         <div class="col-lg">
             <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
             (hideEvent)="changeCheckBox($event)">
             </app-show-table><br>
         </div>
         <div class="col-lg-4" style="padding:0em 0.3em;">
-            <app-labels #Labels id="labelCards" [ngStyle]="{'display': labelsDisplay}" 
+            <app-labels #Labels id="labelCards" [ngStyle]="{'display': labelsDisplay}"
+            [missing]="missingValue" 
             (checkEvent)="changeColomnVisibility($event)" 
-            (labelEvent)="onSelectedLabel($event)"
+            (labelEvent)="onSelectedTargetColumn($event)"
             ></app-labels>
-        </div>
-        <div [ngStyle]="{'display':statsTableDisplay}">
-            <app-stats #Stats></app-stats>
-            <!--<h4>Basic Info</h4>
-            <app-show-table #dataSetInformation id="basicInfo"></app-show-table>-->
-            <br>
         </div>
         <div class="modal fade" id="modifyModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" style="max-width: 80%;">
@@ -88,10 +83,16 @@
             </div>
         </div>
     </div>
+    <div class="stats-view" [ngStyle]="{'display':statsTableDisplay}">
+        <app-stats #Stats></app-stats>
+        <!--<h4>Basic Info</h4>
+        <app-show-table #dataSetInformation id="basicInfo"></app-show-table>-->
+        <br>
+    </div>
 </div>
 
 <div id="second" class="container-flex" [ngStyle]="{'display': secondDisplay}">
-    <app-hyperparameters [featuresLabel]="featuresLabel" [datasetId]="datasetId"></app-hyperparameters>
+    <app-hyperparameters [choosenInAndOutCols]="choosenInAndOutCols" [datasetId]="datasetId"></app-hyperparameters>
     <!-- Deo kada se klikne na dugme -->
     <!-- <div class="options">
         <input>

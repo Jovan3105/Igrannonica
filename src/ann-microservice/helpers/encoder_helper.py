@@ -13,7 +13,7 @@ class CatColEncoder(str, Enum):
 
 def map_catcolencoder(catcolencoder):   
     catcolencoder_switcher = {
-        CatColEncoder.OneHot    : OneHotEncoder(handle_unknown='ignore'),
+        CatColEncoder.OneHot    : OneHotEncoder(handle_unknown='ignore', sparse=False),
         CatColEncoder.Ordinal   : OrdinalEncoder(),
         CatColEncoder.Binary    : ce.BinaryEncoder()
     }

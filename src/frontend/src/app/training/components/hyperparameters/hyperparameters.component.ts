@@ -1,30 +1,31 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
-import { FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
-import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
+import { MatSelect } from '@angular/material/select';
+import { ChosenColumn } from '../../models/table_models';
 
 @Component({
   selector: 'app-hyperparameters',
   templateUrl: './hyperparameters.component.html',
   styleUrls: ['./hyperparameters.component.css']
 })
-export class HyperparametersComponent implements OnInit 
+export class HyperparametersComponent implements OnInit, OnChanges 
 {
-  @Input() featuresLabel:any;
+  @Input() choosenInAndOutCols:{features:ChosenColumn[],label:ChosenColumn} | undefined = undefined;
   @Input() datasetId:any;
   
   loaderMiniDisplay:string = "none";
   readonly backendSocketUrl = environment.backendSocketUrl;
 
-  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
+  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer, private fb: FormBuilder) { }
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -32,26 +33,32 @@ export class HyperparametersComponent implements OnInit
   metrics: Hyperparameter[] = Constants.METRICS;
   weightInitializers: Hyperparameter[] = Constants.WEIGHT_INITIALIZERS;
 
+  formGroup!: FormGroup;
   //activationFunctionControl = new FormControl('', Validators.required);
   optimizerFunctionControl = new FormControl('', Validators.required);
   lossFunctionControl = new FormControl('', Validators.required);
   metricsControl = new FormControl('', Validators.required);
   selectFormControl = new FormControl('', Validators.required);
+  @ViewChild('allMetricsSelected') allMetricsSelected!: MatOption;
 
-  @ViewChild('metricSelect') metricSelect!: MatSelect;
+  @ViewChild('metricsSelect') metricsSelect!: MatSelect;
   @ViewChild('lossSelect') lossSelect!: MatSelect;
 
+  allSelected: boolean = false;
   problemType: string = "regression";
+  selectedNumerical: string = "false";
+  selectedCategorical: string = "false"
   numberOfEpochs: number = 1000;
   learningRate: number = 0.1;
   corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
 
-  sliderValue: number = 80;
+  sliderValueTest: number = 20;
+  sliderValueValidation: number = 20;
   sliderOptions: Options = {
     floor: 10,
     ceil: 90,
-    step: 10,
+    step: 5,
     showSelectionBar: true,
     getSelectionBarColor: (value: number): string => {
       if (value <= 25) {
@@ -75,8 +82,16 @@ export class HyperparametersComponent implements OnInit
 
   ngOnInit(): void 
   {
+    
   }
-
+  ngOnChanges(changes: SimpleChanges): void 
+  { 
+    if (this.choosenInAndOutCols !== undefined && this.choosenInAndOutCols.label !== undefined)
+    {
+      this.problemType = this.choosenInAndOutCols.label.type == "Categorical"? "classification":"regression";
+      this.reset();
+    }
+  }
   layers= [
     { 
       index : 0,
@@ -92,14 +107,18 @@ export class HyperparametersComponent implements OnInit
     }
   ];
 
-  epoches_data:{epoch: number,loss: number,mean_absolute_error: number,val_loss: number,val_mean_absolute_error: number}[]=[];
+  epoches_data:any[]=[];
 
-  loss_arr:number[]=[];
-  val_loss_arr:number[]=[];
+  graph_metric="loss";
+
+  training_arr:number[]=[];
+  val_arr:number[]=[];
   epoches_arr:number[]=[0];
 
-  prikaz:string="none";
+  collapse:string="block";
 
+  prikaz:string="none";
+  started:boolean=false;
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
   }
@@ -118,16 +137,11 @@ export class HyperparametersComponent implements OnInit
     });
   }
 
-  changeWeight(selected:string,index:number)
+  changeGraphMetric(codename:string)
   {
-    this.layers[index].weight_initializer=selected;
-  }
-
-  changeActivation(event:[string,number])
-  {
-    this.layers[event[1]].activation_function=event[0];
-    console.log(this.layers);
-    console.log(this.layers);
+    this.graph_metric=codename;
+    this.training_arr=this.epoches_data.map(a=>a[this.graph_metric]);
+    this.val_arr=this.epoches_data.map(a=>a["val_"+this.graph_metric]);
   }
   
   startTrainingObserver:any = {
@@ -144,7 +158,7 @@ export class HyperparametersComponent implements OnInit
   };
 
   changeEpoch(value: number): void {
-    //this.numberOfEpochs = value;
+    this.numberOfEpochs = value;
   }
   changeRate(value: number): void {
     value = +value.toFixed(2)
@@ -152,32 +166,28 @@ export class HyperparametersComponent implements OnInit
   }
   
   TrainingClick(){
-    //this.loaderDisplay = "block";
-    //this.secondVisibility = "none";
     this.loaderMiniDisplay = "block";
     let connectionID = "";
-
-    let colEncodings: string[] = this.trainingViewComponent.getSelectedEncoding()
     
     // izdvajanje naziva feature-a u poseban niz
     var features = []
-    for (let index = 0; index < this.featuresLabel['features'].length; index++) {
-      const element = this.featuresLabel['features'][index];
-      // TODO hardcoded
-      features.push(new Column(element["name"], colEncodings[0]));
+    for (let index = 0; index < this.choosenInAndOutCols!['features'].length; index++) {
+      const element = this.choosenInAndOutCols!['features'][index];
+      features.push(new Column(element["name"], element["encoding"]));
     } 
       
     // izdvajanje naziva label-a u poseban niz
     var lables = []
-    for (let index = 0; index < this.featuresLabel['label'].length; index++) {
-      const element = this.featuresLabel['label'][index];
-      // TODO hardcoded
-      lables.push(new Column(element["name"], colEncodings[0]));
-    } 
+    const element = this.choosenInAndOutCols!['label'];
+    lables.push(new Column(element["name"], element["encoding"]));
 
     // izdvajanje codename-ova metrika u poseban niz
     this.metricsArrayToSend = this.metricsControl.value.map(
       (item:any)=>item['codename']);
+    
+    
+    if(this.metricsArrayToSend[0] == undefined)
+      this.metricsArrayToSend.shift();
 
     var trainingRequestPayload = {
       DatasetID             : this.datasetId,
@@ -188,8 +198,8 @@ export class HyperparametersComponent implements OnInit
       Labels                : lables,
       Metrics               : this.metricsArrayToSend,
       LossFunction          : this.lossFunctionControl.value.codename,
-      TestDatasetSize       : this.sliderValue / 100,
-      ValidationDatasetSize : 0.2, // TODO hardcoded, promeniti kada se implementira UI komponenta
+      TestDatasetSize       : this.sliderValueTest / 100,
+      ValidationDatasetSize : this.sliderValueValidation / 100,
       Epochs                : this.numberOfEpochs,
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate
@@ -211,8 +221,12 @@ export class HyperparametersComponent implements OnInit
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
+        _this.collapse="none";
         _this.epoches_data=[];
-        _this.prikaz="block";
+        _this.training_arr=[];
+        _this.val_arr=[];
+        _this.prikaz="inline-block";
+        _this.started=true;
       }
       else {
         // TODO iskoristiti za vizuelizaciju
@@ -220,9 +234,11 @@ export class HyperparametersComponent implements OnInit
         console.log(epoch_stats);
         _this.epoches_data.push(epoch_stats);
         // TODO srediti da se salje samo element a ne ceo niz
-        _this.loss_arr=_this.epoches_data.map(a => a.loss);
-        _this.val_loss_arr=_this.epoches_data.map(a => a.val_loss);
-        _this.epoches_arr=_this.epoches_data.map(a => a.epoch);
+        _this.training_arr=_this.epoches_data.map(a=>a[_this.graph_metric]);
+        _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
+        _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
+        if(_this.training_arr.length==_this.numberOfEpochs)
+        _this.collapse="block";
       }
     }
 
@@ -231,9 +247,29 @@ export class HyperparametersComponent implements OnInit
       console.log("Connection is terminated");
     }
   }
+
   reset(){
-    this.metricSelect.options.forEach((data: MatOption) => data.deselect());
+    this.metricsSelect.options.forEach((data: MatOption) => data.deselect());
     this.lossSelect.options.forEach((data: MatOption) => data.deselect());
   }
+
+  toggleAllSelection(){
+    this.metricsSelect.options.forEach( (item : MatOption) => {if(item.value.type == this.problemType)item.select()});
+  }
+
+  toggleAllDeselect(){
+    this.metricsSelect.options.forEach( (item : MatOption) => {item.deselect()});
+    
+  }
+
+  optionClick() {
+    let newStatus = true;
+    this.metricsSelect.options.forEach((item: MatOption) => {
+      if (!item.selected) {
+        newStatus = false;
+      }
+    });
+    this.allSelected = newStatus;
+  }  
 }
 

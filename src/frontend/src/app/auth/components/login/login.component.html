@@ -10,9 +10,6 @@
                 <label for="loginPassword" class="form-label">Password</label>
                 <input type="password" name="password" ngModel required #password="ngModel" class="form-control" id="loginPassword" placeholder="Enter password">
             </div>
-            <div class="mb-3 form-check">
-                <a [routerLink]="['/reset-password']">Forgot Password</a>
-            </div>
             <button type="submit" [disabled]="f.invalid" class="btn btn-primary">Login</button>
             <div id="circle" [ngStyle]="{'display': loaderDisplay}">
                 <div class="loader">
