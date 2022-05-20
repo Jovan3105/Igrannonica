@@ -10,7 +10,8 @@ import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
-import { ChosenColumn } from '../../models/table_models';
+import { ChosenColumn, View } from '../../models/table_models';
+import { SessionService } from 'src/app/core/services/session.service';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -25,7 +26,10 @@ export class HyperparametersComponent implements OnInit, OnChanges
   loaderMiniDisplay:string = "none";
   readonly backendSocketUrl = environment.backendSocketUrl;
 
-  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer) { }
+  constructor(private trainingViewComponent:TrainingViewComponent, 
+    private trainingService: TrainingService,
+    private domSanitizer: DomSanitizer,
+    private sessionService: SessionService) { }
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -47,7 +51,6 @@ export class HyperparametersComponent implements OnInit, OnChanges
   selectedCategorical: string = "false"
   numberOfEpochs: number = 1000;
   learningRate: number = 0.1;
-  corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
 
   sliderValue: number = 80;
@@ -78,7 +81,12 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   ngOnInit(): void 
   {
-    
+    if(this.sessionService.getData('view') != null && parseInt(this.sessionService.getData('view')!) == View.TRAINING)
+    {
+      this.choosenInAndOutCols = JSON.parse(this.sessionService.getData('chosen_columns')!);
+      this.problemType = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"regression";
+      this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
+    }
   }
   ngOnChanges(changes: SimpleChanges): void 
   { 

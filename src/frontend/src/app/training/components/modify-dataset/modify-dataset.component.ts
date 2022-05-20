@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { HeaderDict, TableIndicator } from '../../models/table_models';
 import { ShowTableComponent } from '../show-table/show-table.component';
 
@@ -65,5 +65,9 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
   getDeletedCols()
   {
     return this.modifyTable.deletedCols;
+  }
+  @HostListener('window:beforeunload', ['$event'])
+  unloadHandler(event: Event) {
+    return false;
   }
 }

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CsvExportParams, } from 'ag-grid-community';
+import { SessionService } from 'src/app/core/services/session.service';
 import { Check, EditedCell, HeaderDict, TableIndicator, UndoData, undoType } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
@@ -42,7 +43,7 @@ export class ShowTableComponent implements OnInit {
   undoRedoCellEditingLimit:number;
   enableCellChangeFlash:boolean ;
   
-  constructor(private tableService:TableService) {
+  constructor(private tableService:TableService, private sessionService:SessionService) {
     this.columnDefs = [];
     this.rowData = [];
     this.headers = [];
@@ -68,7 +69,6 @@ export class ShowTableComponent implements OnInit {
 
   ngOnInit(): void 
   {
-
   }
 
   onGridReady(params: GridReadyEvent) {
