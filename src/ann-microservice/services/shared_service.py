@@ -22,13 +22,14 @@ socket_message = {
  
 #################################################################
 
-def log(output):
+def log(output, title=''):
     '''
     Ispisuje prosledjeni objekat. Ukoliko je instanca stringa na njega dodaje prefiks PRINT_PREFIX i onda sve zajedno ispise, 
     dok u suprotnom samo ispisuje prosledjeni objekat
 
     **Ispis se vrsi samo u development modu**
     '''
+    LOGGER.info(title)
     
     if isinstance(output, str):
         LOGGER.info(config.PRINT_PREFIX + output)
