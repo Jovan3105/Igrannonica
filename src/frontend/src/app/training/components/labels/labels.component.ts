@@ -147,7 +147,9 @@ export class LabelsComponent implements OnInit, OnChanges {
       this.labelEvent.emit({id:parseInt(this.targetColumn.key),pred:this.pred});
       this.pred = parseInt(this.targetColumn.key);
 
-      if(this.selectedEncodings[this.targetColumn.key] == 'Binary')
+      let encoding = this.selectedEncodings[this.targetColumn.key];
+
+      if(encoding != 'OneHot')
         this.selectedEncodings[this.targetColumn.key] = 'OneHot';
     }
   }
