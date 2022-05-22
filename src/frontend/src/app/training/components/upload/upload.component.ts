@@ -1,5 +1,6 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { DatasetInfoComponent } from '../dataset-info/dataset-info.component';
 
 
 
@@ -19,6 +20,7 @@ export class UploadComponent implements OnInit {
   @Output() uploadEvent: EventEmitter<File>; //podizanje event-a kada se salje file
 
   constructor(private authService : AuthService) {
+    this.fileName = "";
     this.datasetURL = "";
     this.linkEvent = new EventEmitter<string>();
     this.uploadEvent = new EventEmitter<File>();
@@ -40,6 +42,7 @@ export class UploadComponent implements OnInit {
     if (fileList && fileList?.length > 0) {
 
       this.file = fileList[0];
+      this.fileName = fileList[0].name;
 
     }
     this.showDragAndDrop = false;
@@ -49,6 +52,8 @@ export class UploadComponent implements OnInit {
   {
     this.file = file;
     this.showDragAndDrop = false;
+
+    this.fileName = file.name;
   }
 
   uploadClick()
