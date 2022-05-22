@@ -1,6 +1,6 @@
 <h3>Choose dataset</h3>
 <div class="dataset-container">
-    <mat-tab-group mat-align-tabs="center" animationDuration="0ms">
+    <mat-tab-group mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
         <mat-tab label="Public dataset">
             <div class="dropzone">
                 We are working on it!
@@ -30,15 +30,15 @@
                         <br>
                         <span style="color:dodgerblue">click to upload</span>
                     </div>
-                    <div class="col-md-5 files-list my-auto" *ngIf="file">
+                    <div class="col-md-5 files-list my-auto" *ngIf="!showDragAndDrop">
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-lg-2 file-icon">
                                     <img class="img-icon" src="assets/resources/file-icon.svg" alt="file"> 
                                 </div>
                                 <div class="col-lg-8" id="info">
-                                    <p class="file-name">{{file.name}}</p>
-                                    <p class="file-size" style="color: #38424c;">{{file.size | filesize}}</p>
+                                    <p class="file-name">{{fileName}}</p>
+                                    <p class="file-size" style="color: #38424c;">{{fileSize}}</p>
                                 </div>
                                 <div class="col-lg-2 my-auto mx-0">
                                     <button type="button" class="btn btn-primary" id="delete-button" (click)="removeFile()"><mat-icon>delete</mat-icon></button>

@@ -15,12 +15,16 @@
         </div>
     </div>
 </div>
+
 <div [ngStyle]="{'display': uploadDisplay}">
     <app-upload #upload (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
+    <div id="error-message" *ngIf="errorDisplay" class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
     <br><br>
 </div>
 
-<div id="first" [ngStyle]="{'display': firstVisibility}">
+<div id="first" [ngStyle]="{'display': previewDisplay}">
     <div class="header-container">
         <h4>{{fileName}}</h4>
         <button type="button" class="btn btn-secondary" (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
@@ -43,45 +47,6 @@
             (labelEvent)="onSelectedTargetColumn($event)"
             ></app-labels>
         </div>
-        <div class="modal fade" id="modifyModal" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" style="max-width: 80%;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">Modify '{{fileName}}' dataset</h5>
-                        <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()" aria-label="Close" id="modal-close">
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.data" [header]="dataTable.headers"></app-modify-dataset>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationSave()">Modify</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="secondModal" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">Confirmation</h5>
-                    </div>
-                    <div class="modal-body" *ngIf="!confirmation">
-                        Are you sure that you want to cancel changes? This proccess cannot be undone.
-                    </div>
-                    <div class="modal-body" *ngIf="confirmation">
-                        Are you sure that you want to save changes? This proccess cannot be undone.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modifyModal">No</button>
-                        <button type="button" *ngIf="!confirmation" class="btn btn-primary" data-bs-dismiss="modal" (click)="OnModalClose()">Yes</button>
-                        <button type="button" class="btn btn-primary" *ngIf="confirmation" data-bs-dismiss="modal" (click)="OnModalSave()">Yes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="stats-view" [ngStyle]="{'display':statsTableDisplay}">
         <app-stats #Stats></app-stats>
@@ -91,10 +56,50 @@
     </div>
 </div>
 
-<div id="second" class="container-flex" [ngStyle]="{'display': secondDisplay}">
+<div id="second" class="container-flex" [ngStyle]="{'display': trainingDisplay}">
     <app-hyperparameters [choosenInAndOutCols]="choosenInAndOutCols" [datasetId]="datasetId"></app-hyperparameters>
     <!-- Deo kada se klikne na dugme -->
     <!-- <div class="options">
         <input>
     </div> -->
+</div>
+
+<div class="modal fade" #modal id="modifyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Modify '{{fileName}}' dataset</h5>
+                <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()" aria-label="Close" id="modal-close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.data" [header]="dataTable.headers"></app-modify-dataset>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationSave()">Modify</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="secondModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Confirmation</h5>
+            </div>
+            <div class="modal-body" *ngIf="!confirmation">
+                Are you sure that you want to cancel changes? This proccess cannot be undone.
+            </div>
+            <div class="modal-body" *ngIf="confirmation">
+                Are you sure that you want to save changes? This proccess cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modifyModal">No</button>
+                <button type="button" *ngIf="!confirmation" class="btn btn-primary" data-bs-dismiss="modal" (click)="OnModalClose()">Yes</button>
+                <button type="button" class="btn btn-primary" *ngIf="confirmation" data-bs-dismiss="modal" (click)="OnModalSave()">Yes</button>
+            </div>
+        </div>
+    </div>
 </div>
