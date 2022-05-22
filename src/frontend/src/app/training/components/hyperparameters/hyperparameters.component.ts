@@ -138,12 +138,24 @@ export class HyperparametersComponent implements OnInit, OnChanges
   
 
   addLayer(){
-    this.layers.push({ 
-      index : this.layers.length-1,
-      units : 12,
-      weight_initializer  : "HeUniform",
-      activation_function : "ReLu",
-    });
+    if(this.layers.length==0)
+    {
+      this.layers.push({ 
+        index : this.layers.length,
+        units : 12,
+        weight_initializer  : "HeUniform",
+        activation_function : "ReLu",
+      });
+    }
+    else
+    {
+      this.layers.push({ 
+        index : this.layers.length,
+        units : Math.ceil(this.layers[this.layers.length-1].units/2),
+        weight_initializer  : this.layers[this.layers.length-1].weight_initializer,
+        activation_function : this.layers[this.layers.length-1].activation_function,
+      });
+    }
   }
 
   changeGraphMetric(codename:string)
