@@ -25,7 +25,7 @@ category-encoders = "*"
 waitress = "*"
 
 [scripts]
-server = "gunicorn ann_server:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:10082"
+server = "gunicorn ann_server:app --workers 3 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:10082"
 dev_server = "python ann_server.py dev"
 
 [requires]
