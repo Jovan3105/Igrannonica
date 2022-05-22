@@ -279,8 +279,11 @@ export class LabelsComponent implements OnInit, OnChanges {
   }
   unselectAll(){
     for (let index = 0; index < this.checkboxCheckedArray.length; index++) {
-      this.checkboxCheckedArray[index] = false;
-      this.checkEvent.emit(new Check(index, false));
+      if(this.targetColumn==null || this.targetColumn.key!=index)
+      {
+        this.checkboxCheckedArray[index] = false;
+        this.checkEvent.emit(new Check(index, false));
+      }
     }
   }
       
