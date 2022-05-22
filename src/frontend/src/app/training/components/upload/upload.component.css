@@ -36,9 +36,7 @@ h3
 
 .file-icon{
     border-radius: 1rem;
-    /* background-color:white; */
-    display: flex;
-    justify-content: center;
+    background-color:white;
 }
 .row{
     hyphens: auto;
