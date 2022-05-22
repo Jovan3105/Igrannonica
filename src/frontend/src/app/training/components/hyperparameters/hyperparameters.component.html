@@ -121,12 +121,12 @@
             </div>
         </div>
     </form>
-    <div class="row">
+    <div class="row mt-3 mb-3">
         <div class="col-md-3 col-sm-3 col-lg-3" *ngIf="metricsArrayToSend.length>0">
-            <button type="button" class="btn" (click)="changeGraphMetric('loss')">loss</button>
+            <button type="button" class="btn metricsSelect" (click)="changeGraphMetric('loss')">loss</button>
         </div>
         <div class="col-md-3 col-sm-3 col-lg-3" *ngFor="let metric of metricsArrayToSend">
-            <button type="button" class="btn p-1 m-1" (click)="changeGraphMetric(metric)">{{metric}}</button>
+            <button type="button" class="btn p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric)">{{metric}}</button>
         </div>
     </div>
     <app-chart class="row" [started]="started" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>

@@ -61,4 +61,11 @@ h4 {
     color: white;
     padding: 0px;
 }
-  
+.metricsSelect:hover{
+    background-color: #0d6efd;
+    color: white;
+}
+.metricsSelect:focus{
+    background-color: #0d6efd;
+    color: white;
+}

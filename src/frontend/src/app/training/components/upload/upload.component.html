@@ -2,8 +2,34 @@
 <div class="dataset-container">
     <mat-tab-group mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
         <mat-tab label="Public dataset">
-            <div class="dropzone">
-                We are working on it!
+            <div class="container p-3">
+                <div class="row justify-content-center" style="column-gap: 30px;">
+                    <div class="col-sm-1 file-icon p-1 flex-wrap" (click)="publicLinkClick(diamondsURL)">
+                        <img class="img-icon" src="assets/resources/file-icon.svg" alt="file">
+                        <br>
+                        <p class="mb-0 text-center flex-wrap csv-text">diamonds.csv</p>
+                    </div>
+                    <div class="col-sm-1 file-icon p-1 flex-wrap" (click)="publicLinkClick(titanicURL)">
+                        <img class="img-icon" src="assets/resources/file-icon.svg" alt="file">
+                        <br>
+                        <p class="mb-0 text-center flex-wrap csv-text">titanic.csv</p>
+                    </div>
+                    <div class="col-sm-1 file-icon p-1 flex-wrap" (click)="publicLinkClick(weightsURL)">
+                        <img class="img-icon" src="assets/resources/file-icon.svg" alt="file">
+                        <br>
+                        <p class="mb-0 text-center flex-wrap csv-text">weights.csv</p>
+                    </div>
+                    <div class="col-sm-1 file-icon p-1 flex-wrap" (click)="publicLinkClick(covidURL)">
+                        <img class="img-icon" src="assets/resources/file-icon.svg" alt="file">
+                        <br>
+                        <p class="mb-0 text-center flex-wrap csv-text">covid19.csv</p>
+                    </div>
+                    <div class="col-sm-1 file-icon p-1 flex-wrap" (click)="publicLinkClick(browserURL)">
+                        <img class="img-icon" src="assets/resources/file-icon.svg" alt="file">
+                        <br>
+                        <p class="mb-0 text-center flex-wrap csv-text">browsers.csv</p>
+                    </div>
+                </div>
             </div>
         </mat-tab>
         <mat-tab label="Link">
@@ -13,7 +39,7 @@
                 <input type="text" class="form-control mb-3" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
                 <app-dataset-info></app-dataset-info>
             </div>
-            <div style="text-align: end;">
+            <div class="nextButton">
                 <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
             </div>
         </mat-tab>
@@ -51,7 +77,7 @@
                     </div>
                 </div>
             </div>
-            <div style="text-align: end;">
+            <div class="nextButton">
                 <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
             </div>
         </mat-tab>
