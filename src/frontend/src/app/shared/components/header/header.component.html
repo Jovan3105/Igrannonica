@@ -11,29 +11,29 @@
                     <a class="nav-link " [routerLink]="['/home']" routerLinkActive="active">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link user-select-none" [routerLink]="['/training']" routerLinkActive="active">Training</a>
+                    <a class="nav-link" [routerLink]="['/training']" routerLinkActive="active">Training</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link user-select-none" [routerLink]="['/datasets']" routerLinkActive="active">Datasets</a>
+                    <a class="nav-link" [routerLink]="['/datasets']" routerLinkActive="active">Datasets</a>
                 </li>
             </ul>
             <ul class="navbar-nav navbar-right" *ngIf="displayLoginElement">
                 <li class="nav-item">
-                    <a class="nav-link user-select-none" [routerLink]="['/register']" routerLinkActive="active">Register</a>
+                    <a class="nav-link" [routerLink]="['/register']" routerLinkActive="active">Register</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link user-select-none" [routerLink]="['/login']" routerLinkActive="active">Login</a>
+                    <a class="nav-link" [routerLink]="['/login']" routerLinkActive="active">Login</a>
                 </li>
             </ul>
             <ul class="navbar-nav navbar-right" *ngIf="!displayLoginElement && user$">
                 <li class="nav-item">
-                    <a class="nav-link disabled">
+                    <a class="nav-link username disabled">
                         <!--[routerLink]="['/api/my-profile']" routerLinkActive="active"-->
                         {{(user$ | async)?.username}}
                     </a>
                 </li>
                 <li class="nav-item align-self-center">
-                    <a class="nav-link user-select-none" (click)="doLogout()">Logout</a>
+                    <a class="nav-link" (click)="doLogout()">Logout</a>
                 </li>
             </ul>
         </div>

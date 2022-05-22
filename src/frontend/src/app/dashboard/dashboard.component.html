@@ -1,27 +1,10 @@
-<!-- <div id="container" >
-    <div class="item">
-        <div id="middleText">
-            <p>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-            </p>
-        </div>
-        <div class="sonar-wrapper">
-            <div class="sonar-emitter" [routerLink]="['/training']"> 
-                <i class="bi bi-arrow-right-circle"></i>
-                <div class="sonar-wave"></div>
-                
-            </div>
-        </div>
-    </div>
-    <div class="item">
-        Page Two
-    </div>
-    <div class="item">
-        Page Three
-    </div>
-</div> -->
+
 <script src="src\assets\js\particles.js"></script>
 
+<div class="containter-flex" style="z-index: -1; position: fixed; top: 0px; padding: 0;">
+    <canvas id="c" style="max-width: inherit;">
+    </canvas>
+</div>
 <div class="row" style=" position: relative; top: 20px; padding: 0;margin: 0; ">
     <div style="font-family: ' Montserrat ', sans-serif;" class="my-5 mb-0 pb-0 col-lg-6 col-md-6 col-sm-12 noselect" style="z-index: 1; margin-top: 8rem!important;">
         <div class="d-flex justify-content-center col-lg-12 col-sm-12">
@@ -47,11 +30,6 @@
         
         
     </div>
-    <div class="containter-flex" style="position: absolute; top:-20px; max-height: 100%; padding: 0;">
-        <canvas id="c" style="max-width: inherit;">
-                
-            </canvas>
-    </div>
 </div>
 <div class="modal fade" id="tutorial" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg-4 modal-dialog-centered">
@@ -72,11 +50,3 @@
         </div>
     </div>
 </div>
-<!--
-    <div class="row bg-dark text-secondary">
-        <div class="col-md-12 col-sm-12 d-flex justify-items-center">
-            <div class="embed-responsive " style="text-align: center;">
-                <iframe id="tutorial " src="https://www.youtube.com/embed/jyQqXBJfF78 " title="YouTube video player " frameborder="0 " allowfullscreen></iframe>
-            </div>
-        </div>
-    </div>-->
