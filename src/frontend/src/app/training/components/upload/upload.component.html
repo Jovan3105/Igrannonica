@@ -1,60 +1,68 @@
 <h3>Choose dataset</h3>
 <div class="dataset-container">
-    <mat-tab-group mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
+    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
         <mat-tab label="Public dataset">
-            <div class="dropzone">
-                We are working on it!
-            </div>
+            <ng-template matTabContent>
+                <div class="dropzone">
+                    We are working on it!
+                </div>
+            </ng-template>
         </mat-tab>
         <mat-tab label="Link">
-            <div class="mx-auto" style="width: 80%;">
-                <h5>Dataset URL</h5>
-                <input type="text" class="form-control" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
-                <app-dataset-info></app-dataset-info>
-            </div>
-            <div style="text-align: end;">
-                <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
-            </div>
+            <ng-template matTabContent>
+                <div class="mx-auto" style="width: 80%;">
+                    <h5>Dataset URL</h5>
+                    <input type="text" class="form-control" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
+                    <app-dataset-info></app-dataset-info>
+                </div>
+                <div style="text-align: end;">
+                    <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
+                </div>
+            </ng-template>
         </mat-tab>
         <mat-tab label="Upload">
-            <div class="container" id="div-upload">
-                <div class="row justify-content-center">
-                    <div class="col-md-5 dropzone" *ngIf="showDragAndDrop" appDragAndDrop (fileDropped)="onFileDropped($event)">
-                        <input type="file" accept=".csv" class="file-input" #fileDrop id="file-drop" (change)="fileHandler($event)">
-                        <img src="assets/resources/icon-upload.svg" width="10%">
-                        <p>Drag and drop file here</p>
-                        <p>or</p>
-                        <p style="color:dodgerblue">click to upload</p>
-                    </div>
-                    <div class="col-md-5 files-list" *ngIf="!showDragAndDrop">
-                        <div class="container">
-                            <div class="row justify-content-center">
-                                <div class="col-lg-2 file-icon">
-                                    <img class="img-icon" src="assets/resources/file-icon.svg" alt="file"> 
-                                </div>
-                                <div class="col-lg-8" id="info">
-                                    <p class="file-name">{{fileName}}</p>
-                                    <p class="file-size" style="color: #38424c;">{{fileSize}}</p>
-                                </div>
-                                <div class="col-lg-2" style="text-align: center;">
-                                    <button type="button" class="btn btn-primary" id="delete-button" (click)="removeFile()"><mat-icon>delete</mat-icon></button>
+            <ng-template matTabContent>
+                <div class="container" id="div-upload">
+                    <div class="row justify-content-center">
+                        <div class="col-md-5 dropzone" *ngIf="showDragAndDrop" appDragAndDrop (fileDropped)="onFileDropped($event)">
+                            <input type="file" accept=".csv" class="file-input" #fileDrop id="file-drop" (change)="fileHandler($event)">
+                            <img src="assets/resources/icon-upload.svg" width="10%">
+                            <p>Drag and drop file here</p>
+                            <p>or</p>
+                            <p style="color:dodgerblue">click to upload</p>
+                        </div>
+                        <div class="col-md-5 files-list" *ngIf="!showDragAndDrop">
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-2 file-icon">
+                                        <img class="img-icon" src="assets/resources/file-icon.svg" alt="file"> 
+                                    </div>
+                                    <div class="col-lg-8" id="info">
+                                        <p class="file-name">{{fileName}}</p>
+                                        <p class="file-size" style="color: #38424c;">{{fileSize}}</p>
+                                    </div>
+                                    <div class="col-lg-2" style="text-align: center;">
+                                        <button type="button" class="btn btn-primary" id="delete-button" (click)="removeFile()"><mat-icon>delete</mat-icon></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-7">
-                        <app-dataset-info></app-dataset-info>
+                        <div class="col-md-7">
+                            <app-dataset-info></app-dataset-info>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div style="text-align: end;">
-                <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
-            </div>
+                <div style="text-align: end;">
+                    <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
+                </div>
+            </ng-template>
         </mat-tab>
         <mat-tab label="Private dataset">
-            <div class="dropzone">
-                We are working on it!
-            </div>
+            <ng-template matTabContent>
+                <div class="dropzone">
+                    We are working on it!
+                </div>
+            </ng-template>
         </mat-tab>
     </mat-tab-group>
 </div>

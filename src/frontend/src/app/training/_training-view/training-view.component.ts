@@ -10,6 +10,8 @@ import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
 import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
 import { SessionService } from 'src/app/core/services/session.service';
+import { UserService } from 'src/app/core/services/user.service';
+import { JwtService } from 'src/app/core/services/jwt.service';
 @Component({
   selector: 'app-training-view',
   templateUrl: './training-view.component.html',
@@ -18,6 +20,7 @@ import { SessionService } from 'src/app/core/services/session.service';
 export class TrainingViewComponent implements OnInit {
 
   datasetId:number = -1;
+  userId:number = -1; 
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
   learningRate: number = 0.1;
@@ -58,7 +61,8 @@ export class TrainingViewComponent implements OnInit {
     private datasetService: DatasetService, 
     private headersService: HeadersService,
     public dialog: MatDialog,
-    public sessionService:SessionService ) {}
+    private sessionService:SessionService,
+    private jwtService: JwtService ) {}
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('upload') private upload!:UploadComponent;
@@ -160,6 +164,16 @@ export class TrainingViewComponent implements OnInit {
 
   ngOnInit(): void 
   {
+    if (this.sessionService.getData('user_id') != null)
+    {
+      this.userId = parseInt(this.sessionService.getData('user_id')!);
+    }
+    else
+    {
+      var decodedToken = this.jwtService.getDecodedAccessToken();
+      this.userId = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
+      this.sessionService.saveData('user_id',this.userId.toString());
+    }
     if (this.sessionService.getData('view') != null){
       this.viewIndicator = parseInt(this.sessionService.getData('view')!);
       if (this.viewIndicator == View.PREVIEW)
