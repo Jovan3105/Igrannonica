@@ -1,6 +1,6 @@
 <div class="card" style="height: 27rem;" *ngIf = "headers">
   <div class="row card-header ms-0 me-0">
-    <h1 class="mb-0 col-sm-6">Choose features</h1>
+    <h2 class="mb-0 ps-0 col-sm-6">Choose features</h2>
   </div>
   <div class="row card-header ms-0 me-0">
     <div class="btn col-sm-6 text-center selectAllButton" (click)="selectAll()">
@@ -82,11 +82,11 @@
 </div>
 
 <div class="card" style="height: 30%;" *ngIf = "headers">
-  <h3 class="card-header mb-0">Choose target variable</h3>
+  <h2 class="card-header mb-0">Choose target variable</h2>
   <div class="card-body">
     <select [(ngModel)]="targetColumn" #selectLabel class="form-select" aria-label="Odabir izlaza" 
     (change)="onSelectLabel()"><!-- TODO povecati font za aria-label -->
-      <option [ngValue]="null" disabled>Choose target variable</option>
+      <option [ngValue]="null" disabled></option>
       <option class="word-wrap" *ngFor="let header of headers;" [ngValue]="header">
         {{header.name}}</option> <!-- TODO postaviti automatski tip -->
     </select>
