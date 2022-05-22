@@ -241,19 +241,31 @@ export class TrainingViewComponent implements OnInit {
       console.log("choosenInAndOutCols")
       console.log(choosenInAndOutCols)
       
-      if (choosenInAndOutCols?.label !== undefined){
-        if(choosenInAndOutCols.features.length > 0)
+      if (choosenInAndOutCols?.label !== undefined || choosenInAndOutCols!.features.length > 0){
+        if(choosenInAndOutCols!.features.length > 0)
         {
-          this.choosenInAndOutCols = choosenInAndOutCols;
+          if(choosenInAndOutCols!.label !== undefined)
+          {
+            this.choosenInAndOutCols = choosenInAndOutCols;
 
-          this.firstVisibility = "none";
-          this.secondDisplay = "block";
-          this.viewIndicator = View.TRAINING;
+            this.firstVisibility = "none";
+            this.secondDisplay = "block";
+            this.viewIndicator = View.TRAINING;
+          }
+          else
+          {
+            this.dialogTitle = "Alert";
+            this.dialogMessage = "You have to choose a target variable";
+    
+            this.dialog.open(DialogComponent,{
+              data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
+            });
+          }
         }
         else
         {
           this.dialogTitle = "Alert";
-        this.dialogMessage = "You have to choose at least one label";
+        this.dialogMessage = "You have to choose at least one feature";
 
         this.dialog.open(DialogComponent,{
           data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
@@ -263,7 +275,7 @@ export class TrainingViewComponent implements OnInit {
       else
       {
         this.dialogTitle = "Alert";
-        this.dialogMessage = "You have to choose target variable";
+        this.dialogMessage = "You have to choose at least one feature and a target variable";
 
         this.dialog.open(DialogComponent,{
           data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
