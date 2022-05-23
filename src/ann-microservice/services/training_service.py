@@ -58,9 +58,9 @@ def encode_and_scale(cont_cols: dict, encoders_cols_dict: {str}, X, y):
 
         col_transformers[i] = ColumnTransformer([
             ("scaler", MinMaxScaler(), cont_cols[i]),
-            ("onehot", map_catcolencoder(CatColEncoder.OneHot), encoders_cols_dict[i]['OneHot']),
-            ("ordinal", map_catcolencoder(CatColEncoder.Ordinal), encoders_cols_dict[i]['Ordinal']),
-            ("binary", map_catcolencoder(CatColEncoder.Binary), encoders_cols_dict[i]['Binary'])
+            ("OneHot", map_catcolencoder(CatColEncoder.OneHot), encoders_cols_dict[i]['OneHot']),
+            ("Ordinal", map_catcolencoder(CatColEncoder.Ordinal), encoders_cols_dict[i]['Ordinal']),
+            ("Binary", map_catcolencoder(CatColEncoder.Binary), encoders_cols_dict[i]['Binary'])
         ])
 
     X_preprocessed = col_transformers['features'].fit_transform(X)
@@ -148,7 +148,12 @@ def train_model(
 
     log(cont_cols, "cont_cols = ")
 
-    target_encoder = labels[0].encoder
+    if labels[0].name in cont_cols['labels']:
+        target_encoder = 'None'
+    else:    
+        target_encoder = labels[0].encoder
+
+    log(target_encoder, "target_encoder: ")
 
     # Get dict with list of cols to encode with specific encoder
     encoders_cols_dict = make_encoder_col_dict(features, labels, cont_cols)
@@ -249,13 +254,17 @@ def train_model(
     input_actual_values = None 
     pred_actual_values  = None
 
+    
+
+    log(CatColEncoder.NoEncoder.value, "CatColEncoder.NoEncoder.value: ")
+
     if target_encoder == CatColEncoder.NoEncoder.value:
         used_scaler = cts['labels'].named_transformers_['scaler']
         
         input_actual_values = used_scaler.inverse_transform(y_test)
         pred_actual_values  = used_scaler.inverse_transform(y_pred)
     else:
-        used_encoder = cts['labels'].named_transformers_[target_encoder.lower()]
+        used_encoder = cts['labels'].named_transformers_[target_encoder]
 
         input_actual_values = used_encoder.inverse_transform(y_test)
         pred_actual_values  = used_encoder.inverse_transform(y_pred)
