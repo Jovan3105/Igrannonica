@@ -4,11 +4,11 @@
     <form>
         <div class="form-group">
           <label for="dataset-title">Title</label>
-          <input type="text" class="form-control mb-3" id="dataset-title" placeholder="Add your title">
+          <input type="text" class="form-control mb-3" id="dataset-title" [value]="filename">
         </div>
         <div class="form-group">
           <label for="dataset-desc">Description</label>
-          <input type="text" class="form-control mb-3" id="dataset-desc" placeholder="Enter description">
+          <input type="text" class="form-control mb-3" id="dataset-desc" [value]="filename">
         </div>
         <div>
           <label class="switch">
