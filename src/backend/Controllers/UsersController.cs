@@ -48,7 +48,7 @@ namespace backend.Controllers
             return Ok(await this.userContext.Users.ToListAsync());
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> deleteUser(int id) // TODO dodati id u path kao userID
         {
             User u = await this.userContext.Users.FindAsync(id);
