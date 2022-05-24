@@ -43,7 +43,7 @@ export class ChartComponent implements OnInit {
       {
         // data: this.epoches_data.map(a => a.loss),
         data: [],
-        label: 'Training',
+        label: 'Error on trining set',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -55,8 +55,8 @@ export class ChartComponent implements OnInit {
       },
       {
         data: [],
-        label: 'Validation',
-        yAxisID: 'y-axis-1',
+        label: 'Error on validation set',
+        //yAxisID: 'y-axis-1',
         backgroundColor: 'rgba(255,0,0,0.3)',
         borderColor: 'red',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -97,14 +97,32 @@ export class ChartComponent implements OnInit {
       'y-axis-0':
         {
           position: 'left',
+          title: {
+            text:'Error',
+            display:true,
+            align:'center',
+            font:{
+              size: 17
+            }
+          }
         },
-      'y-axis-1': {
-        position: 'right',
-        
-        ticks: {
-          color: 'red'
+        x:{
+          title: {
+            text:'Epoch',
+            display:true,
+            align:'center',
+            font:{
+              size: 17
+            }
+          }
         }
-      }
+      // 'y-axis-1': {
+      //   position: 'right',
+        
+        // ticks: {
+        //   color: 'red'
+        // }
+     // }
     },
     
 
