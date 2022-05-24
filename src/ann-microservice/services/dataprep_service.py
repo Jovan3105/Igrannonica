@@ -6,6 +6,7 @@ from pydantic import AnyHttpUrl
 from starlette.datastructures import UploadFile
 
 from models import models
+from models.models import FillMethod, ModifiedData, ColumnFillMethodPair
 from services.shared_service import log
 
 #################################################################
@@ -78,7 +79,7 @@ def get_column_types(df):
 
 # # #
 
-def modify_dataset(dataset, data:models.ModifiedData):
+def modify_dataset(dataset, data:ModifiedData):
     df = pd.DataFrame(dataset['parsedDataset'])
     try:
         for editRow in data.edited:
@@ -96,10 +97,57 @@ def modify_dataset(dataset, data:models.ModifiedData):
         df.drop(df.columns[data.deletedCols],axis=1,inplace=True)
 
     except:
-        return 'error'
+        return 'error' # TODO raise HTTPException
     
 
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije
     dataset['basicInfo'] = get_basic_info(df)
 
     return dataset
+
+# # #
+
+def fill_missing(
+    dataset,
+    column_fill_method_pairs : list[ColumnFillMethodPair]
+    ):
+
+    df = pd.DataFrame(dataset['parsedDataset'])
+
+    for column_fill_method in column_fill_method_pairs:
+        log(column_fill_method)
+        column_name = column_fill_method.column_name
+        fill_method = column_fill_method.fill_method
+
+        log(df[column_name].dtype)
+        log(fill_method)
+        fill_value = None
+
+        if fill_method == FillMethod.Mean:
+            fill_value = df[column_name].mean()
+            pass
+        elif fill_method == FillMethod.Median:
+            fill_value = df[column_name].median()
+            pass
+        elif fill_method == FillMethod.MostFrequent:
+            fill_value = df[column_name].mode().iloc[0]
+            pass
+        elif fill_method == FillMethod.FillWithConstantNum:
+            if 'float' in df[column_name].dtype:
+                fill_value = column_fill_method.num_value
+            else:
+                fill_value = int(column_fill_method.num_value)
+            pass
+        elif fill_method == FillMethod.FillWithConstantStr:
+            fill_value = column_fill_method.str_value
+            pass
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown fill method for handling missing value: {fill_method}")
+
+        df[column_name].fillna(fill_value, inplace = True)
+            
+    dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije   
+    dataset['basicInfo'] = get_basic_info(df)
+
+    return dataset    
+            

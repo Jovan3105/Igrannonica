@@ -18,8 +18,8 @@ class LossFunction(str, Enum):
     #SparseCategoricalCrossentropy = "SparseCategoricalCrossentropy"
     SquaredHinge                  = "SquaredHinge"
 
-    def __str__(self):
-        return str(self.value)
+    def __repr__(self):
+        return self.value
 
 def map_loss_function(loss_func):   
     loss_func_switcher = {
