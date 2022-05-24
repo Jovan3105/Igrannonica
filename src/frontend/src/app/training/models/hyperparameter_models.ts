@@ -8,20 +8,20 @@ export class Hyperparameter
 
 export class Constants{
 
-  static readonly ENCODING_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
+  static readonly ENCODING_CATEGORICAL: Hyperparameter[] = [ 
       {name: 'One Hot', codename: 'OneHot'},
       {name: 'Ordinal', codename: 'Ordinal'},
-      {name: 'Binary', codename: 'Binary'}
+      {name: 'Binary',  codename: 'Binary'}
     ];
 
-    static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
-      {name: 'Mean', codename: 'Mean'},
-      {name: 'Median', codename: 'Median'},
+    static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ 
+      {name: 'Mean',   codename: 'mean'},
+      {name: 'Median', codename: 'median'},
     ];
 
-    static readonly MISSING_HANDLER_CATEGORICAL: Hyperparameter[] = [ // Mozda potrebna izmena Codename-a
-      {name: 'Most frequent', codename:'Frequent'},
-      {name: 'Fill with constant', codename:'Constant'},
+    static readonly MISSING_HANDLER_CATEGORICAL: Hyperparameter[] = [ 
+      {name: 'Most frequent',      codename:'most_freq'},
+      {name: 'Fill with constant', codename:'constant_str'},
     ];
 
     static readonly ACTIVATION_FUNCTIONS: Hyperparameter[] = [

@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpEvent, HttpEventType } from '@angula
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { ColumnFillMethodPair } from '../models/dataset_models';
 import { ModifiedData } from '../models/table_models';
 
 @Injectable({
@@ -109,6 +110,13 @@ export class DatasetService {
   
   getCorrMatrix(id:any):Observable<any>{
     return this.http.get<any>(this.datasetAPIUrl +`/${id}/corr-matrix`).pipe(
+      //tap(_ => console.log(`fetched page id=${id}`)),
+      catchError(this.handleError)
+    );
+  }
+
+  fillMissingValues(id:any, colFillMethodPairs: ColumnFillMethodPair[]):Observable<any>{
+    return this.http.post<any>(this.datasetAPIUrl +`/${id}/fillMissing`, colFillMethodPairs).pipe(
       //tap(_ => console.log(`fetched page id=${id}`)),
       catchError(this.handleError)
     );

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Body
 from typing import List, Optional
 from pydantic import AnyHttpUrl
 
@@ -88,7 +88,7 @@ async def modify(stored_dataset : AnyHttpUrl, modified_data : ModifiedData):
 @router.put("/fill-missing")
 async def fill_missing_values(
     stored_dataset           : AnyHttpUrl, 
-    column_fill_method_pairs : List[ColumnFillMethodPair]
+    column_fill_method_pairs : List[ColumnFillMethodPair] = Body(...)
     ):
     '''
     Popunjava prazna polja u dataset-u koristeci odabrani metod

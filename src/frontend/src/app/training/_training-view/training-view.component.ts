@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { Check, ModifiedData, TableIndicator, View } from '../models/table_models';
+import { Check, ChosenColumn, ModifiedData, TableIndicator, View } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
 import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
@@ -10,6 +10,7 @@ import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
 import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
 import { SessionService } from 'src/app/core/services/session.service';
+import { ColumnFillMethodPair } from '../models/dataset_models';
 @Component({
   selector: 'app-training-view',
   templateUrl: './training-view.component.html',
@@ -289,6 +290,7 @@ export class TrainingViewComponent implements OnInit {
       console.log("choosenInAndOutCols")
       console.log(choosenInAndOutCols)
       
+      
       if (choosenInAndOutCols?.label !== undefined || choosenInAndOutCols!.features.length > 0){
         if(choosenInAndOutCols!.features.length > 0)
         {
@@ -298,6 +300,49 @@ export class TrainingViewComponent implements OnInit {
 
             this.previewDisplay = "none";
             this.trainingDisplay = "block";
+
+            if(this.missingValue > 0) {
+              
+              let columnFillMethodPairs: ColumnFillMethodPair[] = []
+              
+              choosenInAndOutCols?.features.forEach(col => {
+                let str_value: string = '';
+                let num_value: number = 0;
+
+                if(col.type == 'object')
+                  str_value = col.missingConstant!;
+                else
+                  num_value = +col.missingConstant!;
+
+                let columnFillMethodPair = new ColumnFillMethodPair(col.name, col.missing!, str_value, num_value)
+                columnFillMethodPairs.push(columnFillMethodPair);
+              });
+              
+              if(choosenInAndOutCols?.label) {
+                let label: ChosenColumn = choosenInAndOutCols?.label;
+                let str_value: string = '';
+                let num_value: number = 0;
+
+                if(label.type == 'object')
+                  str_value = label.missingConstant!;
+                else
+                  num_value = +label.missingConstant!;
+
+                let columnFillMethodPair = new ColumnFillMethodPair(label.name, label.missing!, str_value, num_value)
+                columnFillMethodPairs.push(columnFillMethodPair);
+              }
+
+              this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
+                next: (response:any) => { 
+                  console.log("Fill missing value: ", response)
+                },
+                error: (err: Error) => {
+                  console.log(err);
+                  // TODO error handling kada popunjavanje ne uspe
+                }
+              })
+            }
+
             this.viewIndicator = View.TRAINING;
             this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
           }

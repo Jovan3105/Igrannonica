@@ -115,12 +115,14 @@ def fill_missing(
     df = pd.DataFrame(dataset['parsedDataset'])
 
     for column_fill_method in column_fill_method_pairs:
-        log(column_fill_method)
+        
         column_name = column_fill_method.column_name
         fill_method = column_fill_method.fill_method
 
-        log(df[column_name].dtype)
-        log(fill_method)
+        # Skip columns with 0 missing values
+        if df[column_name].isnull().sum() == 0:
+            continue
+       
         fill_value = None
 
         if fill_method == FillMethod.Mean:
