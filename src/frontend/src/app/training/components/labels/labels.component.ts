@@ -13,13 +13,13 @@ import { SessionService } from 'src/app/core/services/session.service';
 export class LabelsComponent implements OnInit, OnChanges {
 
   columns: HeaderDict[] | null;
-  pred: number | null;
+  previousTargetId: number | null;
   missing_categorical:Hyperparameter[] = Constants.MISSING_HANDLER_CATEGORICAL;
   missing_numerical:Hyperparameter[] = Constants.MISSING_HANDLER_NUMERICAL;
   encoding_categorical:Hyperparameter[] = Constants.ENCODING_CATEGORICAL;
   @Input() missing: number = 0;
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
-  @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
+  @Output() labelEvent: EventEmitter<{ id: number; previousTargetId: number | null; }>; //podizanje event-a kada se promeni izlaz
   selectedEncodings:string[];
   selectedTypes:string[];
   selectedMissingHandler:string[];
@@ -35,9 +35,9 @@ export class LabelsComponent implements OnInit, OnChanges {
   constructor(public dialog:MatDialog, private sessionService:SessionService) {
 
     this.columns = null;
-    this.pred = null;
+    this.previousTargetId = null;
     this.checkEvent = new EventEmitter<Check>();
-    this.labelEvent = new EventEmitter<{id:number,pred:number | null}>();
+    this.labelEvent = new EventEmitter<{id:number,previousTargetId:number | null}>();
     this.checkboxCheckedArray = new Array<boolean>();
     this.selectedEncodings = new Array<string>();
     this.selectedTypes = new Array<string>();
@@ -49,7 +49,7 @@ export class LabelsComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.columns = null;
-    this.pred = null;
+    this.previousTargetId = null;
     this.targetColumn = null;
 
     this.resetValues();
@@ -118,25 +118,25 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
   }
 
-  // poziva se kada se kad se hide-uje iz tabele
+  // poziva se kada se kad se dogodi hideEvent tabele
   changeCheckbox(checkChange:Check)
   {
     this.checkboxCheckedArray[checkChange.id] = !this.checkboxCheckedArray[checkChange.id];
   }
 
-  onSelectLabel()
+  onLabelColSelect()
   {
-    if (this.pred != null)
+    if (this.previousTargetId != null)
     {
-      this.checkboxCheckedArray[this.pred] = true;
+      this.checkboxCheckedArray[this.previousTargetId] = true;
     }
 
     if(this.targetColumn!=null){
       if (this.checkboxCheckedArray[this.targetColumn.key]) 
       this.checkboxCheckedArray[this.targetColumn.key] = false;
 
-      this.labelEvent.emit({id:parseInt(this.targetColumn.key),pred:this.pred});
-      this.pred = parseInt(this.targetColumn.key);
+      this.labelEvent.emit({id:parseInt(this.targetColumn.key),previousTargetId:this.previousTargetId});
+      this.previousTargetId = parseInt(this.targetColumn.key);
 
       let encoding = this.selectedEncodings[this.targetColumn.key];
 
@@ -182,15 +182,24 @@ export class LabelsComponent implements OnInit, OnChanges {
       {
         let id = this.targetColumn.key;
         let lblName = this.columns.filter(element => element.key == this.targetColumn.key)[0].name;
+        
         if (this.showMissingColumn)
         {
           if(!this.constantsDisabledArray[id])
-            label = new ChosenColumn(lblName,this.selectedTypes[id],this.selectedEncodings[id],this.selectedMissingHandler[id],
-              this.constantsChoosen.get(id));
+            label = new ChosenColumn(
+                lblName,
+                this.selectedTypes[id],
+                this.selectedEncodings[id],
+                this.selectedMissingHandler[id],
+                this.constantsChoosen.get(id));
           else 
-            label = new ChosenColumn(lblName,this.selectedTypes[id],this.selectedEncodings[id],this.selectedMissingHandler[id]);
+            label = new ChosenColumn(
+              lblName,
+              this.selectedTypes[id],
+              this.selectedEncodings[id],
+              this.selectedMissingHandler[id]);
         }
-        else label = new ChosenColumn(lblName,this.selectedTypes[id],this.selectedEncodings[id]);
+        else label = new ChosenColumn(lblName, this.selectedTypes[id], this.selectedEncodings[id]);
       }
 
       values = {
@@ -204,16 +213,14 @@ export class LabelsComponent implements OnInit, OnChanges {
 
   onEncodingChange(index: number, encoding: string) {
     if(this.selectedEncodings.length-1 < index) 
-      this.selectedEncodings.push(encoding), console.log('Dodat '+ encoding);
+      this.selectedEncodings.push(encoding);
     else {
       this.selectedEncodings[index] = encoding;
-      console.log("Izmenjen " + index + " na " + encoding)
     }
   }
 
   onTypeChange(type:string,i:number)
   {
-    console.log(type)
     if(type=="Numerical"){
       this.encodingDisabledArray[i] = true;
       this.selectedTypes[i] = "Numerical";
@@ -230,11 +237,11 @@ export class LabelsComponent implements OnInit, OnChanges {
       
   }
 
-  onMissingChange(index:number,missing_selection:string)
+  onMissingChange(index:number,selectedFillMethod:string)
   {
-    this.selectedMissingHandler[index] = missing_selection;
+    this.selectedMissingHandler[index] = selectedFillMethod;
 
-    if (missing_selection == "Constant")
+    if (selectedFillMethod == "Constant")
     {
       var dialogTitle = "Constant for '" + this.columns![index].name + "' column";
       var dialogMessage = "Add constant you would like to fill missing values with";

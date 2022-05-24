@@ -15,7 +15,7 @@ export class StatsComponent implements OnInit {
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
   @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
   @ViewChild('basicInfo') private basicInfo!:ShowTableComponent;
-  corrMatrixSource: any;
+  corrMatrixImgSource: any;
   showImage:boolean = false;
   previewImage:boolean = false;
 
@@ -39,7 +39,7 @@ export class StatsComponent implements OnInit {
   }
   showMatrix(response:any)
   {
-    this.corrMatrixSource = this.domSanitizer.bypassSecurityTrustUrl(response);
+    this.corrMatrixImgSource = this.domSanitizer.bypassSecurityTrustUrl(response);
   }
   showInfo(response:any)
   {

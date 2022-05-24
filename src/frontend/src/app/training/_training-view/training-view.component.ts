@@ -19,69 +19,86 @@ import { View, DisplayType } from '../../shared/models/navigation_models';
 })
 export class TrainingViewComponent implements OnInit {
 
+  /* ********************** */
+  /* podaci */
+  /* ****************************************************** */
   datasetId:number = -1;
-  toggledButton: boolean = true
-  numberOfEpochs: number = 4;
-  learningRate: number = 0.1;
-  corrMatrixSource: any;
-  metricsArrayToSend: any[] = [];
-  missingValue:number = 0;
-  //visibilityTrigger: boolean = false;
+  datasetURL:string = "";
 
   viewIndicator:View = View.UPLOAD;
-  uploadDisplay:string = DisplayType.SHOW_AS_BLOCK;
-  loaderDisplay:string = DisplayType.HIDE;
-  mainContainerDisplay:string = DisplayType.SHOW_AS_FLEX;
-  nextButtonDisable:boolean = true;
-  backButtonDisable:boolean = true;
-  displayTableButtons:string = DisplayType.SHOW_AS_BLOCK;
-  datasetURL:string = "";
-  statsTableDisplay:string = DisplayType.HIDE;
-  deleteButtonDisplay:string = DisplayType.SHOW_AS_INLINE;
-  labelsDisplay:string = DisplayType.SHOW_AS_BLOCK;
-  mainTableDisplay:string = DisplayType.SHOW_AS_BLOCK;
-  previewDisplay:string = DisplayType.HIDE;
-  trainingDisplay:string = DisplayType.HIDE;
-  loaderMiniDisplay:string = DisplayType.HIDE;
-  navButtonsDisplay:string = DisplayType.SHOW_AS_BLOCK;
-  undoDisabled:boolean = true;
-  undoDeletedDisabled:boolean = true;
-  dialogTitle:string = "";
-  dialogMessage:string = "";
+  
   fileName:string = "";
   basicInfo:string = "";
+  corrMatrixImgSource: any;
+  numOfMissingValues:number = 0;
+  columnEncodings: string[] = [];
+
+  dialogTitle:string = "";
+  dialogMessage:string = "";
+  errorMessage:string = "";
+
+  metricsArrayToSend: any[] = [];
+  
+  public form: FormData = new FormData();
+  public choosenInAndOutCols:any = undefined;
+  
+  /* ********************** */
+  /* promenljive za display */
+  /* ****************************************************** */
+  loaderDisplay:string = DisplayType.HIDE;
+  loaderMiniDisplay:string = DisplayType.HIDE;
+
+  previewDisplay:string = DisplayType.HIDE;
+  trainingDisplay:string = DisplayType.HIDE;
+  uploadDisplay:string = DisplayType.SHOW_AS_BLOCK;
+
+  navButtonsDisplay:string = DisplayType.SHOW_AS_BLOCK;
+
+  mainContainerDisplay:string = DisplayType.SHOW_AS_FLEX;
+  mainTableDisplay:string = DisplayType.SHOW_AS_BLOCK;
+  statsTableDisplay:string = DisplayType.HIDE;
+  labelsDisplay:string = DisplayType.SHOW_AS_BLOCK;
+
+  deleteButtonDisplay:string = DisplayType.SHOW_AS_INLINE;
+
+  /* ********************** */
+  /* promenljive za disabled direktivu */
+  /* ****************************************************** */
+  undoDisabled:boolean = true;
+  nextButtonDisable:boolean = true;
+  backButtonDisable:boolean = true;
+
+  undoDeletedDisabled:boolean = true;
+
+  /* ********************** */
+  /* promenljive za kontrolu prikaza (ngIF, typescript, ...) */
+  /* ****************************************************** */
   modalDisplay:boolean = false;
   errorDisplay:boolean = false;
-  errorMessage:string = "";
   confirmation:boolean = false;
-  columnEncodings: string[] = [];
+  showColumnSelectionPage: boolean = true
 
   constructor(
     private datasetService: DatasetService, 
     private headersService: HeadersService,
     public dialog: MatDialog,
-    public sessionService:SessionService ) {}
+    public sessionService:SessionService ) {
+    }
    
-  //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('upload') private upload!:UploadComponent;
   @ViewChild('dataTable') private dataTable!: ShowTableComponent;
   @ViewChild('dataSetInformation') private dataSetInformation!: ShowTableComponent;
-  @ViewChild('Labels') private labels!: LabelsComponent;
+  @ViewChild('columnsSelecion') private labels!: LabelsComponent;
   @ViewChild('Stats') private stats!:StatsComponent;
   @ViewChild('modifyModal') private modifyModal!:ModifyDatasetComponent;
 
-  public form: FormData = new FormData();
-  
-  colEncodings: string[] = [];
-  public choosenInAndOutCols:any = undefined;
-  //activateModal:boolean = false;
 
   req : any = {
     "public": true,
     "userID": 0,
     "description": "string",
     "name": "string",
-    "datasetSource": "change me!",
+    "datasetSource": "TODO",
     "delimiter": null,
     "lineTerminator": null,
     "quotechar": null,
@@ -123,7 +140,7 @@ export class TrainingViewComponent implements OnInit {
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
-      this.missingValue = response['basicInfo']['missing'];
+      this.numOfMissingValues = response['basicInfo']['missing'];
 
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
@@ -162,13 +179,21 @@ export class TrainingViewComponent implements OnInit {
 
   ngOnInit(): void 
   {
-    if (this.sessionService.getData('view') != null){
-      this.viewIndicator = parseInt(this.sessionService.getData('view')!);
+    let lastVisitedPage =  this.sessionService.getData('view');
+
+    if (lastVisitedPage == null) {
+      this.sessionService.saveData('view',this.viewIndicator.toString());
+    }
+    else  {
+      this.viewIndicator = parseInt(lastVisitedPage);
+
+      // TODO proveriti da li ovde treba da se odradi i loading ostalih podataka 
+      // na datoj stranici
+
       if (this.viewIndicator == View.PREVIEW)
       {
         this.uploadDisplay = DisplayType.HIDE;
         this.showElements();
-
       }
       else if(this.viewIndicator == View.TRAINING)
       {
@@ -178,9 +203,7 @@ export class TrainingViewComponent implements OnInit {
         this.nextButtonDisable = false;
         this.backButtonDisable = false;
       }
-    }
-    else
-      this.sessionService.saveData('view',this.viewIndicator.toString());
+    }  
   }
 
   hideElements()
@@ -195,7 +218,7 @@ export class TrainingViewComponent implements OnInit {
 
     this.previewDisplay = DisplayType.HIDE;
     this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
-    //this.containerVisibility = "hidden";
+
     //this.labelsDisplay = DisplayType.HIDE;
     this.navButtonsDisplay = DisplayType.HIDE;
     this.nextButtonDisable = true;
@@ -205,7 +228,7 @@ export class TrainingViewComponent implements OnInit {
   {
     this.loaderDisplay = DisplayType.HIDE;
     this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
-    //this.containerVisibility = "visible";
+    
     if (this.statsTableDisplay == DisplayType.SHOW_AS_BLOCK) this.labelsDisplay = DisplayType.HIDE;
     else this.labelsDisplay = DisplayType.SHOW_AS_BLOCK;
     this.navButtonsDisplay = DisplayType.SHOW_AS_BLOCK;
@@ -232,12 +255,12 @@ export class TrainingViewComponent implements OnInit {
   {
     this.hideElements();
 
-    if (this.form.get('file')) this.form.delete('file');
+    if (this.form.get('file')) 
+      this.form.delete('file');
     
     this.form.append('file', file);
 
-    this.datasetService.uploadDatasetFile(this.form)
-      .subscribe(this.uploadObserver);
+    this.datasetService.uploadDatasetFile(this.form).subscribe(this.uploadObserver);
   }
 
   onShowDataClick(datasetURL:string) {
@@ -247,18 +270,13 @@ export class TrainingViewComponent implements OnInit {
       console.log("problem: dataset-url");
     else {
       this.req["datasetSource"] = datasetURL
-      this.sessionService.saveData('upload_link',datasetURL);
+      this.sessionService.saveData('upload_link', datasetURL);
       this.datasetService.uploadDatasetFileWithLink(datasetURL).subscribe(this.uploadObserver);
     }
   }
 
-  modalOpen(){
-    this.modalDisplay = true;
-  }
-
   toggleTables(event:any){
-    
-    if(this.toggledButton)
+    if(this.showColumnSelectionPage)
     {
       event.currentTarget.innerHTML = "Show table";
       this.statsTableDisplay = DisplayType.SHOW_AS_BLOCK;
@@ -274,7 +292,7 @@ export class TrainingViewComponent implements OnInit {
       //this.mainTableDisplay = DisplayType.SHOW_AS_BLOCK;
       this.mainContainerDisplay = DisplayType.SHOW_AS_FLEX;
     }
-    this.toggledButton = !this.toggledButton
+    this.showColumnSelectionPage = !this.showColumnSelectionPage
   }
 
   OnNextClick() {
@@ -299,11 +317,11 @@ export class TrainingViewComponent implements OnInit {
           {
             this.choosenInAndOutCols = choosenInAndOutCols;
 
-            this.previewDisplay = DisplayType.HIDE;
-            this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
-
-            if(this.missingValue > 0) {
-              
+            if(this.numOfMissingValues == 0) {
+              this.previewDisplay = DisplayType.HIDE;
+              this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
+            }
+            else {
               let columnFillMethodPairs: ColumnFillMethodPair[] = []
               
               choosenInAndOutCols?.features.forEach(col => {
@@ -336,6 +354,17 @@ export class TrainingViewComponent implements OnInit {
               this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
                 next: (response:any) => { 
                   console.log("Fill missing value: ", response)
+                  this.viewIndicator = View.TRAINING;
+                  
+                  this.sessionService.saveData('dataset_id',this.datasetId.toString());
+                  this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+                  this.fileName = this.upload.fileName!;
+                  this.sessionService.saveData('file_name',this.fileName);
+
+                  this.previewDisplay = DisplayType.HIDE;
+                  this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
+
+                  this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
                 },
                 error: (err: Error) => {
                   console.log(err);
@@ -343,9 +372,6 @@ export class TrainingViewComponent implements OnInit {
                 }
               })
             }
-
-            this.viewIndicator = View.TRAINING;
-            this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
           }
           else
           {
@@ -398,6 +424,10 @@ export class TrainingViewComponent implements OnInit {
     
   }
 
+  changePageView() {
+
+  }
+
   confirmationCancel()
   {
     this.confirmation = false;
@@ -405,6 +435,10 @@ export class TrainingViewComponent implements OnInit {
   
   confirmationSave(){
     this.confirmation = true;
+  }
+
+  modalOpen(){
+    this.modalDisplay = true;
   }
 
   OnModalClose()
@@ -442,7 +476,7 @@ export class TrainingViewComponent implements OnInit {
           this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
           this.showElements();
 
-          //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+          //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver); // TODO check
           }
       }
     )
@@ -457,7 +491,7 @@ export class TrainingViewComponent implements OnInit {
     this.labels.changeCheckbox(checkChange)
   } 
 
-  onSelectedTargetColumn(data:{id: number, pred: number | null})
+  onTargetColumnSelect(data:{id: number, previousTargetId: number | null})
   {
     this.dataTable.changeLabelColumn(data);
   }
@@ -475,8 +509,6 @@ export class TrainingViewComponent implements OnInit {
 
     if(this.modalDisplay == true)
     {
-      //console.log("Jeste");
-      
     }
   }
 }

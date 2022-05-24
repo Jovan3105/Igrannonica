@@ -20,12 +20,12 @@
         </mat-tab>
         <mat-tab label="Correlation Matrix">
             <div class="tab-container">
-                <img class="corr-img" [src]="corrMatrixSource" (click)="openImage()">
+                <img class="corr-img" [src]="corrMatrixImgSource" (click)="openImage()">
             </div>
             <div class="preview-img" *ngIf="showImage">
                 <button class="close-btn" (click)="closeImage()"><mat-icon>close</mat-icon></button>
                 <div class="corr-full-img" *ngIf="previewImage">
-                    <img [src]="corrMatrixSource">
+                    <img [src]="corrMatrixImgSource">
                 </div>
             </div>
         </mat-tab>

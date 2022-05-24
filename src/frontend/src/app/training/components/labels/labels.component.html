@@ -83,7 +83,7 @@
   <h2 class="card-header mb-0">Choose target variable</h2>
   <div class="card-body">
     <select [(ngModel)]="targetColumn" #selectLabel class="form-select" aria-label="Odabir izlaza" 
-    (change)="onSelectLabel()"><!-- TODO povecati font za aria-label -->
+    (change)="onLabelColSelect()"><!-- TODO povecati font za aria-label -->
       <option [ngValue]="null" disabled></option>
       <option class="word-wrap" *ngFor="let column of columns;" [ngValue]="column">
         {{column.name}}</option> <!-- TODO postaviti automatski tip -->

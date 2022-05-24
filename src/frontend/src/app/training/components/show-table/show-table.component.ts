@@ -315,9 +315,9 @@ export class ShowTableComponent implements OnInit {
   }
 
   //Lock-uje kolonu koja je odabrana za label tako da ne moze da se hide-uje iz tabele
-  changeLabelColumn(data:{id:number,pred:number | null })
+  changeLabelColumn(data:{id:number,previousTargetId:number | null })
   {
-    if (data.pred != null)
+    if (data.previousTargetId != null)
     {
       this.columnDefs.forEach(element=>{
         if (element.colId == data.id.toString())
@@ -325,7 +325,7 @@ export class ShowTableComponent implements OnInit {
           element.lockVisible  = true;
 
         }
-        else if (element.colId == data.pred!.toString()){
+        else if (element.colId == data.previousTargetId!.toString()){
           element.lockVisible  = false;
         }
       });
