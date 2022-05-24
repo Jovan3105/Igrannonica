@@ -14,11 +14,24 @@ export class EmailVerifComponent implements OnInit {
   ngOnInit(): void {
     const emailVerifObserver = {
       next: (x:any) => { 
+        console.log('Account is deactivated'); 
+        var cancelMessage = document.getElementById('verifyMessage');
+        
+        cancelMessage!.innerHTML = "Account is succesfully verified!";
+        var hide_button = () => {
+
+          this.router.navigateByUrl('/login'); 
+            
+        }
+        setTimeout(hide_button, 3000);
         console.log('Email is verified'); 
-        this.router.navigateByUrl('/login'); 
+        
       },
       error: (err: Error) => {
         console.log(err)
+        var cancelMessage = document.getElementById('verifyMessage');
+        
+        cancelMessage!.innerText = "Email verification token has expired!";
 
       }
     };
