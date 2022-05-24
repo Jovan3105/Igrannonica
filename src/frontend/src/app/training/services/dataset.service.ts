@@ -1,6 +1,7 @@
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ModifiedData } from '../models/table_models';
 
@@ -15,19 +16,19 @@ export class DatasetService {
   httpHeader = new HttpHeaders()
   .set('Access-Control-Allow-Origin', '*');*/
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router : Router) { }
 
   getDatasets(): Observable<any[]> {
     return this.http.get<any>(this.datasetAPIUrl).pipe(
       tap(_ => console.log(`fetched all data`)),
-      catchError(this.handleError<any>('getDatasets'))
+      catchError(this.handleError)
     );
   }
 
   getpublicDatasets(): Observable<any[]> {
     return this.http.get<any>(this.datasetAPIUrl + '?p=1').pipe(
       tap(_ => console.log(`fetched public data`)),
-      catchError(this.handleError<any>('getpublicDatasets'))
+      catchError(this.handleError)
     );
   }
 
@@ -35,17 +36,17 @@ export class DatasetService {
     return this.http.post<any>(this.datasetAPIUrl, data);
   }
 
-  getData(id: number): Observable<any[]> {
-    return this.http.get<any>(this.datasetAPIUrl + `/${id}/Data`).pipe(
+  getData(id: number, userId: number): Observable<any[]> {
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/Data?userId=${userId}` ).pipe(
       tap(_ => console.log(`fetched data id=${id}`)),
-      catchError(this.handleError<any>('getData'))
+      catchError(this.handleError)
     );
   }
 
   getPage(id: number, page: number): Observable<any[]> {
     return this.http.get<any>(this.datasetAPIUrl + `/${id}/Data?page=${page}`).pipe(
       tap(_ => console.log(`fetched page id=${id}, page=${page}`)),
-      catchError(this.handleError<any>('getPage'))
+      catchError(this.handleError)
     );
   }
   
@@ -55,7 +56,7 @@ export class DatasetService {
       //observe: 'events'
     }).pipe(
       //map(event => this.getEventMessage(event)),
-      catchError(this.handleError<any>('fileUploadDataset'))
+      catchError(this.handleError)
     );
   }
 
@@ -65,14 +66,14 @@ export class DatasetService {
       //observe: 'events'
       }).pipe(
       //map(event => this.getEventMessage(event)),
-      catchError(this.handleError<any>('uploadWithLink'))
+      catchError(this.handleError)
     );
   }
 
   getStatIndicators(id: number): Observable<any> {
     return this.http.get<any>(this.datasetAPIUrl + `/${id}/stat-indicators`).pipe(
       tap(_ => console.log(`fetched page id=${id}`)),
-      catchError(this.handleError<any>('getStatIndicators'))
+      catchError(this.handleError)
     );
   }
 
@@ -82,14 +83,14 @@ export class DatasetService {
       //observe: 'events'
     }).pipe(
       //map(event => this.getEventMessage(event)),
-      catchError(this.handleError<any>('parseDataset'))
+      catchError(this.handleError)
     );
   }
 
   modifyDataset(id: number, source: ModifiedData): Observable<any[]> {
     return this.http.post<any>(this.datasetAPIUrl + `/${id}/modifyData`, source).pipe(
       tap(_ => console.log(`sent modified data`)),
-      catchError(this.handleError<any>('modifyDataset'))
+      catchError(this.handleError)
     );
   }
 
@@ -116,33 +117,37 @@ export class DatasetService {
   deleteDataset(id: number): Observable<any[]> {
     return this.http.delete<any>(this.datasetAPIUrl + `/${id}`).pipe(
       tap(_ => console.log(`deleted data id=${id}`)),
-      catchError(this.handleError<any>('deleteDataset'))
+      catchError(this.handleError)
     );
   }
 
   updateDataset(id: number, data: any): Observable<any[]> {
     return this.http.put<any>(this.datasetAPIUrl + `/${id}`, data).pipe(
       tap(_ => console.log(`updated data id=${id}`)),
-      catchError(this.handleError<any>('uploadDataset'))
-    );;
+      catchError(this.handleError)
+    );
   }
   
   getCorrMatrix(id:any):Observable<any>{
     return this.http.get<any>(this.datasetAPIUrl +`/${id}/corr-matrix`).pipe(
       //tap(_ => console.log(`fetched page id=${id}`)),
-      catchError(this.handleError<any>('getCorrMatrix'))
+      catchError(this.handleError)
     );
   }
 
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
 
-      console.error(error); // log to console instead
-
-      console.log(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
+  private handleError(error:any) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      // client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    //console.log(errorMessage);
+    return throwError(() => {
+        return errorMessage;
+    });
   }
 }

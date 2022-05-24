@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, mapTo, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { Observable, timer } from 'rxjs';
+import { Observable, throwError, timer } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import jwt_decode from 'jwt-decode';
 import { of, Subject } from 'rxjs';
@@ -38,11 +38,15 @@ export class AuthService {
       map((response:any) => {
         const user = response;
         if(user.success){
-          this.jwtService.storeTokens(user.data); //ubacuje token u localstorage
+          //console.log(user.data);
+          this.jwtService.storeToken(user.data.token);
+           this.jwtService.storeRefreshToken(user.data.refreshToken);
+          //ubacuje token u localstorage
           this.updatemenu.next();
           //window.location.reload()
         }
-      })
+      }),
+      catchError(error => throwError(() => error))
     )
   }
 
@@ -115,7 +119,9 @@ export class AuthService {
       'refreshToken': this.jwtService.getRefreshToken()
     }).pipe(
       tap((data: any) => {
-        this.jwtService.storeTokens(data);
+        //console.log(data);
+        this.jwtService.storeToken(data.accessToken);
+        this.jwtService.storeRefreshToken(data.refreshToken);
     }));
   }
 

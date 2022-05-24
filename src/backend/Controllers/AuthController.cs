@@ -496,13 +496,12 @@ namespace backend.Controllers
             }
         }
         
-        [Authorize]
         [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
 
-            Console.WriteLine("\n\n\n\n\n\n\n\n\n "+ Request.Headers["Authorization"]);
+            Console.WriteLine("\n\n\n\n\n\n\n\n\n"+ Request.Headers["Authorization"]);
             if (tokenModel is null)
             {
                 return BadRequest("Invalid client request");

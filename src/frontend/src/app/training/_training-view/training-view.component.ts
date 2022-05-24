@@ -9,6 +9,7 @@ import { DialogComponent } from 'src/app/shared/components/dialog/dialog.compone
 import { StatsComponent } from '../components/stats/stats.component';
 import { UploadComponent } from '../components/upload/upload.component';
 import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
+import { JwtService } from 'src/app/core/services/jwt.service';
 
 @Component({
   selector: 'app-training-view',
@@ -18,6 +19,7 @@ import { ModifyDatasetComponent } from '../components/modify-dataset/modify-data
 export class TrainingViewComponent implements OnInit {
 
   datasetId:number = -1;
+  userId:number = 0;
   toggledButton: boolean = true
   numberOfEpochs: number = 4;
   learningRate: number = 0.1;
@@ -54,7 +56,8 @@ export class TrainingViewComponent implements OnInit {
   constructor(
     private datasetService: DatasetService, 
     private headersService: HeadersService,
-    public dialog: MatDialog) {}
+    public dialog: MatDialog,
+    private jwtService: JwtService) {}
    
   //@ViewChild(ShowTableComponent,{static: true}) private dataTable!: ShowTableComponent;
   @ViewChild('upload') private upload!:UploadComponent;
@@ -90,7 +93,7 @@ export class TrainingViewComponent implements OnInit {
 
       this.datasetId = response;
 
-      this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+      this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
       this.fileName = this.upload.fileName;
     },
     error: (err: Error) => {
@@ -147,6 +150,8 @@ export class TrainingViewComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    var decodedToken = this.jwtService.getDecodedAccessToken();
+    this.userId = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
   }
 
   hideElements()
