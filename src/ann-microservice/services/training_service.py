@@ -8,6 +8,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 
+import config
 from constants import ProblemType
 from models.models import NNLayer, Column
 from services.shared_service import log, send_msg, run_async
@@ -18,6 +19,13 @@ from helpers.optimizer_helper import map_optimizer, Optimizer
 from helpers.activation_func_helper import map_activation_function, ActivationFunction
 from helpers.loss_func_helper import map_loss_function, LossFunction
 from helpers.encoder_helper import map_catcolencoder, CatColEncoder
+
+#################################################################
+
+VERBOSE = 0
+
+if config.ENVIRONMENT == 'development':
+    VERBOSE = 1
 
 #################################################################
 
@@ -230,11 +238,12 @@ def train_model(
         X_train,
         y_train,
         epochs=epochs,
-        # Suppress logging.
-        verbose=1,
+        verbose=VERBOSE,
         # Calculate validation results on x% of the training data.
         validation_split=validation_size,
-        callbacks=[callback]
+        callbacks=[callback],
+        use_multiprocessing=True,
+        workers=4
     )
 
     y_pred = model.predict(X_train)
@@ -244,8 +253,7 @@ def train_model(
     score = model.evaluate(
         X_test,
         y_test,
-        # Suppress logging.
-        verbose=1,
+        verbose=VERBOSE,
         callbacks=[callback]
     )
 
