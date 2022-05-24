@@ -320,6 +320,17 @@ namespace backend.Controllers
             return $"{backendURL}/{datasetsVirtPath}/{userID}/{datasetID}/{filename}";
         }
 
+        [HttpGet]
+        [Route("filter")]
+        public async Task<ActionResult<List<Dataset>>> filterDatasets(string? param)
+        {
+            List<Dataset> lista = new List<Dataset>();
+            lista = await this.datasetContext.Datasets.Where(
+                x => x.Name.Contains(param) || x.Description.Contains(param)
+                ).ToListAsync();
+
+            return Ok(lista);
+        }
 
     }
 }
