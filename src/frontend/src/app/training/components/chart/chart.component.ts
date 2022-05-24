@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Chart, ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { DisplayType } from 'src/app/shared/models/navigation_models';
 
 @Component({
   selector: 'app-chart',
@@ -9,7 +10,7 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class ChartComponent implements OnInit {
 
-  chartDisplay:string = "none";
+  chartDisplay:string = DisplayType.HIDE;
 
   @Input() epoch!:number[];
   @Input() training!:number[];

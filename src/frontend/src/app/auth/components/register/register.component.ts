@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { Router } from '@angular/router';
 import { timeout } from 'rxjs';
 import { Tuple } from 'ag-grid-community/dist/lib/filter/provided/simpleFilter';
+import { DisplayType } from 'src/app/shared/models/navigation_models';
 
 @Component({
   selector: 'app-register',
@@ -12,11 +13,11 @@ import { Tuple } from 'ag-grid-community/dist/lib/filter/provided/simpleFilter';
 })
 export class RegisterComponent implements OnInit {
 
-  loaderDisplay:string = "none";
-  serverErrorDisplay:string = "none";
-  registerSuccessDisplay:string = "none";
-  usernameExistsDisplay:string = "none";
-  emailExistsDisplay:string = "none";
+  loaderDisplay:string = DisplayType.HIDE;
+  serverErrorDisplay:string = DisplayType.HIDE;
+  registerSuccessDisplay:string = DisplayType.HIDE;
+  usernameExistsDisplay:string = DisplayType.HIDE;
+  emailExistsDisplay:string = DisplayType.HIDE;
 
   constructor(private authService: AuthService, private router:Router) { }
 
@@ -24,7 +25,7 @@ export class RegisterComponent implements OnInit {
   }
   onSubmit(f: NgForm) {
     
-    this.loaderDisplay = "block";
+    this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
     if(f.controls['email'].value <= 320){
       console.log("Predugacak email");
       return;
@@ -37,30 +38,30 @@ export class RegisterComponent implements OnInit {
       error: (err: any) => {
         //userOrEmail_AlreadyExists
         if(err['error'] instanceof ProgressEvent ){
-          this.serverErrorDisplay = "block";
+          this.serverErrorDisplay = DisplayType.SHOW_AS_BLOCK;
           //f.controls['username'].setValue(null)
           //f.controls['email'].setValue(null)
           //f.controls['password'].setValue(null)
           //f.controls['registerConfirmPassword'].setValue(null)
           setTimeout(() => {
-            //this.serverErrorDisplay = "none";
-            this.loaderDisplay = "none";
+            //this.serverErrorDisplay = DisplayType.HIDE;
+            this.loaderDisplay = DisplayType.HIDE;
           }, 3000);
         }
         else{
           err['error']['data']['errors'].forEach( (item:any) => {
             if(item['code'] == "username_AlreadyExists"){
-              this.usernameExistsDisplay = "block";
-              this.loaderDisplay = "none";
+              this.usernameExistsDisplay = DisplayType.SHOW_AS_BLOCK;
+              this.loaderDisplay = DisplayType.HIDE;
               setTimeout(() => {
-                this.usernameExistsDisplay = "none";
+                this.usernameExistsDisplay = DisplayType.HIDE;
               }, 3000);
             }
             if(item['code'] == "email_AlreadyExists"){
-              this.emailExistsDisplay = "block";
-              this.loaderDisplay = "none";
+              this.emailExistsDisplay = DisplayType.SHOW_AS_BLOCK;
+              this.loaderDisplay = DisplayType.HIDE;
               setTimeout(() => {
-                this.emailExistsDisplay = "none";
+                this.emailExistsDisplay = DisplayType.HIDE;
               }, 3000);
             }
           });

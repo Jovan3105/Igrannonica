@@ -8,6 +8,7 @@ import jwt_decode from 'jwt-decode';
 import { of, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { JwtService } from 'src/app/core/services/jwt.service';
+import { DisplayType } from 'src/app/shared/models/navigation_models';
 
 @Injectable({
   providedIn: 'root'
@@ -81,14 +82,14 @@ export class AuthService {
           
           var forma = document.getElementById('blok');
           var uspesnaRegistracijaMessage = document.getElementById('uspesnaRegistracijaMessage')
-          forma!.style.display = "none";
+          forma!.style.display = DisplayType.HIDE;
 
           
           uspesnaRegistracijaMessage!.style.display = "block";
           var hide_button = () => {
             if(uspesnaRegistracijaMessage) {
               const user = response;
-              uspesnaRegistracijaMessage.style.display = "none";
+              uspesnaRegistracijaMessage.style.display = DisplayType.HIDE;
               //this.doLoginUser(user.username,user.data.token);
               this.router.navigateByUrl('/login');
             }

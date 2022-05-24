@@ -83,9 +83,3 @@ export enum TableIndicator {
   INFO,
   STATS
 }
-
-export enum View {
-  UPLOAD,
-  PREVIEW,
-  TRAINING
-}

@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { Check, ChosenColumn, ModifiedData, TableIndicator, View } from '../models/table_models';
+import { Check, ChosenColumn, ModifiedData, TableIndicator } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
 import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
@@ -11,6 +11,7 @@ import { UploadComponent } from '../components/upload/upload.component';
 import { ModifyDatasetComponent } from '../components/modify-dataset/modify-dataset.component';
 import { SessionService } from 'src/app/core/services/session.service';
 import { ColumnFillMethodPair } from '../models/dataset_models';
+import { View, DisplayType } from '../../shared/models/navigation_models';
 @Component({
   selector: 'app-training-view',
   templateUrl: './training-view.component.html',
@@ -28,21 +29,21 @@ export class TrainingViewComponent implements OnInit {
   //visibilityTrigger: boolean = false;
 
   viewIndicator:View = View.UPLOAD;
-  uploadDisplay:string = "block";
-  loaderDisplay:string = "none";
-  mainContainerDisplay:string = "flex";
+  uploadDisplay:string = DisplayType.SHOW_AS_BLOCK;
+  loaderDisplay:string = DisplayType.HIDE;
+  mainContainerDisplay:string = DisplayType.SHOW_AS_FLEX;
   nextButtonDisable:boolean = true;
   backButtonDisable:boolean = true;
-  displayTableButtons:string = "block";
+  displayTableButtons:string = DisplayType.SHOW_AS_BLOCK;
   datasetURL:string = "";
-  statsTableDisplay:string = "none";
-  deleteButtonDisplay:string = "inline";
-  labelsDisplay:string = "block";
-  mainTableDisplay:string = "block";
-  previewDisplay:string = "none";
-  trainingDisplay:string = "none";
-  loaderMiniDisplay:string = "none";
-  navButtonsDisplay:string = "block";
+  statsTableDisplay:string = DisplayType.HIDE;
+  deleteButtonDisplay:string = DisplayType.SHOW_AS_INLINE;
+  labelsDisplay:string = DisplayType.SHOW_AS_BLOCK;
+  mainTableDisplay:string = DisplayType.SHOW_AS_BLOCK;
+  previewDisplay:string = DisplayType.HIDE;
+  trainingDisplay:string = DisplayType.HIDE;
+  loaderMiniDisplay:string = DisplayType.HIDE;
+  navButtonsDisplay:string = DisplayType.SHOW_AS_BLOCK;
   undoDisabled:boolean = true;
   undoDeletedDisabled:boolean = true;
   dialogTitle:string = "";
@@ -165,15 +166,15 @@ export class TrainingViewComponent implements OnInit {
       this.viewIndicator = parseInt(this.sessionService.getData('view')!);
       if (this.viewIndicator == View.PREVIEW)
       {
-        this.uploadDisplay = "none";
+        this.uploadDisplay = DisplayType.HIDE;
         this.showElements();
 
       }
       else if(this.viewIndicator == View.TRAINING)
       {
-        this.uploadDisplay = "none";
-        this.previewDisplay = "none";
-        this.trainingDisplay = "block";
+        this.uploadDisplay = DisplayType.HIDE;
+        this.previewDisplay = DisplayType.HIDE;
+        this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
         this.nextButtonDisable = false;
         this.backButtonDisable = false;
       }
@@ -188,25 +189,26 @@ export class TrainingViewComponent implements OnInit {
     {
       this.viewIndicator = View.PREVIEW;
       //this.sessionService.saveData('view',this.viewIndicator.toString());
-      this.uploadDisplay = "none";
+      this.uploadDisplay = DisplayType.HIDE;
       
     }
-    this.previewDisplay = "none";
-    this.loaderDisplay = "block";
+
+    this.previewDisplay = DisplayType.HIDE;
+    this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
     //this.containerVisibility = "hidden";
-    //this.labelsDisplay = "none";
-    this.navButtonsDisplay = "none";
+    //this.labelsDisplay = DisplayType.HIDE;
+    this.navButtonsDisplay = DisplayType.HIDE;
     this.nextButtonDisable = true;
   }
 
   showElements()
   {
-    this.loaderDisplay = "none";
-    this.previewDisplay = "block";
+    this.loaderDisplay = DisplayType.HIDE;
+    this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
     //this.containerVisibility = "visible";
-    if (this.statsTableDisplay == "block") this.labelsDisplay = "none";
-    else this.labelsDisplay = "block";
-    this.navButtonsDisplay = "block";
+    if (this.statsTableDisplay == DisplayType.SHOW_AS_BLOCK) this.labelsDisplay = DisplayType.HIDE;
+    else this.labelsDisplay = DisplayType.SHOW_AS_BLOCK;
+    this.navButtonsDisplay = DisplayType.SHOW_AS_BLOCK;
     this.nextButtonDisable = false;
     this.backButtonDisable = false;
   }
@@ -214,11 +216,11 @@ export class TrainingViewComponent implements OnInit {
   showUploadErrorMessage(message:string)
   {
     this.errorMessage = message;
-    this.loaderDisplay = "none";
+    this.loaderDisplay = DisplayType.HIDE;
     this.viewIndicator = View.UPLOAD;
     this.sessionService.saveData('view',this.viewIndicator.toString());
-    this.uploadDisplay = "block";
-    this.navButtonsDisplay = "block";
+    this.uploadDisplay = DisplayType.SHOW_AS_BLOCK;
+    this.navButtonsDisplay = DisplayType.SHOW_AS_BLOCK;
     this.errorDisplay = true;  
     setTimeout(() => {
       this.errorDisplay = false;
@@ -259,18 +261,18 @@ export class TrainingViewComponent implements OnInit {
     if(this.toggledButton)
     {
       event.currentTarget.innerHTML = "Show table";
-      this.statsTableDisplay = "block";
-      //this.labelsDisplay = "none";
-      //this.mainTableDisplay = "none";
-      this.mainContainerDisplay = "none";
+      this.statsTableDisplay = DisplayType.SHOW_AS_BLOCK;
+      //this.labelsDisplay = DisplayType.HIDE;
+      //this.mainTableDisplay = DisplayType.HIDE;
+      this.mainContainerDisplay = DisplayType.HIDE;
     }
     else
     {
       event.currentTarget.innerHTML = "Show stats"
-      this.statsTableDisplay = "none";
-      //this.labelsDisplay = "block";
-      //this.mainTableDisplay = "block";
-      this.mainContainerDisplay = "flex";
+      this.statsTableDisplay = DisplayType.HIDE;
+      //this.labelsDisplay = DisplayType.SHOW_AS_BLOCK;
+      //this.mainTableDisplay = DisplayType.SHOW_AS_BLOCK;
+      this.mainContainerDisplay = DisplayType.SHOW_AS_FLEX;
     }
     this.toggledButton = !this.toggledButton
   }
@@ -278,8 +280,8 @@ export class TrainingViewComponent implements OnInit {
   OnNextClick() {
     if (this.viewIndicator == View.UPLOAD)
     {
-        this.uploadDisplay = "none";
-        this.previewDisplay = "block";
+        this.uploadDisplay = DisplayType.HIDE;
+        this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
         this.viewIndicator = View.PREVIEW;
         //this.sessionService.saveData('view',this.viewIndicator.toString());
         this.backButtonDisable = false;
@@ -290,7 +292,6 @@ export class TrainingViewComponent implements OnInit {
       console.log("choosenInAndOutCols")
       console.log(choosenInAndOutCols)
       
-      
       if (choosenInAndOutCols?.label !== undefined || choosenInAndOutCols!.features.length > 0){
         if(choosenInAndOutCols!.features.length > 0)
         {
@@ -298,8 +299,8 @@ export class TrainingViewComponent implements OnInit {
           {
             this.choosenInAndOutCols = choosenInAndOutCols;
 
-            this.previewDisplay = "none";
-            this.trainingDisplay = "block";
+            this.previewDisplay = DisplayType.HIDE;
+            this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
 
             if(this.missingValue > 0) {
               
@@ -381,16 +382,16 @@ export class TrainingViewComponent implements OnInit {
   OnBackClick(){
     if (this.viewIndicator == View.PREVIEW)
     {
-      this.previewDisplay = "none";
-      this.uploadDisplay = "block";
+      this.previewDisplay = DisplayType.HIDE;
+      this.uploadDisplay = DisplayType.SHOW_AS_BLOCK;
       this.backButtonDisable = true;
       this.viewIndicator = View.UPLOAD;
       this.sessionService.saveData('view', this.viewIndicator.toString());
     }
     else if(this.viewIndicator == View.TRAINING)
     {
-      this.trainingDisplay = "none";
-      this.previewDisplay = "block";
+      this.trainingDisplay = DisplayType.HIDE;
+      this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
       this.viewIndicator = View.PREVIEW;
       //this.sessionService.saveData('view', this.viewIndicator.toString());
     }
