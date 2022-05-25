@@ -25,6 +25,14 @@ export class HeaderComponent implements OnInit {
       this.MenuDisplay();
     });
 
+    this.user$.subscribe({
+      error(msg) {
+        if (msg == "authorization_problem")
+        {
+          console.log("Session expired! Log in again")
+        }
+      }
+    });
     this.MenuDisplay();
     
   }

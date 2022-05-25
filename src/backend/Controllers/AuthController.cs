@@ -27,12 +27,14 @@ namespace backend.Controllers
 
         private readonly UserContext userContext;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContext;
         //private const int _expirationMinutes = 5;
 
-        public AuthController(UserContext userContext,IConfiguration configuration)
+        public AuthController(UserContext userContext, IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             this.userContext = userContext;
             _configuration = configuration;
+            _httpContext = httpContext;
         }
 
         Services.EmailSender emailSender = new Services.EmailSender();
@@ -206,6 +208,7 @@ namespace backend.Controllers
                             new Claim(ClaimTypes.Name,user.Username),
                             new Claim(ClaimTypes.Email,user.Email),
                             new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
+                            new Claim(ClaimTypes.Role,"User"),
                             new Claim("message","Logging in...")
                         };
 
@@ -493,13 +496,11 @@ namespace backend.Controllers
             }
         }
         
-        [Authorize]
         [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
-
-            Console.WriteLine("\n\n\n\n\n\n\n\n\n "+ Request.Headers["Authorization"]);
+            //Console.WriteLine("\n\n\n\n\n\n\n\n\n"+ Request.Headers["Authorization"]);
             if (tokenModel is null)
             {
                 return BadRequest("Invalid client request");

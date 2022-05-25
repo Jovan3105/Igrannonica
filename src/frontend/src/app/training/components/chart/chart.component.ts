@@ -44,7 +44,7 @@ export class ChartComponent implements OnInit {
       {
         // data: this.epoches_data.map(a => a.loss),
         data: [],
-        label: 'Error on trining set',
+        label: 'Error on training set',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',

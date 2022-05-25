@@ -12,6 +12,8 @@ import { ModifyDatasetComponent } from '../components/modify-dataset/modify-data
 import { SessionService } from 'src/app/core/services/session.service';
 import { ColumnFillMethodPair } from '../models/dataset_models';
 import { View, DisplayType } from '../../shared/models/navigation_models';
+import { JwtService } from 'src/app/core/services/jwt.service';
+
 @Component({
   selector: 'app-training-view',
   templateUrl: './training-view.component.html',
@@ -24,6 +26,7 @@ export class TrainingViewComponent implements OnInit {
   /* ****************************************************** */
   datasetId:number = -1;
   datasetURL:string = "";
+  userId:number = 0;
 
   viewIndicator:View = View.UPLOAD;
   datasetSource: string = '';
@@ -84,6 +87,7 @@ export class TrainingViewComponent implements OnInit {
     private datasetService: DatasetService, 
     private headersService: HeadersService,
     public dialog: MatDialog,
+    private jwtService: JwtService,
     public sessionService:SessionService ) {
     }
    
@@ -120,7 +124,7 @@ export class TrainingViewComponent implements OnInit {
         this.sessionService.saveData('file_size',this.upload.fileSize!);
       */
       this.sessionService.saveData('dataset_id',this.datasetId.toString());
-      this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+      this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
       this.fileName = this.upload.fileName!;
       this.sessionService.saveData('file_name',this.fileName);
     },
@@ -183,6 +187,9 @@ export class TrainingViewComponent implements OnInit {
 
   ngOnInit(): void 
   {
+    var decodedToken = this.jwtService.getDecodedAccessToken();
+    this.userId = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
+    
     let lastVisitedPage =  this.sessionService.getData('view');
 
     if (lastVisitedPage == null) {
@@ -369,7 +376,7 @@ export class TrainingViewComponent implements OnInit {
                 next: (response:any) => { 
                   
                   this.sessionService.saveData('dataset_id',this.datasetId.toString());
-                  this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+                  this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
                   
                   this.fileName = this.upload.fileName!;
                   this.sessionService.saveData('file_name',this.fileName);

@@ -21,10 +21,14 @@ export class JwtService {
     return localStorage.getItem(this.REFRESH_TOKEN);
   }
 
-  storeTokens(data:any)
+  storeToken(token:any)
   {
-    localStorage.setItem(this.JWT_TOKEN, data.token);
-    localStorage.setItem(this.REFRESH_TOKEN, data.refreshToken);
+    localStorage.setItem(this.JWT_TOKEN, token);
+  }
+
+  storeRefreshToken(refresh_token:any)
+  {
+    localStorage.setItem(this.REFRESH_TOKEN, refresh_token);
   }
 
   removeTokens()

@@ -13,15 +13,17 @@ namespace backend.Controllers
     {
         private readonly UserContext userContext;
         private readonly IConfiguration _configuration;
-        
+        private readonly IHttpContextAccessor _httpContext;
 
-        public UsersController(UserContext userContext, IConfiguration configuration)
+        public UsersController(UserContext userContext, IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             this.userContext = userContext;
             _configuration = configuration;
-            
+            _httpContext = httpContext;
+
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Object>> getUserByID(int id)
         {
@@ -42,21 +44,48 @@ namespace backend.Controllers
             };
             return p;
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<User>>> getUsers()
         {
             return Ok(await this.userContext.Users.ToListAsync());
         }
 
-        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete]
         public async Task<ActionResult> deleteUser(int id) // TODO dodati id u path kao userID
         {
             User u = await this.userContext.Users.FindAsync(id);
-            this.userContext.Users.Remove(u);
-            this.userContext.SaveChanges();
-            return Ok();
+            if (u != null)
+            {
+                this.userContext.Users.Remove(u);
+                this.userContext.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+           
         }
-     
-
+        
+        [Authorize(Roles = "Admin")]
+        [HttpDelete]
+        [Route("email")]
+        public async Task<ActionResult> deleteUserEmail(string email)
+        {
+            User u = await this.userContext.Users.FirstOrDefaultAsync(x=>x.Email==email);
+            if (u != null)
+            {
+                this.userContext.Users.Remove(u);
+                this.userContext.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }

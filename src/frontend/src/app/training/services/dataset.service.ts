@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ColumnFillMethodPair } from '../models/dataset_models';
@@ -16,7 +17,7 @@ export class DatasetService {
   httpHeader = new HttpHeaders()
   .set('Access-Control-Allow-Origin', '*');*/
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router : Router) { }
 
   getDatasets(): Observable<any[]> {
     return this.http.get<any>(this.datasetAPIUrl).pipe(
@@ -36,8 +37,8 @@ export class DatasetService {
     return this.http.post<any>(this.datasetAPIUrl, data);
   }
 
-  getData(id: number): Observable<any[]> {
-    return this.http.get<any>(this.datasetAPIUrl + `/${id}/Data`).pipe(
+  getData(id: number, userId: number): Observable<any[]> {
+    return this.http.get<any>(this.datasetAPIUrl + `/${id}/Data?userId=${userId}` ).pipe(
       tap(_ => console.log(`fetched data id=${id}`)),
       catchError(this.handleError)
     );
@@ -105,7 +106,7 @@ export class DatasetService {
     return this.http.put<any>(this.datasetAPIUrl + `/${id}`, data).pipe(
       tap(_ => console.log(`updated data id=${id}`)),
       catchError(this.handleError)
-    );;
+    );
   }
   
   getCorrMatrix(id:any):Observable<any>{
@@ -125,13 +126,19 @@ export class DatasetService {
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
 
-      console.error(error); // log to console instead
-
-      console.log(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
+  private handleError(error:any) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      // client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    //console.log(errorMessage);
+    return throwError(() => {
+        return errorMessage;
+    });
   }
   */
   private handleError(error: HttpErrorResponse) {

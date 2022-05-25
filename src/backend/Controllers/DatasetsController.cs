@@ -10,6 +10,7 @@ using System.Net.Http.Headers;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
@@ -22,13 +23,15 @@ namespace backend.Controllers
         private static string _datasetFolderPath;
         private static string _microserviceBaseURL;
         private static readonly HttpClient _client = new HttpClient();
+        private readonly IHttpContextAccessor _httpContext;
 
-        public DatasetsController(DatasetContext datasetContext, IConfiguration configuration)
+        public DatasetsController(DatasetContext datasetContext, IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             this.datasetContext = datasetContext;
             _configuration = configuration;
             _microserviceBaseURL = _configuration["Addresses:Microservice"];
             _datasetFolderPath = _configuration["FileSystemRelativePaths:Datasets"];
+            _httpContext = httpContext;
         }
 
         [HttpGet]
@@ -79,11 +82,14 @@ namespace backend.Controllers
             return Ok("da");
         }
 
+
+        [Authorize]
         [HttpPost]
         [Route("uploadWithLink")]
         public async Task<ActionResult<string>> uploadWithLink(String url)
         { // TODO dodati user id u request
             var microserviceURL = _microserviceBaseURL + "/data-preparation/parse";
+            var userID = Convert.ToInt32(_httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value);
 
             string responseString = null;
             
@@ -102,7 +108,7 @@ namespace backend.Controllers
             }
 
             Dataset dataset = new Dataset();
-            dataset.UserID = 0; // TODO privremeno
+            dataset.UserID = userID;
             dataset.Path = "temp"; // TODO privremeno
 
             this.datasetContext.Datasets.Add(dataset);
@@ -125,7 +131,7 @@ namespace backend.Controllers
 
             return Ok(dataset.Id);
         }
-
+        [Authorize]
         [HttpPost]
         [DisableRequestSizeLimit,
         RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
@@ -133,6 +139,9 @@ namespace backend.Controllers
         [Route("uploadFile")]
         public async Task<ActionResult<List<Dataset>>> uploadFile(IFormFile file)
         { // TODO dodati user id u request
+
+            var userID = Convert.ToInt32(_httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value);
+
             if (file.Length == 0)
             {
                 return BadRequest("empty file");
@@ -168,7 +177,7 @@ namespace backend.Controllers
             // Sacuvaj parsirane podatke u bazu i na fs //
 
             Dataset dataset = new Dataset();
-            dataset.UserID = 0;
+            dataset.UserID = userID;
             dataset.Path = "temp";
 
             this.datasetContext.Datasets.Add(dataset);
