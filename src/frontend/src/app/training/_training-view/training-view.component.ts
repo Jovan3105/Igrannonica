@@ -322,6 +322,7 @@ export class TrainingViewComponent implements OnInit {
 
             if(this.numOfMissingValues == 0) {
               this.previewDisplay = DisplayType.HIDE;
+              this.viewIndicator = View.TRAINING;
               this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
             }
             else {
