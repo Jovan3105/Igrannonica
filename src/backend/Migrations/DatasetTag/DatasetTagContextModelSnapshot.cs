@@ -7,10 +7,10 @@ using backend.Data;
 
 #nullable disable
 
-namespace backend.Migrations.Dataset
+namespace backend.Migrations.DatasetTag
 {
-    [DbContext(typeof(DatasetContext))]
-    partial class DatasetContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DatasetTagContext))]
+    partial class DatasetTagContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -56,6 +56,21 @@ namespace backend.Migrations.Dataset
                     b.ToTable("Datasets");
                 });
 
+            modelBuilder.Entity("backend.Models.DatasetDatasetTag", b =>
+                {
+                    b.Property<int>("DatasetId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DatasetTagId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("DatasetId", "DatasetTagId");
+
+                    b.HasIndex("DatasetTagId");
+
+                    b.ToTable("DatasetDatasetTags");
+                });
+
             modelBuilder.Entity("backend.Models.DatasetTag", b =>
                 {
                     b.Property<int>("Id")
@@ -70,37 +85,36 @@ namespace backend.Migrations.Dataset
 
                     b.HasKey("Id");
 
-                    b.ToTable("DatasetTag");
+                    b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("DatasetDatasetTag", b =>
+            modelBuilder.Entity("backend.Models.DatasetDatasetTag", b =>
                 {
-                    b.Property<int>("DatasetsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("DatasetsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("DatasetDatasetTag");
-                });
-
-            modelBuilder.Entity("DatasetDatasetTag", b =>
-                {
-                    b.HasOne("backend.Models.Dataset", null)
-                        .WithMany()
-                        .HasForeignKey("DatasetsId")
+                    b.HasOne("backend.Models.Dataset", "Dataset")
+                        .WithMany("DatasetDatasetTags")
+                        .HasForeignKey("DatasetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.DatasetTag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
+                    b.HasOne("backend.Models.DatasetTag", "DatasetTag")
+                        .WithMany("DatasetDatasetTags")
+                        .HasForeignKey("DatasetTagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Dataset");
+
+                    b.Navigation("DatasetTag");
+                });
+
+            modelBuilder.Entity("backend.Models.Dataset", b =>
+                {
+                    b.Navigation("DatasetDatasetTags");
+                });
+
+            modelBuilder.Entity("backend.Models.DatasetTag", b =>
+                {
+                    b.Navigation("DatasetDatasetTags");
                 });
 #pragma warning restore 612, 618
         }

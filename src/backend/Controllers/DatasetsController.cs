@@ -20,18 +20,20 @@ namespace backend.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly DatasetContext datasetContext;
+        private readonly DatasetTagContext datasetTagContext;
         private static string _datasetFolderPath;
         private static string _microserviceBaseURL;
         private static readonly HttpClient _client = new HttpClient();
         private readonly IHttpContextAccessor _httpContext;
 
-        public DatasetsController(DatasetContext datasetContext, IConfiguration configuration, IHttpContextAccessor httpContext)
+        public DatasetsController(DatasetContext datasetContext, IConfiguration configuration, IHttpContextAccessor httpContext,DatasetTagContext datasetTagContext)
         {
             this.datasetContext = datasetContext;
             _configuration = configuration;
             _microserviceBaseURL = _configuration["Addresses:Microservice"];
             _datasetFolderPath = _configuration["FileSystemRelativePaths:Datasets"];
             _httpContext = httpContext;
+            this.datasetTagContext = datasetTagContext;
         }
 
         [HttpGet]
@@ -41,12 +43,15 @@ namespace backend.Controllers
             List<Dataset> lista = new List<Dataset>();
             if (p == "1")
             {
-                lista = await this.datasetContext.Datasets.ToListAsync();
+                lista = await this.datasetTagContext.Datasets.Include(x => x.DatasetDatasetTags).ToListAsync();
                 lista.Where(x => x.Public == true);
             }
             else
             {
-                lista = await this.datasetContext.Datasets.ToListAsync();
+                //lista = await this.datasetTagContext.Datasets.Include(x=>x.DatasetDatasetTags).ToListAsync();
+                //lista = await this.datasetTagContext.DatasetDatasetTags.Include(x => x.Dataset).Where(entry => entry.DatasetId != 0).Select(entry => entry.Dataset).ToListAsync();
+                lista = await this.datasetTagContext.Datasets.Include(x=>x.DatasetDatasetTags).ToListAsync();
+                
             }
 
             return Ok(lista);
@@ -365,6 +370,24 @@ namespace backend.Controllers
             return $"{backendURL}/{datasetsVirtPath}/{userID}/{datasetID}/{filename}";
         }
 
+        [HttpPost]
+        [Route("tag")]
+        public async Task<ActionResult<List<Dataset>>> addTag(string name,int id)
+        {
+            Dataset set =await datasetTagContext.Datasets.FindAsync(id);
+            DatasetTag tag = new DatasetTag();
+            tag.Tag = name;
+            
+            DatasetDatasetTag ddt = new DatasetDatasetTag();
+            ddt.Dataset = set;
+            ddt.DatasetTag = tag;
+  
+            datasetTagContext.DatasetDatasetTags.Add(ddt);
+            await datasetTagContext.SaveChangesAsync();
+        
+            return Ok();
+        }
+
         [HttpGet]
         [Route("filter")]
         public async Task<ActionResult<List<Dataset>>> filterDatasets(string? param)
@@ -376,6 +399,5 @@ namespace backend.Controllers
 
             return Ok(lista);
         }
-
     }
 }
