@@ -26,7 +26,8 @@ export class TrainingViewComponent implements OnInit {
   datasetURL:string = "";
 
   viewIndicator:View = View.UPLOAD;
-  
+  datasetSource: string = '';
+
   fileName:string = "";
   basicInfo:string = "";
   corrMatrixImgSource: any;
@@ -254,6 +255,11 @@ export class TrainingViewComponent implements OnInit {
 
   }
 
+  onDatasetSelection(obj: { isSelected: boolean, datasetSource: string }) {
+    this.nextButtonDisable = !obj.isSelected;
+    this.datasetSource = obj.datasetSource;
+  }
+
   onFileSelected(file:File)
   {
     this.hideElements();
@@ -301,11 +307,13 @@ export class TrainingViewComponent implements OnInit {
   OnNextClick() {
     if (this.viewIndicator == View.UPLOAD)
     {
-        this.uploadDisplay = DisplayType.HIDE;
-        this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
-        this.viewIndicator = View.PREVIEW;
-        //this.sessionService.saveData('view',this.viewIndicator.toString());
-        this.backButtonDisable = false;
+      if(this.datasetSource == 'link')
+        this.upload.linkClick();
+      else
+        this.upload.uploadClick();
+
+      //this.sessionService.saveData('view',this.viewIndicator.toString());
+      this.backButtonDisable = false;
     }
     else if (this.viewIndicator == View.PREVIEW)
     {
@@ -394,9 +402,9 @@ export class TrainingViewComponent implements OnInit {
         else
         {
           this.dialogTitle = "Alert";
-        this.dialogMessage = "You have to choose at least one feature";
+          this.dialogMessage = "You have to choose at least one feature";
 
-        this.dialog.open(DialogComponent,{
+          this.dialog.open(DialogComponent,{
           data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
         });
         }

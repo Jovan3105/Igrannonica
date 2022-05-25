@@ -1,6 +1,11 @@
 <div class="navigation-buttons" [ngStyle]="{'display': navButtonsDisplay}">
     <button class="btn btn-primary float-start ms-4" [disabled]="backButtonDisable" (click)="OnBackClick()">Back</button>
     <button id="nextButton" type="button" class="btn btn-primary float-end me-5" [disabled]="nextButtonDisable" (click)="OnNextClick()">Next</button>
+    
+
+
+
+
 </div>
 <div id="circle" [ngStyle]="{'display': loaderDisplay}">
     <div class="loader">
@@ -17,7 +22,7 @@
 </div>
 
 <div [ngStyle]="{'display': uploadDisplay}">
-    <app-upload #upload (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
+    <app-upload #upload (linkEvent)="onShowDataClick($event)" (datasetSelectedEvent)="onDatasetSelection($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
     <div id="error-message" *ngIf="errorDisplay" class="alert alert-danger" role="alert">
         {{errorMessage}}
     </div>

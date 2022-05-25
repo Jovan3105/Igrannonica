@@ -26,12 +26,14 @@ export class UploadComponent implements OnInit {
   browserURL:string;
   @Output() linkEvent: EventEmitter<string>; //podizanje event-a kada se salje link
   @Output() uploadEvent: EventEmitter<File>; //podizanje event-a kada se salje file
+  @Output() datasetSelectedEvent: EventEmitter<{ isSelected: boolean, datasetSource: string }>;
 
   constructor(private authService : AuthService, public sessionService:SessionService) {
     this.fileName = "";
     this.datasetURL = "";
     this.linkEvent = new EventEmitter<string>();
     this.uploadEvent = new EventEmitter<File>();
+    this.datasetSelectedEvent = new EventEmitter<{ isSelected: boolean, datasetSource: string }>();
     this.isLoggedIn = this.authService.isLoggedIn();
     this.showDragAndDrop = true;
     this.diamondsURL = "https://raw.githubusercontent.com/tidyverse/ggplot2/main/data-raw/diamonds.csv"
@@ -58,8 +60,8 @@ export class UploadComponent implements OnInit {
         this.fileSize = this.sessionService.getData('file_size')!;
         this.showDragAndDrop = false;
       }
-      
     }
+      
     if(this.sessionService.getData('upload_link') != null)
     {
       this.datasetURL = this.sessionService.getData('upload_link')!;
@@ -71,14 +73,19 @@ export class UploadComponent implements OnInit {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
 
-
     if (fileList && fileList?.length > 0) {
 
       this.file = fileList[0];
       this.fileName = this.file.name;
       this.fileSize = this.convertFileSize(this.file.size);
     }
+
     this.showDragAndDrop = false;
+
+    if(this.file == null)
+      this.datasetSelectedEvent.emit({ isSelected: false, datasetSource: "local_upload"});
+    else  
+      this.datasetSelectedEvent.emit({ isSelected: true, datasetSource: "local_upload"});
   }
 
   onFileDropped(file:File)
@@ -107,6 +114,8 @@ export class UploadComponent implements OnInit {
     this.clearSessionStorage();
     this.file = undefined;
     this.showDragAndDrop = true;
+
+    this.datasetSelectedEvent.emit({ isSelected: false, datasetSource: "local_upload"});
   }
 
   setIndex(index:number)
@@ -146,5 +155,13 @@ export class UploadComponent implements OnInit {
   {
     this.linkEvent.emit(datasetLink);
     this.fileName = datasetLink.split("/").pop();
+  }
+
+  onUrlInputChange(event:any) {
+    console.log(event.target.value)
+    if(this.datasetURL == '')
+      this.datasetSelectedEvent.emit({ isSelected: false, datasetSource: "link"});
+    else  
+      this.datasetSelectedEvent.emit({ isSelected: true, datasetSource: "link"});
   }
 }

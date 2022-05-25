@@ -1,6 +1,6 @@
 <h3>Choose dataset</h3>
 <div class="dataset-container">
-    <mat-tab-group mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
+    <mat-tab-group class=" pb-3" mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
         <mat-tab label="Public dataset">
             <div class="container p-3">
                 <div class="row justify-content-center" style="column-gap: 30px;">
@@ -36,11 +36,8 @@
             <div class="mx-auto" style="width: 80%;">
                 <h3 class="mb-0" style="text-align: left; color: #212529">Dataset URL</h3>
                 <hr class="mt-0">
-                <input type="text" class="form-control mb-3" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
+                <input type="text" class="form-control mb-3" (input)="onUrlInputChange($event)" (blur)="onUrlInputChange($event)" (keyup)="onUrlInputChange($event)" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
                 <app-dataset-info></app-dataset-info>
-            </div>
-            <div class="nextButton">
-                <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
             </div>
         </mat-tab>
         <mat-tab label="Upload">
@@ -76,9 +73,6 @@
                         <app-dataset-info [filenameFromParent]="fileName"></app-dataset-info>
                     </div>
                 </div>
-            </div>
-            <div class="nextButton">
-                <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
             </div>
         </mat-tab>
         <mat-tab label="Private dataset">
