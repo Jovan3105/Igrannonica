@@ -1,4 +1,4 @@
-<h3>Choose dataset</h3>
+<h2 style="text-align: center;">Choose dataset</h2>
 <div class="dataset-container">
     <mat-tab-group mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
         <mat-tab label="Public dataset">
@@ -36,8 +36,8 @@
             <div class="mx-auto" style="width: 80%;">
                 <h3 class="mb-0" style="text-align: left; color: #212529">Dataset URL</h3>
                 <hr class="mt-0">
-                <input type="text" class="form-control mb-3" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
-                <app-dataset-info></app-dataset-info>
+                <input type="text" class="form-control mb-3" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL" (ngModelChange)="onLinkChange()">
+                <app-dataset-info [filenameFromParent]="linkName"></app-dataset-info>
             </div>
             <div class="nextButton">
                 <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>

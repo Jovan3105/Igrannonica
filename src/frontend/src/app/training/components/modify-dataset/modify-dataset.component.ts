@@ -19,7 +19,6 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-
     this.table_data = changes['table_data'].currentValue;
     this.header = changes['header'].currentValue;
     this.refreshView();
@@ -31,7 +30,10 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
 
   refreshView()
   {
-    if (this.modifyTable) this.modifyTable.prepareTable(TableIndicator.DATA_MANIPULATION, this.table_data, this.header);
+    if (this.modifyTable) 
+    {
+      this.modifyTable.prepareTable(TableIndicator.DATA_MANIPULATION, this.table_data, this.header);
+    }
   }
 
   ngAfterViewInit() {

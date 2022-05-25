@@ -14,11 +14,15 @@ export class UploadComponent implements OnInit {
 
   file?:File;
   fileName?:string;
+  linkName:string = "";
+  name:string = "";
   fileSize?:string;
   datasetURL:string = "";
   isLoggedIn:boolean;
   showDragAndDrop:boolean = true;
   tab_index:number = 0;
+  newFileBool:boolean = true;
+  newLinkBool:boolean = true;
   diamondsURL:string;
   titanicURL:string;
   weightsURL:string;
@@ -51,7 +55,7 @@ export class UploadComponent implements OnInit {
     if (this.sessionService.getData('file_name') != null)
     {
       this.fileName = this.sessionService.getData('file_name')!;
-      console.log(this.sessionService.getData('file_size'));
+      //console.log(this.sessionService.getData('file_size'));
       if (this.sessionService.getData('file_size') != null)
       {
         //console.log("Upadam"); 
@@ -79,6 +83,7 @@ export class UploadComponent implements OnInit {
       this.fileSize = this.convertFileSize(this.file.size);
     }
     this.showDragAndDrop = false;
+    this.newFileBool = true;
   }
 
   onFileDropped(file:File)
@@ -89,26 +94,48 @@ export class UploadComponent implements OnInit {
     this.showDragAndDrop = false;
 
     this.fileName = file.name;
+    this.newFileBool = true;
   }
 
   uploadClick()
   {
-    this.uploadEvent.emit(this.file);
-    this.fileName = this.file?.name;
+    if (this.newFileBool)
+    {
+      this.uploadEvent.emit(this.file);
+      this.fileName = this.name = this.file?.name!;
+      this.newFileBool = false;
+      this.newLinkBool = true;
+    }
+    else{
+      this.uploadEvent.emit(undefined);
+    }
   }
   
   linkClick()
   {
-    this.linkEvent.emit(this.datasetURL);
-    this.fileName = this.datasetURL.split("/").pop();
+    if (this.newLinkBool)
+    {
+      this.linkEvent.emit(this.datasetURL);
+      this.linkName = this.name = this.datasetURL.split("/").pop()!;
+      this.newLinkBool = false;
+      this.newFileBool = true;
+    }
+    else{
+      this.linkEvent.emit(undefined);
+    }
+
   }
+
   removeFile()
   {
     this.clearSessionStorage();
     this.file = undefined;
     this.showDragAndDrop = true;
   }
-
+  onLinkChange()
+  {
+    this.newLinkBool = true;
+  }
   setIndex(index:number)
   {
     this.tab_index = index;
@@ -120,6 +147,7 @@ export class UploadComponent implements OnInit {
     this.sessionService.removeData('file_name');
     this.sessionService.removeData('file_size');
   }
+
   convertFileSize(bytes : number, si : boolean = true, dp : number = 1) {
     const thresh = si ? 1000 : 1024;
   

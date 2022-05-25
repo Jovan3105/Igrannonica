@@ -28,9 +28,10 @@
     </mat-step>
     <mat-step label="Data preview and manipulation">
         <div id="first">
-            <div class="header-container">
-                <span class="float-start ms-4">{{fileName}}</span>
-                <div>
+            <div class="row justify-content-center" style="margin-top: 0.3rem;">
+                <div class="col-sm-4 ms-5">
+                <h2>{{fileName}}</h2></div>
+                <div class="col-sm ms-5">
                     <button type="button" class="btn btn-secondary" (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifyModal" (click)="modalOpen()">
                     Modify dataset
@@ -38,9 +39,7 @@
                     <button type="button" class="btn btn-warning" (click)="downloadFile()">Download</button>
                     <!--<button id="nextButton" type="button" class="btn btn-primary float-end me-5" [disabled]="nextButtonDisable" (click)="OnNextClick()">Next</button>-->
                 </div>
-
             </div>
-        
             <div class="row mx-auto" id="mainContainer" [ngStyle]="{'display': mainContainerDisplay}">
                 <div class="col-lg">
                     <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
@@ -81,12 +80,12 @@
     <div class="modal-dialog modal-lg" style="max-width: 80%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Modify '{{fileName}}' dataset</h5>
+                <h2 class="modal-title" id="staticBackdropLabel">Modify '{{fileName}}' dataset</h2>
                 <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()" aria-label="Close" id="modal-close">
                 </button>
             </div>
             <div class="modal-body">
-                <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.data" [header]="dataTable.headers"></app-modify-dataset>
+                <app-modify-dataset #modifyModal *ngIf="modalDisplay" [table_data]="dataTable.rowData" [header]="dataTable.headers"></app-modify-dataset>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>
@@ -100,7 +99,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Confirmation</h5>
+                <h2 class="modal-title" id="staticBackdropLabel">Confirmation</h2>
             </div>
             <div class="modal-body" *ngIf="!confirmation">
                 Are you sure that you want to cancel changes? This proccess cannot be undone.

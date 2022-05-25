@@ -125,8 +125,12 @@ export class TrainingViewComponent implements OnInit {
         this.uploadCompleted = true;
         this.sessionService.saveData('dataset_id',this.datasetId.toString());
         this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
-        this.fileName = this.upload.fileName!;
+        this.fileName = this.upload.name!;
         this.sessionService.saveData('file_name',this.fileName);
+      }
+      else
+      {
+        this.showUploadErrorMessage("There was problem while fetching data. Please try again later")
       }
       /*
       this.sessionService.saveData('file_name',this.upload.fileName!);
@@ -136,7 +140,7 @@ export class TrainingViewComponent implements OnInit {
     },
     error: (err: Error) => {
       console.log("### error@uploadObserver")
-      console.log(err.message)
+      //console.log(err.message)
       this.showUploadErrorMessage(err.message);
     }
   };
@@ -148,18 +152,19 @@ export class TrainingViewComponent implements OnInit {
       //this.sessionService.saveData('table_data',JSON.stringify(response));
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
+      
+      this.numOfMissingValues = response['basicInfo']['missing'];
+      this.missingIndicator = !this.missingIndicator;
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
-      this.numOfMissingValues = response['basicInfo']['missing'];
-      this.missingIndicator = !this.missingIndicator;
 
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },
     error: (err: Error) => {
       console.log(err)
-
+      this.showUploadErrorMessage(err.message);
     }
   };
 
@@ -228,10 +233,6 @@ export class TrainingViewComponent implements OnInit {
     }
     this.stepperDisplay = DisplayType.HIDE;
     this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
-
-    //this.labelsDisplay = DisplayType.HIDE;
-    //this.navButtonsDisplay = DisplayType.HIDE;
-    //this.nextButtonDisable = true;
   }
 
   showElements()
@@ -244,12 +245,6 @@ export class TrainingViewComponent implements OnInit {
       this.viewIndicator = View.PREVIEW;
       //this.sessionService.saveData('view',this.viewIndicator.toString());
     }
-    
-    //if (this.statsTableDisplay == DisplayType.SHOW_AS_BLOCK) this.labelsDisplay = DisplayType.HIDE;
-    //else this.labelsDisplay = DisplayType.SHOW_AS_BLOCK;
-    //this.navButtonsDisplay = DisplayType.SHOW_AS_BLOCK;
-    //this.nextButtonDisable = false;
-    //this.backButtonDisable = false;
   }
 
   showUploadErrorMessage(message:string)
@@ -257,9 +252,9 @@ export class TrainingViewComponent implements OnInit {
     this.errorMessage = message;
     this.loaderDisplay = DisplayType.HIDE;
     this.viewIndicator = View.UPLOAD;
+    this.stepperDisplay = DisplayType.SHOW_AS_BLOCK;
     this.sessionService.saveData('view',this.viewIndicator.toString());
-    this.uploadDisplay = DisplayType.SHOW_AS_BLOCK;
-    this.navButtonsDisplay = DisplayType.SHOW_AS_BLOCK;
+
     this.errorDisplay = true;  
     setTimeout(() => {
       this.errorDisplay = false;
@@ -269,6 +264,10 @@ export class TrainingViewComponent implements OnInit {
 
   onFileSelected(file:File)
   {
+    if (file == undefined) {
+      this.viewIndicator = View.PREVIEW;
+      return;
+    }
     this.hideElements();
     if (this.form.get('file')) 
       this.form.delete('file');
@@ -279,6 +278,11 @@ export class TrainingViewComponent implements OnInit {
   }
 
   onShowDataClick(datasetURL:string) {
+
+    if (datasetURL == undefined) {
+      this.viewIndicator = View.PREVIEW;
+      return;
+    }
 
     this.hideElements();
     if (datasetURL == null || datasetURL == "")
@@ -492,7 +496,7 @@ export class TrainingViewComponent implements OnInit {
                 next: (response:any) => { 
                   console.log("Fill missing value: ", response)
                   this.viewIndicator = View.TRAINING;
-                  
+                  this.labels.keep_state = true;
                   this.sessionService.saveData('dataset_id',this.datasetId.toString());
                   this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
                   this.fileName = this.upload.fileName!;
