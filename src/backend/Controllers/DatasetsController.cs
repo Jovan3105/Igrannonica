@@ -299,6 +299,42 @@ namespace backend.Controllers
 
         }
 
+        [HttpPost]
+        [Route("{datasetId:int}/fillMissing")]
+        public async Task<ActionResult<Object>> fillMissingValues(int datasetId, [FromBody]ColumnFillMethodPair[] columnFillMethodPairs)
+        {
+            var dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
+
+            if (dataset == null)
+                return BadRequest(new { Message = "No dataset with this id" });
+        
+            var microserviceURL = _microserviceBaseURL + "/data-preparation/fill-missing";
+
+            string url = CreateDatasetURL(_configuration, dataset.UserID, dataset.Id, dataset.FileName);
+
+            string responseString = null;
+
+            try
+            {
+                var response = await _client.PutAsJsonAsync(microserviceURL + "?stored_dataset=" + url, columnFillMethodPairs);
+                response.EnsureSuccessStatusCode();
+                responseString = await response.Content.ReadAsStringAsync();
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");	
+                Console.WriteLine("Message :{0} ", e.Message);
+
+                return BadRequest(new ResponseToRequest(false, "TODO", "An error occured while filling missing values", "fillMissingValues_UnknownError"));
+            }
+
+            StreamWriter f = new(dataset.Path);
+            f.Write(responseString);
+            f.Close();
+
+            return Ok(new { Message = "OK" } );
+        }
+
         // TODO premestiti logiku za kreiranje root foldera dataset-ova prilikom pokretanja aplikacije
         private string CreatePathToDataRoot(int userID, int datasetID, string filename)
         {

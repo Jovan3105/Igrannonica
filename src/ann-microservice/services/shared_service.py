@@ -29,12 +29,14 @@ def log(output, title=''):
 
     **Ispis se vrsi samo u development modu**
     '''
-    LOGGER.info(title)
     
-    if isinstance(output, str):
-        LOGGER.info(config.PRINT_PREFIX + output)
-    else:
-        LOGGER.info(output)
+    if config.ENVIRONMENT == 'development':
+        LOGGER.info(title)
+        
+        if isinstance(output, str):
+            LOGGER.info(config.PRINT_PREFIX + output)
+        else:
+            LOGGER.info(output)
  
 
 async def send_msg(dest_id, msg):

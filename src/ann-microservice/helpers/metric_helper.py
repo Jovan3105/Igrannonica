@@ -41,8 +41,8 @@ class Metric(str, Enum):
     TrueNegatives                 = "true_negatives"
     TruePositives                 = "true_positives"
 
-    def __str__(self):
-        return str(self.value)
+    def __repr__(self):
+        return self.value
 
 def map_metrics(metrics):   
     metric_switcher = {

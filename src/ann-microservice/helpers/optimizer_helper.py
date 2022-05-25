@@ -11,8 +11,8 @@ class Optimizer(str, Enum):
     RMSprop  = "RMSprop"
     SGD      = "SGD"
 
-    def __str__(self):
-        return str(self.value)
+    def __repr__(self):
+        return self.value
 
 def map_optimizer(optimizer_key, learning_rate):   
     optimizer_switcher = {

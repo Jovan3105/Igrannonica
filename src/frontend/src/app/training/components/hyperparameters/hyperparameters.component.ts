@@ -10,8 +10,9 @@ import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { ChosenColumn, View } from '../../models/table_models';
+import { ChosenColumn } from '../../models/table_models';
 import { SessionService } from 'src/app/core/services/session.service';
+import { View, DisplayType } from '../../../shared/models/navigation_models';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -23,7 +24,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
   @Input() choosenInAndOutCols:{features:ChosenColumn[],label:ChosenColumn} | undefined = undefined;
   @Input() datasetId:any;
   
-  loaderMiniDisplay:string = "none";
+  loaderMiniDisplay:string = DisplayType.HIDE;
   readonly backendSocketUrl = environment.backendSocketUrl;
 
   constructor(private trainingViewComponent:TrainingViewComponent, 
@@ -124,9 +125,9 @@ export class HyperparametersComponent implements OnInit, OnChanges
   val_arr:number[]=[];
   epoches_arr:number[]=[0];
 
-  collapse:string="block";
+  collapse:string=DisplayType.SHOW_AS_BLOCK;
 
-  prikaz:string="none";
+  prikaz:string=DisplayType.HIDE;
   started:boolean=false;
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
@@ -175,7 +176,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
   }
   
   TrainingClick(){
-    this.loaderMiniDisplay = "block";
+    this.loaderMiniDisplay = DisplayType.SHOW_AS_BLOCK;
     let connectionID = "";
     
     // izdvajanje naziva feature-a u poseban niz
@@ -230,11 +231,11 @@ export class HyperparametersComponent implements OnInit, OnChanges
         trainingRequestPayload["ClientConnID"] = connectionID;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
-        _this.collapse="none";
+        _this.collapse=DisplayType.HIDE;
         _this.epoches_data=[];
         _this.training_arr=[];
         _this.val_arr=[];
-        _this.prikaz="inline-block";
+        _this.prikaz=DisplayType.SHOW_AS_INLINE_BLOCK;
         _this.started=true;
       }
       else {
@@ -247,7 +248,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
         _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
         _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
         if(_this.training_arr.length==_this.numberOfEpochs)
-        _this.collapse="block";
+        _this.collapse=DisplayType.SHOW_AS_BLOCK;
       }
     }
 

@@ -17,8 +17,8 @@ class WeightInitializer(str, Enum):
     TruncatedNormal = "TruncatedNormal",
     Zeros           = "Zeros"
 
-    def __str__(self):
-        return str(self.value)
+    def __repr__(self):
+        return self.value
 
 def map_weight_init(weight_init):   
     weight_init_switcher = {

@@ -6,3 +6,5 @@ SERVER_PORT = 10082
 BACKEND_BASE_ADDRESS = 'softeng.pmf.kg.ac.rs:10079'
 
 PRINT_PREFIX = "(script)     "
+
+ENVIRONMENT = 'production'

@@ -41,10 +41,11 @@
             </app-show-table><br>
         </div>
         <div class="col-lg-4" style="padding:0em 0.3em;">
-            <app-labels #Labels id="labelCards" [ngStyle]="{'display': labelsDisplay}"
-            [missing]="missingValue" 
+            <app-labels #columnsSelecion id="labelCards" [ngStyle]="{'display': labelsDisplay}"
+            [missing]="numOfMissingValues" 
+            [missing_incidator]="missingIndicator"
             (checkEvent)="changeColomnVisibility($event)" 
-            (labelEvent)="onSelectedTargetColumn($event)"
+            (labelEvent)="onTargetColumnSelect($event)"
             ></app-labels>
         </div>
     </div>

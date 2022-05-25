@@ -4,6 +4,7 @@ import { Check, ChosenColumn, HeaderDict } from '../../models/table_models';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { SessionService } from 'src/app/core/services/session.service';
+import { View } from 'src/app/shared/models/navigation_models';
 
 @Component({
   selector: 'app-labels',
@@ -13,13 +14,14 @@ import { SessionService } from 'src/app/core/services/session.service';
 export class LabelsComponent implements OnInit, OnChanges {
 
   columns: HeaderDict[] | null;
-  pred: number | null;
+  previousTargetId: number | null;
   missing_categorical:Hyperparameter[] = Constants.MISSING_HANDLER_CATEGORICAL;
   missing_numerical:Hyperparameter[] = Constants.MISSING_HANDLER_NUMERICAL;
   encoding_categorical:Hyperparameter[] = Constants.ENCODING_CATEGORICAL;
   @Input() missing: number = 0;
+  @Input() missing_incidator : boolean = false;
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
-  @Output() labelEvent: EventEmitter<{ id: number; pred: number | null; }>; //podizanje event-a kada se promeni izlaz
+  @Output() labelEvent: EventEmitter<{ id: number; previousTargetId: number | null; }>; //podizanje event-a kada se promeni izlaz
   selectedEncodings:string[];
   selectedTypes:string[];
   selectedMissingHandler:string[];
@@ -35,9 +37,9 @@ export class LabelsComponent implements OnInit, OnChanges {
   constructor(public dialog:MatDialog, private sessionService:SessionService) {
 
     this.columns = null;
-    this.pred = null;
+    this.previousTargetId = null;
     this.checkEvent = new EventEmitter<Check>();
-    this.labelEvent = new EventEmitter<{id:number,pred:number | null}>();
+    this.labelEvent = new EventEmitter<{id:number,previousTargetId:number | null}>();
     this.checkboxCheckedArray = new Array<boolean>();
     this.selectedEncodings = new Array<string>();
     this.selectedTypes = new Array<string>();
@@ -49,7 +51,7 @@ export class LabelsComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.columns = null;
-    this.pred = null;
+    this.previousTargetId = null;
     this.targetColumn = null;
 
     this.resetValues();
@@ -60,6 +62,7 @@ export class LabelsComponent implements OnInit, OnChanges {
     if (this.missing > 0) 
       this.showMissingColumn = true;
     else this.showMissingColumn = false;
+
     if (this.showMissingColumn)
     {
       if (this.columns)
@@ -78,11 +81,14 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
   }
 
-  onDatasetSelected(columns: Array<HeaderDict>) 
+  onDatasetSelected(columns: Array<HeaderDict>, view: View) 
   {
+    if(view == View.TRAINING)
+      return;
+
     this.ngOnInit();
     this.columns = columns;
-    this.sessionService.saveData('columns',JSON.stringify(this.columns));
+    this.sessionService.saveData('columns', JSON.stringify(this.columns));
     for(let i = 0; i<columns.length; i++) {
       this.checkboxCheckedArray.push(true);
       this.constantsDisabledArray.push(true);
@@ -99,7 +105,8 @@ export class LabelsComponent implements OnInit, OnChanges {
         this.selectedEncodings.push(this.encoding_categorical[0].codename);
       }
     };
-    this.sessionService.saveData('selected_checkboxes',JSON.stringify(this.checkboxCheckedArray));
+
+    this.sessionService.saveData('selected_checkboxes', JSON.stringify(this.checkboxCheckedArray));
   }
 
   // poziva se kada se klikne na checkbox
@@ -114,35 +121,34 @@ export class LabelsComponent implements OnInit, OnChanges {
       this.checkboxCheckedArray[event.target.value] = false;
       this.checkEvent.emit(new Check(event.target.value, false));
     }
-    
   }
 
-  // poziva se kada se kad se hide-uje iz tabele
+  // poziva se kada se kad se dogodi hideEvent tabele
   changeCheckbox(checkChange:Check)
   {
     this.checkboxCheckedArray[checkChange.id] = !this.checkboxCheckedArray[checkChange.id];
   }
 
-  onSelectLabel()
+  onLabelColSelect()
   {
-    if (this.pred != null)
+    if (this.previousTargetId != null)
     {
-      this.checkboxCheckedArray[this.pred] = true;
+      this.checkboxCheckedArray[this.previousTargetId] = true;
     }
 
     if(this.targetColumn!=null){
       if (this.checkboxCheckedArray[this.targetColumn.key]) 
       this.checkboxCheckedArray[this.targetColumn.key] = false;
 
-      this.labelEvent.emit({id:parseInt(this.targetColumn.key),pred:this.pred});
-      this.pred = parseInt(this.targetColumn.key);
+      this.labelEvent.emit({id:parseInt(this.targetColumn.key),previousTargetId:this.previousTargetId});
+      this.previousTargetId = parseInt(this.targetColumn.key);
 
       let encoding = this.selectedEncodings[this.targetColumn.key];
 
       if(encoding != 'OneHot')
         this.selectedEncodings[this.targetColumn.key] = 'OneHot';
 
-      this.sessionService.saveData('target_column',JSON.stringify(this.targetColumn));
+      this.sessionService.saveData('target_column', JSON.stringify(this.targetColumn));
     }
   }
 
@@ -151,10 +157,8 @@ export class LabelsComponent implements OnInit, OnChanges {
     var features: ChosenColumn[] = [];
     var label: ChosenColumn | undefined = undefined;
     
-    
     if (this.columns)
     {
-
       for(let i=0; i<this.columns.length; i++)
         if (this.checkboxCheckedArray[i]) 
         {
@@ -183,15 +187,24 @@ export class LabelsComponent implements OnInit, OnChanges {
       {
         let id = this.targetColumn.key;
         let lblName = this.columns.filter(element => element.key == this.targetColumn.key)[0].name;
+        
         if (this.showMissingColumn)
         {
           if(!this.constantsDisabledArray[id])
-            label = new ChosenColumn(lblName,this.selectedTypes[id],this.selectedEncodings[id],this.selectedMissingHandler[id],
-              this.constantsChoosen.get(id));
+            label = new ChosenColumn(
+                lblName,
+                this.selectedTypes[id],
+                this.selectedEncodings[id],
+                this.selectedMissingHandler[id],
+                this.constantsChoosen.get(id));
           else 
-          label = new ChosenColumn(lblName,this.selectedTypes[id],this.selectedEncodings[id],this.selectedMissingHandler[id]);
+            label = new ChosenColumn(
+              lblName,
+              this.selectedTypes[id],
+              this.selectedEncodings[id],
+              this.selectedMissingHandler[id]);
         }
-        else label = new ChosenColumn(lblName,this.selectedTypes[id],this.selectedEncodings[id]);
+        else label = new ChosenColumn(lblName, this.selectedTypes[id], this.selectedEncodings[id]);
       }
 
       values = {
@@ -205,16 +218,14 @@ export class LabelsComponent implements OnInit, OnChanges {
 
   onEncodingChange(index: number, encoding: string) {
     if(this.selectedEncodings.length-1 < index) 
-      this.selectedEncodings.push(encoding), console.log('Dodat '+ encoding);
+      this.selectedEncodings.push(encoding);
     else {
       this.selectedEncodings[index] = encoding;
-      console.log("Izmenjen " + index + " na " + encoding)
     }
   }
 
   onTypeChange(type:string,i:number)
   {
-    console.log(type)
     if(type=="Numerical"){
       this.encodingDisabledArray[i] = true;
       this.selectedTypes[i] = "Numerical";
@@ -230,11 +241,12 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
       
   }
-  onMissingChange(index:number,missing_selection:string)
-  {
-    this.selectedMissingHandler[index] = missing_selection;
 
-    if (missing_selection == "Constant")
+  onMissingChange(index:number,selectedFillMethod:string)
+  {
+    this.selectedMissingHandler[index] = selectedFillMethod;
+
+    if (selectedFillMethod == "constant_str")
     {
       var dialogTitle = "Constant for '" + this.columns![index].name + "' column";
       var dialogMessage = "Add constant you would like to fill missing values with";
@@ -254,12 +266,14 @@ export class LabelsComponent implements OnInit, OnChanges {
       });
     }
   }
+
   deleteConstant(index:number)
   {
     this.constantsDisabledArray[index] = true;
     this.constantsChoosen.delete(index);
     this.selectedMissingHandler[index] = this.missing_categorical[0].codename;
   }
+
   selectAll(){
     for (let index = 0; index < this.checkboxCheckedArray.length; index++) {
       if(this.targetColumn==null || this.targetColumn.key!=index)
@@ -269,6 +283,7 @@ export class LabelsComponent implements OnInit, OnChanges {
       }
     }
   }
+
   unselectAll(){
     for (let index = 0; index < this.checkboxCheckedArray.length; index++) {
       if(this.targetColumn==null || this.targetColumn.key!=index)
