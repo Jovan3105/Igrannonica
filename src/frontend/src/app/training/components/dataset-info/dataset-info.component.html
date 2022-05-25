@@ -3,20 +3,19 @@
     <hr class="mt-0">
     <form>
         <div class="form-group">
-          <label for="dataset-title">Title</label>
-          <input type="text" class="form-control mb-3" id="dataset-title" [value]="filename">
+            <label for="dataset-title">Title</label>
+            <input type="text" class="form-control mb-3" placeholder="Enter dataset title" id="dataset-title" [value]="name">
         </div>
         <div class="form-group">
-          <label for="dataset-desc">Description</label>
-          <input type="text" class="form-control mb-3" id="dataset-desc" [value]="filename">
+            <label for="dataset-desc">Description</label>
+            <input type="text" class="form-control mb-3" placeholder="Enter description" id="dataset-desc" [value]="description">
         </div>
         <div>
-          <label class="switch">
+            <label class="switch">
             <input type="checkbox" id="dataset-visibility">
             <span class="slider round"></span>
           </label>
-          <label class="form-check-label ms-2" for="dataset-visibility">Public</label>
+            <label class="form-check-label ms-2" for="dataset-visibility">Public</label>
         </div>
-      </form>
+    </form>
 </div>
-

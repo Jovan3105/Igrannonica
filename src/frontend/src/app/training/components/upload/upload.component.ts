@@ -113,6 +113,7 @@ export class UploadComponent implements OnInit {
   {
     this.clearSessionStorage();
     this.file = undefined;
+    this.fileName="";
     this.showDragAndDrop = true;
 
     this.datasetSelectedEvent.emit({ isSelected: false, datasetSource: "local_upload"});
