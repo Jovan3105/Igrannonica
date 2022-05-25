@@ -16,54 +16,66 @@
     </div>
 </div>
 
-<div [ngStyle]="{'display': uploadDisplay}">
-    <app-upload #upload (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
-    <div id="error-message" *ngIf="errorDisplay" class="alert alert-danger" role="alert">
-        {{errorMessage}}
-    </div>
-    <br><br>
-</div>
-
-<div id="first" [ngStyle]="{'display': previewDisplay}">
-    <div class="header-container">
-        <h4>{{fileName}}</h4>
-        <button type="button" class="btn btn-secondary" (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifyModal" (click)="modalOpen()">
-        Modify dataset
-        </button>&nbsp;
-        <button type="button" class="btn btn-warning" (click)="downloadFile()">Download</button>
-    </div>
-
-    <div class="row mx-auto" id="mainContainer" [ngStyle]="{'display': mainContainerDisplay}">
-        <div class="col-lg">
-            <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
-            (hideEvent)="changeCheckBox($event)">
-            </app-show-table><br>
+<mat-stepper [linear]="linearStepper" [selectedIndex]="viewIndicator" (selectionChange)="setIndex($event)" #stepper [ngStyle]="{'display': stepperDisplay}">
+    <mat-step label="Upload" [completed]="uploadCompleted">
+        <div>
+            <app-upload #upload (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
+            <div id="error-message" *ngIf="errorDisplay" class="alert alert-danger" role="alert">
+                {{errorMessage}}
+            </div>
+            <br><br>
         </div>
-        <div class="col-lg-4" style="padding:0em 0.3em;">
-            <app-labels #columnsSelecion id="labelCards" [ngStyle]="{'display': labelsDisplay}"
-            [missing]="numOfMissingValues" 
-            [missing_incidator]="missingIndicator"
-            (checkEvent)="changeColomnVisibility($event)" 
-            (labelEvent)="onTargetColumnSelect($event)"
-            ></app-labels>
-        </div>
-    </div>
-    <div class="stats-view" [ngStyle]="{'display':statsTableDisplay}">
-        <app-stats #Stats></app-stats>
-        <!--<h4>Basic Info</h4>
-        <app-show-table #dataSetInformation id="basicInfo"></app-show-table>-->
-        <br>
-    </div>
-</div>
+    </mat-step>
+    <mat-step label="Data preview and manipulation">
+        <div id="first">
+            <div class="header-container">
+                <span class="float-start ms-4">{{fileName}}</span>
+                <div>
+                    <button type="button" class="btn btn-secondary" (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifyModal" (click)="modalOpen()">
+                    Modify dataset
+                    </button>&nbsp;
+                    <button type="button" class="btn btn-warning" (click)="downloadFile()">Download</button>
+                    <!--<button id="nextButton" type="button" class="btn btn-primary float-end me-5" [disabled]="nextButtonDisable" (click)="OnNextClick()">Next</button>-->
+                </div>
 
-<div id="second" class="container-flex" [ngStyle]="{'display': trainingDisplay}">
-    <app-hyperparameters [choosenInAndOutCols]="choosenInAndOutCols" [datasetId]="datasetId"></app-hyperparameters>
-    <!-- Deo kada se klikne na dugme -->
-    <!-- <div class="options">
-        <input>
-    </div> -->
-</div>
+            </div>
+        
+            <div class="row mx-auto" id="mainContainer" [ngStyle]="{'display': mainContainerDisplay}">
+                <div class="col-lg">
+                    <app-show-table [ngStyle]="{'display':mainTableDisplay}" #dataTable id="mainTable" 
+                    (hideEvent)="changeCheckBox($event)">
+                    </app-show-table><br>
+                </div>
+                <div class="col-lg-4" style="padding:0em 0.3em;">
+                    <app-labels #columnsSelecion id="labelCards" [ngStyle]="{'display': labelsDisplay}"
+                    [missing]="numOfMissingValues" 
+                    [missing_incidator]="missingIndicator"
+                    (checkEvent)="changeColomnVisibility($event)" 
+                    (labelEvent)="onTargetColumnSelect($event)"
+                    ></app-labels>
+                </div>
+            </div>
+            <div class="stats-view" [ngStyle]="{'display':statsTableDisplay}">
+                <app-stats #Stats></app-stats>
+                <!--<h4>Basic Info</h4>
+                <app-show-table #dataSetInformation id="basicInfo"></app-show-table>-->
+                <br>
+            </div>
+        </div>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Training</ng-template>
+      <div id="second" class="container-flex">
+        <app-hyperparameters [choosenInAndOutCols]="choosenInAndOutCols" [datasetId]="datasetId" 
+        [ngStyle]="{'display': trainingDisplay}"></app-hyperparameters>
+        <!-- Deo kada se klikne na dugme -->
+        <!-- <div class="options">
+            <input>
+        </div> -->
+    </div>
+    </mat-step>
+  </mat-stepper>
 
 <div class="modal fade" #modal id="modifyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" style="max-width: 80%;">

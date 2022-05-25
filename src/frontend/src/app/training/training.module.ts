@@ -12,6 +12,7 @@ import { TableService } from './services/table.service';
 import { HyperparametersComponent } from './components/hyperparameters/hyperparameters.component';
 import { NgxNumberSpinnerModule } from 'ngx-number-spinner';
 import { MatSelectModule } from "@angular/material/select";
+import {MatStepperModule} from '@angular/material/stepper'; 
 import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
@@ -60,7 +61,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     NgChartsModule,
     MatTabsModule,
     NgxFilesizeModule,
-    DragDropModule
+    DragDropModule,
+    MatStepperModule
   ],
   exports: [
     LabelsComponent,
