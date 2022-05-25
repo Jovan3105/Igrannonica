@@ -4,6 +4,7 @@ import { Check, ChosenColumn, HeaderDict } from '../../models/table_models';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { SessionService } from 'src/app/core/services/session.service';
+import { View } from 'src/app/shared/models/navigation_models';
 
 @Component({
   selector: 'app-labels',
@@ -80,8 +81,11 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
   }
 
-  onDatasetSelected(columns: Array<HeaderDict>) 
+  onDatasetSelected(columns: Array<HeaderDict>, view: View) 
   {
+    if(view == View.TRAINING)
+      return;
+
     this.ngOnInit();
     this.columns = columns;
     this.sessionService.saveData('columns', JSON.stringify(this.columns));
@@ -240,8 +244,6 @@ export class LabelsComponent implements OnInit, OnChanges {
 
   onMissingChange(index:number,selectedFillMethod:string)
   {
-    console.log("Je l radi");
-    console.log(selectedFillMethod);
     this.selectedMissingHandler[index] = selectedFillMethod;
 
     if (selectedFillMethod == "constant_str")

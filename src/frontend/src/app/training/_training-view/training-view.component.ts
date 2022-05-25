@@ -132,14 +132,15 @@ export class TrainingViewComponent implements OnInit {
 
   fetchTableDataObserver:any = {
     next: (response:any) => { 
-      this.showElements();
+      if(this.viewIndicator != View.TRAINING)
+        this.showElements();
 
       //console.log(response);
       //this.sessionService.saveData('table_data',JSON.stringify(response));
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
 
-      this.labels.onDatasetSelected(headerDataTable);
+      this.labels.onDatasetSelected(headerDataTable, this.viewIndicator);
       this.stats.showInfo([response['basicInfo']]);
       this.numOfMissingValues = response['basicInfo']['missing'];
       this.missingIndicator = !this.missingIndicator;
@@ -339,36 +340,41 @@ export class TrainingViewComponent implements OnInit {
                 columnFillMethodPairs.push(columnFillMethodPair);
               });
               
-              if(choosenInAndOutCols?.label) {
-                let label: ChosenColumn = choosenInAndOutCols?.label;
-                let str_value: string = '';
-                let num_value: number = 0;
+              let label: ChosenColumn = choosenInAndOutCols?.label!;
+              let str_value: string = '';
+              let num_value: number = 0;
 
-                if(label.type == 'object')
-                  str_value = label.missingConstant!;
-                else
-                  num_value = +label.missingConstant!;
+              if(label.type == 'object')
+                str_value = label.missingConstant!;
+              else
+                num_value = +label.missingConstant!;
 
-                let columnFillMethodPair = new ColumnFillMethodPair(label.name, label.missing!, str_value, num_value)
-                columnFillMethodPairs.push(columnFillMethodPair);
-              }
+              let columnFillMethodPair = new ColumnFillMethodPair(label.name, label.missing!, str_value, num_value)
+              columnFillMethodPairs.push(columnFillMethodPair);
+             
+              this.previewDisplay = DisplayType.HIDE;
+              this.viewIndicator = View.TRAINING;
+              this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
 
               this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
                 next: (response:any) => { 
-                  console.log("Fill missing value: ", response)
-                  this.viewIndicator = View.TRAINING;
                   
                   this.sessionService.saveData('dataset_id',this.datasetId.toString());
                   this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
+                  
                   this.fileName = this.upload.fileName!;
                   this.sessionService.saveData('file_name',this.fileName);
-                  this.previewDisplay = DisplayType.HIDE;
+
+                  this.loaderDisplay = DisplayType.HIDE;
                   this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
 
                   this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
                 },
                 error: (err: Error) => {
                   console.log(err);
+                  this.viewIndicator = View.PREVIEW;
+                  this.loaderDisplay = DisplayType.HIDE;
+                  this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
                   // TODO error handling kada popunjavanje ne uspe
                 }
               })
