@@ -18,6 +18,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   missing_numerical:Hyperparameter[] = Constants.MISSING_HANDLER_NUMERICAL;
   encoding_categorical:Hyperparameter[] = Constants.ENCODING_CATEGORICAL;
   @Input() missing: number = 0;
+  @Input() missing_incidator : boolean = false;
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; previousTargetId: number | null; }>; //podizanje event-a kada se promeni izlaz
   selectedEncodings:string[];
@@ -239,9 +240,11 @@ export class LabelsComponent implements OnInit, OnChanges {
 
   onMissingChange(index:number,selectedFillMethod:string)
   {
+    console.log("Je l radi");
+    console.log(selectedFillMethod);
     this.selectedMissingHandler[index] = selectedFillMethod;
 
-    if (selectedFillMethod == "Constant")
+    if (selectedFillMethod == "constant_str")
     {
       var dialogTitle = "Constant for '" + this.columns![index].name + "' column";
       var dialogMessage = "Add constant you would like to fill missing values with";

@@ -41,7 +41,6 @@ tbody select{
 #constant-div{
     border-radius: 0.2rem;
     color: white;
-    height: 2rem;
 }
 
 #close-icon
@@ -56,8 +55,6 @@ tbody select{
 }
 
 .trim-content {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 50px;
+    hyphens: auto;
+    word-wrap: break-word;
   }

@@ -1,4 +1,5 @@
 import json
+from fastapi import HTTPException
 import numpy as np
 import pandas as pd
 
@@ -97,7 +98,7 @@ def modify_dataset(dataset, data:ModifiedData):
         df.drop(df.columns[data.deletedCols],axis=1,inplace=True)
 
     except:
-        return 'error' # TODO raise HTTPException
+        raise HTTPException(status_code=400, detail="Error on modifying data")
     
 
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije

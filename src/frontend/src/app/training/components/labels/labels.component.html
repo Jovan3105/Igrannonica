@@ -57,9 +57,9 @@
               </select>
             </td>
             <td class="missing-handler" *ngIf="showMissingColumn">
-              <div id="constant-div" class="bg-primary p-1" *ngIf="!constantsDisabledArray[i]">
-                <span style="margin-top: 2.5px;" class="trim-content">Constant - <b>{{constantsChoosen.get(i)}}</b></span>
-                <mat-icon id="close-icon" class="float-end" (click)="deleteConstant(i)">close</mat-icon>
+              <div id="constant-div" class="row bg-primary p-1" style="--bs-gutter-x: 0rem;" *ngIf="!constantsDisabledArray[i]">
+                <span style="margin-top: 2.5px;" class="col-10 trim-content">Constant - <b>{{constantsChoosen.get(i)}}</b></span>
+                <span class="col-2"><mat-icon id="close-icon" (click)="deleteConstant(i)">close</mat-icon></span>
               </div>
               <select class="form-select" [(ngModel)]="selectedMissingHandler[i]"  #missingSelection aria-label="Default select example" *ngIf="typeSelection.value == 'Categorical' && constantsDisabledArray[i]" (change)="onMissingChange(i, missingSelection.value)">
                 <option *ngFor="let handler of missing_categorical" [value]="handler.codename">

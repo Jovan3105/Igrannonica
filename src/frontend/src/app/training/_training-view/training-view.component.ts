@@ -31,6 +31,7 @@ export class TrainingViewComponent implements OnInit {
   basicInfo:string = "";
   corrMatrixImgSource: any;
   numOfMissingValues:number = 0;
+  missingIndicator:boolean = false;
   columnEncodings: string[] = [];
 
   dialogTitle:string = "";
@@ -141,6 +142,7 @@ export class TrainingViewComponent implements OnInit {
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
       this.numOfMissingValues = response['basicInfo']['missing'];
+      this.missingIndicator = !this.missingIndicator;
 
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
@@ -360,7 +362,6 @@ export class TrainingViewComponent implements OnInit {
                   this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver);
                   this.fileName = this.upload.fileName!;
                   this.sessionService.saveData('file_name',this.fileName);
-
                   this.previewDisplay = DisplayType.HIDE;
                   this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
 
@@ -477,6 +478,10 @@ export class TrainingViewComponent implements OnInit {
           this.showElements();
 
           //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver); // TODO check
+          },
+          error:(err: Error) => {
+            console.log(err);
+            // TODO error handling kada modify ne uspe
           }
       }
     )
