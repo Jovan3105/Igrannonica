@@ -27,14 +27,14 @@ namespace backend.WS
                 
                 await SendConnIDAsync(webSocket,ConnID);
 
-                Console.WriteLine("WebSocket Connected");
+                //Console.WriteLine("WebSocket Connected");
 
                 await Receive(webSocket, async (result, buffer) =>
                 {
                     if (result.MessageType == WebSocketMessageType.Text)
                     {
-                        Console.WriteLine($"Receive->Text");
-                        Console.WriteLine($"Message: {Encoding.UTF8.GetString(buffer, 0, result.Count)}");
+                        //Console.WriteLine($"Receive->Text");
+                        //Console.WriteLine($"Message: {Encoding.UTF8.GetString(buffer, 0, result.Count)}");
                         await RouteJSONMessageAsync(Encoding.UTF8.GetString(buffer, 0, result.Count));
                         return;
                     }
@@ -42,7 +42,7 @@ namespace backend.WS
                     {
                         string id = _manager.GetAllSockets().FirstOrDefault(s => s.Value == webSocket).Key;
                         _manager.GetAllSockets().TryRemove(id, out WebSocket sock);
-                        Console.WriteLine("Closed Connection: " + _manager.GetAllSockets().Count.ToString());
+                        //Console.WriteLine("Closed Connection: " + _manager.GetAllSockets().Count.ToString());
 
                         await sock.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
 
@@ -52,7 +52,7 @@ namespace backend.WS
             }
             else
             {
-                Console.WriteLine("Hello from 2nd Request Delegate - No WebSocket");
+               // Console.WriteLine("Hello from 2nd Request Delegate - No WebSocket");
                 await _next(context);
             }
         }
@@ -81,7 +81,7 @@ namespace backend.WS
 
             if (Guid.TryParse(routeOb.To.ToString(), out Guid guidOutput))
             {
-                Console.WriteLine("Targeted");
+                //Console.WriteLine("Targeted");
                 var sock = _manager.GetAllSockets().FirstOrDefault(s => s.Key == routeOb.To.ToString());
                 if (sock.Value != null)
                 {
@@ -90,12 +90,12 @@ namespace backend.WS
                 }
                 else
                 {
-                    Console.WriteLine("Invalid Recipient");
+                    //Console.WriteLine("Invalid Recipient");
                 }
             }
             else
             {
-                Console.WriteLine("Broadcast");
+                //Console.WriteLine("Broadcast");
                 foreach (var sock in _manager.GetAllSockets())
                 {
                     if (sock.Value.State == WebSocketState.Open)
