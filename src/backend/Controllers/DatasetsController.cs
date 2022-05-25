@@ -152,6 +152,18 @@ namespace backend.Controllers
                 return BadRequest("empty file");
             }
 
+            var datasetInfo=new datasetInfoDto();
+
+            try
+            {
+                datasetInfo = JsonConvert.DeserializeObject<datasetInfoDto>(Request.Form["data"]);
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
             // Formiranje i slanje zahteva za parsiranje //
 
             using var _x = file.OpenReadStream();
@@ -196,6 +208,9 @@ namespace backend.Controllers
 
             dataset.Path = path;
             dataset.FileName = fileName;
+            dataset.Name = datasetInfo.Name;
+            dataset.Description = datasetInfo.Description;
+            dataset.Public = datasetInfo.Public;
             this.datasetContext.Datasets.Update(dataset);
             await this.datasetContext.SaveChangesAsync();
 

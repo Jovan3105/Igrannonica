@@ -271,6 +271,14 @@ export class TrainingViewComponent implements OnInit {
   {
     this.hideElements();
 
+    const mData = JSON.stringify({
+      Name: "aaaaa",
+      Description: "bbbbb",
+      Public: true
+    });
+
+    this.form.append("data",mData);
+
     if (this.form.get('file')) 
       this.form.delete('file');
     
