@@ -4,35 +4,41 @@
       <h1>Admin panel</h1>
     </div>
     <div class="list-container row">
-      
-      <div class="col s12 m6 l4" style="overflow-y: scroll;">
-        <h4>Users</h4>
-        <div *ngFor="let user of users" >
-          <div class="user-list list insert-docs" >
-            <div class="list-item" *ngIf="user">
-              <div class="primary-data">
-                <div class="name">{{user['username']}}</div>
-                <div class="email">{{user['email']}}</div>
-              </div>
-              <div class="secondary-data">
-                <div class="action-icon red-text" data-toggle="modal"  data-target="#buttonDeleteModal" (click)="deleteUser(user['id'])"><i class="material-icons">delete</i></div>
+      <div class="row">
+        <div class="col">
+          <h4>Users</h4>
+        </div>
+        <div class="col">
+          <h4>Admins</h4>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 m6 l4" style="overflow-y: scroll; max-height: 90%;">
+          <div *ngFor="let user of users" >
+            <div class="user-list list insert-docs">
+              <div class="list-item" *ngIf="user">
+                <div class="primary-data trim-overflow">
+                  <div class="name">{{user['username']}}</div>
+                  <div class="email">{{user['email']}}</div>
+                </div>
+                <div class="secondary-data">
+                  <div class="action-icon red-text" data-bs-toggle="modal"  data-bs-target="#buttonDeleteModal" (click)="selectUser(user['id'])"><i class="material-icons">delete</i></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        
-      </div>
-      <div class="col s12 m6 l4"   style="overflow-y: scroll;">
-        <h4>Admins</h4>
-        <div class="user-list list insert-admins">
-          <div class="list-item">
-            <div class="primary-data">
-              <div class="name">Admin1</div>
-              <div class="email">admin1@gmail.com</div>
+        <div class="col s12 m6 l4" style="overflow-y: scroll; max-height: 90%;">
+          <div class="user-list list insert-admins">
+            <div class="list-item">
+              <div class="primary-data">
+                <div class="name">Admin1</div>
+                <div class="email">admin1@gmail.com</div>
+              </div>
+              <!-- <div class="secondary-data">
+                <div class="action-icon grey-text"><i class="material-icons">delete</i></div>
+              </div> -->
             </div>
-            <!-- <div class="secondary-data">
-              <div class="action-icon grey-text"><i class="material-icons">delete</i></div>
-            </div> -->
           </div>
         </div>
       </div>
@@ -40,7 +46,7 @@
   </div>
   
   <div class="col s12 m-3 l4 text-center">
-    <button type="button" class="btn red-text btn-lg btn-block" data-toggle="modal" data-target="#emailDeleteModal">Delete by email</button>
+    <button type="button" class="btn red-text btn-lg btn-block" data-bs-toggle="modal" data-bs-target="#emailDeleteModal">Delete by email</button>
   </div>
 
   
@@ -50,7 +56,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="emailDeleteModal">Delete by email</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -63,15 +69,15 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn red-text">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn red-text" data-bs-dismiss="modal">Delete</button>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal fade" id="buttonDeleteModal" tabindex="-1" aria-labelledby="buttonDeleteModal" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="buttonDeleteModal">Delete</h5>
@@ -82,7 +88,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn red-text">Delete</button>
+        <button type="button" class="btn red-text" data-bs-dismiss="modal" (click)="deleteUser(userSelectedID)">Delete</button>
       </div>
     </div>
   </div>

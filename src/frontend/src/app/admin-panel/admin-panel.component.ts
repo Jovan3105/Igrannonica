@@ -10,6 +10,7 @@ import { UserService } from '../core/services/user.service';
 export class AdminPanelComponent implements OnInit {
 
   users!: any;
+  userSelectedID: any;
 
   constructor(private userService: UserService) { }
 
@@ -33,6 +34,7 @@ export class AdminPanelComponent implements OnInit {
       next: (x:any) => {
         console.log('User deleted');
         window.location.reload(); // srediti bez page reload
+        this.userSelectedID = null;
       },
       error: (err: any) => {
        
@@ -40,6 +42,9 @@ export class AdminPanelComponent implements OnInit {
     };
 
     this.userService.deleteUser(id).subscribe(deleteUserObserver);
+  }
+  selectUser(id:number){
+    this.userSelectedID = id;
   }
   
 
