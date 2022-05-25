@@ -25,6 +25,14 @@ export class HeaderComponent implements OnInit {
       this.MenuDisplay();
     });
 
+    this.user$.subscribe({
+      error(msg) {
+        if (msg == "authorization_problem")
+        {
+          console.log("Session expired! Log in again")
+        }
+      }
+    });
     this.MenuDisplay();
     
   }
@@ -36,15 +44,6 @@ export class HeaderComponent implements OnInit {
         var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
 
       this.user$ = this.userService.getUser(id);
-      //ISPITATI DA LI SUBSCRIBE TREBA OVDE DA IDE
-      this.user$.subscribe({
-        error(msg) {
-          if (msg == "authorization_problem")
-          {
-            console.log("Session expired! Log in again")
-          }
-        }
-      });
 
       /*
       .subscribe({

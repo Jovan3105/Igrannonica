@@ -17,9 +17,26 @@ export class LoginComponent implements OnInit {
   errorDisplay:string = "none";
   errorMsg:string = "";
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) 
+  {
+    
+    if (this.router != null) {
+      if(this.router.getCurrentNavigation()?.extras.state)
+      {
+        if (this.router.getCurrentNavigation()?.extras.state!['message'] == "session_expired"){
+          this.errorMsg = "Session expired. Please log in again";
+          this.errorDisplay = "block";
+          setTimeout(() => {
+            this.errorDisplay = "none";
+          }, 5000);
+        }
+
+      }
+    }
+  }
 
   ngOnInit(): void {
+
   }
   onSubmit(f: NgForm) {
     this.loaderDisplay = "block"; 

@@ -50,9 +50,11 @@ export class AuthService {
     )
   }
 
-  logout() {
+  logout(message:string='') {
     this.jwtService.removeTokens();
-    this.router.navigateByUrl('/login');
+    if (message == "session_expired")
+      this.router.navigateByUrl('/login', {state:{message:'session_expired'}});
+    else this.router.navigateByUrl('/login');
     this.updatemenu.next();
     //kada se napravi API za logout
     /*
