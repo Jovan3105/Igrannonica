@@ -100,3 +100,11 @@
   .content-yield {
     height: 100%;
   }
+  @media only screen and (max-width: 600px) {
+    .trim-overflow {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+  }
