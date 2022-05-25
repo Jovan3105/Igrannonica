@@ -43,7 +43,7 @@ namespace backend.Controllers
             };
             return p;
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<User>>> getUsers()
         {
@@ -61,10 +61,39 @@ namespace backend.Controllers
         public async Task<ActionResult> deleteUser(int id) // TODO dodati id u path kao userID
         {
             User u = await this.userContext.Users.FindAsync(id);
-            this.userContext.Users.Remove(u);
-            this.userContext.SaveChanges();
-            return Ok();
+            if (u != null)
+            {
+                this.userContext.Users.Remove(u);
+                this.userContext.SaveChanges();
+                return Ok();
+
+            }
+            else
+            {
+                return BadRequest();
+            }
+           
         }
+        [HttpDelete]
+        [Route("email")]
+        public async Task<ActionResult> deleteUserEmail(string email)
+        {
+            User u = await this.userContext.Users.FirstOrDefaultAsync(x=>x.Email==email);
+            if (u != null)
+            {
+                this.userContext.Users.Remove(u);
+                this.userContext.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+            
+           
+
+        }
+        
 
      
 
