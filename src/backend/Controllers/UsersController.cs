@@ -43,7 +43,7 @@ namespace backend.Controllers
             };
             return p;
         }
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<User>>> getUsers()
         {
@@ -56,7 +56,7 @@ namespace backend.Controllers
            
             return Ok(await this.userContext.Users.ToListAsync());
         }
-       
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<ActionResult> deleteUser(int id) // TODO dodati id u path kao userID
         {
@@ -74,6 +74,7 @@ namespace backend.Controllers
             }
            
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("email")]
         public async Task<ActionResult> deleteUserEmail(string email)
