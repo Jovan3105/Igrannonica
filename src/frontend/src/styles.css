@@ -6,6 +6,10 @@
 .ag-header-cell-label {
     justify-content: center;
 }
+.ag-input-field-input, .ag-text-field-input
+{
+    text-align: center;
+}
 
 body{
     background-color:#F5F5F5;

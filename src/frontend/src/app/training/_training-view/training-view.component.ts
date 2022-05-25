@@ -35,13 +35,13 @@ export class TrainingViewComponent implements OnInit {
   missingIndicator:boolean = false;
   linearStepper:boolean = true;
   columnEncodings: string[] = [];
+  currentPage:number = 1;
 
   dialogTitle:string = "";
   dialogMessage:string = "";
   errorMessage:string = "";
 
   uploadCompleted:boolean = false;
-  previewCompleted:boolean = true;
 
   metricsArrayToSend: any[] = [];
   
@@ -74,8 +74,7 @@ export class TrainingViewComponent implements OnInit {
   undoDisabled:boolean = true;
   nextButtonDisable:boolean = true;
   backButtonDisable:boolean = true;
-
-  undoDeletedDisabled:boolean = true;
+  modifyChangeButtons:boolean = false;
 
   /* ********************** */
   /* promenljive za kontrolu prikaza (ngIF, typescript, ...) */
@@ -351,7 +350,10 @@ export class TrainingViewComponent implements OnInit {
   changePageView() {
 
   }
-
+  changeModifyButtons(value:boolean)
+  {
+    this.modifyChangeButtons = value;
+  }
   confirmationCancel()
   {
     this.confirmation = false;
@@ -362,6 +364,7 @@ export class TrainingViewComponent implements OnInit {
   }
 
   modalOpen(){
+    this.currentPage = this.dataTable.getCurrentPage();;
     this.modalDisplay = true;
   }
 

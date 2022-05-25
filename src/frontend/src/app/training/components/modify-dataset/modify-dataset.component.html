@@ -1,23 +1,10 @@
-
-<!--<h1 mat-dialog-title>Modify '{{ title }}' dataset</h1>
-<div mat-dialog-content>
-  <button type="button" class="btn btn-danger" 
-  id="deleteButton">Delete selected</button>&nbsp;
-  <button type="button" class="btn btn-secondary" 
-  id="undoButton">Undo</button>&nbsp;
-  <button id="updateMainTable" type="button" class="btn btn-primary">Apply Changes</button>&nbsp;
-  <app-show-table #modifyTable></app-show-table>
-</div>
-<div mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close [mat-dialog-close]="true">Cancel</button>
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Modify</button>
-</div>
--->
 <div style="text-align: center;">
   <button type="button" class="btn btn-danger" 
   id="deleteButton" (click)="onRemoveSelected()">Delete selected</button>&nbsp;
   <button type="button" class="btn btn-secondary" 
   id="undoButton" (click)="onUndo()" [disabled]="undoDisabled">Undo</button>&nbsp;
-</div>  <br>
+</div>
+<span style="color: red;text-align: center;">{{errorMessage}}</span> 
+<br>
 <app-show-table #modifyTable 
-(undoEvent)="enableUndo($event)"></app-show-table>
+(undoEvent)="enableUndo($event)" (errorEvent)="showErrorMessage($event)" [currentPage]="currentPage"></app-show-table>

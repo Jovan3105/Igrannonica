@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CsvExportParams, } from 'ag-grid-community';
 import { SessionService } from 'src/app/core/services/session.service';
 import { Check, EditedCell, HeaderDict, TableIndicator, UndoData, undoType } from '../../models/table_models';
@@ -25,9 +25,10 @@ export class ShowTableComponent implements OnInit {
   deletedCols:number[];
   undoData : UndoData[] = [];
   
+  @Input() currentPage:number = 0;
   @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
   @Output() undoEvent; //event koji se dize kada treba dis/enable undo dugme
-  @Output() deleteEvent; //event koji se dize kada treba dis/enable undo deleted dugme
+  @Output() errorEvent; //event koji se dize kada se unese pogresan tip(npr string za int)
 
   columnDefs: ColDef[];
   rowData: any;
@@ -64,7 +65,7 @@ export class ShowTableComponent implements OnInit {
     this.editedCells = [];
     this.hideEvent = new EventEmitter<Check>();
     this.undoEvent = new EventEmitter<boolean>();
-    this.deleteEvent = new EventEmitter<boolean>();
+    this.errorEvent = new EventEmitter<boolean>();
   }
 
   ngOnInit(): void 
@@ -74,6 +75,12 @@ export class ShowTableComponent implements OnInit {
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.columnApi = params.columnApi;
+    if (this.currentPage != 0 || (this.currentPage == 0 && this.getCurrentPage() != 0)) this.setCurrentPage(this.currentPage);
+  }
+  isReady()
+  {
+    if (this.gridApi) return true;
+    return false;
   }
 
   prepareTable(indicator:TableIndicator, data: any, headers: Array<HeaderDict>) {
@@ -103,7 +110,7 @@ export class ShowTableComponent implements OnInit {
 
   onCellValueChanged(params:CellValueChangedEvent)
   {
-    console.log(params);
+    //console.log(params);
     var editedCellIndex; 
     var row = params.rowIndex!;
     var colId = parseInt(params.column.getColId());
@@ -112,6 +119,7 @@ export class ShowTableComponent implements OnInit {
     //console.log(newValue);
     if (newValue !== undefined)
     {
+      this.errorEvent.emit(false);
       //console.log(newValue);
       this.addUndoElement(new UndoData(undoType.EDIT,params));
       if ((editedCellIndex = this.editedCells.findIndex(element => element.col == colId && element.row == row)) != -1) //ukoliko vec postoji u objektu
@@ -127,6 +135,9 @@ export class ShowTableComponent implements OnInit {
       }
       else 
         this.editedCells.push(new EditedCell(row,colId,newValue? newValue.toString() : ""));
+    }
+    else{
+      this.errorEvent.emit(true);
     }
     
     //console.log(this.editedCells);
@@ -312,6 +323,15 @@ export class ShowTableComponent implements OnInit {
 
   setPaginationPageSize(paginationPageSize:number){
     this.paginationPageSize = paginationPageSize;
+  }
+
+  getCurrentPage()
+  {
+    return this.gridApi.paginationGetCurrentPage();
+  }
+  setCurrentPage(page:number)
+  {
+    this.gridApi.paginationGoToPage(page);
   }
 
   //Lock-uje kolonu koja je odabrana za label tako da ne moze da se hide-uje iz tabele
