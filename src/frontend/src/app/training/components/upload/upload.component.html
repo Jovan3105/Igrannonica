@@ -37,7 +37,7 @@
                 <h3 class="mb-0" style="text-align: left; color: #212529">Dataset URL</h3>
                 <hr class="mt-0">
                 <input type="text" class="form-control mb-3" (input)="onUrlInputChange($event)" (blur)="onUrlInputChange($event)" (keyup)="onUrlInputChange($event)" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL">
-                <app-dataset-info></app-dataset-info>
+                <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)"></app-dataset-info>
             </div>
         </mat-tab>
         <mat-tab label="Upload">
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                     <div class="col-md-7">
-                        <app-dataset-info [filenameFromParent]="fileName"></app-dataset-info>
+                        <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)" [filenameFromParent]="fileName"></app-dataset-info>
                     </div>
                 </div>
             </div>
