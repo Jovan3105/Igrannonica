@@ -173,10 +173,7 @@ namespace backend.Controllers
                                 message = "bad request",
                                 code = "user_notFound"
                             }
-                            }
-
-
-
+                        }
                     }
                 });
             }

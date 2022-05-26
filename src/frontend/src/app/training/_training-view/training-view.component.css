@@ -65,3 +65,13 @@ h6{
     width: 75%;
     margin:auto;
 }
+::ng-deep .mat-horizontal-stepper-header-container{
+    height: 5rem;
+}
+
+::ng-deep .mat-step-header .mat-step-icon {
+    background-color: #09f;
+    height: 2.5rem;
+    width: 2.5rem;
+    font-size: 1.5rem;
+  }

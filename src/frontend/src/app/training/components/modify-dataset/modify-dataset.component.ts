@@ -1,4 +1,5 @@
-import { AfterViewInit, ChangeDetectorRef, Component, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { HeaderDict, TableIndicator } from '../../models/table_models';
 import { ShowTableComponent } from '../show-table/show-table.component';
 
@@ -13,25 +14,34 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
   @Input() table_data:any;
   @Input() header:HeaderDict[] = [];
   @Input() undoDisabled:boolean = true;
+  @Input() currentPage:number = 0;
+
+  @Output() changeEvent = new EventEmitter<boolean>();
+  errorMessage:string = "";
 
   constructor(private cd: ChangeDetectorRef) 
   {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-
-    this.table_data = changes['table_data'].currentValue;
-    this.header = changes['header'].currentValue;
+    //this.table_data = changes['table_data'].currentValue;
+    //this.header = changes['header'].currentValue;
     this.refreshView();
   }
 
   ngOnInit(): void 
   {
+    this.changeEvent.emit(false);
   }
 
   refreshView()
   {
-    if (this.modifyTable) this.modifyTable.prepareTable(TableIndicator.DATA_MANIPULATION, this.table_data, this.header);
+    if (this.modifyTable) 
+    {
+      this.modifyTable.prepareTable(TableIndicator.DATA_MANIPULATION, this.table_data, this.header);
+      if(this.modifyTable.isReady()) 
+        this.modifyTable.setCurrentPage(this.currentPage);
+    }
   }
 
   ngAfterViewInit() {
@@ -50,10 +60,31 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
 
   enableUndo(indicator:boolean)
   {
-    if (indicator) this.undoDisabled = false;
-    else this.undoDisabled = true;
+    if (indicator) 
+    {
+      this.undoDisabled = false;
+      this.changeEvent.emit(true);
+    }
+    else 
+    {
+      this.undoDisabled = true;
+      this.changeEvent.emit(false);
+    }
   }
+  showErrorMessage(errorIndicatior:boolean)
+  {
+    if(errorIndicatior)
+    {
+      this.errorMessage = "You cannot input categorical value in field for numerical value"; // TODO - razmotriti bolji opis greske
+      setTimeout(() => {
+      this.errorMessage = "";
+      }, 3000); 
+    }
+    else{
+      this.errorMessage = "";
+    }
 
+  }
   getEditedCells()
   {
     return this.modifyTable.editedCells;
@@ -68,6 +99,7 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
   }
   @HostListener('window:beforeunload', ['$event'])
   unloadHandler(event: Event) {
+    if (this.undoDisabled) return true;
     return false;
   }
 }

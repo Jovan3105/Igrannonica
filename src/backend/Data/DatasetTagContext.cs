@@ -11,7 +11,7 @@ namespace backend.Data
 {
     public class DatasetTagContext : DbContext
     {
-
+        /*
 
         public DatasetTagContext(DbContextOptions<DatasetTagContext> options) : base(options)
         {
@@ -38,6 +38,6 @@ namespace backend.Data
 
             base.OnModelCreating(modelBuilder);
 
-        }
+        }*/
     }
 }

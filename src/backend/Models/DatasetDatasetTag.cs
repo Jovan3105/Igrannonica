@@ -1,10 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace backend.Models
 {
     public class DatasetDatasetTag
     {
-        [JsonIgnore]
+        /*[JsonIgnore]
         public int DatasetId { get; set; }
 
         [JsonIgnore]
@@ -13,6 +14,6 @@ namespace backend.Models
         public int DatasetTagId { get; set; }
 
         [JsonIgnore]
-        public DatasetTag DatasetTag {get;set;}
+        public DatasetTag DatasetTag {get;set;}*/
     }
 }

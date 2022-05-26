@@ -33,6 +33,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   encodingDisabledArray: boolean[];
   constantsDisabledArray:boolean[];
   constantsChoosen:Map<number,string>;
+  keep_state:boolean = false;
 
   constructor(public dialog:MatDialog, private sessionService:SessionService) {
 
@@ -81,30 +82,37 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
   }
 
-  onDatasetSelected(columns: Array<HeaderDict>, view: View) 
+  onDatasetSelected(columns: Array<HeaderDict>) 
   {
-    if(view == View.TRAINING)
-      return;
-
-    this.ngOnInit();
-    this.columns = columns;
-    this.sessionService.saveData('columns', JSON.stringify(this.columns));
-    for(let i = 0; i<columns.length; i++) {
-      this.checkboxCheckedArray.push(true);
-      this.constantsDisabledArray.push(true);
-      if(columns[i].type=="int64" || columns[i].type=="float64")
+    if (!this.keep_state)
+    {
+      this.ngOnInit();
+      this.columns = columns;
+      this.sessionService.saveData('columns', JSON.stringify(this.columns));
+      for(let i = 0; i<columns.length; i++) {
+        this.checkboxCheckedArray.push(true);
+        this.constantsDisabledArray.push(true);
+        if(columns[i].type=="int64" || columns[i].type=="float64")
+        {
+          this.encodingDisabledArray.push(true);
+          this.selectedTypes.push("Numerical");
+          this.selectedEncodings.push("None");
+        }
+        else 
+        {
+          this.encodingDisabledArray.push(false);
+          this.selectedTypes.push("Categorical");
+          this.selectedEncodings.push(this.encoding_categorical[0].codename);
+        }
+      };
+    }
+    else{
+      this.keep_state = false;
+      for(let i = 0; i < this.checkboxCheckedArray.length; i++)
       {
-        this.encodingDisabledArray.push(true);
-        this.selectedTypes.push("Numerical");
-        this.selectedEncodings.push("None");
+        if (this.checkboxCheckedArray[i] == false && i != this.targetColumn.key) this.checkEvent.emit(new Check(i, false));
       }
-      else 
-      {
-        this.encodingDisabledArray.push(false);
-        this.selectedTypes.push("Categorical");
-        this.selectedEncodings.push(this.encoding_categorical[0].codename);
-      }
-    };
+    }
 
     this.sessionService.saveData('selected_checkboxes', JSON.stringify(this.checkboxCheckedArray));
   }

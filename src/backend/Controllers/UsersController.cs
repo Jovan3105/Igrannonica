@@ -67,7 +67,6 @@ namespace backend.Controllers
             {
                 return BadRequest();
             }
-           
         }
         
         [Authorize(Roles = "Admin")]

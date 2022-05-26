@@ -14,6 +14,7 @@ import { ColumnFillMethodPair } from '../models/dataset_models';
 import { View, DisplayType } from '../../shared/models/navigation_models';
 import { JwtService } from 'src/app/core/services/jwt.service';
 
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 @Component({
   selector: 'app-training-view',
   templateUrl: './training-view.component.html',
@@ -36,11 +37,15 @@ export class TrainingViewComponent implements OnInit {
   corrMatrixImgSource: any;
   numOfMissingValues:number = 0;
   missingIndicator:boolean = false;
+  linearStepper:boolean = true;
   columnEncodings: string[] = [];
+  currentPage:number = 1;
 
   dialogTitle:string = "";
   dialogMessage:string = "";
   errorMessage:string = "";
+
+  uploadCompleted:boolean = false;
 
   metricsArrayToSend: any[] = [];
   
@@ -53,11 +58,12 @@ export class TrainingViewComponent implements OnInit {
   loaderDisplay:string = DisplayType.HIDE;
   loaderMiniDisplay:string = DisplayType.HIDE;
 
+  stepperDisplay:string =DisplayType.SHOW_AS_BLOCK;
   previewDisplay:string = DisplayType.HIDE;
   trainingDisplay:string = DisplayType.HIDE;
   uploadDisplay:string = DisplayType.SHOW_AS_BLOCK;
 
-  navButtonsDisplay:string = DisplayType.SHOW_AS_BLOCK;
+  navButtonsDisplay:string = DisplayType.HIDE;
 
   mainContainerDisplay:string = DisplayType.SHOW_AS_FLEX;
   mainTableDisplay:string = DisplayType.SHOW_AS_BLOCK;
@@ -72,8 +78,7 @@ export class TrainingViewComponent implements OnInit {
   undoDisabled:boolean = true;
   nextButtonDisable:boolean = true;
   backButtonDisable:boolean = true;
-
-  undoDeletedDisabled:boolean = true;
+  modifyChangeButtons:boolean = false;
 
   /* ********************** */
   /* promenljive za kontrolu prikaza (ngIF, typescript, ...) */
@@ -118,44 +123,52 @@ export class TrainingViewComponent implements OnInit {
       console.log(response)
 
       this.datasetId = response;
+
+      if (this.datasetId != undefined)
+      {
+        this.uploadCompleted = true;
+        this.sessionService.saveData('dataset_id',this.datasetId.toString());
+        this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
+        this.fileName = this.upload.name!;
+        this.sessionService.saveData('file_name',this.fileName);
+      }
+      else
+      {
+        this.showUploadErrorMessage("There was problem while fetching data. Please try again later")
+      }
       /*
       this.sessionService.saveData('file_name',this.upload.fileName!);
       if (this.upload.fileSize != undefined)
         this.sessionService.saveData('file_size',this.upload.fileSize!);
       */
-      this.sessionService.saveData('dataset_id',this.datasetId.toString());
-      this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-      this.fileName = this.upload.fileName!;
-      this.sessionService.saveData('file_name',this.fileName);
     },
     error: (err: Error) => {
       console.log("### error@uploadObserver")
-      console.log(err.message)
+      //console.log(err.message)
       this.showUploadErrorMessage(err.message);
     }
   };
 
   fetchTableDataObserver:any = {
     next: (response:any) => { 
-      if(this.viewIndicator != View.TRAINING)
-        this.showElements();
-
+      this.showElements();
       //console.log(response);
       //this.sessionService.saveData('table_data',JSON.stringify(response));
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
-
-      this.labels.onDatasetSelected(headerDataTable, this.viewIndicator);
-      this.stats.showInfo([response['basicInfo']]);
+      
       this.numOfMissingValues = response['basicInfo']['missing'];
       this.missingIndicator = !this.missingIndicator;
+
+      this.labels.onDatasetSelected(headerDataTable);
+      this.stats.showInfo([response['basicInfo']]);
 
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },
     error: (err: Error) => {
       console.log(err)
-
+      this.showUploadErrorMessage(err.message);
     }
   };
 
@@ -219,32 +232,26 @@ export class TrainingViewComponent implements OnInit {
 
   hideElements()
   {
+    
     if (this.viewIndicator == View.UPLOAD) 
     {
-      this.viewIndicator = View.PREVIEW;
+      //this.viewIndicator = View.PREVIEW;
       //this.sessionService.saveData('view',this.viewIndicator.toString());
-      this.uploadDisplay = DisplayType.HIDE;
-      
     }
-
-    this.previewDisplay = DisplayType.HIDE;
+    this.stepperDisplay = DisplayType.HIDE;
     this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
-
-    //this.labelsDisplay = DisplayType.HIDE;
-    this.navButtonsDisplay = DisplayType.HIDE;
-    this.nextButtonDisable = true;
   }
 
   showElements()
   {
+
     this.loaderDisplay = DisplayType.HIDE;
-    this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
-    
-    if (this.statsTableDisplay == DisplayType.SHOW_AS_BLOCK) this.labelsDisplay = DisplayType.HIDE;
-    else this.labelsDisplay = DisplayType.SHOW_AS_BLOCK;
-    this.navButtonsDisplay = DisplayType.SHOW_AS_BLOCK;
-    this.nextButtonDisable = false;
-    this.backButtonDisable = false;
+    this.stepperDisplay = DisplayType.SHOW_AS_BLOCK;
+    if (this.viewIndicator == View.UPLOAD) 
+    {
+      this.viewIndicator = View.PREVIEW;
+      //this.sessionService.saveData('view',this.viewIndicator.toString());
+    }
   }
 
   showUploadErrorMessage(message:string)
@@ -252,9 +259,9 @@ export class TrainingViewComponent implements OnInit {
     this.errorMessage = message;
     this.loaderDisplay = DisplayType.HIDE;
     this.viewIndicator = View.UPLOAD;
+    this.stepperDisplay = DisplayType.SHOW_AS_BLOCK;
     this.sessionService.saveData('view',this.viewIndicator.toString());
-    this.uploadDisplay = DisplayType.SHOW_AS_BLOCK;
-    this.navButtonsDisplay = DisplayType.SHOW_AS_BLOCK;
+
     this.errorDisplay = true;  
     setTimeout(() => {
       this.errorDisplay = false;
@@ -269,8 +276,11 @@ export class TrainingViewComponent implements OnInit {
 
   onFileSelected(file:File)
   {
+    if (file == undefined) {
+      this.viewIndicator = View.PREVIEW;
+      return;
+    }
     this.hideElements();
-
     if (this.form.get('file')) 
       this.form.delete('file');
     
@@ -280,8 +290,13 @@ export class TrainingViewComponent implements OnInit {
   }
 
   onShowDataClick(datasetURL:string) {
-    this.hideElements();
 
+    if (datasetURL == undefined) {
+      this.viewIndicator = View.PREVIEW;
+      return;
+    }
+
+    this.hideElements();
     if (datasetURL == null || datasetURL == "")
       console.log("problem: dataset-url");
     else {
@@ -324,107 +339,7 @@ export class TrainingViewComponent implements OnInit {
     }
     else if (this.viewIndicator == View.PREVIEW)
     {
-      var choosenInAndOutCols = this.labels.getChoosenCols(); 
-      console.log("choosenInAndOutCols")
-      console.log(choosenInAndOutCols)
-      
-      if (choosenInAndOutCols?.label !== undefined || choosenInAndOutCols!.features.length > 0){
-        if(choosenInAndOutCols!.features.length > 0)
-        {
-          if(choosenInAndOutCols!.label !== undefined)
-          {
-            this.choosenInAndOutCols = choosenInAndOutCols;
 
-            if(this.numOfMissingValues == 0) {
-              this.previewDisplay = DisplayType.HIDE;
-              this.viewIndicator = View.TRAINING;
-              this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
-            }
-            else {
-              let columnFillMethodPairs: ColumnFillMethodPair[] = []
-              
-              choosenInAndOutCols?.features.forEach(col => {
-                let str_value: string = '';
-                let num_value: number = 0;
-
-                if(col.type == 'object')
-                  str_value = col.missingConstant!;
-                else
-                  num_value = +col.missingConstant!;
-
-                let columnFillMethodPair = new ColumnFillMethodPair(col.name, col.missing!, str_value, num_value)
-                columnFillMethodPairs.push(columnFillMethodPair);
-              });
-              
-              let label: ChosenColumn = choosenInAndOutCols?.label!;
-              let str_value: string = '';
-              let num_value: number = 0;
-
-              if(label.type == 'object')
-                str_value = label.missingConstant!;
-              else
-                num_value = +label.missingConstant!;
-
-              let columnFillMethodPair = new ColumnFillMethodPair(label.name, label.missing!, str_value, num_value)
-              columnFillMethodPairs.push(columnFillMethodPair);
-             
-              this.previewDisplay = DisplayType.HIDE;
-              this.viewIndicator = View.TRAINING;
-              this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
-
-              this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
-                next: (response:any) => { 
-                  
-                  this.sessionService.saveData('dataset_id',this.datasetId.toString());
-                  this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-                  
-                  this.fileName = this.upload.fileName!;
-                  this.sessionService.saveData('file_name',this.fileName);
-
-                  this.loaderDisplay = DisplayType.HIDE;
-                  this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
-
-                  this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
-                },
-                error: (err: Error) => {
-                  console.log(err);
-                  this.viewIndicator = View.PREVIEW;
-                  this.loaderDisplay = DisplayType.HIDE;
-                  this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
-                  // TODO error handling kada popunjavanje ne uspe
-                }
-              })
-            }
-          }
-          else
-          {
-            this.dialogTitle = "Alert";
-            this.dialogMessage = "You have to choose a target variable";
-    
-            this.dialog.open(DialogComponent,{
-              data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
-            });
-          }
-        }
-        else
-        {
-          this.dialogTitle = "Alert";
-          this.dialogMessage = "You have to choose at least one feature";
-
-          this.dialog.open(DialogComponent,{
-          data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
-        });
-        }
-      }
-      else
-      {
-        this.dialogTitle = "Alert";
-        this.dialogMessage = "You have to choose at least one feature and a target variable";
-
-        this.dialog.open(DialogComponent,{
-          data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
-        });
-      }
     }
   }
 
@@ -450,7 +365,10 @@ export class TrainingViewComponent implements OnInit {
   changePageView() {
 
   }
-
+  changeModifyButtons(value:boolean)
+  {
+    this.modifyChangeButtons = value;
+  }
   confirmationCancel()
   {
     this.confirmation = false;
@@ -461,6 +379,7 @@ export class TrainingViewComponent implements OnInit {
   }
 
   modalOpen(){
+    this.currentPage = this.dataTable.getCurrentPage();;
     this.modalDisplay = true;
   }
 
@@ -538,5 +457,129 @@ export class TrainingViewComponent implements OnInit {
     {
     }
   }
+  setIndex(event:StepperSelectionEvent)
+  {
+    this.viewIndicator = event.selectedIndex;
+
+    if (event.selectedIndex == View.TRAINING)
+    {
+      var choosenInAndOutCols = this.labels.getChoosenCols(); 
+      console.log("choosenInAndOutCols")
+      console.log(choosenInAndOutCols)
+      
+      if (choosenInAndOutCols?.label !== undefined || choosenInAndOutCols!.features.length > 0)
+      {
+        if(choosenInAndOutCols!.features.length > 0)
+        {
+          if(choosenInAndOutCols!.label !== undefined)
+          {
+            this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
+            this.choosenInAndOutCols = choosenInAndOutCols;
+
+            if(this.numOfMissingValues == 0) {
+              //this.previewDisplay = DisplayType.HIDE;
+              //this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
+            }
+            else {
+              let columnFillMethodPairs: ColumnFillMethodPair[] = []
+              
+              choosenInAndOutCols?.features.forEach(col => {
+                let str_value: string = '';
+                let num_value: number = 0;
+
+                if(col.type == 'object')
+                  str_value = col.missingConstant!;
+                else
+                  num_value = +col.missingConstant!;
+
+                let columnFillMethodPair = new ColumnFillMethodPair(col.name, col.missing!, str_value, num_value)
+                columnFillMethodPairs.push(columnFillMethodPair);
+              });
+              
+              if(choosenInAndOutCols?.label) {
+                let label: ChosenColumn = choosenInAndOutCols?.label;
+                let str_value: string = '';
+                let num_value: number = 0;
+
+                if(label.type == 'object')
+                  str_value = label.missingConstant!;
+                else
+                  num_value = +label.missingConstant!;
+
+                let columnFillMethodPair = new ColumnFillMethodPair(label.name, label.missing!, str_value, num_value)
+                columnFillMethodPairs.push(columnFillMethodPair);
+              }
+
+              this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
+                next: (response:any) => { 
+                  console.log("Fill missing value: ", response)
+                  this.viewIndicator = View.TRAINING;
+                  this.labels.keep_state = true;
+                  this.sessionService.saveData('dataset_id',this.datasetId.toString());
+                  this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
+                  this.fileName = this.upload.fileName!;
+                  this.sessionService.saveData('file_name',this.fileName);
+                  this.previewDisplay = DisplayType.HIDE;
+                  this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
+
+                  this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
+                },
+                error: (err: Error) => {
+                  console.log(err);
+                  // TODO error handling kada popunjavanje ne uspe
+                }
+              })
+            }
+          }
+          else
+          {
+            this.dialogTitle = "Alert";
+            this.dialogMessage = "You have to choose a target variable";
+    
+            const dialogRef = this.dialog.open(DialogComponent,{
+              data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
+            });
+            dialogRef.afterClosed().subscribe(result => {
+              this.setView(View.PREVIEW);
+              console.log(this.viewIndicator);
+            });
+            
+          }
+        }
+        else
+        {
+          this.dialogTitle = "Alert";
+          this.dialogMessage = "You have to choose at least one feature";
+
+          const dialogRef = this.dialog.open(DialogComponent,{
+            data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
+          });
+          dialogRef.afterClosed().subscribe(result => {
+            this.setView(View.PREVIEW);
+          });
+        }
+      }
+      else
+      {
+        this.dialogTitle = "Alert";
+        this.dialogMessage = "You have to choose at least one feature and a target variable";
+
+        const dialogRef = this.dialog.open(DialogComponent,{
+          data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
+        });
+        dialogRef.afterClosed().subscribe(result => {
+          this.setView(View.PREVIEW);
+        });
+      }
+    }
+    //this.viewIndicator = index;
+    //this.sessionService.saveData('tab_index',this.tab_index.toString());
+  }
+
+  setView(view:View)
+  {
+    this.viewIndicator = view;
+  }
+
 }
 

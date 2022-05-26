@@ -15,6 +15,6 @@ namespace backend.Models
         public string Name { get; set; }=string.Empty;
         public string FileName { get; set; } = string.Empty;
 
-        public virtual List<DatasetDatasetTag> DatasetDatasetTags {  get; set;}
+        //public virtual List<DatasetDatasetTag> DatasetDatasetTags {  get; set;}
     }
 }

@@ -2,27 +2,28 @@
     <mat-tab-group mat-align-tabs="center" animationDuration="0ms">
         <mat-tab label="Basic Info">
             <div class="tab-container">
-                <h4>Basic Info</h4>
+                <h3>Basic Info</h3>
                 <app-show-table #basicInfo></app-show-table>
             </div>
         </mat-tab>
         <mat-tab label="Numerical Data">
             <div class="tab-container">
-                <h4>Statistical Indicators for Numerical Data</h4>
+                <h3>Statistical Indicators for Numerical Data</h3>
                 <app-show-table #numIndicators></app-show-table>
             </div>
         </mat-tab>
         <mat-tab label="Categorical Data">
             <div  class="tab-container">
-                <h4>Statistical Indicators for Categorical Data</h4>
+                <h3>Statistical Indicators for Categorical Data</h3>
                 <app-show-table #catIndicators></app-show-table>
             </div>
         </mat-tab>
         <mat-tab label="Correlation Matrix">
             <div class="tab-container">
                 <img class="corr-img" [src]="corrMatrixImgSource" (click)="openImage()">
+                <p style="color:gray">Click to see closer</p>
             </div>
-            <div class="preview-img" *ngIf="showImage">
+            <div class="preview-img" *ngIf="showImage" (click)="closeImage()">
                 <button class="close-btn" (click)="closeImage()"><mat-icon>close</mat-icon></button>
                 <div class="corr-full-img" *ngIf="previewImage">
                     <img [src]="corrMatrixImgSource">
