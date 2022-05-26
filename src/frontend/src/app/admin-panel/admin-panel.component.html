@@ -14,7 +14,7 @@
       </div>
       <div class="row">
         <div class="col s12 m6 l4" style="overflow-y: scroll; max-height: 30em;">
-          <div *ngFor="let user of users;">
+          <div *ngFor="let user of users;  let i = index" [attr.data-index]="i">
             <div class="user-list list insert-docs"  *ngIf="user['role']=='User'">
               <div class="list-item">
                 <div class="primary-data trim-overflow">
@@ -48,6 +48,9 @@
   </div>
 
   
+  <div class="mx-auto" id="deleteError" [ngStyle]="{'display': errorDisplay}">
+    <p class="alert alert-danger text-center" role="alert">Error</p>
+  </div>
 </div>
 <div class="modal fade" id="emailDeleteModal" role="dialog" aria-labelledby="emailDeleteModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
