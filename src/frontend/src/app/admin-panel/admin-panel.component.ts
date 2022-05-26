@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UserService } from '../core/services/user.service';
 
@@ -11,6 +11,7 @@ export class AdminPanelComponent implements OnInit {
 
   users!: any;
   userSelectedID: any;
+  @ViewChild('email') email: any;
 
   constructor(private userService: UserService) { }
 
@@ -37,7 +38,7 @@ export class AdminPanelComponent implements OnInit {
         this.userSelectedID = null;
       },
       error: (err: any) => {
-       
+        alert("Error");
       }
     };
 
@@ -46,6 +47,21 @@ export class AdminPanelComponent implements OnInit {
   selectUser(id:number){
     this.userSelectedID = id;
   }
-  
+  deleteUserByEmail(){
+    // var inputValue = (<HTMLInputElement>document.getElementById("email")).value;
+    var inputValue = this.email.nativeElement.value
+    console.log(inputValue)
+    const deleteUserByEmailObserver = {
+      next: (x:any) => {
+        console.log('User deleted by email');
+        window.location.reload(); // srediti bez page reload
+      },
+      error: (err: any) => {
+       alert("Error");
+      }
+    };
+
+    this.userService.deleteUserByEmail(inputValue).subscribe(deleteUserByEmailObserver);
+  }
 
 }

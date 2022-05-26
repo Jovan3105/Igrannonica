@@ -13,10 +13,10 @@
         </div>
       </div>
       <div class="row">
-        <div class="col s12 m6 l4" style="overflow-y: scroll; max-height: 90%;">
-          <div *ngFor="let user of users" >
-            <div class="user-list list insert-docs">
-              <div class="list-item" *ngIf="user">
+        <div class="col s12 m6 l4" style="overflow-y: scroll; max-height: 30em;">
+          <div *ngFor="let user of users;">
+            <div class="user-list list insert-docs"  *ngIf="user['role']=='User'">
+              <div class="list-item">
                 <div class="primary-data trim-overflow">
                   <div class="name">{{user['username']}}</div>
                   <div class="email">{{user['email']}}</div>
@@ -28,19 +28,17 @@
             </div>
           </div>
         </div>
-        <div class="col s12 m6 l4" style="overflow-y: scroll; max-height: 90%;">
-          <div class="user-list list insert-admins">
-            <div class="list-item">
-              <div class="primary-data">
-                <div class="name">Admin1</div>
-                <div class="email">admin1@gmail.com</div>
+        <div class="col s12 m6 l4" style="overflow-y: scroll; max-height: 30em;">
+          <div *ngFor="let user of users">
+            <div class="user-list list insert-docs"  *ngIf="user['role']=='Admin'">
+              <div class="list-item">
+                <div class="primary-data trim-overflow">
+                  <div class="name">{{user['username']}}</div>
+                  <div class="email">{{user['email']}}</div>
+                </div>
               </div>
-              <!-- <div class="secondary-data">
-                <div class="action-icon grey-text"><i class="material-icons">delete</i></div>
-              </div> -->
             </div>
           </div>
-        </div>
       </div>
     </div>
   </div>
@@ -64,13 +62,13 @@
         <form>
           <div class="form-group">
             <label for="recipient-name" class="col-form-label">Email:</label>
-            <input type="email" class="form-control" id="email">
+            <input type="email" class="form-control" id="email" #email placeholder="user@gmail.com">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn red-text" data-bs-dismiss="modal">Delete</button>
+        <button type="button" class="btn red-text" data-bs-dismiss="modal" (click)="deleteUserByEmail()">Delete</button>
       </div>
     </div>
   </div>
