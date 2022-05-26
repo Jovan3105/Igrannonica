@@ -4,7 +4,7 @@ from pydantic import AnyHttpUrl
 
 from models.models import ModifiedData, ColumnFillMethodPair
 from services.shared_service import read_json_data
-from services.dataprep_service import parse_dataset, get_column_types, get_basic_info, modify_dataset, fill_missing
+from services.dataprep_service import get_missing_values_for_each_column, parse_dataset, get_column_types, get_basic_info, modify_dataset, fill_missing
 
 #################################################################
 
@@ -37,8 +37,9 @@ async def get_parsed_dataset(
 
     parsed_dataset = df.to_dict('records')
     basic_info = get_basic_info(df)
+    missing_for_each_column = get_missing_values_for_each_column(df)
 
-    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info}
+    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info, "missingValues" : missing_for_each_column }
 
 # # #
 
@@ -66,8 +67,9 @@ async def parse_dataset_file(
 
     parsed_dataset = df.to_dict('records')
     basic_info = get_basic_info(df)
+    missing_for_each_column = get_missing_values_for_each_column(df)
 
-    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info}
+    return {'parsedDataset' : parsed_dataset, "columnTypes" : column_types, "basicInfo" : basic_info, "missingValues" : missing_for_each_column}
 
 # # #
 

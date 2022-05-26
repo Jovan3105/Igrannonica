@@ -157,6 +157,7 @@ export class TrainingViewComponent implements OnInit {
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
+      this.stats.showMissingValues([response['missingValues']]);
 
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);

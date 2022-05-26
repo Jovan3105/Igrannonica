@@ -75,6 +75,15 @@ def get_basic_info(df):
 
 # # #
 
+def get_missing_values_for_each_column(df):
+    missing = {}
+    for column in df.columns:
+        missing[column] = int(df[column].isna().sum())
+    
+    return missing
+
+# # #
+
 def get_column_types(df):
     return [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
 

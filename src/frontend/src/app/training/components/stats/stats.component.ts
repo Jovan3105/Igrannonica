@@ -15,6 +15,8 @@ export class StatsComponent implements OnInit {
   @ViewChild('numIndicators') private numIndicators!: ShowTableComponent;
   @ViewChild('catIndicators') private catIndicators!: ShowTableComponent;
   @ViewChild('basicInfo') private basicInfo!:ShowTableComponent;
+  @ViewChild('missingValues') private missingValues!:ShowTableComponent;
+
   corrMatrixImgSource: any;
   showImage:boolean = false;
   previewImage:boolean = false;
@@ -43,11 +45,19 @@ export class StatsComponent implements OnInit {
   }
   showInfo(response:any)
   {
-    console.log(response);
+    //console.log(response);
     this.basicInfo.setPaginationEnabled(false);
     this.basicInfo.setTableStyle("height: 100px;");
     var headerInfo = this.headersService.getInfoStatsHeader(response);
     this.basicInfo.prepareTable(TableIndicator.INFO, response, headerInfo) 
+  }
+  showMissingValues(response:any)
+  {
+    //console.log(response);
+    this.missingValues.setPaginationEnabled(false);
+    this.missingValues.setTableStyle("height: 100px;");
+    var headerMissing = this.headersService.getInfoStatsHeader(response);
+    this.missingValues.prepareTable(TableIndicator.INFO, response, headerMissing) 
   }
   openImage()
   {
