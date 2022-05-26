@@ -112,6 +112,7 @@ def modify_dataset(dataset, data:ModifiedData):
 
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije
     dataset['basicInfo'] = get_basic_info(df)
+    dataset['missingValues'] = get_missing_values_for_each_column(df)
 
     return dataset
 
