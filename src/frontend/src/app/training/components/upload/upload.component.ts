@@ -16,6 +16,8 @@ export class UploadComponent implements OnInit {
   fileName?:string;
   linkName:string = "";
   name:string = "";
+  datasetName?:string="";
+  datasetDescription?:string="";
   fileSize?:string;
   datasetURL:string = "";
   isLoggedIn:boolean;
@@ -29,7 +31,7 @@ export class UploadComponent implements OnInit {
   covidURL:string;
   browserURL:string;
   @Output() linkEvent: EventEmitter<string>; //podizanje event-a kada se salje link
-  @Output() uploadEvent: EventEmitter<File>; //podizanje event-a kada se salje file
+  @Output() uploadEvent: EventEmitter<any>; //podizanje event-a kada se salje file
   @Output() datasetSelectedEvent: EventEmitter<{ isSelected: boolean, datasetSource: string }>;
 
   constructor(private authService : AuthService, public sessionService:SessionService) {
@@ -72,6 +74,16 @@ export class UploadComponent implements OnInit {
     }
   }
 
+  updateDatasetName(value:string)
+  {
+    this.datasetName=value;
+  }
+
+  updateDatasetDescription(value:string)
+  {
+    this.datasetDescription=value;
+  }
+
   fileHandler(event:Event)
   {
     const element = event.currentTarget as HTMLInputElement;
@@ -82,6 +94,11 @@ export class UploadComponent implements OnInit {
       this.file = fileList[0];
       this.fileName = this.file.name;
       this.fileSize = this.convertFileSize(this.file.size);
+      let text = this.fileName;
+    text = text!.replace(/\.[^/.]+$/, '');
+    text = text.charAt(0).toUpperCase() + text.slice(1);
+    this.datasetDescription=text;
+    this.datasetName=text;
     }
 
     this.showDragAndDrop = false;
@@ -105,13 +122,24 @@ export class UploadComponent implements OnInit {
 
     this.fileName = file.name;
     this.newFileBool = true;
+    let text = this.fileName;
+    text = text!.replace(/\.[^/.]+$/, '');
+    text = text.charAt(0).toUpperCase() + text.slice(1);
+    this.datasetDescription=text;
+    this.datasetName=text;
   }
 
   uploadClick()
   {
     if (this.newFileBool)
     {
-      this.uploadEvent.emit(this.file);
+      this.uploadEvent.emit({
+        file:this.file,
+        name:this.datasetName,
+        description:this.datasetDescription,
+        public:true
+      });
+
       this.fileName = this.name = this.file?.name!;
       this.newFileBool = false;
       this.newLinkBool = true;
@@ -145,10 +173,12 @@ export class UploadComponent implements OnInit {
 
     this.datasetSelectedEvent.emit({ isSelected: false, datasetSource: "local_upload"});
   }
+  
   onLinkChange()
   {
     this.newLinkBool = true;
   }
+
   setIndex(index:number)
   {
     this.tab_index = index;

@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     <div class="col-md-7">
-                        <app-dataset-info [filenameFromParent]="fileName"></app-dataset-info>
+                        <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)" [filenameFromParent]="fileName"></app-dataset-info>
                     </div>
                 </div>
             </div>

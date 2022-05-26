@@ -274,17 +274,28 @@ export class TrainingViewComponent implements OnInit {
     this.datasetSource = obj.datasetSource;
   }
 
-  onFileSelected(file:File)
+  onFileSelected($event:any)
   {
-    if (file == undefined) {
+    if ($event == undefined) {
       this.viewIndicator = View.PREVIEW;
       return;
     }
     this.hideElements();
+
+    const datasetInfo = JSON.stringify({
+      Name: $event.name,
+      Description: $event.description,
+      Public: $event.public
+    });
+
+    if (this.form.get('data')) 
+      this.form.delete('data');
+    this.form.append("data",datasetInfo);
+
     if (this.form.get('file')) 
       this.form.delete('file');
     
-    this.form.append('file', file);
+    this.form.append('file', $event.file);
 
     this.datasetService.uploadDatasetFile(this.form).subscribe(this.uploadObserver);
   }
