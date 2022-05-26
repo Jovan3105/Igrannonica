@@ -30,6 +30,9 @@ export class UserService {
   deleteUser(id:number): Observable<User>{
     return this.http.delete<any>(this.apiUrl + `/Users/${id}`);
   }
+  deleteUserByEmail(email:string): Observable<User>{
+    return this.http.delete<any>(this.apiUrl + `/Users/email/${email}`);
+  }
 
   private handleError(error:any) {
     let errorMessage = '';

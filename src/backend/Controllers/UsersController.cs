@@ -54,6 +54,7 @@ namespace backend.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpDelete]
+        [Route("{id}")]
         public async Task<ActionResult> deleteUser(int id) // TODO dodati id u path kao userID
         {
             User u = await this.userContext.Users.FindAsync(id);
@@ -72,7 +73,7 @@ namespace backend.Controllers
         
         [Authorize(Roles = "Admin")]
         [HttpDelete]
-        [Route("email")]
+        [Route("email/{email}")]
         public async Task<ActionResult> deleteUserEmail(string email)
         {
             User u = await this.userContext.Users.FirstOrDefaultAsync(x=>x.Email==email);
