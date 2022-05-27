@@ -175,6 +175,7 @@ export class ShowTableComponent implements OnInit {
     }
     else if (indicator == TableIndicator.INFO || indicator == TableIndicator.STATS)
     {
+      this.rowSelection = "none";
       if (indicator == TableIndicator.STATS) //postavi indicator kao prvu kolonu
       {
         const index = this.headers.findIndex((element) => element.name == "indicator");
@@ -188,7 +189,6 @@ export class ShowTableComponent implements OnInit {
           flex: 1,
           field: header.name,
           resizable: true,
-          sortable: true,
           minWidth: 50,
           lockPosition:true
         }

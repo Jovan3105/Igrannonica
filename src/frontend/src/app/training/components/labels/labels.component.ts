@@ -254,22 +254,29 @@ export class LabelsComponent implements OnInit, OnChanges {
   {
     this.selectedMissingHandler[index] = selectedFillMethod;
 
-    if (selectedFillMethod == "constant_str")
+    if (selectedFillMethod == "constant_str" || selectedFillMethod == "constant_num" )
     {
       var dialogTitle = "Constant for '" + this.columns![index].name + "' column";
       var dialogMessage = "Add constant you would like to fill missing values with";
       const dialogRef = this.dialog.open(DialogComponent, 
         {
-          data: { title: dialogTitle, message: dialogMessage, input:true }
+          data: { title: dialogTitle, message: dialogMessage, input:true, input_type: selectedFillMethod == "constant_num"? 'num':'str'}
         });
       dialogRef.afterClosed().subscribe(result => {
 
         if (result != undefined){
+
           this.constantsDisabledArray[index] = false;
-          this.constantsChoosen.set(index, result);
+          if (selectedFillMethod == "constant_num")
+          {
+            if(this.columns![index].type == 'int64') result = Math.round(parseFloat(result));
+            else if (this.columns![index].type == 'float64') result = parseFloat(result);
+          }
+          this.constantsChoosen.set(index,result);
+          console.log(this.constantsChoosen);
         }
         else{
-          this.selectedMissingHandler[index] = this.missing_categorical[0].codename;
+          this.selectedMissingHandler[index] = selectedFillMethod == "constant_str"? this.missing_categorical[0].codename : this.missing_numerical[0].codename;
         }
       });
     }
@@ -279,7 +286,10 @@ export class LabelsComponent implements OnInit, OnChanges {
   {
     this.constantsDisabledArray[index] = true;
     this.constantsChoosen.delete(index);
-    this.selectedMissingHandler[index] = this.missing_categorical[0].codename;
+    if (this.selectedTypes[index] = "Numerical")
+      this.selectedMissingHandler[index] = this.missing_numerical[0].codename;
+    else
+      this.selectedMissingHandler[index] = this.missing_categorical[0].codename;
   }
 
   selectAll(){

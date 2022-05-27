@@ -3,8 +3,6 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { DatasetInfoComponent } from '../dataset-info/dataset-info.component';
 import { SessionService } from 'src/app/core/services/session.service';
 
-
-
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',

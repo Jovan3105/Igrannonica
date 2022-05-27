@@ -51,24 +51,22 @@ export class TokenInterceptor implements HttpInterceptor
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
       const refreshToken = this.jwtService.getRefreshToken();
-      if (refreshToken)
-      {
-        return this.authService.refreshToken().pipe(
-          switchMap((data: any) => {
-            //console.log("Refresh token - switch map");
-            //console.log(data);
-            this.isRefreshing = false;
-            this.refreshTokenSubject.next(data.accessToken);
-            return next.handle(this.addToken(request, data.accessToken));
-          }),
-          catchError((err) => {
-            this.isRefreshing = false;
-            console.log(err);
-            this.authService.logout('session_expired');
-            
-            return throwError(() => err);
-          }));
-      }
+      return this.authService.refreshToken().pipe(
+        switchMap((data: any) => {
+          //console.log("Refresh token - switch map");
+          //console.log(data);
+          this.isRefreshing = false;
+          this.refreshTokenSubject.next(data.accessToken);
+          return next.handle(this.addToken(request, data.accessToken));
+        }),
+        catchError((err) => {
+          this.isRefreshing = false;
+          console.log(err);
+          this.authService.logout('session_expired');
+          
+          return throwError(() => err);
+        }));
+      
     } 
     return this.refreshTokenSubject.pipe(
       filter(token => token != null),

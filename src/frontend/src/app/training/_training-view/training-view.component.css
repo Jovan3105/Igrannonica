@@ -65,6 +65,9 @@ h6{
     width: 75%;
     margin:auto;
 }
+.mat-stepper-horizontal{
+    background-color: inherit;
+}
 ::ng-deep .mat-horizontal-stepper-header-container{
     height: 5rem;
 }

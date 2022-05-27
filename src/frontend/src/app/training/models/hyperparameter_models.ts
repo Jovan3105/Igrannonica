@@ -17,6 +17,7 @@ export class Constants{
     static readonly MISSING_HANDLER_NUMERICAL: Hyperparameter[] = [ 
       {name: 'Mean',   codename: 'mean'},
       {name: 'Median', codename: 'median'},
+      {name:'Fill with constant', codename:'constant_num'}
     ];
 
     static readonly MISSING_HANDLER_CATEGORICAL: Hyperparameter[] = [ 

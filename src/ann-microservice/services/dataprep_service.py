@@ -146,7 +146,7 @@ def fill_missing(
             fill_value = df[column_name].mode().iloc[0]
             pass
         elif fill_method == FillMethod.FillWithConstantNum:
-            if 'float' in df[column_name].dtype:
+            if 'float' in str(df[column_name].dtype):
                 fill_value = column_fill_method.num_value
             else:
                 fill_value = int(column_fill_method.num_value)
@@ -161,6 +161,7 @@ def fill_missing(
             
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije   
     dataset['basicInfo'] = get_basic_info(df)
+    dataset['missingValues'] = get_missing_values_for_each_column(df)
 
     return dataset    
             
