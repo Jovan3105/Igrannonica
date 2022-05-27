@@ -37,6 +37,10 @@
                 <h3 class="mb-0" style="text-align: left; color: #212529">Dataset URL</h3>
                 <hr class="mt-0">
                 <input type="text" class="form-control mb-3" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL" (ngModelChange)="onLinkChange()">
+                <div id="error-message" [hidden]="!badLinkErrorDisplay" class="alert alert-danger" role="alert">
+                    {{errorMessage}}
+                </div>
+                <br><br>
                 <app-dataset-info [filenameFromParent]="linkName"></app-dataset-info>
             </div>
             <div class="nextButton">

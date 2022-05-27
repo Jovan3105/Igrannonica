@@ -24,11 +24,7 @@
 <mat-stepper [linear]="linearStepper" [selectedIndex]="viewIndicator" (selectionChange)="setIndex($event)" #stepper [ngStyle]="{'display': stepperDisplay}">
     <mat-step label="Upload" [completed]="uploadCompleted">
         <div>
-            <app-upload #upload (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
-            <div id="error-message" *ngIf="errorDisplay" class="alert alert-danger" role="alert">
-                {{errorMessage}}
-            </div>
-            <br><br>
+            <app-upload #upload [badLinkErrorDisplay]="errorDisplay" [errorMessage]="errorMessage" (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
         </div>
     </mat-step>
     <mat-step label="Data preview and manipulation">

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { DatasetInfoComponent } from '../dataset-info/dataset-info.component';
 import { SessionService } from 'src/app/core/services/session.service';
@@ -20,16 +20,21 @@ export class UploadComponent implements OnInit {
   datasetDescription?:string="";
   fileSize?:string;
   datasetURL:string = "";
+
   isLoggedIn:boolean;
   showDragAndDrop:boolean = true;
   tab_index:number = 0;
   newFileBool:boolean = true;
   newLinkBool:boolean = true;
+
   diamondsURL:string;
   titanicURL:string;
   weightsURL:string;
   covidURL:string;
   browserURL:string;
+  
+  @Input() badLinkErrorDisplay: boolean = false;
+  @Input() errorMessage: string = '';
   @Output() linkEvent: EventEmitter<string>; //podizanje event-a kada se salje link
   @Output() uploadEvent: EventEmitter<any>; //podizanje event-a kada se salje file
   @Output() datasetSelectedEvent: EventEmitter<{ isSelected: boolean, datasetSource: string }>;
