@@ -7,6 +7,7 @@ import websockets
 import urllib, base64
 import pandas as pd
 import matplotlib.pyplot as plt
+from urllib.parse import quote
 
 import config
 
@@ -79,7 +80,14 @@ def figure_to_uri(figure, ext='png'):
 
 def read_json_data(url):
     json_data = None
-    with urllib.request.urlopen(url) as data:
+
+    log(url, "url=")
+
+    encoded_url = quote(url).replace('http%3A', 'http:')
+    
+    log(encoded_url, "encoded_url: ")
+
+    with urllib.request.urlopen(encoded_url) as data:
         json_data = data.read()
 
     return json.loads(json_data)

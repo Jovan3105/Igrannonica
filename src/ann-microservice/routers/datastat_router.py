@@ -1,6 +1,6 @@
 import pandas as pd
 from fastapi import APIRouter
-from pydantic import AnyHttpUrl
+from pydantic import AnyUrl, AnyHttpUrl
 
 from services.datastat_service import get_corr_matrix, get_stat_indicators
 from services.shared_service import read_json_data
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/dataset")
 #################################################################
 
 @router.get("/stat-indicators")
-async def get_statistical_indicators(stored_dataset : AnyHttpUrl):
+async def get_statistical_indicators(stored_dataset : str):
     dataset = read_json_data(stored_dataset)
     df = pd.DataFrame(dataset['parsedDataset'])
 
@@ -22,7 +22,7 @@ async def get_statistical_indicators(stored_dataset : AnyHttpUrl):
 # # #
 
 @router.get("/corr-matrix")
-async def get_correlation_matrix(stored_dataset : AnyHttpUrl):
+async def get_correlation_matrix(stored_dataset : str):
     dataset = read_json_data(stored_dataset)
     df = pd.DataFrame(dataset['parsedDataset'])
 
