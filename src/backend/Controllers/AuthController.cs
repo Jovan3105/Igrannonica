@@ -16,6 +16,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
+
 namespace backend.Controllers
 {
 
@@ -44,92 +45,23 @@ namespace backend.Controllers
         {
             //proveravanje maila
 
-            
-            var response = new
-            {
-                success = false,
-                data = new
-                {
-                    token = "",
-                    errors = new List<object>()
-
-
-
-                }
-            };
-
+            var response = new ResponseBase();
 
             if (!IsValidEmail(user.Email))
             {
-                /*return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "email_notValid"
-                            }
-                            }
-
-
-
-                    }
-                });*/
-                response.data.errors.Add(new
-                {
-                    message = "bad request",
-                    code = "email_notValid"
-                });
+               response.AddError("bad request", "email_notValid");
             }
 
             User userDB = this.userContext.Users.FirstOrDefault(x => x.Username == user.Username);
             if (userDB != null)
             {
-                /*return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "username_AlreadyExists"
-                            }
-                        }
-                    }
-                });*/
-                response.data.errors.Add(new
-                {
-                    message = "bad request",
-                    code = "username_AlreadyExists"
-                });
+                response.AddError("bad request", "username_AlreadyExists");
             }
+
             userDB = this.userContext.Users.FirstOrDefault(x => x.Email == user.Email);
             if (userDB != null)
             {
-                /*return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "email_AlreadyExists"
-                            }
-                        }
-                    }
-                });*/
-                response.data.errors.Add(new
-                {
-                    message = "bad request",
-                    code = "email_AlreadyExists"
-                });
+                response.AddError("bad request", "email_AlreadyExists");
             }
             
             if(response.data.errors.Count>0)
@@ -162,24 +94,7 @@ namespace backend.Controllers
             User user = this.userContext.Users.FirstOrDefault(user => user.Username == request.UsernameOrEmail || user.Email == request.UsernameOrEmail);
             if (user == null)
             {
-
-                return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "user_notFound"
-                            }
-                            }
-
-
-
-                    }
-                });
+                return BadRequest(new ResponseBase().AddError("bad request", "user_notFound"));
             }
             else
             {
@@ -187,29 +102,16 @@ namespace backend.Controllers
                 {
                     if (user.VerifiedEmail == false)
                     {
-                        return BadRequest(new
-                        {
-                            success = false,
-                            data = new
-                            {
-                                token = "",
-                                errors = new[] {
-                                    new {
-                                        message = "bad request",
-                                        code = "email_notVerified"
-                                    }
-                                }
-                            }
-                        });
+                        return BadRequest(new ResponseBase().AddError("bad request", "email_notVerified"));
                     }
                     else
                     {
                         List<Claim> claims = new List<Claim>
                         {
-                            new Claim(ClaimTypes.Name,user.Username),
-                            new Claim(ClaimTypes.Email,user.Email),
-                            new Claim(ClaimTypes.SerialNumber,user.Id.ToString()),
-                            new Claim(ClaimTypes.Role,user.Role),
+                            new Claim(ClaimTypes.Name, user.Username),
+                            new Claim(ClaimTypes.Email, user.Email),
+                            new Claim(ClaimTypes.SerialNumber, user.Id.ToString()),
+                            new Claim(ClaimTypes.Role, user.Role),
                             new Claim("message","Logging in...")
                         };
 
@@ -221,6 +123,7 @@ namespace backend.Controllers
 
                         userContext.Entry(user).State = EntityState.Modified;
                         await userContext.SaveChangesAsync();
+
                         return Ok(new
                         {
                             success = true,
@@ -234,20 +137,7 @@ namespace backend.Controllers
                 }
                 else
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        data = new
-                        {
-                            token = "",
-                            errors = new[] {
-                                new {
-                                    message = "bad request",
-                                    code = "incorrect_password"
-                                }
-                            }
-                        }
-                    });
+                    return BadRequest(new ResponseBase().AddError("bad request", "incorrect_password"));
                 }
             }
         }
@@ -260,23 +150,7 @@ namespace backend.Controllers
             User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
             if(user == null)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "user_notFound"
-                            }
-                            }
-
-
-
-                    }
-                });
+                return BadRequest(new ResponseBase().AddError("bad request", "user_notFound"));
             }
             else
             {
@@ -298,39 +172,12 @@ namespace backend.Controllers
                     }
                     else
                     {
-                        return BadRequest(new
-                        {
-                            success = false,
-                            data = new
-                            {
-                                token = "",
-                                errors = new[] {
-                                new {
-                                    message = "bad request",
-                                    code = "token_emailMismatch"
-                                }
-                            }
-                            }
-                        });
+                        return BadRequest(new ResponseBase().AddError("bad request", "token_emailMismatch"));
                     }
-
                 }
                 else
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        data = new
-                        {
-                            token = "",
-                            errors = new[] {
-                                new {
-                                    message = "bad request",
-                                    code = "token_notValid"
-                                }
-                            }
-                        }
-                    });
+                    return BadRequest(new ResponseBase().AddError("bad request", "token_notValid"));
                 }
             }    
         }
@@ -341,21 +188,7 @@ namespace backend.Controllers
             User user = this.userContext.Users.FirstOrDefault(x => x.Email == email);
             if (user == null)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "email_notExists"
-                            }
-                        }
-
-                    }
-                });
+                return BadRequest(new ResponseBase().AddError("bad request", "email_notExists"));
             }
             else
             {
@@ -427,23 +260,7 @@ namespace backend.Controllers
             User user = this.userContext.Users.FirstOrDefault(user => user.Email == email);
             if (user == null)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    data = new
-                    {
-                        token = "",
-                        errors = new[] {
-                            new {
-                                message = "bad request",
-                                code = "user_notFound"
-                            }
-                            }
-
-
-
-                    }
-                });
+                return BadRequest(new ResponseBase().AddError("bad request", "user_notFound"));
             }
             else
             {
@@ -462,39 +279,13 @@ namespace backend.Controllers
                     }
                     else
                     {
-                        return BadRequest(new
-                        {
-                            success = false,
-                            data = new
-                            {
-                                token = "",
-                                errors = new[] {
-                                new {
-                                    message = "bad request",
-                                    code = "token_emailMismatch"
-                                }
-                            }
-                            }
-                        });
+                        return BadRequest(new ResponseBase().AddError("bad request", "token_emailMismatch"));
                     }
 
                 }
                 else
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        data = new
-                        {
-                            token = "",
-                            errors = new[] {
-                                new {
-                                    message = "bad request",
-                                    code = "token_notValid"
-                                }
-                            }
-                        }
-                    });
+                    return BadRequest(new ResponseBase().AddError("bad request", "token_notValid"));
                 }
             }
         }
@@ -503,7 +294,6 @@ namespace backend.Controllers
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
-            //Console.WriteLine("\n\n\n\n\n\n\n\n\n"+ Request.Headers["Authorization"]);
             if (tokenModel is null)
             {
                 return BadRequest("Invalid client request");
@@ -513,15 +303,14 @@ namespace backend.Controllers
             string? refreshToken = tokenModel.RefreshToken;
 
             var principal = GetPrincipalFromExpiredToken(accessToken);
+
             if (principal == null)
             {
                 return BadRequest("Invalid access token or refresh token");
             }
 
-
             string username = principal.Identity.Name;
             
-
 
             var user = this.userContext.Users.FirstOrDefault(x=>x.Username==username);
 
@@ -535,11 +324,8 @@ namespace backend.Controllers
 
             user.RefreshToken = newRefreshToken;
 
-
-
             userContext.Entry(user).State = EntityState.Modified;
             await userContext.SaveChangesAsync();
-
 
             return new ObjectResult(new
             {
@@ -625,9 +411,9 @@ namespace backend.Controllers
             }
             return true;
         }
+
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
         {
-            Console.WriteLine("\n\n\n\n\n pozvano");
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false,
@@ -645,6 +431,7 @@ namespace backend.Controllers
             return principal;
 
         }
+
         private static string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
@@ -652,7 +439,6 @@ namespace backend.Controllers
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-
 
         private bool IsValidEmail(string email)
         {
