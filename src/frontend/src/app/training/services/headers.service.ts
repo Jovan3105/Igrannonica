@@ -12,10 +12,13 @@ export class HeadersService {
     
     var tempHeader;
     var newHeader = new Array<HeaderDict>();
-    for(let i=0; i<data.length; i++)
+    if (data)
     {
-      tempHeader = Object.getOwnPropertyNames(data[i]);
-      if (tempHeader.length > 0) newHeader.push(new HeaderDict(i,tempHeader[0], data[i][tempHeader[0]]));
+      for(let i=0; i<data.length; i++)
+      {
+        tempHeader = Object.getOwnPropertyNames(data[i]);
+        if (tempHeader.length > 0) newHeader.push(new HeaderDict(i,tempHeader[0], data[i][tempHeader[0]]));
+      }
     }
     /*
     this.types.forEach((element:any) => {
@@ -30,20 +33,20 @@ export class HeadersService {
   {
     var newHeader = new Array<HeaderDict>();
     var temp;
-    //console.log(data);
-    if (!data.length) return newHeader; 
-    
-    temp = Object.getOwnPropertyNames(data[0]);
-  
-    for (let i=0; i<temp.length; i++)
+
+    if (data)
     {
-      newHeader.push(new HeaderDict(i,temp[i]));
+      if (!data.length) return newHeader; 
+    
+      temp = Object.getOwnPropertyNames(data[0]);
+    
+      for (let i=0; i<temp.length; i++)
+      {
+        newHeader.push(new HeaderDict(i,temp[i]));
+      }
     }
 
     return newHeader;
   }
-  getStatsHeader(data:Array<any>)
-  {
 
-  }
 }

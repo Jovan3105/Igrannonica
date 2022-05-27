@@ -17,16 +17,14 @@ def get_stat_indicators(df):
     #columns with numeric values
     continuous = df.select_dtypes(include='number')
 
-    log("continuous:")
-    log(continuous)
+    log(continuous, "continuous: ")
 
     if len(continuous.columns) > 0:
         continuous_stat = continuous.describe().to_dict('records')
     else:
         continuous_stat = []
 
-    log("continuous_stat:")
-    log(continuous_stat)
+    log(continuous_stat, "continuous_stat: ")
 
     #columns with non-numeric values
     categorical = df.select_dtypes(exclude='number')
@@ -36,8 +34,7 @@ def get_stat_indicators(df):
     else:
         categorical_stat = []
     
-    log("categorical_stat:")
-    log(categorical_stat)
+    log(categorical_stat, "categorical_stat: ")
 
     cont_stat_response = []
     cat_stat_response = []
@@ -49,11 +46,13 @@ def get_stat_indicators(df):
         i += 1
 
     log(categorical_stat)
+    
     i = 0
     for stat in categorical_stat:
         row = {"indicator":CAT_INDEXES[i], **stat}
         cat_stat_response += [row]
         i += 1
+
     log(cat_stat_response)
 
     stat_indicators = {}

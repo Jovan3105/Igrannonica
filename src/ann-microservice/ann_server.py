@@ -5,8 +5,6 @@ from fastapi import FastAPI
 
 import config
 from routers import dataprep_router, datastat_router, traning_router
-from services.shared_service import log
-
 
 #################################################################
 

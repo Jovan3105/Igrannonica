@@ -75,6 +75,15 @@ def get_basic_info(df):
 
 # # #
 
+def get_missing_values_for_each_column(df):
+    missing = {}
+    for column in df.columns:
+        missing[column] = int(df[column].isna().sum())
+    
+    return missing
+
+# # #
+
 def get_column_types(df):
     return [ {name : str(dtype) } for name, dtype in df.dtypes.iteritems() ]
 
@@ -103,6 +112,7 @@ def modify_dataset(dataset, data:ModifiedData):
 
     dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije
     dataset['basicInfo'] = get_basic_info(df)
+    dataset['missingValues'] = get_missing_values_for_each_column(df)
 
     return dataset
 

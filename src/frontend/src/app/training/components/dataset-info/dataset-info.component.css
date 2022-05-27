@@ -54,3 +54,8 @@ input:checked + .slider:before {
   -ms-transform: translateX(26px);
   transform: translateX(26px);
 }
+
+h3{
+  font-weight: 500;
+  text-align: center;
+}

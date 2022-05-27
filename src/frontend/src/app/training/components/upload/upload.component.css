@@ -3,10 +3,11 @@ h3
     margin-top: 2%;
     text-align: center;
     color:#38424c;
+    font-weight: 500;
 }
 
 .dataset-container{
-    width: 75%;
+    width: 80%;
     background-color: #e4eae2;
     margin:auto;
     border-radius: 10px;
@@ -47,7 +48,6 @@ h3
     font-size: 1em;
 }
 
-
 #delete-button{
     color:white;
     background-color: #db202f;
@@ -62,9 +62,6 @@ h3
     top: 0;
     left: 0;
     cursor: pointer;
-}
-#dataset-url{
-    border-radius: 10px;
 }
 .link-group{
     text-align: center;

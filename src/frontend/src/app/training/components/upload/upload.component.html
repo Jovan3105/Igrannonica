@@ -34,7 +34,7 @@
         </mat-tab>
         <mat-tab label="Link">
             <div class="mx-auto" style="width: 80%;">
-                <h3 class="mb-0" style="text-align: left; color: #212529">Dataset URL</h3>
+                <h3 class="mb-0" style="color: #212529">Dataset URL</h3>
                 <hr class="mt-0">
                 <input type="text" class="form-control mb-3" [(ngModel)]="datasetURL" name="dataset-url" id="dataset-url" placeholder="Enter dataset URL" (ngModelChange)="onLinkChange()">
                 <div id="error-message" [hidden]="!badLinkErrorDisplay" class="alert alert-danger" role="alert">
