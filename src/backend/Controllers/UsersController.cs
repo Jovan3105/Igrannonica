@@ -33,7 +33,6 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
-            //Byte[] b = System.IO.File.ReadAllBytes("F:\\Desktop\\regresis\\sandbox\\resource\\"+user.Username+".png");
 
             var p = new
             {
@@ -55,7 +54,7 @@ namespace backend.Controllers
         [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("{id}")]
-        public async Task<ActionResult> deleteUser(int id) // TODO dodati id u path kao userID
+        public async Task<ActionResult> deleteUser(int id)
         {
             User u = await this.userContext.Users.FindAsync(id);
             if (u != null)

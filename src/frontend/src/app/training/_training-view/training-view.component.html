@@ -81,7 +81,7 @@
     <div class="modal-dialog modal-lg" style="max-width: 80%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="staticBackdropLabel" style="margin-bottom:0px">Modifying dataset: '{{fileName}}' </h2>
+                <h2 class="modal-title" id="staticBackdropLabel" style="margin-bottom:0px">Modifying dataset: <i>{{fileName}}</i></h2>
                 <button type="button" class="btn-close" *ngIf="modifyChangeButtons" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()" aria-label="Close" id="modal-close"></button>
                 <button type="button" class="btn-close" *ngIf="!modifyChangeButtons" data-bs-dismiss="modal" aria-label="Close" id="modal-close"></button>
             </div>

@@ -6,7 +6,7 @@ import { EmailVerifComponent } from './auth/components/email-verif/email-verif.c
 import { LoginComponent } from './auth/components/login/login.component';
 import { RegisterComponent } from './auth/components/register/register.component';
 import { ResetPasswordComponent } from './auth/components/reset-password/reset-password.component';
-import { AuthGuard } from './core/guards/auth.guard';
+import { AuthGuard, AuthGuardAdmin } from './core/guards/auth.guard';
 import { DashboardGuard } from './core/guards/dashboard.guard';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CatalogComponent } from './datasets/components/catalog/catalog.component';
@@ -20,12 +20,13 @@ const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent},
   { path: 'verifyEmail', component:EmailVerifComponent},
   { path: 'cancelRegistration', component:CancelRegistrationComponent},
-  { path: 'admin-panel', component:AdminPanelComponent},
+  { path: 'admin-panel', component:AdminPanelComponent, canActivate:[AuthGuardAdmin] },
   { path: 'datasets', component:CatalogComponent },
   { path: 'home', component: DashboardComponent },
   { path: 'training', component: TrainingViewComponent, canActivate: [DashboardGuard] },
   { path: 'not-found', component: PageNotFoundComponent},
   { path: '**', redirectTo:'not-found'}
+  
   // Kostur da ako bude bilo potrebe postavimo lazy-loading
   /*
   {

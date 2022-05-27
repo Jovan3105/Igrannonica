@@ -96,14 +96,15 @@ export class UploadComponent implements OnInit {
 
     if (fileList && fileList?.length > 0) {
 
-      this.file = fileList[0];
-      this.fileName = this.file.name;
-      this.fileSize = this.convertFileSize(this.file.size);
-      let text = this.fileName;
-    text = text!.replace(/\.[^/.]+$/, '');
-    text = text.charAt(0).toUpperCase() + text.slice(1);
-    this.datasetDescription=text;
-    this.datasetName=text;
+    this.file = fileList[0];
+    this.fileName = this.name = this.file.name;
+    this.fileSize = this.convertFileSize(this.file.size);
+
+    let fileNameToTitle = this.fileName;
+    fileNameToTitle = fileNameToTitle!.replace(/\.[^/.]+$/, '');
+    fileNameToTitle = fileNameToTitle.charAt(0).toUpperCase() + fileNameToTitle.slice(1);
+    this.datasetDescription = fileNameToTitle;
+    this.datasetName = fileNameToTitle;
     }
 
     this.showDragAndDrop = false;
@@ -121,17 +122,16 @@ export class UploadComponent implements OnInit {
   onFileDropped(file:File)
   {
     this.file = file;
-    this.fileName = this.file.name;
-    this.fileSize = this.convertFileSize(this.file.size);
+    this.fileName = this.name = file.name;
+    this.fileSize = this.convertFileSize(file.size);
     this.showDragAndDrop = false;
-
-    this.fileName = file.name;
     this.newFileBool = true;
-    let text = this.fileName;
-    text = text!.replace(/\.[^/.]+$/, '');
-    text = text.charAt(0).toUpperCase() + text.slice(1);
-    this.datasetDescription=text;
-    this.datasetName=text;
+
+    let fileNameToTitle = this.fileName;
+    fileNameToTitle = fileNameToTitle!.replace(/\.[^/.]+$/, '');
+    fileNameToTitle = fileNameToTitle.charAt(0).toUpperCase() + fileNameToTitle.slice(1);
+    this.datasetDescription = fileNameToTitle;
+    this.datasetName = fileNameToTitle;
   }
 
   uploadClick()
@@ -174,6 +174,7 @@ export class UploadComponent implements OnInit {
     this.clearSessionStorage();
     this.file = undefined;
     this.fileName="";
+    this.name="";
     this.showDragAndDrop = true;
 
     this.datasetSelectedEvent.emit({ isSelected: false, datasetSource: "local_upload"});
@@ -221,7 +222,7 @@ export class UploadComponent implements OnInit {
   publicLinkClick(datasetLink:string)
   {
     this.linkEvent.emit(datasetLink);
-    this.fileName = datasetLink.split("/").pop();
+    this.fileName = this.name = datasetLink.split("/").pop()!;
   }
 
   onUrlInputChange(event:any) {

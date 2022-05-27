@@ -58,6 +58,7 @@ export class AuthService {
       this.router.navigateByUrl('/login', {state:{message:'session_expired'}});
     else this.router.navigateByUrl('/login');
     this.updatemenu.next();
+    // TODO proveriti komentar ispod
     //kada se napravi API za logout
     /*
     return this.http.post<any>(`${this.apiUrl}/auth/logout`, {
@@ -86,12 +87,10 @@ export class AuthService {
     return this.http.post(this.registerUrl, model, options).pipe(
       map((response:any) => {
         if(response.success){
-          
-          var forma = document.getElementById('blok');
-          var uspesnaRegistracijaMessage = document.getElementById('uspesnaRegistracijaMessage')
+          var forma = document.getElementById('blok'); // TODO srediti preko angulara
+          var uspesnaRegistracijaMessage = document.getElementById('uspesnaRegistracijaMessage') // TODO srediti preko angulara
           forma!.style.display = DisplayType.HIDE;
 
-          
           uspesnaRegistracijaMessage!.style.display = "block";
           var hide_button = () => {
             if(uspesnaRegistracijaMessage) {
@@ -100,21 +99,30 @@ export class AuthService {
               //this.doLoginUser(user.username,user.data.token);
               this.router.navigateByUrl('/login');
             }
-            
           }
           setTimeout(hide_button, 3000);
         }
-        
       })
-      
     );
-
   }
-
 
   isLoggedIn() {
     if (this.jwtService.getJwtToken()) return true;
     return false;
+  }
+
+  isAdmin() {
+    let jwt = this.jwtService.getJwtToken();
+    
+    if (!jwt)
+      return false;
+    
+    let decodedJwt = this.jwtService.getDecodedAccessToken();
+
+    if(!decodedJwt)
+      return false;
+
+    return "Admin" == decodedJwt["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] 
   }
 
   refreshToken() {
