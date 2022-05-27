@@ -16,6 +16,9 @@
                 <!-- <li class="nav-item">
                     <a class="nav-link" [routerLink]="['/datasets']" routerLinkActive="active">Datasets</a> TODO vratiti nakon implementacije potrebnih stranica
                 </li> -->
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="['/admin-panel']" routerLinkActive="active" *ngIf="isLoggedIn && isAdmin">Manage users</a>
+                </li>
             </ul>
             <ul class="navbar-nav navbar-right" *ngIf="displayLoginElement">
                 <li class="nav-item">

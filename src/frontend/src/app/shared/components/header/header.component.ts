@@ -13,9 +13,11 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 export class HeaderComponent implements OnInit {
   
-  user:User | undefined;
-  user$:Observable<User> | undefined;
+  user: User | undefined;
+  user$: Observable<User> | undefined;
   displayLoginElement = false;
+  isAdmin: boolean = false;
+  isLoggedIn: boolean = false;
 
   constructor(public service: AuthService, public jwtService : JwtService, public userService: UserService) {}
 
@@ -38,12 +40,13 @@ export class HeaderComponent implements OnInit {
   }
 
   MenuDisplay() {
-    if (this.service.isLoggedIn()) {
-        this.displayLoginElement = false;
-        var decodedToken = this.jwtService.getDecodedAccessToken();
-        var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
-
+    this.isLoggedIn = this.service.isLoggedIn();
+    if (this.isLoggedIn) {
+      this.displayLoginElement = false;
+      var decodedToken = this.jwtService.getDecodedAccessToken();
+      var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
       this.user$ = this.userService.getUser(id);
+      this.isAdmin = this.service.isAdmin();
 
       /*
       .subscribe({
