@@ -33,7 +33,6 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
-            //Byte[] b = System.IO.File.ReadAllBytes("F:\\Desktop\\regresis\\sandbox\\resource\\"+user.Username+".png");
 
             var p = new
             {

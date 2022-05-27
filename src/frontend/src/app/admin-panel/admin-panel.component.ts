@@ -30,13 +30,11 @@ export class AdminPanelComponent implements OnInit {
     };
 
     this.userService.getUsers().subscribe(getUserObserver);
-    
   }
+
   deleteUser(id:number){
     const deleteUserObserver = {
       next: (x:any) => {
-        console.log('User deleted');
-        //window.location.reload();
         this.users = this.users.filter((item: { id: number; }) => item.id !== id);
         this.userSelectedID = null;
       },
@@ -47,11 +45,12 @@ export class AdminPanelComponent implements OnInit {
 
     this.userService.deleteUser(id).subscribe(deleteUserObserver);
   }
+
   selectUser(id:number){
     this.userSelectedID = id;
   }
+
   deleteUserByEmail(){
-    // var inputValue = (<HTMLInputElement>document.getElementById("email")).value;
     var inputValue = this.email.nativeElement.value
     console.log(inputValue)
     const deleteUserByEmailObserver = {

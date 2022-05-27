@@ -139,6 +139,7 @@ namespace backend.Controllers
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             user.VerifiedEmail = false;
+            user.Role = "Unverified user";
             
             this.userContext.Users.Add(user);
 
@@ -285,8 +286,10 @@ namespace backend.Controllers
                     if(true || user.Email == GetClaim(token, ClaimTypes.Email))
                     {
                         user.VerifiedEmail = true;
+                        user.Role = "User";
                         this.userContext.Update(user);
                         await this.userContext.SaveChangesAsync();
+
                         return Ok(new
                         {
                             success = true,

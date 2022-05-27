@@ -16,6 +16,6 @@ namespace backend.Models
         public string RefreshToken { get; set; }  = string.Empty;
         public DateTime RefreshTokenExpires { get; set; }
         public bool VerifiedEmail { get; set; }
-        public string Role { get; set; } = "User";
+        public string Role { get; set; } = "Unverified user";
     }
 }
