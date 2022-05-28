@@ -313,4 +313,4 @@ class CustomCallback(keras.callbacks.Callback):
 
             epoch_report[new_key] = logs[key]
             
-        run_async( send_msg, self.client_conn_id, epoch_report)
+        run_async(send_msg, self.client_conn_id, epoch_report)
