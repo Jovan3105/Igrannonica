@@ -234,7 +234,7 @@ export class TrainingViewComponent implements OnInit {
   hideElements()
   {
     
-    if (this.viewIndicator == View.UPLOAD) 
+    if (this.viewIndicator == View.UPLOAD) // TODO - cuvanje stanja
     {
       //this.viewIndicator = View.PREVIEW;
       //this.sessionService.saveData('view',this.viewIndicator.toString());
@@ -323,16 +323,12 @@ export class TrainingViewComponent implements OnInit {
     {
       event.currentTarget.innerHTML = "Show table";
       this.statsTableDisplay = DisplayType.SHOW_AS_BLOCK;
-      //this.labelsDisplay = DisplayType.HIDE;
-      //this.mainTableDisplay = DisplayType.HIDE;
       this.mainContainerDisplay = DisplayType.HIDE;
     }
     else
     {
       event.currentTarget.innerHTML = "Show stats"
       this.statsTableDisplay = DisplayType.HIDE;
-      //this.labelsDisplay = DisplayType.SHOW_AS_BLOCK;
-      //this.mainTableDisplay = DisplayType.SHOW_AS_BLOCK;
       this.mainContainerDisplay = DisplayType.SHOW_AS_FLEX;
     }
     this.showColumnSelectionPage = !this.showColumnSelectionPage
@@ -499,8 +495,11 @@ export class TrainingViewComponent implements OnInit {
                 let str_value: string = '';
                 let num_value: number = 0;
 
-                if(col.type == 'object')
+                if(col.type == 'Categorical')
+                {
                   str_value = col.missingConstant!;
+                  console.log(col.missingConstant);
+                }
                 else
                   num_value = +col.missingConstant!;
 
@@ -513,7 +512,7 @@ export class TrainingViewComponent implements OnInit {
                 let str_value: string = '';
                 let num_value: number = 0;
 
-                if(label.type == 'object')
+                if(label.type == 'Categorical')
                   str_value = label.missingConstant!;
                 else
                   num_value = +label.missingConstant!;
@@ -521,9 +520,10 @@ export class TrainingViewComponent implements OnInit {
                 let columnFillMethodPair = new ColumnFillMethodPair(label.name, label.missing!, str_value, num_value)
                 columnFillMethodPairs.push(columnFillMethodPair);
               }
-
+              console.log(columnFillMethodPairs);
+              this.hideElements(); 
               this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
-                next: (response:any) => { 
+                next: (response:any) => {
                   console.log("Fill missing value: ", response)
                   this.viewIndicator = View.TRAINING;
                   this.labels.keep_state = true;
@@ -538,6 +538,7 @@ export class TrainingViewComponent implements OnInit {
                 },
                 error: (err: Error) => {
                   console.log(err);
+                  this.showUploadErrorMessage(err.message);
                   // TODO error handling kada popunjavanje ne uspe
                 }
               })

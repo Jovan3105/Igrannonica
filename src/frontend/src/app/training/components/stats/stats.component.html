@@ -1,10 +1,10 @@
 <div class="stats-container">
-    <mat-tab-group mat-align-tabs="center" animationDuration="0ms">
+    <mat-tab-group mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="stats_tab_index" (selectedIndexChange)="setIndex($event)">
         <mat-tab label="Basic Info">
             <div class="tab-container">
                 <h3>Basic Info</h3>
                 <app-show-table #basicInfo></app-show-table>
-                <h3>Missing Values for Each Column</h3>
+                <h3 class="missing-heading">Missing Values for Each Column</h3>
                 <app-show-table #missingValues></app-show-table>
             </div>
         </mat-tab>
@@ -24,14 +24,14 @@
             <div class="tab-container">
                 <img class="corr-img" [src]="corrMatrixImgSource" (click)="openImage()">
                 <p style="color:gray">Click to see closer</p>
-            </div>
-            <div class="preview-img" *ngIf="showImage" (click)="closeImage()">
-                <button class="close-btn" (click)="closeImage()"><mat-icon>close</mat-icon></button>
-                <div class="corr-full-img" *ngIf="previewImage">
-                    <img [src]="corrMatrixImgSource">
+                <div class="preview-img" *ngIf="showImage" (click)="closeImage()">
+                    <button class="close-btn" (click)="closeImage()"><mat-icon>close</mat-icon></button>
+                    <div class="corr-full-img" *ngIf="previewImage">
+                        <img [src]="corrMatrixImgSource">
+                    </div>
                 </div>
             </div>
         </mat-tab>
-      </mat-tab-group>
+    </mat-tab-group>
 </div>
 

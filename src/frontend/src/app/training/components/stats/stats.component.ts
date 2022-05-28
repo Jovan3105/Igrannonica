@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { SessionService } from 'src/app/core/services/session.service';
 import { HeaderDict, TableIndicator } from '../../models/table_models';
 import { HeadersService } from '../../services/headers.service';
 import { ShowTableComponent } from '../show-table/show-table.component';
@@ -20,11 +21,18 @@ export class StatsComponent implements OnInit {
   corrMatrixImgSource: any;
   showImage:boolean = false;
   previewImage:boolean = false;
+  stats_tab_index:number = 0;
 
-  constructor(private headersService:HeadersService, private domSanitizer: DomSanitizer) { }
+  constructor(private headersService:HeadersService, 
+              private domSanitizer: DomSanitizer,
+              private sessionService: SessionService) { }
 
   ngOnInit(): void 
   {
+    if (this.sessionService.getData('stats_tab_index') != null)
+      this.stats_tab_index = parseInt(this.sessionService.getData('stats_tab_index')!);
+    else
+      this.sessionService.saveData('stats_tab_index',this.stats_tab_index.toString());
   }
 
   showTables(response:any)
@@ -68,5 +76,10 @@ export class StatsComponent implements OnInit {
   {
     this.showImage = false;
     this.previewImage = false;
+  }
+  setIndex(index:number)
+  {
+    this.stats_tab_index = index;
+    this.sessionService.saveData('stats_tab_index',this.stats_tab_index.toString());
   }
 }
