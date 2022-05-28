@@ -88,6 +88,12 @@ namespace backend.Controllers
 
             // Procitaj response //
 
+            if (client.Timeout == TimeSpan.FromSeconds(100))
+            {
+                Console.WriteLine("HTTP client: changed timeout from 100s to infinite");
+                client.Timeout = Timeout.InfiniteTimeSpan;
+            }
+
             var response = await client.PostAsJsonAsync(url, requestData);
 
             var responseString = await response.Content.ReadAsStringAsync();
