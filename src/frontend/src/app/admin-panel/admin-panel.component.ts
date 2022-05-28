@@ -20,9 +20,9 @@ export class AdminPanelComponent implements OnInit {
   ngOnInit(): void {
     
     const getUserObserver = {
-      next: (x:any) => {
+      next: (users:any) => {
         console.log('Users get');
-        this.users = x;
+        this.users = users;
       },
       error: (err: any) => {
        

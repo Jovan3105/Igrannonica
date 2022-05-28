@@ -4,7 +4,7 @@
   <input *ngIf="input" [(ngModel)]="input_value" type="text" class="form-control" aria-label="input-text" aria-describedby="basic-addon1">
   <div><p style="color:red" [ngStyle]="{'visibility': warningVisibility}">{{warning}}</p></div>
 </div>
-<div mat-dialog-actions align="end">
+<div mat-dialog-actions align="end"> <!-- zameniti align jer je obsolete -->
   <button mat-button (click)="onCloseClick()">Close</button>
   <button *ngIf="input" mat-button (click)="onAddClick()" cdkFocusInitial>Add</button>
 </div>

@@ -13,8 +13,10 @@ import { SessionService } from 'src/app/core/services/session.service';
 import { ColumnFillMethodPair } from '../models/dataset_models';
 import { View, DisplayType } from '../../shared/models/navigation_models';
 import { JwtService } from 'src/app/core/services/jwt.service';
-
+import { UserService } from 'src/app/core/services/user.service';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { AuthService } from 'src/app/auth/services/auth.service';
+
 @Component({
   selector: 'app-training-view',
   templateUrl: './training-view.component.html',
@@ -27,7 +29,7 @@ export class TrainingViewComponent implements OnInit {
   /* ****************************************************** */
   datasetId:number = -1;
   datasetURL:string = "";
-  userId:number = 0;
+  userId:number = -1;
 
   viewIndicator:View = View.UPLOAD;
   datasetSource: string = '';
@@ -93,7 +95,8 @@ export class TrainingViewComponent implements OnInit {
     private headersService: HeadersService,
     public dialog: MatDialog,
     private jwtService: JwtService,
-    public sessionService:SessionService ) {
+    private sessionService: SessionService,
+    private authService: AuthService ) {
     }
    
   @ViewChild('upload') private upload!:UploadComponent;
@@ -202,7 +205,20 @@ export class TrainingViewComponent implements OnInit {
   ngOnInit(): void 
   {
     var decodedToken = this.jwtService.getDecodedAccessToken();
-    this.userId = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
+
+    if(!decodedToken) {
+      this.authService.logout('session_expired')
+    }
+
+    let userIdTemp = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
+
+    if(!userIdTemp) {
+      this.authService.logout('session_expired')
+    }
+
+    this.userId = userIdTemp;
+
+    this.sessionService.saveData('user_id', this.userId.toString());
     
     let lastVisitedPage =  this.sessionService.getData('view');
 

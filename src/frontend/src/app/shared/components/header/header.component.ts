@@ -19,11 +19,11 @@ export class HeaderComponent implements OnInit {
   isAdmin: boolean = false;
   isLoggedIn: boolean = false;
 
-  constructor(public service: AuthService, public jwtService : JwtService, public userService: UserService) {}
+  constructor(public authService: AuthService, public jwtService : JwtService, public userService: UserService) {}
 
   ngOnInit(): void {
     this.user$ = new Observable<User>();
-    this.service.updatemenu.subscribe(res => {
+    this.authService.updatemenu.subscribe(res => {
       this.MenuDisplay();
     });
 
@@ -40,13 +40,25 @@ export class HeaderComponent implements OnInit {
   }
 
   MenuDisplay() {
-    this.isLoggedIn = this.service.isLoggedIn();
+    this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       this.displayLoginElement = false;
+
       var decodedToken = this.jwtService.getDecodedAccessToken();
-      var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
-      this.user$ = this.userService.getUser(id);
-      this.isAdmin = this.service.isAdmin();
+
+      if(!decodedToken)
+        this.authService.logout('session_expired');
+      else {
+        var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
+  
+        if(!id) {
+          this.authService.logout('session_expired')
+        }
+  
+        this.user$ = this.userService.getUser(id);
+      }
+      
+      this.isAdmin = this.authService.isAdmin();
 
       /*
       .subscribe({
@@ -63,7 +75,7 @@ export class HeaderComponent implements OnInit {
 
   doLogout()
   {
-    this.service.logout();
+    this.authService.logout();
   }
 
 }

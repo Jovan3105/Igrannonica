@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../shared/shared.module';
-
+import { CoreModule } from '../core/core.module';
 
 import { TrainingRoutingModule } from './training-routing.module';
 import { LabelsComponent } from './components/labels/labels.component';
@@ -51,6 +51,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     CommonModule,
     TrainingRoutingModule,
     SharedModule,
+    CoreModule,
     AgGridModule.withComponents([]),
     NgxNumberSpinnerModule,
     MatSelectModule,
