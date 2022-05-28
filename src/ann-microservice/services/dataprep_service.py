@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from pydantic import AnyHttpUrl
+from typing import List
 from starlette.datastructures import UploadFile
 
 from models import models
@@ -120,7 +121,7 @@ def modify_dataset(dataset, data:ModifiedData):
 
 def fill_missing(
     dataset,
-    column_fill_method_pairs : list[ColumnFillMethodPair]
+    column_fill_method_pairs : List[ColumnFillMethodPair]
     ):
 
     df = pd.DataFrame(dataset['parsedDataset'])

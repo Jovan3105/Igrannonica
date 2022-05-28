@@ -1,3 +1,4 @@
+import time #
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Body
 from typing import Optional, List
@@ -38,6 +39,8 @@ async def begin_training(
     optimizer        : Optimizer = Body(Optimizer.Adam),
     learning_rate    : float = Body(0.1)
     ):
+
+    start = time.time()
 
     log(f"Feature list={features};\n Label list={labels};\n Metric list={metrics};\n Layer list: {layers}")
     log(f"Loss function={loss_function};\n Optimizer={optimizer};\n Problem type: {problem_type}")
@@ -116,5 +119,9 @@ async def begin_training(
         cat_cols_set=cat_cols_set,
         client_conn_id=client_conn_id
         )
+
+    end = time.time()
+
+    log("Elapsed time: {:.4f}s".format(end-start))
 
     return { "true-pred" : [f"{left} | {right}" for left,right in zip(true,pred) ] }
