@@ -103,7 +103,7 @@ export class DatasetService {
   }
 
   updateDataset(id: number, data: any): Observable<any[]> {
-    return this.http.put<any>(this.datasetAPIUrl + `/${id}`, data).pipe(
+    return this.http.put<any>(this.datasetAPIUrl + `?id=${id}`, data).pipe(
       tap(_ => console.log(`updated data id=${id}`)),
       catchError(this.handleError)
     );

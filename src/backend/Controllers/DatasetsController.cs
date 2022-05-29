@@ -79,14 +79,20 @@ namespace backend.Controllers
 
         [HttpPut]
         [Route("")]
-        public async Task<ActionResult<string>> updateDataset(int id, Dataset data)
+        public async Task<ActionResult<string>> updateDataset(int id,[FromBody] datasetInfoDto data)
         {
             //var dataset = await this.datasetContext.Datasets.FindAsync(id); // TODO proveriti
-            data.Id = id;
-            datasetContext.Entry(data).State = EntityState.Modified;
+            if (data.Name == "" || data.Description == "")
+                return BadRequest("empty field");
+            Dataset dataset = await this.datasetContext.Datasets.FindAsync(id);
+            dataset.Name = data.Name;
+            dataset.Description = data.Description;
+            dataset.Public = data.Public;
+            //datasetContext.Entry(data).State = EntityState.Modified;
+            this.datasetContext.Datasets.Update(dataset);
             await datasetContext.SaveChangesAsync();
+            return Ok(id);
 
-            return Ok("da");
         }
 
 

@@ -152,6 +152,20 @@ export class TrainingViewComponent implements OnInit {
     }
   };
 
+  changeInfoObserver:any = {
+    next: (response:any) => { 
+      console.log("### next@changeInfoObserver")
+      console.log(response)
+      this.viewIndicator = View.PREVIEW;
+      
+    },
+    error: (err: Error) => {
+      console.log("### error@changeInfoObserver")
+      //console.log(err.message)
+      this.showUploadErrorMessage(err.message);
+    }
+  };
+
   fetchTableDataObserver:any = {
     next: (response:any) => { 
       this.showElements();
@@ -293,17 +307,22 @@ export class TrainingViewComponent implements OnInit {
 
   onFileSelected($event:any)
   {
-    if ($event == undefined) {
-      this.viewIndicator = View.PREVIEW;
-      return;
-    }
-    this.hideElements();
-
     const datasetInfo = JSON.stringify({
       Name: $event.name,
       Description: $event.description,
       Public: $event.public
     });
+    if ($event.file == undefined) {
+      this.viewIndicator = View.PREVIEW;
+      this.datasetService.updateDataset(this.datasetId,{
+        Name: $event.name,
+        Description: $event.description,
+        Public: $event.public
+      }).subscribe(this.changeInfoObserver);
+      return;
+    }
+    this.hideElements();
+
 
     if (this.form.get('data')) 
       this.form.delete('data');
