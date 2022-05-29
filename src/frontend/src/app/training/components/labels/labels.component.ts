@@ -4,7 +4,6 @@ import { Check, ChosenColumn, HeaderDict } from '../../models/table_models';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { SessionService } from 'src/app/core/services/session.service';
-import { View } from 'src/app/shared/models/navigation_models';
 
 @Component({
   selector: 'app-labels',
@@ -23,7 +22,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; previousTargetId: number | null; }>; //podizanje event-a kada se promeni izlaz
   selectedEncodings:string[];
-  selectedTypes:string[];
+  typeArray:string[];
   selectedMissingHandler:string[];
   
   selectAllTrigger: boolean = false;
@@ -43,7 +42,7 @@ export class LabelsComponent implements OnInit, OnChanges {
     this.labelEvent = new EventEmitter<{id:number,previousTargetId:number | null}>();
     this.checkboxCheckedArray = new Array<boolean>();
     this.selectedEncodings = new Array<string>();
-    this.selectedTypes = new Array<string>();
+    this.typeArray = new Array<string>();
     this.encodingDisabledArray = new Array<boolean>();
     this.constantsDisabledArray = new Array<boolean>();
     this.selectedMissingHandler = new Array<string>();
@@ -95,16 +94,16 @@ export class LabelsComponent implements OnInit, OnChanges {
         if(columns[i].type=="int64" || columns[i].type=="float64")
         {
           this.encodingDisabledArray.push(true);
-          this.selectedTypes.push("Numerical");
+          this.typeArray.push("Numerical");
           this.selectedEncodings.push("None");
         }
         else 
         {
           this.encodingDisabledArray.push(false);
-          this.selectedTypes.push("Categorical");
+          this.typeArray.push("Categorical");
           this.selectedEncodings.push(this.encoding_categorical[0].codename);
         }
-      };
+      }
     }
     else{
       this.keep_state = false;
@@ -175,19 +174,19 @@ export class LabelsComponent implements OnInit, OnChanges {
             if(!this.constantsDisabledArray[i])
             {
               features.push(new ChosenColumn(this.columns[i].name,
-                                            this.selectedTypes[i],
+                                            this.typeArray[i],
                                             this.selectedEncodings[i],
                                             this.selectedMissingHandler[i],
                                             this.constantsChoosen.get(i)));
             }
             else 
               features.push(new ChosenColumn(this.columns[i].name,
-                this.selectedTypes[i],
+                this.typeArray[i],
                 this.selectedEncodings[i],
                 this.selectedMissingHandler[i]));
           }
           else 
-            features.push(new ChosenColumn(this.columns[i].name,this.selectedTypes[i],this.selectedEncodings[i]));
+            features.push(new ChosenColumn(this.columns[i].name,this.typeArray[i],this.selectedEncodings[i]));
         }
       
 
@@ -201,18 +200,18 @@ export class LabelsComponent implements OnInit, OnChanges {
           if(!this.constantsDisabledArray[id])
             label = new ChosenColumn(
                 lblName,
-                this.selectedTypes[id],
+                this.typeArray[id],
                 this.selectedEncodings[id],
                 this.selectedMissingHandler[id],
                 this.constantsChoosen.get(id));
           else 
             label = new ChosenColumn(
               lblName,
-              this.selectedTypes[id],
+              this.typeArray[id],
               this.selectedEncodings[id],
               this.selectedMissingHandler[id]);
         }
-        else label = new ChosenColumn(lblName, this.selectedTypes[id], this.selectedEncodings[id]);
+        else label = new ChosenColumn(lblName, this.typeArray[id], this.selectedEncodings[id]);
       }
 
       values = {
@@ -236,14 +235,14 @@ export class LabelsComponent implements OnInit, OnChanges {
   {
     if(type=="Numerical"){
       this.encodingDisabledArray[i] = true;
-      this.selectedTypes[i] = "Numerical";
+      this.typeArray[i] = "Numerical";
       this.selectedEncodings[i] = "None";
       this.selectedMissingHandler[i] = this.missing_numerical[0].codename;
     }
     else
     {
       this.encodingDisabledArray[i] = false;
-      this.selectedTypes[i] = "Categorical";
+      this.typeArray[i] = "Categorical";
       this.selectedEncodings[i] = "OneHot";
       this.selectedMissingHandler[i] = this.missing_categorical[0].codename;
     }
@@ -286,7 +285,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   {
     this.constantsDisabledArray[index] = true;
     this.constantsChoosen.delete(index);
-    if (this.selectedTypes[index] = "Numerical")
+    if (this.typeArray[index] == "Numerical")
       this.selectedMissingHandler[index] = this.missing_numerical[0].codename;
     else
       this.selectedMissingHandler[index] = this.missing_categorical[0].codename;
@@ -316,7 +315,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   {
     this.checkboxCheckedArray.splice(0,this.checkboxCheckedArray.length);
     this.encodingDisabledArray.splice(0,this.encodingDisabledArray.length);
-    this.selectedTypes.splice(0,this.selectedTypes.length);
+    this.typeArray.splice(0,this.typeArray.length);
     this.selectedEncodings.splice(0,this.selectedEncodings.length);
     this.selectedMissingHandler.splice(0,this.selectedMissingHandler.length);
     this.constantsDisabledArray.splice(0,this.constantsDisabledArray.length);

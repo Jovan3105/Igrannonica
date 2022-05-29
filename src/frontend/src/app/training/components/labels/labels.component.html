@@ -16,39 +16,34 @@
   </div>
   <div class="card-body" style="overflow-y: auto;padding:0.5rem" tabindex="0">
     <div class="table-responsive">
-      <table class="table table-hover">
-        <thead>
+      <table class="table table-hover align-middle">
+        <thead class="align-middle">
           <tr>
             <th scope="col">Include</th>
-            <th scope="col">Column Name</th>
-            <th scope="col">Type</th>
+            <th scope="col">Column</th>
             <th scope="col">Encoding</th>
             <th scope="col" *ngIf="showMissingColumn">Fill Missing Values With</th>
           </tr>
         </thead>
         <tbody *ngFor="let column of columns; index as i" style="overflow-y:auto;">
-          <tr>
+          <tr [ngStyle]="(targetColumn && targetColumn.key == column.key) && {'background-color': '#9eaebc4f'}">
             <td>
               <input class="form-check-input" type="checkbox" [value]="column.key" 
               [checked]="checkboxCheckedArray[i]" 
               [disabled]="targetColumn != null && targetColumn.key == i" id="inputCheckbox{{column.key}}" 
-              (change)= "onCheckChange($event)">
+              (change)= "onCheckChange($event)"
+              *ngIf="!targetColumn || ( targetColumn && targetColumn.key != column.key )">
+              <span style="font-size: small;" *ngIf="targetColumn && targetColumn.key == column.key">Output</span>
             </td>
             <td>
               <label class="form-check-label custom-label" for="inputCheckbox{{column.key}}">
                 {{column.name}}
-                <div *ngIf="targetColumn && targetColumn.key == column.key">
-                  <span style="font-size: x-small;">Output</span>
+                <div>
+                  <span style="font-size: x-small;font-style: italic;">{{ typeArray[i] }}</span>
                 </div>
               </label>
             </td>
-            <td>
-              <select class="form-select" #typeSelection aria-label="Default select example" (change)="onTypeChange(typeSelection.value,i)" >
-                <option value="Categorical" [selected]="column.type !='int64' && column.type !='float64'">Categorical</option>
-                <option value="Numerical" [selected]="column.type =='int64' || column.type =='float64'">Numerical</option> 
-              </select>
-            </td>
-            <td> <!-- NAPOMENA: redosled opcija mora da se poklapa sa redosledom u modelima -->
+            <td class="encoding" [ngStyle]="{'width': !showMissingColumn? '40%' : 'auto'}"> <!-- NAPOMENA: redosled opcija mora da se poklapa sa redosledom u modelima -->
               <select [hidden]="targetColumn && targetColumn.key == columns[i].key" class="form-select" #encodingSelection aria-label="Default select example" (change)="onEncodingChange(i,encodingSelection.value)" [disabled]="encodingDisabledArray[i]">
                 <option value="None" [hidden]="!encodingDisabledArray[i]" [selected]="encodingDisabledArray[i]">Not Allowed</option><!-- TODO izmestiti listu encoding-a -->
                 <option value="OneHot" [selected]="!encodingDisabledArray[i]">One Hot</option>
@@ -61,12 +56,12 @@
                 <span style="margin-top: 2.5px;" class="col-10 trim-content">Constant - <b>{{constantsChoosen.get(i)}}</b></span>
                 <span class="col-2"><mat-icon id="close-icon" (click)="deleteConstant(i)">close</mat-icon></span>
               </div>
-              <select class="form-select" [(ngModel)]="selectedMissingHandler[i]"  #missingSelection aria-label="Default select example" *ngIf="typeSelection.value == 'Categorical' && constantsDisabledArray[i]" (change)="onMissingChange(i, missingSelection.value)">
+              <select class="form-select" [(ngModel)]="selectedMissingHandler[i]"  #missingSelection aria-label="Default select example" *ngIf="typeArray[i] == 'Categorical' && constantsDisabledArray[i]" (change)="onMissingChange(i, missingSelection.value)">
                 <option *ngFor="let handler of missing_categorical" [value]="handler.codename">
                   {{handler.name}}
                 </option>
               </select>
-              <select class="form-select" [(ngModel)]="selectedMissingHandler[i]" aria-label="Default select example" #missingNumericalSelection *ngIf="typeSelection.value == 'Numerical' && constantsDisabledArray[i]" (change)="onMissingChange(i, missingNumericalSelection.value)">
+              <select class="form-select" [(ngModel)]="selectedMissingHandler[i]" aria-label="Default select example" #missingNumericalSelection *ngIf="typeArray[i] == 'Numerical' && constantsDisabledArray[i]" (change)="onMissingChange(i, missingNumericalSelection.value)">
                 <option *ngFor="let handler of missing_numerical" [value]="handler.codename">
                   {{handler.name}}
                 </option>
