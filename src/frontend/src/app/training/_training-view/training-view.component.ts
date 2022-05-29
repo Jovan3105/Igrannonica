@@ -16,6 +16,7 @@ import { JwtService } from 'src/app/core/services/jwt.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-training-view',
@@ -53,7 +54,16 @@ export class TrainingViewComponent implements OnInit {
   
   public form: FormData = new FormData();
   public choosenInAndOutCols:any = undefined;
-  
+
+  maxPages = Infinity;
+  minPages = 1;
+  formPages=new FormGroup({
+    currentPage:new FormControl('1',[Validators.required])
+  })
+  maxPagesModiify = Infinity;
+  formPagesModify=new FormGroup({
+    currentPageModify:new FormControl('1',[Validators.required])
+  })
   /* ********************** */
   /* promenljive za display */
   /* ****************************************************** */
@@ -105,6 +115,7 @@ export class TrainingViewComponent implements OnInit {
   @ViewChild('columnsSelecion') private labels!: LabelsComponent;
   @ViewChild('Stats') private stats!:StatsComponent;
   @ViewChild('modifyModal') private modifyModal!:ModifyDatasetComponent;
+  @ViewChild('modifyTable') private modifyTable!:ModifyDatasetComponent;
 
 
   req : any = {
@@ -609,6 +620,26 @@ export class TrainingViewComponent implements OnInit {
   {
     this.viewIndicator = view;
   }
+  public changePage(event: any){
+    if(event>this.maxPages){
+      this.formPages.controls['currentPage'].setValue(this.maxPages);
+    }
+    else if(event<this.minPages){
+      this.formPages.controls['currentPage'].setValue(this.minPages);
+    }
+    this.dataTable.setCurrentPage(this.formPages.get('currentPage')!.value-1)
+    //console.log(this.maxPages+" "+ this.minPages)
+  }
+  // public changePageModify(event: any){
+  //   if(event>this.maxPagesModiify){
+  //     this.formPagesModify.controls['currentPageModify'].setValue(this.maxPagesModiify);
+  //   }
+  //   else if(event<1){
+  //     this.formPagesModify.controls['currentPageModify'].setValue(1);
+  //   }
+  //   this.modifyModal.setCurrentPage(this.formPagesModify.get('currentPageModify')!.value-1)
+  //   //console.log(this.maxPages+" "+ this.minPages)
+  // }
 
 }
 

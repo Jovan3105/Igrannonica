@@ -370,5 +370,8 @@ export class ShowTableComponent implements OnInit {
   downloadFile(){
     this.gridApi.exportDataAsCsv();
   }
+  paginationGetTotalPages(){
+    return this.gridApi.paginationGetTotalPages();
+  }
 }
 
