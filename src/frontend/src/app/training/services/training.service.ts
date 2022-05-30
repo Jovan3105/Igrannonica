@@ -18,7 +18,9 @@ export class TrainingService {
       //observe: 'events'
     }).pipe(
       //tap(_ => console.log(`fetched all data`)),
-      catchError(this.handleError<any>('getDatasets'))
+      // TODO zakomentarisano jer onemogucava ispravan handling u pozivaocu pa nikad ne ide u
+      // error granu observer-a 
+      // catchError(this.handleError<any>('getDatasets')) 
     );
   }
 

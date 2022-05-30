@@ -160,10 +160,12 @@ export class HyperparametersComponent implements OnInit, OnChanges
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver > next:")
       console.log(response)
       
-      this.loaderMiniDisplay = 'none'; // TODO 
+      this.loaderMiniDisplay = DisplayType.HIDE;
+      this.collapse = DisplayType.SHOW_AS_BLOCK;
     },
     error: (err: Error) => {
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
+      this.collapse = DisplayType.SHOW_AS_BLOCK;
       console.log(err)
     }
   };
@@ -215,12 +217,15 @@ export class HyperparametersComponent implements OnInit, OnChanges
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate
     }
+
     let subject = new WebSocket(this.backendSocketUrl);
     console.log(trainingRequestPayload)
     console.log(this.lossFunctionControl)
+
     subject.onopen = function (evt){
       console.log("Socket connection is established");
     }
+
     let _this = this
     
     subject.onmessage = function (evt) {
@@ -230,30 +235,30 @@ export class HyperparametersComponent implements OnInit, OnChanges
       if(dataArr[0] == "ConnID:") {
         connectionID = dataArr[1];
         trainingRequestPayload["ClientConnID"] = connectionID;
+        _this.collapse = DisplayType.HIDE;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
-        _this.collapse=DisplayType.HIDE;
-        _this.epoches_data=[];
-        _this.training_arr=[];
-        _this.val_arr=[];
-        _this.prikaz=DisplayType.SHOW_AS_INLINE_BLOCK;
-        _this.started=true;
+        _this.epoches_data = [];
+        _this.training_arr = [];
+        _this.val_arr = [];
+        _this.prikaz = DisplayType.SHOW_AS_INLINE_BLOCK;
+        _this.started  =true;
       }
       else {
-        // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
         console.log(epoch_stats);
         _this.epoches_data.push(epoch_stats);
         // TODO srediti da se salje samo element a ne ceo niz
-        _this.training_arr=_this.epoches_data.map(a=>a[_this.graph_metric]);
-        _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
-        _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
-        if(_this.training_arr.length==_this.numberOfEpochs)
-        _this.collapse=DisplayType.SHOW_AS_BLOCK;
+        _this.training_arr = _this.epoches_data.map(a=>a[_this.graph_metric]);
+        _this.val_arr = _this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
+        _this.epoches_arr = _this.epoches_data.map(a=> a.epoch);
+
+        if(_this.training_arr.length == _this.numberOfEpochs)
+          _this.collapse = DisplayType.SHOW_AS_BLOCK;
       }
     }
 
-    //  subject.close(); //zatvara socket
+    // TODO proveriti da li je potrebno zatvoriti socket sa: subject.locse()
     subject.onclose = function(evt){
       console.log("Connection is terminated");
     }

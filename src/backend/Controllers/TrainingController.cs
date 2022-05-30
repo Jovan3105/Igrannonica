@@ -31,7 +31,6 @@ namespace backend.Controllers
             _httpContext = httpContext;
         }
 
-
         [HttpPost]
         public async Task<ActionResult<string>> sendS(string algorithm, string epoha)
         {
@@ -66,7 +65,7 @@ namespace backend.Controllers
 
             string datasetURL = DatasetsController.CreateDatasetURL(_configuration, userID, trainingDto.DatasetID, dataset.FileName);
         
-           // Kreiraj zahtev //
+            // Kreiraj zahtev //
 
             var url = _microserviceBaseURL + "/training";
 
@@ -97,8 +96,16 @@ namespace backend.Controllers
             var response = await client.PostAsJsonAsync(url, requestData);
 
             var responseString = await response.Content.ReadAsStringAsync();
-            return Ok(responseString);
-
+            
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                return Ok(responseString);
+            }
+            catch (HttpRequestException)
+            {
+                return responseString;
+            }
         }
     }
 }

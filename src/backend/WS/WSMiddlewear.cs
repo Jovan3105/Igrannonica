@@ -69,11 +69,13 @@ namespace backend.WS
                 handleMessage(result, buffer);
             }
         }
+        
         private async Task SendConnIDAsync(WebSocket socket, string connID)
         {
             var buffer = Encoding.UTF8.GetBytes("ConnID: " + connID);
             await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
         }
+
         private async Task RouteJSONMessageAsync(string message)
         {
 
