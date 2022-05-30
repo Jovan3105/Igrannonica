@@ -13,8 +13,8 @@ import config
 
 #################################################################
 
-BACKEND_WEB_SOCKET_URI = f'ws://{config.BACKEND_BASE_ADDRESS}/ws'
 LOGGER = logging.getLogger('uvicorn.error')
+
 socket_message = {
     "From":"me",
     "To":"you",
@@ -23,21 +23,26 @@ socket_message = {
  
 #################################################################
 
-def log(output, title=''):
+def log(output, title='', use_print=False, prefix=config.PRINT_PREFIX, ignore_env=False):
     '''
     Ispisuje prosledjeni objekat. Ukoliko je instanca stringa na njega dodaje prefiks PRINT_PREFIX i onda sve zajedno ispise, 
     dok u suprotnom samo ispisuje prosledjeni objekat
 
     **Ispis se vrsi samo u development modu**
     '''
+
+    logger = LOGGER.info
     
-    if config.ENVIRONMENT == 'development':
-        LOGGER.info(title)
+    if use_print:
+        logger = print
+
+    if ignore_env or not config.ENVIRONMENT == 'production':
+        logger(title)
         
         if isinstance(output, str):
-            LOGGER.info(config.PRINT_PREFIX + output)
+            logger(prefix + output)
         else:
-            LOGGER.info(output)
+            logger(output)
  
 
 async def send_msg(dest_id, msg):
