@@ -168,3 +168,7 @@ prime/
 stage/
 pip-wheel-metadata/
 .vim/
+
+
+# Test outputs
+tests/test_*

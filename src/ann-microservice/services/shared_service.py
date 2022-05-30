@@ -46,7 +46,7 @@ def log(output, title='', use_print=False, prefix=config.PRINT_PREFIX, ignore_en
  
 
 async def send_msg(dest_id, msg):
-    async with websockets.connect(uri = BACKEND_WEB_SOCKET_URI) as websocket:
+    async with websockets.connect(uri = config.BACKEND_WEB_SOCKET_URI) as websocket:
         socket_message["From"] = await websocket.recv()
         socket_message["To"] = dest_id
         socket_message["Message"] = msg
