@@ -9,6 +9,7 @@ import { of, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { JwtService } from 'src/app/core/services/jwt.service';
 import { DisplayType } from 'src/app/shared/models/navigation_models';
+import { SessionService } from 'src/app/core/services/session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,7 @@ export class AuthService {
   cancelRegistrationUrl = environment.apiUrl + "/Auth/cancelRegistration";
   sendVerificationEmailUrl = environment.apiUrl + "/Auth/sendVerificationEmail";
 
-  constructor(private http: HttpClient, private router: Router, private jwtService: JwtService) { }
+  constructor(private http: HttpClient, private router: Router, private jwtService: JwtService, private sessionService:SessionService) { }
 
   private _updatemenu = new Subject<void>();
   get updatemenu() {
@@ -54,6 +55,7 @@ export class AuthService {
 
   logout(message:string='') {
     this.jwtService.removeTokens();
+    this.sessionService.clearData();
     if (message == "session_expired")
       this.router.navigateByUrl('/login', {state:{message:'session_expired'}});
     else this.router.navigateByUrl('/login');
