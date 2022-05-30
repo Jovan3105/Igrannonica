@@ -25,7 +25,6 @@ export class DatasetInfoComponent implements OnInit {
 
   changeDescription(event:any)
   {
-    console.log(event);
     this.changeDescriptionEvent.emit(event.value);
   }
 
