@@ -148,7 +148,12 @@ export class UploadComponent implements OnInit {
       this.newLinkBool = true;
     }
     else{
-      this.uploadEvent.emit(undefined);
+      this.uploadEvent.emit({
+        file:undefined,
+        name:this.datasetName,
+        description:this.datasetDescription,
+        public:true
+      });
     }
   }
   
