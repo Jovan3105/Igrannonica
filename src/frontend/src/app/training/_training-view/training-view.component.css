@@ -1,4 +1,4 @@
-#buttons,#mainTable,#labelCards{
+#buttons,#mainTable,#labelCards,#mainContainer{
     animation: fadein 3s;
 }
 @keyframes fadein {
@@ -8,9 +8,9 @@
 #circle {
     position: relative;
     top: 200px;
-    left: 30px;
+    /* left: 30px; */
     margin: 0 auto;
-    transform: translate(-50%,-50%);
+    /* transform: translate(-50%,-50%); */
 	width: 150px;
     height: 150px;	
 }

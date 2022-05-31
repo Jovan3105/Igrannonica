@@ -49,10 +49,12 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
 
     this.cd.detectChanges();
   }
+
   onRemoveSelected()
   {
     this.modifyTable.onRemoveSelected();
   }
+
   onUndo()
   {
     this.modifyTable.onUndo();
@@ -71,6 +73,7 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
       this.changeEvent.emit(false);
     }
   }
+
   showErrorMessage(errorIndicatior:boolean)
   {
     if(errorIndicatior)
@@ -85,21 +88,29 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
     }
 
   }
+
   getEditedCells()
   {
     return this.modifyTable.editedCells;
   }
+
   getDeletedRows()
   {
     return this.modifyTable.deletedRows;
   }
+
   getDeletedCols()
   {
     return this.modifyTable.deletedCols;
   }
+
   @HostListener('window:beforeunload', ['$event'])
   unloadHandler(event: Event) {
     if (this.undoDisabled) return true;
     return false;
+  }
+  
+  setCurrentPage(page:number){
+    this.modifyTable.setCurrentPage(page);
   }
 }

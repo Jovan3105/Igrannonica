@@ -246,6 +246,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
       }
       else {
         let epoch_stats = JSON.parse(evt.data)
+        _this.loaderMiniDisplay = DisplayType.HIDE;
         console.log(epoch_stats);
         _this.epoches_data.push(epoch_stats);
         // TODO srediti da se salje samo element a ne ceo niz
