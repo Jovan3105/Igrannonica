@@ -369,6 +369,7 @@ export class TrainingViewComponent implements OnInit {
     }
 
     this.hideElements();
+    
     if ($dataset.link == null || $dataset.link == "")
       console.log("problem: dataset-url");
     else {
