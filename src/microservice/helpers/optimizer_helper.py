@@ -18,6 +18,7 @@ def map_optimizer(optimizer_key, learning_rate):
     optimizer_switcher = {
         Optimizer.Adam     : tf.optimizers.Adam(learning_rate=learning_rate),
         Optimizer.Adadelta : tf.optimizers.Adadelta(learning_rate=learning_rate),
+        Optimizer.Adagrad  : tf.optimizers.Adagrad(learning_rate=learning_rate),
         Optimizer.Adamax   : tf.optimizers.Adamax(learning_rate=learning_rate),
         Optimizer.Ftrl     : tf.optimizers.Ftrl(learning_rate=learning_rate),
         Optimizer.Nadam    : tf.optimizers.Nadam(learning_rate=learning_rate),

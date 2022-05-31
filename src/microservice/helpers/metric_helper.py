@@ -25,7 +25,7 @@ class Metric(str, Enum):
     #MeanTensor
     #OneHotIoU
     #OneHotMeanIoU
-    Poisson                       = "poisson"
+    #Poisson                       = "poisson"
     Precision                     = "precision"
     #PrecisionAtRecall             = "PrecisionAtRecall" required recall
     Recall                        = "recall"
@@ -68,7 +68,7 @@ def map_metrics(metrics):
         #Metric.MeanTensor
         #Metric.OneHotIoU
         #Metric.OneHotMeanIoU
-        Metric.Poisson                       : tf.keras.metrics.Poisson(),
+        #Metric.Poisson                       : tf.keras.metrics.Poisson(),
         Metric.Precision                     : tf.keras.metrics.Precision(),
         #Metric.PrecisionAtRecall             : tf.keras.metrics.PrecisionAtRecall(),
         Metric.Recall                        : tf.keras.metrics.Recall(),

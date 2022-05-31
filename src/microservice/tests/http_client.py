@@ -27,12 +27,16 @@ activation_funcs = [
 
 loss_funcs = [ 
     "BinaryCrossentropy", "BinaryFocalCrossentropy", "CategoricalCrossentropy", "CategoricalHinge", "CosineSimilarity", "Hinge", "Huber",
-    "KLDivergence", "MeanAbsoluteError", "MeanAbsolutePercentageError", "MeanSquaredError", "MeanSquaredLogarithmicError", "Poisson", "SquaredHinge"
+    "KLDivergence", "MeanAbsoluteError", "MeanAbsolutePercentageError", "MeanSquaredError", "MeanSquaredLogarithmicError", 
+    #"Poisson", 
+    "SquaredHinge"
      ]
 
 regression_metrics = [
     "logcosh", "mean_absolute_error", "mean_absolute_percentage_error", "mean_squared_error", 
-    "mean_squared_logarithmic_error", "poisson", "root_mean_squared_error"
+    "mean_squared_logarithmic_error", 
+    #"poisson", 
+    "root_mean_squared_error"
     ]
 
 classification_metrics = [ 

@@ -14,7 +14,7 @@ class LossFunction(str, Enum):
     MeanAbsolutePercentageError   = "MeanAbsolutePercentageError"
     MeanSquaredError              = "MeanSquaredError"
     MeanSquaredLogarithmicError   = "MeanSquaredLogarithmicError"
-    Poisson                       = "Poisson"
+    #Poisson                       = "Poisson"
     #SparseCategoricalCrossentropy = "SparseCategoricalCrossentropy"
     SquaredHinge                  = "SquaredHinge"
 
@@ -35,7 +35,7 @@ def map_loss_function(loss_func):
         LossFunction.MeanAbsolutePercentageError   : tf.keras.losses.MeanAbsolutePercentageError(),
         LossFunction.MeanSquaredError              : tf.keras.losses.MeanSquaredError(),
         LossFunction.MeanSquaredLogarithmicError   : tf.keras.losses.MeanSquaredLogarithmicError(),
-        LossFunction.Poisson                       : tf.keras.losses.Poisson(),
+        #LossFunction.Poisson                       : tf.keras.losses.Poisson(),
         #LossFunction.SparseCategoricalCrossentropy : tf.keras.losses.SparseCategoricalCrossentropy(),
         LossFunction.SquaredHinge                  : tf.keras.losses.SquaredHinge()
     }
