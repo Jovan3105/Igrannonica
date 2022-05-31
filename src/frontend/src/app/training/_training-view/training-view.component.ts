@@ -336,20 +336,25 @@ export class TrainingViewComponent implements OnInit {
     this.datasetService.uploadDatasetFile(this.form).subscribe(this.uploadObserver);
   }
 
-  onShowDataClick(datasetURL:string) {
+  onShowDataClick($dataset:any) {
 
-    if (datasetURL == undefined) {
+    if ($dataset.link == undefined) {
       this.viewIndicator = View.PREVIEW;
+      this.datasetService.updateDataset(this.datasetId,{
+        Name: $dataset.name,
+        Description: $dataset.description,
+        Public: $dataset.public
+      }).subscribe(this.changeInfoObserver);
       return;
     }
 
     this.hideElements();
-    if (datasetURL == null || datasetURL == "")
+    if ($dataset.link == null || $dataset.link == "")
       console.log("problem: dataset-url");
     else {
-      this.req["datasetSource"] = datasetURL
-      this.sessionService.saveData('upload_link', datasetURL);
-      this.datasetService.uploadDatasetFileWithLink(datasetURL).subscribe(this.uploadObserver);
+      this.req["datasetSource"] = $dataset.link
+      this.sessionService.saveData('upload_link', $dataset.link);
+      this.datasetService.uploadDatasetFileWithLink($dataset).subscribe(this.uploadObserver);
     }
   }
 

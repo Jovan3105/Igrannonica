@@ -12,7 +12,7 @@
         </div>
         <div>
             <label class="switch">
-            <input type="checkbox" id="dataset-visibility">
+            <input type="checkbox" (change)="changePublic($event.target)" id="dataset-visibility">
             <span class="slider round"></span>
           </label>
             <label class="form-check-label ms-2" for="dataset-visibility">Public</label>
