@@ -25,9 +25,13 @@ activation_funcs = [
     "Elu", "Exponential", "GeLu", "HardSigmoid", "Linear", "ReLu", "SeLu", "Sigmoid", "Softmax", "Softplus", "Softsign", "Swish", "Tanh"
      ]
 
-loss_funcs = [ 
+regression_loss_funcs = [
+  "MeanAbsoluteError", "MeanAbsolutePercentageError", "MeanSquaredError", "MeanSquaredLogarithmicError"
+  ] 
+
+classification_loss_funcs = [ 
     "BinaryCrossentropy", "BinaryFocalCrossentropy", "CategoricalCrossentropy", "CategoricalHinge", "CosineSimilarity", "Hinge", "Huber",
-    "KLDivergence", "MeanAbsoluteError", "MeanAbsolutePercentageError", "MeanSquaredError", "MeanSquaredLogarithmicError", 
+    "KLDivergence",  
     #"Poisson", 
     "SquaredHinge"
      ]
@@ -173,8 +177,12 @@ def test_begin_training_api(stored_dataset, label_name, features, problem_type):
     'encoder' : 'None'
   }
 
+  loss_funcs = regression_loss_funcs
+
   if problem_type == 'classification':
     label['encoder'] = 'OneHot'
+    loss_funcs = classification_loss_funcs
+    
 
   for loss_func in loss_funcs:
     for optimizer in optimizers:
@@ -194,14 +202,15 @@ def test_begin_training_api(stored_dataset, label_name, features, problem_type):
 #########################################################################
 
 # diamonds.csv
-dataset = 'http://localhost:7220/Datasets/1/355/titanic.json'
+dataset = 'http://localhost:7220/Datasets/1/355/titanic.json' # TODO umesto hardcoded str staviti input()
 
+ # TODO umesto hardcoded feature-a staviti input() u while-u
 features = [{
   'name'    : 'Age',
   'encoder' : 'None'
 }]
 
-label_name = 'Fare'
+label_name = 'Fare'  # TODO umesto hardcoded str staviti input()
 
 log(f'API URL: {ANN_URL}')
 log(f"Testing 'begin_training' API...", use_print = True)
@@ -215,7 +224,7 @@ def test():
       stored_dataset = dataset,
       label_name = label_name,
       features = features,
-      problem_type = 'regression'
+      problem_type = 'regression' # TODO umesto hardcoded str staviti input()
     )
 
 try:

@@ -16,11 +16,17 @@ from helpers.loss_func_helper import LossFunction
 #################################################################
 
 router = APIRouter(prefix="/training")
+
 REGRESSION_METRICS = [
     Metric.LogCoshError, Metric.MeanAbsoluteError, Metric.MeanAbsolutePercentageError, Metric.MeanSquaredError, 
     Metric.MeanSquaredLogarithmicError, 
     #Metric.Poisson, 
     Metric.RootMeanSquaredError
+    ]
+    
+REGRESSION_LOSS_FUNCS = [
+    LossFunction.MeanAbsoluteError, LossFunction.MeanAbsolutePercentageError, LossFunction.MeanSquaredError, 
+    LossFunction.MeanSquaredLogarithmicError
     ]
 
 #################################################################
@@ -42,11 +48,14 @@ async def begin_training(
     learning_rate    : float = Body(0.1)
     ):
 
-    try:
+    if True:
         start = time.time()
 
         log(f"Feature list={features};\n Label list={labels};\n Metric list={metrics};\n Layer list: {layers}")
         log(f"Loss function={loss_function};\n Optimizer={optimizer};\n Problem type: {problem_type}")
+
+        problem_is_regression = problem_type == ProblemType.REGRESSION
+        problem_is_classification = problem_type == ProblemType.CLASSIFICATION
 
         # Read data #
 
@@ -80,8 +89,6 @@ async def begin_training(
 
         # Validate metric list #
 
-        problem_is_regression = problem_type == ProblemType.REGRESSION
-        problem_is_classification = problem_type == ProblemType.CLASSIFICATION
         invalid_choices = []
 
         for metric in metrics:
@@ -93,7 +100,21 @@ async def begin_training(
 
         if len(invalid_choices) > 0:
             raise HTTPException(status_code=400,
-                detail=f"One or more metric does not match it's problem type (choosen problem type:'{problem_type}'). Invalid metrics:{invalid_choices}")
+                detail=f"One or more metric does not match it's problem type (problem type:'{problem_type}'). Invalid metrics:{invalid_choices}")
+
+         # Validate loss function #
+
+        invalid_choice = False
+
+        if problem_is_regression:
+            if not loss_function in REGRESSION_LOSS_FUNCS:
+                invalid_choice = True
+        elif loss_function in REGRESSION_LOSS_FUNCS:
+            invalid_choice = True
+
+        if invalid_choice:
+            raise HTTPException(status_code=400,
+                detail=f"Loss function '{loss_function}' does not match it's problem type (problem type:'{problem_type}').")        
 
         # Validate layer list #
 
@@ -126,5 +147,3 @@ async def begin_training(
         log("Elapsed time: {:.4f}s".format(end-start))
 
         return { "true-pred" : [f"{left} | {right}" for left,right in zip(true,pred) ] }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Microservice: {e}")
