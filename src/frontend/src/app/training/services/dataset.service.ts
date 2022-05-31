@@ -61,8 +61,8 @@ export class DatasetService {
     );
   }
 
-  uploadDatasetFileWithLink(source: string): Observable<any[]> {
-    return this.http.post<any>(this.datasetAPIUrl + `/uploadWithLink?url=${source}`, null, {
+  uploadDatasetFileWithLink(source: any): Observable<any[]> {
+    return this.http.post<any>(this.datasetAPIUrl + "/uploadWithLink", source, {
       //reportProgress: true,
       //observe: 'events'
       }).pipe(

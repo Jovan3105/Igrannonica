@@ -99,11 +99,11 @@ namespace backend.Controllers
         [Authorize]
         [HttpPost]
         [Route("uploadWithLink")]
-        public async Task<ActionResult<string>> uploadWithLink(String url)
+        public async Task<ActionResult<string>> uploadWithLink(datasetLinkInfoDto datasetDto)
         { // TODO dodati user id u request
             var microserviceURL = _microserviceBaseURL + "/data-preparation/parse";
             var userID = Convert.ToInt32(_httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value);
-
+            string url = datasetDto.Link;
             string responseString = null;
             
             try
@@ -139,6 +139,9 @@ namespace backend.Controllers
 
             dataset.Path = path;
             dataset.FileName = fileName;
+            dataset.Name = datasetDto.Name;
+            dataset.Description = datasetDto.Description;
+            dataset.Public = datasetDto.Public;
             this.datasetContext.Datasets.Update(dataset);
             await this.datasetContext.SaveChangesAsync();
 

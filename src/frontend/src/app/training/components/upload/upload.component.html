@@ -44,7 +44,7 @@
                         {{errorMessage}}
                     </div>
                     <br><br>
-                    <app-dataset-info [filenameFromParent]="linkName"></app-dataset-info>
+                    <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)" (changePublicEvent)="updateDatasetPublic($event)" [filenameFromParent]="linkName"></app-dataset-info>
                 </div>
                 <div class="nextButton">
                     <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
@@ -82,7 +82,7 @@
                             </div>
                         </div>
                         <div class="col-md-7">
-                            <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)" [filenameFromParent]="fileName"></app-dataset-info>
+                            <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)" (changePublicEvent)="updateDatasetPublic($event)" [filenameFromParent]="fileName"></app-dataset-info>
                         </div>
                     </div>
                 </div>

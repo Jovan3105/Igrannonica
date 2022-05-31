@@ -16,6 +16,7 @@ export class UploadComponent implements OnInit {
   name:string = "";
   datasetName?:string="";
   datasetDescription?:string="";
+  isDatasetPublic?:boolean=false;
   fileSize?:string;
   datasetURL:string = "";
 
@@ -33,7 +34,7 @@ export class UploadComponent implements OnInit {
   
   @Input() badLinkErrorDisplay: boolean = false;
   @Input() errorMessage: string = '';
-  @Output() linkEvent: EventEmitter<string>; //podizanje event-a kada se salje link
+  @Output() linkEvent: EventEmitter<any>; //podizanje event-a kada se salje link
   @Output() uploadEvent: EventEmitter<any>; //podizanje event-a kada se salje file
   @Output() datasetSelectedEvent: EventEmitter<{ isSelected: boolean, datasetSource: string }>;
 
@@ -85,6 +86,11 @@ export class UploadComponent implements OnInit {
   updateDatasetDescription(value:string)
   {
     this.datasetDescription=value;
+  }
+
+  updateDatasetPublic(value:boolean)
+  {
+    this.isDatasetPublic=value;
   }
 
   fileHandler(event:Event)
@@ -140,7 +146,7 @@ export class UploadComponent implements OnInit {
         file:this.file,
         name:this.datasetName,
         description:this.datasetDescription,
-        public:true
+        public:this.isDatasetPublic
       });
 
       this.fileName = this.name = this.file?.name!;
@@ -152,7 +158,7 @@ export class UploadComponent implements OnInit {
         file:undefined,
         name:this.datasetName,
         description:this.datasetDescription,
-        public:true
+        public:this.isDatasetPublic
       });
     }
   }
@@ -161,13 +167,23 @@ export class UploadComponent implements OnInit {
   {
     if (this.newLinkBool)
     {
-      this.linkEvent.emit(this.datasetURL);
+      this.linkEvent.emit({
+        link:this.datasetURL,
+        name:this.datasetName,
+        description:this.datasetDescription,
+        public:this.isDatasetPublic
+      });
       this.linkName = this.name = this.datasetURL.split("/").pop()!;
       this.newLinkBool = false;
       this.newFileBool = true;
     }
     else{
-      this.linkEvent.emit(undefined);
+      this.linkEvent.emit({
+        link:undefined,
+        name:this.datasetName,
+        description:this.datasetDescription,
+        public:this.isDatasetPublic
+      });
     }
 
   }
