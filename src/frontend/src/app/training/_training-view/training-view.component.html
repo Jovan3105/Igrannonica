@@ -96,9 +96,8 @@
                 (changeEvent)="changeModifyButtons($event)"></app-modify-dataset>
                 <div class="justify-content-sm-end d-flex align-items-center me-1 my-2">
                     Jump to Page&nbsp;<input matInput type="number" formControlName="currentPageModify" [min]="1"
-                      [max]="maxPagesModiify" >
+                      [max]="maxPagesModiify" (ngModelChange)="changePageModify($event)" >
                 </div>
-                <!-- (ngModelChange)="changePageModify($event)" -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" *ngIf="modifyChangeButtons" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>

@@ -102,4 +102,7 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
     if (this.undoDisabled) return true;
     return false;
   }
+  setCurrentPage(page:number){
+    this.modifyTable.setCurrentPage(page);
+  }
 }
