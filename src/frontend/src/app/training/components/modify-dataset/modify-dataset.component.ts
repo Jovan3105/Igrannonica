@@ -113,4 +113,8 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
   setCurrentPage(page:number){
     this.modifyTable.setCurrentPage(page);
   }
+  
+  getCurrentPage(){
+    return this.modifyTable.getCurrentPage();
+  }
 }

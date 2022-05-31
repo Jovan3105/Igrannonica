@@ -49,7 +49,7 @@
                     </app-show-table><br>
                     <div class="justify-content-sm-end d-flex align-items-center me-1">
                         Jump to page&nbsp;<input matInput type="number" formControlName="currentPage" [min]="minPages"
-                          [max]="maxPages" (ngModelChange)="changePage($event)" (keydown.enter)="changePage($event)>
+                          [max]="maxPages" (ngModelChange)="changePage($event)" (keydown.enter)="changePage($event)">
                     </div>
                 </div>
                 <div class="col-lg-4" style="padding:0em 0.3em;">
@@ -96,12 +96,12 @@
                 (changeEvent)="changeModifyButtons($event)"></app-modify-dataset>
                 <div class="justify-content-sm-end d-flex align-items-center me-1 my-2">
                     Jump to page&nbsp;<input matInput type="number" formControlName="currentPageModify" [min]="1"
-                      [max]="maxPagesModiify" (ngModelChange)="changePageModify($event)" (keydown.enter)="changePageModify($event)">
+                      [max]="maxPagesModiify" (ngModelChange)="changePageModify($event)" (keydown.enter)="changePageModify($event)" >
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" *ngIf="modifyChangeButtons" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>
-                <button type="button" class="btn btn-secondary" *ngIf="!modifyChangeButtons" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" *ngIf="!modifyChangeButtons" data-bs-dismiss="modal" (click)="updateCurrentPageFromModify()">Cancel</button>
                 <button type="button" class="btn btn-primary" *ngIf="modifyChangeButtons" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationSave()">Apply changes</button>
                 <button type="button" class="btn btn-primary" *ngIf="!modifyChangeButtons"  data-bs-dismiss="modal">Apply changes</button>
             </div>

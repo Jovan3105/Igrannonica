@@ -56,11 +56,13 @@ export class TrainingViewComponent implements OnInit {
   public choosenInAndOutCols:any = undefined;
 
   maxPages = Infinity;
+  maxPagesModiify = Infinity;
   minPages = 1;
+  
   formPages=new FormGroup({
     currentPage:new FormControl('1',[Validators.required])
   })
-  maxPagesModiify = Infinity;
+  
   formPagesModify=new FormGroup({
     currentPageModify:new FormControl('1',[Validators.required])
   })
@@ -179,6 +181,13 @@ export class TrainingViewComponent implements OnInit {
 
   fetchTableDataObserver:any = {
     next: (response:any) => { 
+      if(this.currentPage != 1) {
+        this.currentPage = 1;
+        this.formPages.controls['currentPage']!.setValue(1);
+        this.formPagesModify.controls['currentPageModify']!.setValue(1); 
+        this.dataTable.setCurrentPage(0);
+      }
+      
       this.showElements();
       //console.log(response);
       //this.sessionService.saveData('table_data',JSON.stringify(response));
@@ -416,9 +425,6 @@ export class TrainingViewComponent implements OnInit {
     
   }
 
-  changePageView() {
-
-  }
   changeModifyButtons(value:boolean)
   {
     this.modifyChangeButtons = value;
@@ -433,7 +439,7 @@ export class TrainingViewComponent implements OnInit {
   }
 
   modalOpen(){
-    this.currentPage = this.dataTable.getCurrentPage();;
+    this.currentPage = this.dataTable.getCurrentPage();
     this.modalDisplay = true;
   }
 
@@ -448,6 +454,13 @@ export class TrainingViewComponent implements OnInit {
     this.modalDisplay = false;
     this.hideElements();
     var tempEdited: object[] = [];
+
+    let formPagesModifyElement = this.formPagesModify.get('currentPageModify');
+    if(formPagesModifyElement) {
+      this.currentPage = this.modifyModal.getCurrentPage();
+      this.dataTable.setCurrentPage(this.currentPage);
+    }
+      
 
     var req:ModifiedData = new ModifiedData(this.modifyModal.getEditedCells(), this.modifyModal.getDeletedRows(), this.modifyModal.getDeletedCols());
 
@@ -470,8 +483,9 @@ export class TrainingViewComponent implements OnInit {
 
           this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
           this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
-          this.showElements();
 
+          this.showElements();
+          
           //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver); // TODO check
           },
           error:(err: Error) => {
@@ -480,7 +494,6 @@ export class TrainingViewComponent implements OnInit {
           }
       }
     )
-
   }
 
   changeColomnVisibility(checkChange: Check) {
@@ -511,6 +524,7 @@ export class TrainingViewComponent implements OnInit {
     {
     }
   }
+
   setIndex(event:StepperSelectionEvent)
   {
     this.viewIndicator = event.selectedIndex;
@@ -647,8 +661,8 @@ export class TrainingViewComponent implements OnInit {
     else if(event<this.minPages){
       this.formPages.controls['currentPage'].setValue(this.minPages);
     }
-    this.dataTable.setCurrentPage(this.formPages.get('currentPage')!.value-1)
-    //console.log(this.maxPages+" "+ this.minPages)
+
+    this.dataTable.setCurrentPage(this.formPages.get('currentPage')!.value - 1)
   }
 
   public changePageModify(event: any){
@@ -658,8 +672,13 @@ export class TrainingViewComponent implements OnInit {
     else if(event<1){
       this.formPagesModify.controls['currentPageModify'].setValue(1);
     }
+
     this.modifyModal.setCurrentPage(this.formPagesModify.get('currentPageModify')!.value-1)
-    //console.log(this.maxPages+" "+ this.minPages)
+  }
+
+  updateCurrentPageFromModify() {
+    this.currentPage = this.modifyModal.getCurrentPage();
+    this.dataTable.setCurrentPage(this.currentPage);
   }
 }
 
