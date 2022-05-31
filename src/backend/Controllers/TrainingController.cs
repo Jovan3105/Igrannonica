@@ -97,15 +97,10 @@ namespace backend.Controllers
 
             var responseString = await response.Content.ReadAsStringAsync();
             
-            try
-            {
-                response.EnsureSuccessStatusCode();
+            if(response.IsSuccessStatusCode)
                 return Ok(responseString);
-            }
-            catch (HttpRequestException)
-            {
-                return responseString;
-            }
+
+            return BadRequest(responseString);
         }
     }
 }

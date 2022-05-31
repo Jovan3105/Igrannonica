@@ -58,7 +58,7 @@ export class Constants{
       {name: 'Cosine Similarity',              info: 'CosineSimilarity!',            codename: 'CosineSimilarity',            type: 'classification'},
       {name: 'Hinge',                          info: 'Hinge!',                       codename: 'Hinge',                       type: 'classification'},
       {name: 'Huber',                          info: 'Huber!',                       codename: 'Huber',                       type: 'classification'},
-      {name: 'KL Divergence',                  info: 'KLDivergence!',                codename: 'KLDivergence',                type: 'classification'},
+      {name: 'Kullback-Leibler Divergence',    info: 'KLDivergence!',                codename: 'KLDivergence',                type: 'classification'},
       {name: 'Mean Absolute Error',            info: 'MeanAbsoluteError!',           codename: 'MeanAbsoluteError',           type: 'regression'},
       {name: 'Mean Absolute Percentage Error', info: 'MeanAbsolutePercentageError!', codename: 'MeanAbsolutePercentageError', type: 'regression'},
       {name: 'Mean Squared Error',             info: 'MeanSquaredError!',            codename: 'MeanSquaredError',            type: 'regression'},
