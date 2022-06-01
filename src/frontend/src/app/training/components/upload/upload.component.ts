@@ -173,7 +173,7 @@ export class UploadComponent implements OnInit {
         description:this.datasetDescription,
         public:this.isDatasetPublic
       });
-      this.fileName = this.linkName = this.name = this.datasetURL.split("/").pop()!;
+      this.fileName = this.linkName = this.name = this.datasetURL.split("/").pop()!.split(".")[0];
       this.newLinkBool = false;
       this.newFileBool = true;
     }
@@ -241,8 +241,8 @@ export class UploadComponent implements OnInit {
   {
     this.linkEvent.emit({
       link:datasetLink,
-      name:this.datasetName,
-      description:this.datasetDescription,
+      name:this.datasetURL.split("/").pop()!.split(".")[0],
+      description:this.datasetURL.split("/").pop()!.split(".")[0],
       public:false
     });
     this.fileName = this.linkName = this.name = this.datasetURL.split("/").pop()!;
