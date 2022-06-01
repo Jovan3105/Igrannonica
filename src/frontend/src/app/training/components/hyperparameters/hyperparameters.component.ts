@@ -166,6 +166,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
     error: (err: Error) => {
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
       this.collapse = DisplayType.SHOW_AS_BLOCK;
+      this.loaderMiniDisplay = DisplayType.HIDE;
       console.log(err)
     }
   };
