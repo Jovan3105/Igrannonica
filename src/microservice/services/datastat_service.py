@@ -20,45 +20,37 @@ def get_stat_indicators(df):
     log(continuous, "continuous: ")
 
     if len(continuous.columns) > 0:
-        continuous_stat = continuous.describe().to_dict('records')
-    else:
-        continuous_stat = []
+        continuous_described = continuous.describe().T.to_dict('split')
 
-    log(continuous_stat, "continuous_stat: ")
+        continuous_described['columns'][0] = 'Available value count'
+        continuous_described['columns'][2] = 'Standard deviation'
+        continuous_described['columns'][4] = '25th percentile'
+        continuous_described['columns'][5] = 'Median'
+        continuous_described['columns'][6] = '75th percentile'
+        
+    else:
+        continuous_described = []
+
+    log(continuous_described, "continuous_described: ")
 
     #columns with non-numeric values
     categorical = df.select_dtypes(exclude='number')
     
     if len(categorical.columns) > 0:
-        categorical_stat = categorical.describe().to_dict('records')
+        categorical_described = categorical.describe().T.to_dict('split')
+
+        categorical_described['columns'][0] = 'Available value count'
+        categorical_described['columns'][2] = 'Most common'
+        categorical_described['columns'][3] = 'Occurrence of most common'
     else:
-        categorical_stat = []
+        categorical_described = []
     
-    log(categorical_stat, "categorical_stat: ")
-
-    cont_stat_response = []
-    cat_stat_response = []
-    
-    i = 0
-    for stat in continuous_stat:
-        row = {"indicator":CONT_INDEXES[i], **stat}
-        cont_stat_response += [row]
-        i += 1
-
-    log(categorical_stat)
-    
-    i = 0
-    for stat in categorical_stat:
-        row = {"indicator":CAT_INDEXES[i], **stat}
-        cat_stat_response += [row]
-        i += 1
-
-    log(cat_stat_response)
+    log(categorical_described, "categorical_described: ")
 
     stat_indicators = {}
 
-    stat_indicators["continuous"] = cont_stat_response
-    stat_indicators["categorical"] = cat_stat_response
+    stat_indicators["continuous"] = continuous_described
+    stat_indicators["categorical"] = categorical_described
 
     return stat_indicators
 

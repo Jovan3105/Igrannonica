@@ -59,8 +59,10 @@ async def begin_training(
 
         # Read data #
 
-        dataset = read_json_data(stored_dataset)
-        df = pd.DataFrame(dataset['parsedDataset'])
+        dataset = read_json_data(stored_dataset)['parsedDataset']
+        dataset['index_names'] = [None]
+        dataset['column_names'] = [None]
+        df = pd.DataFrame.from_dict(dataset, orient='tight')
         
         cont_cols_set = set(df.select_dtypes(include='number').columns.values)
         cat_cols_set = set(df.select_dtypes(exclude='number').columns.values)
@@ -69,7 +71,7 @@ async def begin_training(
 
         # Check if dataset has missing values #
 
-        if get_basic_info(df)['missing'] != 0:
+        if get_basic_info(df)['missing values count'] != 0:
             raise HTTPException(status_code=400, detail=f"Dataset has missing values")
 
         # Validate problem type #

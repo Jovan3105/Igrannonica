@@ -37,31 +37,32 @@ export class StatsComponent implements OnInit {
 
   showTables(response:any)
   {
-    var headerContinuous = this.headersService.getInfoStatsHeader(response['continuous']);
+    var headerContinuous = this.headersService.getStatIndicatorHeader(response['continuous']);
     this.numIndicators.setPaginationEnabled(false);
     this.numIndicators.setTableStyle("height: 400px;");
     this.numIndicators.prepareTable(TableIndicator.STATS, response['continuous'], headerContinuous);
 
-    var headerCategorical = this.headersService.getInfoStatsHeader(response['categorical']);
+    var headerCategorical = this.headersService.getStatIndicatorHeader(response['categorical']);
     this.catIndicators.setPaginationEnabled(false);
-    this.catIndicators.setTableStyle("height: 250px;");
+    this.catIndicators.setTableStyle("height: 400px;");
     this.catIndicators.prepareTable(TableIndicator.STATS, response['categorical'], headerCategorical);
   }
+
   showMatrix(response:any)
   {
     this.corrMatrixImgSource = this.domSanitizer.bypassSecurityTrustUrl(response);
   }
+
   showInfo(response:any)
   {
-    //console.log(response);
     this.basicInfo.setPaginationEnabled(false);
     this.basicInfo.setTableStyle("height: 100px;");
     var headerInfo = this.headersService.getInfoStatsHeader(response);
     this.basicInfo.prepareTable(TableIndicator.INFO, response, headerInfo) 
   }
+
   showMissingValues(response:any)
   {
-    //console.log(response);
     this.missingValues.setPaginationEnabled(false);
     this.missingValues.setTableStyle("height: 100px;");
     var headerMissing = this.headersService.getInfoStatsHeader(response);

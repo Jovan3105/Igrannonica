@@ -72,7 +72,7 @@ def get_basic_info(df):
     missingValuesEntireDF = int(df.isnull().sum().sum()) #df.value_counts()["NaN"]
     nrows, ncols = df.shape
 
-    return { "rowNum" : nrows, "colNum" : ncols, "missing" : missingValuesEntireDF }
+    return { "row count" : nrows, "column count" : ncols, "missing values count" : missingValuesEntireDF }
 
 # # #
 
@@ -90,28 +90,34 @@ def get_column_types(df):
 
 # # #
 
-def modify_dataset(dataset, data:ModifiedData):
-    df = pd.DataFrame(dataset['parsedDataset'])
+def modify_dataset(dataset, modified_data:ModifiedData):
+    data = dataset['parsedDataset']
+    types = dataset['columnTypes']
+    data['index_names'] = [None]
+    data['column_names'] = [None]
+    
+    df = pd.DataFrame.from_dict(data, orient='tight')
+
     try:
-        for editRow in data.edited:
+        for editRow in modified_data.edited:
+            dtype = next(iter(types[editRow.col].values()))
             if (editRow.value == ""):
                 df.iloc[editRow.row, editRow.col] = np.nan
-            elif (dataset['columnTypes'][editRow.col] == "int64"):
+            elif (dtype == "int64"):
                 df.iloc[editRow.row, editRow.col] = int(editRow.value)
-            elif (dataset['columnTypes'][editRow.col] == "float64"):
+            elif (dtype == "float64"):
                 df.iloc[editRow.row, editRow.col] = float(editRow.value)
             else:
                 df.iloc[editRow.row, editRow.col] = editRow.value
             
-        df.drop(data.deletedRows, inplace=True)
-    
-        df.drop(df.columns[data.deletedCols],axis=1,inplace=True)
+        df.drop(modified_data.deletedRows, inplace=True)
+        df.drop(df.columns[modified_data.deletedCols],axis=1,inplace=True)
 
     except:
         raise HTTPException(status_code=400, detail="Error on modifying data")
     
 
-    dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije
+    dataset['parsedDataset'] = json.loads(df.to_json(orient="split"))  # TODO proveriti da li moze da se odradi jednostavnije
     dataset['basicInfo'] = get_basic_info(df)
     dataset['missingValues'] = get_missing_values_for_each_column(df)
 
@@ -124,7 +130,11 @@ def fill_missing(
     column_fill_method_pairs : List[ColumnFillMethodPair]
     ):
 
-    df = pd.DataFrame(dataset['parsedDataset'])
+    data = dataset['parsedDataset']
+    data['index_names'] = [None]
+    data['column_names'] = [None]
+    
+    df = pd.DataFrame.from_dict(data, orient='tight')
 
     for column_fill_method in column_fill_method_pairs:
         
@@ -160,7 +170,7 @@ def fill_missing(
 
         df[column_name].fillna(fill_value, inplace = True)
             
-    dataset['parsedDataset'] = json.loads(df.to_json(orient="records"))  # TODO proveriti da li moze da se odradi jednostavnije   
+    dataset['parsedDataset'] = json.loads(df.to_json(orient="split"))  # TODO proveriti da li moze da se odradi jednostavnije   
     dataset['basicInfo'] = get_basic_info(df)
     dataset['missingValues'] = get_missing_values_for_each_column(df)
 

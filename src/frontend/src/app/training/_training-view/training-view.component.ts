@@ -192,9 +192,9 @@ export class TrainingViewComponent implements OnInit {
       //console.log(response);
       //this.sessionService.saveData('table_data',JSON.stringify(response));
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
-      this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
+      this.dataTable.prepareTable(TableIndicator.PREVIEW, response['parsedDataset'], headerDataTable);
       
-      this.numOfMissingValues = response['basicInfo']['missing'];
+      this.numOfMissingValues = response['basicInfo']['missing values count'];
       this.missingIndicator = !this.missingIndicator;
 
       this.labels.onDatasetSelected(headerDataTable);
@@ -205,7 +205,7 @@ export class TrainingViewComponent implements OnInit {
       this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
     },
     error: (err: Error) => {
-      console.log(err)
+      console.log(err);
       this.showUploadErrorMessage(err.message);
     }
   };

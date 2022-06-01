@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HeaderDict} from '../models/table_models';
+import { HeaderDict } from '../models/table_models';
 
 @Injectable({
   providedIn: 'root'
@@ -20,29 +20,41 @@ export class HeadersService {
         if (tempHeader.length > 0) newHeader.push(new HeaderDict(i,tempHeader[0], data[i][tempHeader[0]]));
       }
     }
-    /*
-    this.types.forEach((element:any) => {
-      tempHeader = Object.getOwnPropertyNames(element);
-      if (tempHeader.length > 0) temp.splice(index,0,new HeaderDict(index,tempHeader[0], element[tempHeader[0]]));
-      index++;
-    });*/
+    
     return newHeader;
   }
 
-  getInfoStatsHeader(data: Array<HeaderDict>)
+  getInfoStatsHeader(data: any)
   {
-    var newHeader = new Array<HeaderDict>();
-    var temp;
+    let newHeader = new Array<HeaderDict>();
+    
+    if (data)
+    {
+      let tempHeader = Object.getOwnPropertyNames(data[0]);
+      
+      for(let i=0; i < tempHeader.length; i++)
+        newHeader.push( new HeaderDict(i, tempHeader[i]) );
+    }
+
+    return newHeader;
+  }
+
+  getStatIndicatorHeader(data: {index:Array<any>, columns:Array<any>, data:Array<any>})
+  {
+    let newHeader = new Array<HeaderDict>();
+    let columns;
 
     if (data)
     {
-      if (!data.length) return newHeader; 
+      columns = data.columns;
+      if (!columns || !columns.length) 
+        return newHeader; 
     
-      temp = Object.getOwnPropertyNames(data[0]);
-    
-      for (let i=0; i<temp.length; i++)
+      newHeader.push(new HeaderDict(0, 'Column name'));
+
+      for (let i=0; i< columns.length; i++)
       {
-        newHeader.push(new HeaderDict(i,temp[i]));
+        newHeader.push(new HeaderDict(i+1, columns[i]));
       }
     }
 
