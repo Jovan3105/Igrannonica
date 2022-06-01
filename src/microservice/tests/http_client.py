@@ -114,7 +114,7 @@ def test_training_request(
   loss_function   = loss_function_default_value,
   test_size       = 0.2,
   validation_size = 0.2,
-  epochs          = 100,
+  epochs          = 30,
   optimizer       = 'Adam',
   learning_rate   = 0.1
   ):
@@ -141,7 +141,7 @@ def test_training_request(
   log(f'Test ID: {client_conn_id}; Testing dataset: {stored_dataset}')
   response = client.getresponse()
 
-  with open(f"test_begin_training_http_{client_conn_id}.txt", 'a') as output_file:
+  with open(f"test_begin_training_{client_conn_id}_http.txt", 'a') as output_file:
         
         output_file.write(f"{30*'#'} \nRequest ID: {client_conn_id} \n{30*'#'} \n\n")
         
@@ -178,10 +178,12 @@ def test_begin_training_api(stored_dataset, label_name, features, problem_type):
   }
 
   loss_funcs = regression_loss_funcs
+  metrics = regression_metrics
 
   if problem_type == 'classification':
     label['encoder'] = 'OneHot'
     loss_funcs = classification_loss_funcs
+    metrics = classification_metrics
     
 
   for loss_func in loss_funcs:
@@ -193,7 +195,9 @@ def test_begin_training_api(stored_dataset, label_name, features, problem_type):
         labels = [label],
         features = features,
         loss_function = loss_func,
-        optimizer = optimizer
+        optimizer = optimizer,
+        problem_type = problem_type,
+        metrics = metrics
       )
 
 # # #
@@ -206,11 +210,11 @@ dataset = 'http://localhost:7220/Datasets/1/355/titanic.json' # TODO umesto hard
 
  # TODO umesto hardcoded feature-a staviti input() u while-u
 features = [{
-  'name'    : 'Age',
+  'name'    : 'Fare',
   'encoder' : 'None'
 }]
 
-label_name = 'Fare'  # TODO umesto hardcoded str staviti input()
+label_name = 'Sex'  # TODO umesto hardcoded str staviti input()
 
 log(f'API URL: {ANN_URL}')
 log(f"Testing 'begin_training' API...", use_print = True)
@@ -224,12 +228,12 @@ def test():
       stored_dataset = dataset,
       label_name = label_name,
       features = features,
-      problem_type = 'regression' # TODO umesto hardcoded str staviti input()
+      problem_type = 'classification' # TODO umesto hardcoded str staviti input()
     )
 
 try:
   test()
-  log("Testing of 'training/begin_training' endpoint was completed", use_print = True))
+  log("Testing of 'training/begin_training' endpoint was completed", use_print = True)
 except ConnectionRefusedError:
   if num_of_attempts <= MAX_ATTEMPTS:
     num_of_attempts += 1

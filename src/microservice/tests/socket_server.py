@@ -35,7 +35,7 @@ async def write_to_file(data):
     log(json.dumps(parsed_message, indent=4), 'Message: ', use_print = True)
     validation_set_metrics = {}
 
-    with open(f"test_begin_training_socket_{parsed_data['To']}.txt", 'a') as output_file:
+    with open(f"test_begin_training_{parsed_data['To']}_socket.txt", 'a') as output_file:
         
         output_file.write(f"{30*'#'} \nepoch: {parsed_message['epoch']} \n{30*'#'} \n\n")
         del parsed_message['epoch']
