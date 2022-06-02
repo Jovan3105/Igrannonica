@@ -14,16 +14,19 @@
 </div>
 
 <mat-stepper [linear]="linearStepper" [selectedIndex]="viewIndicator" (selectionChange)="setIndex($event)" #stepper [ngStyle]="{'display': stepperDisplay}">
-    <mat-step label="Upload" [completed]="uploadCompleted">
+    <mat-step [completed]="uploadCompleted">
+        <ng-template matStepLabel>Dataset</ng-template>
         <div>
             <app-upload #upload [badLinkErrorDisplay]="errorDisplay" [errorMessage]="errorMessage" (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
         </div>
     </mat-step>
-    <mat-step label="Data preview and manipulation">
+    <mat-step>
+        <ng-template matStepLabel>Data preparation</ng-template>
         <div id="first">
             <div class="row justify-content-center" style="margin-top: 0.3rem;">
                 <div class="col-sm-4 ms-5">
-                <h2>{{fileName}}</h2></div>
+                    <h2>Choosen dataset: <i>{{fileName}}</i></h2>
+                </div>
                 <div class="col-sm ms-5">
                     <button type="button" class="btn btn-secondary" (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifyModal" (click)="modalOpen()">

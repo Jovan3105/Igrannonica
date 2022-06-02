@@ -1,6 +1,6 @@
 <div class="card" style="height: 27rem;" *ngIf = "columns">
   <div class="row card-header ms-0 me-0">
-    <h2 class="mb-0 ps-0 col-sm-6">Choose features</h2>
+    <h2 class="mb-0 ps-0 col-sm-6">Choose inputs</h2>
   </div>
   <div class="row card-header ms-0 me-0">
     <div class="btn col-sm-6 text-center selectAllButton" (click)="selectAll()">
@@ -36,7 +36,7 @@
               <span style="font-size: small;" *ngIf="targetColumn && targetColumn.key == column.key">Output</span>
             </td>
             <td>
-              <label class="form-check-label custom-label" for="inputCheckbox{{column.key}}">
+              <label class="form-check-label custom-label" for="inputCheckbox{{column.key}}" [ngStyle]="{'cursor':targetColumn != null && targetColumn.key == i? 'default' : 'pointer'}">
                 {{column.name}}
                 <div>
                   <span style="font-size: x-small;font-style: italic;">{{ typeArray[i] }}</span>
@@ -90,7 +90,7 @@
 </div>
 
 <div class="card" style="height: 30%;" *ngIf = "columns">
-  <h2 class="card-header mb-0">Choose target variable</h2>
+  <h2 class="card-header mb-0">Choose output</h2>
   <div class="card-body">
     <select [(ngModel)]="targetColumn" #selectLabel class="form-select" aria-label="Odabir izlaza" 
     (change)="onLabelColSelect()"><!-- TODO povecati font za aria-label -->
