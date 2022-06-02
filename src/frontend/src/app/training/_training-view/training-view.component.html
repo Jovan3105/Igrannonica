@@ -28,7 +28,8 @@
                     <h2>Choosen dataset: <i>{{fileName}}</i></h2>
                 </div>
                 <div class="col-sm ms-5">
-                    <button type="button" class="btn btn-secondary" (click)="toggleTables($event)" id="statsButton">Show stats</button>&nbsp;
+                    <button type="button" class="btn btn-secondary" *ngIf="showColumnSelectionPage" (click)="toggleTables()" id="statsButton">Show stats</button>&nbsp;
+                    <button type="button" class="btn btn-secondary" *ngIf="!showColumnSelectionPage" (click)="toggleTables()" id="statsButton">Show table</button>&nbsp;
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifyModal" (click)="modalOpen()">
                     Modify dataset
                     </button>&nbsp;

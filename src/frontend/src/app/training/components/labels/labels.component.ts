@@ -28,6 +28,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   
   selectAllTrigger: boolean = false;
   targetColumn:any = null;
+  targetColumnId:number = -1;
   checkboxCheckedArray:boolean[];
   showMissingColumn:boolean = false;
   encodingDisabledArray: boolean[];
@@ -145,8 +146,9 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
 
     if(this.targetColumn!=null){
+      this.targetColumnId = this.targetColumn.key;
       if (this.checkboxCheckedArray[this.targetColumn.key]) 
-      this.checkboxCheckedArray[this.targetColumn.key] = false;
+        this.checkboxCheckedArray[this.targetColumn.key] = false;
 
       this.labelEvent.emit({id:parseInt(this.targetColumn.key),previousTargetId:this.previousTargetId});
       this.previousTargetId = parseInt(this.targetColumn.key);

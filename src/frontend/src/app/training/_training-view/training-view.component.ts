@@ -368,20 +368,19 @@ export class TrainingViewComponent implements OnInit {
     }
   }
 
-  toggleTables(event:any){
+  toggleTables(){
+
     if(this.showColumnSelectionPage)
     {
-      event.currentTarget.innerHTML = "Show table";
       this.statsViewDisplay = DisplayType.SHOW_AS_BLOCK;
       this.mainContainerDisplay = DisplayType.HIDE;
     }
     else
     {
-      event.currentTarget.innerHTML = "Show stats"
       this.statsViewDisplay = DisplayType.HIDE;
       this.mainContainerDisplay = DisplayType.SHOW_AS_FLEX;
     }
-    this.showColumnSelectionPage = !this.showColumnSelectionPage
+    this.showColumnSelectionPage = !this.showColumnSelectionPage;
   }
 
   changeModifyButtons(value:boolean)
@@ -605,6 +604,7 @@ export class TrainingViewComponent implements OnInit {
               data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
             });
             dialogRef.afterClosed().subscribe(result => {
+              if (!this.showColumnSelectionPage) this.toggleTables();
               this.setView(View.PREVIEW);
               console.log(this.viewIndicator);
             });
@@ -620,6 +620,7 @@ export class TrainingViewComponent implements OnInit {
             data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
           });
           dialogRef.afterClosed().subscribe(result => {
+            if (!this.showColumnSelectionPage) this.toggleTables();
             this.setView(View.PREVIEW);
           });
         }
@@ -633,6 +634,7 @@ export class TrainingViewComponent implements OnInit {
           data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
         });
         dialogRef.afterClosed().subscribe(result => {
+          if (!this.showColumnSelectionPage) this.toggleTables();
           this.setView(View.PREVIEW);
         });
       }
