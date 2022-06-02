@@ -106,7 +106,6 @@ export class TrainingViewComponent implements OnInit {
   @ViewChild('columnsSelecion') private labels!: LabelsComponent;
   @ViewChild('Stats') private stats!:StatsComponent;
   @ViewChild('modifyModal') private modifyModal!:ModifyDatasetComponent;
-  @ViewChild('modifyTable') private modifyTable!:ModifyDatasetComponent;
 
 
   req : any = {
@@ -413,38 +412,46 @@ export class TrainingViewComponent implements OnInit {
 
   OnModalSave()
   {
-    this.modalDisplay = false;
+    var newRowData = this.modifyModal.getRowData();
+    
     this.hideElements();
-    var tempEdited: object[] = [];
-
+    
     let formPagesModifyElement = this.formPagesModify.get('currentPageModify');
     if(formPagesModifyElement) {
       this.currentPage = this.modifyModal.getCurrentPage();
       this.dataTable.setCurrentPage(this.currentPage);
     }
-      
 
     var req:ModifiedData = new ModifiedData(this.modifyModal.getEditedCells(), this.modifyModal.getDeletedRows(), this.modifyModal.getDeletedCols());
-
-    req.edited.forEach(element =>{
-      this.dataTable.rowData[element.row][this.dataTable.headers[element.col].name] = this.modifyModal.modifyTable.rowData[element.row][this.modifyModal.modifyTable.headers[element.col].name];
-      tempEdited.push(this.dataTable.rowData[element.row]);
-    });
+    console.log(req)
+ 
     //const now = new Date().getTime();
     this.datasetService.modifyDataset(this.datasetId, req).subscribe(
       {
         next: (response:any) =>{
           //const now2 = new Date().getTime();
-
-          //console.log(now2 - now);
+          var tempEdited: object[] = [];
           var tempDeleted :object[] = [];
-          req.deletedRows.forEach(element => {
-            tempDeleted.push(this.dataTable.rowData[element])
-            this.dataTable.rowData.splice(element,1);
+          //console.log(now2 - now);
+          
+          req.edited.forEach(element =>{
+            this.dataTable.rowData[element.row][this.dataTable.headers[element.col].name] = newRowData[element.row][this.dataTable.headers[element.col].name];
+            //console.log(this.dataTable.rowData[element.row][this.dataTable.headers[element.col].name]);
+            tempEdited.push(this.dataTable.rowData[element.row]);
           });
           
+          req.deletedRows.forEach(element => {
+            tempDeleted.push(this.dataTable.rowData[element])
+          });
+
           this.dataTable.updateRows(tempEdited);
           this.dataTable.removeRows(tempDeleted);
+          
+          tempDeleted.forEach(element =>
+          {
+            this.dataTable.rowData = this.dataTable.rowData.filter(row => row !== element);
+          });
+          //console.log(this.dataTable.rowData)
 
           var basicInfo = JSON.parse(response['basicInfo']);
           var missingValues = JSON.parse(response['missingValues']) 
@@ -457,9 +464,11 @@ export class TrainingViewComponent implements OnInit {
           this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
           this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
 
+          this.modalDisplay = false;
           this.showElements();
-          
+          /*
           //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver); // TODO check
+          */
           },
           error:(err: Error) => {
             console.log(err);

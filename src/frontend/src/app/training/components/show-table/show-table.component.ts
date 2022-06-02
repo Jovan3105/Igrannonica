@@ -31,7 +31,7 @@ export class ShowTableComponent implements OnInit {
   @Output() errorEvent; //event koji se dize kada se unese pogresan tip(npr string za int)
 
   columnDefs: ColDef[];
-  rowData: any;
+  rowData: any[];
   public rowSelection;
   public paginationPageSize;
   tableStyle:string;
@@ -46,7 +46,7 @@ export class ShowTableComponent implements OnInit {
   
   constructor(private tableService:TableService, private sessionService:SessionService) {
     this.columnDefs = [];
-    this.rowData = [];
+    this.rowData = new Array();
     this.headers = [];
     this.rowSelection = 'multiple';
     this.paginationPageSize = 10;

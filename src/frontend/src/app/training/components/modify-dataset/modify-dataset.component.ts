@@ -10,7 +10,7 @@ import { ShowTableComponent } from '../show-table/show-table.component';
 })
 export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges {
 
-  @ViewChild('modifyTable') public modifyTable!: ShowTableComponent;
+  @ViewChild('modifyTable') private modifyTable!: ShowTableComponent;
   @Input() table_data:any;
   @Input() header:HeaderDict[] = [];
   @Input() undoDisabled:boolean = true;
@@ -103,7 +103,10 @@ export class ModifyDatasetComponent implements OnInit, AfterViewInit, OnChanges 
   {
     return this.modifyTable.deletedCols;
   }
-
+  getRowData()
+  {
+    return this.modifyTable.rowData;
+  }
   @HostListener('window:beforeunload', ['$event'])
   unloadHandler(event: Event) {
     if (this.undoDisabled) return true;
