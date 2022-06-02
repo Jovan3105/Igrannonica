@@ -89,7 +89,7 @@ async def modify(stored_dataset : AnyHttpUrl, modified_data : ModifiedData):
 
 @router.put("/fill-missing")
 async def fill_missing_values(
-    stored_dataset           : str, 
+    stored_dataset           : AnyHttpUrl, 
     column_fill_method_pairs : List[ColumnFillMethodPair] = Body(...)
     ):
     '''

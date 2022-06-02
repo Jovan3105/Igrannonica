@@ -115,7 +115,7 @@ export class ShowTableComponent implements OnInit {
   {
     //console.log(params);
     var editedCellIndex; 
-    var row = params.rowIndex!;
+    var row = this.rowData.findIndex((x: any) => x == params.data)
     var colId = parseInt(params.column.getColId());
 
     var newValue = this.tableService.onCellValueChanged(this.gridApi, params,params.data,this.headers);
@@ -214,17 +214,17 @@ export class ShowTableComponent implements OnInit {
   onRemoveSelected() 
   {
     const selectedData = this.gridApi.getSelectedRows();
-  
     const res = this.removeRows(selectedData);
 
-    this.addUndoElement(new UndoData(undoType.DELETE,res?.remove));
+    if (res?.remove.length! > 0) this.addUndoElement(new UndoData(undoType.DELETE,res?.remove));
 
     for (let sData of res?.remove!) 
     {
-      this.deletedRows.push(sData.childIndex);
+      this.deletedRows.push(this.rowData.findIndex((x: any) => x == sData.data));
     }
 
     this.emitUndoEvent();
+    //console.log(this.deletedRows);
   }
 
   onUndo()
@@ -242,33 +242,32 @@ export class ShowTableComponent implements OnInit {
 
         this.updateRows([data.node.data]);
 
-        var index = this.editedCells.findIndex(x => x.row == data.rowIndex && x.col == data.column.getColId());
+        var rowIndex = this.rowData.findIndex((x: any) => x == data.node.data);
+
+        var index = this.editedCells.findIndex(x => x.row == rowIndex && x.col == data.column.getColId())
         
         if (index != -1) 
         {     
-          if (this.data[data.rowIndex][data.column.colDef.field] == data.oldValue) 
+          if (this.data[this.editedCells[index].row][data.column.colDef.field] == data.oldValue) 
           {
             //ukoliko je vraceno na originalnu vrednost, izbacuje se iz niza
-            this.editedCells.splice(index,1);
+            this.editedCells.splice(index, 1);
           }
           else
             this.editedCells[index].value = data.oldValue.toString();
         }
         else{ //ukoliko se sa originalne vrednosti uradi undo na promenjenu, potrebno je ponovo dodati vrednost u edited niz
-          this.editedCells.push(new EditedCell(data.rowIndex,parseInt(data.column.getColId()),data.oldValue.toString()));
+          this.editedCells.push(new EditedCell(rowIndex,parseInt(data.column.getColId()),data.oldValue.toString()));
         }
       }
       else
       {
         var data = res?.data;
         data.forEach((element: any) => {
-          this.gridApi.applyTransaction({ add: [element.data], addIndex: parseInt(element.childIndex) });
-          var index = this.deletedRows.findIndex(x => x == element.childIndex);
-          this.deletedRows.splice(index,1);
-
+          var res = this.gridApi.applyTransaction({ add: [element.data], addIndex: parseInt(element.childIndex) });
+          this.deletedRows.pop();
         });
       }
-      //console.log(this.editedCells);
       this.emitUndoEvent();
     }
   }
