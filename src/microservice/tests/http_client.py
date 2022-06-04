@@ -17,6 +17,11 @@ ANN_URL = f"{config.HOST_NAME}:{config.SERVER_PORT}"
 
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
+client = http.client.HTTPConnection(ANN_URL)
+client.set_debuglevel(5)
+
+headers = {'Content-type' : 'application/json'}
+
 ########################################################################
 
 encoders = [ "None", "OneHot", "Ordinal", "Binary" ]
@@ -60,11 +65,6 @@ weight_initializers = [
 problem_types = [ 'regression', 'classification' ]
 
 # # #
-
-client = http.client.HTTPConnection(ANN_URL)
-client.set_debuglevel(5)
-
-headers = {'Content-type' : 'application/json'}
 
 # Default objects #
 
@@ -206,7 +206,7 @@ def test_begin_training_api(stored_dataset, label_name, features, problem_type):
 #########################################################################
 
 # diamonds.csv
-dataset = 'http://localhost:7220/Datasets/1/355/titanic.json' # TODO umesto hardcoded str staviti input()
+dataset = 'http://localhost:7220/Datasets/1/546/titanic.json' # TODO umesto hardcoded str staviti input()
 
  # TODO umesto hardcoded feature-a staviti input() u while-u
 features = [{
@@ -216,7 +216,7 @@ features = [{
 
 label_name = 'Sex'  # TODO umesto hardcoded str staviti input()
 
-log(f'API URL: {ANN_URL}')
+log(f'API URL: {ANN_URL}', use_print = True)
 log(f"Testing 'begin_training' API...", use_print = True)
 
 num_of_attempts = 0
