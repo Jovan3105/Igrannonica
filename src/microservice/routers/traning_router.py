@@ -135,7 +135,8 @@ async def begin_training(
 
         # begin training #
         
-        true, pred = train_model(
+        metrics_on_testing_set = train_model(
+        #true, pred = train_model(
             df=df,
             problem_type=problem_type,
             features=features,
@@ -158,4 +159,4 @@ async def begin_training(
 
         log("Elapsed time: {:.4f}s".format(end-start))
 
-        return { "true-pred" : [f"{left} | {right}" for left,right in zip(true,pred) ] }
+        return {'test_metrics' : metrics_on_testing_set} # { "true-pred" : [f"{left} | {right}" for left,right in zip(true,pred) ] }
