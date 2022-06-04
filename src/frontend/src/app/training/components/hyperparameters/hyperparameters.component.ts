@@ -96,11 +96,16 @@ export class HyperparametersComponent implements OnInit, OnChanges
   }
   
   ngOnChanges(changes: SimpleChanges): void 
-  { 
+  {
     if (this.choosenInAndOutCols !== undefined && this.choosenInAndOutCols.label !== undefined)
     {
-      this.problemType = this.choosenInAndOutCols.label.type == "Categorical"? "classification":"regression";
-      this.reset();
+      var newProblemType = this.choosenInAndOutCols.label.type == "Categorical"? "classification":"regression";
+      if (this.problemType != newProblemType)
+      {
+        this.problemType = newProblemType;
+        this.reset();
+      }
+      
     }
   }
   layers= [

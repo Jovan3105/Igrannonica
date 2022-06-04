@@ -18,6 +18,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   missing_numerical:Hyperparameter[] = Constants.MISSING_HANDLER_NUMERICAL;
   encoding_categorical:Hyperparameter[] = Constants.ENCODING_CATEGORICAL;
   @Input() missing: number = 0;
+  @Input() missing_array: any;
   @Input() missing_incidator : boolean = false;
   @Output() checkEvent: EventEmitter<Check>; //podizanje event-a kada se chekira ili unchekira nesto
   @Output() labelEvent: EventEmitter<{ id: number; previousTargetId: number | null; }>; //podizanje event-a kada se promeni izlaz
@@ -27,6 +28,7 @@ export class LabelsComponent implements OnInit, OnChanges {
   
   selectAllTrigger: boolean = false;
   targetColumn:any = null;
+  targetColumnId:number = -1;
   checkboxCheckedArray:boolean[];
   showMissingColumn:boolean = false;
   encodingDisabledArray: boolean[];
@@ -144,8 +146,9 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
 
     if(this.targetColumn!=null){
+      this.targetColumnId = this.targetColumn.key;
       if (this.checkboxCheckedArray[this.targetColumn.key]) 
-      this.checkboxCheckedArray[this.targetColumn.key] = false;
+        this.checkboxCheckedArray[this.targetColumn.key] = false;
 
       this.labelEvent.emit({id:parseInt(this.targetColumn.key),previousTargetId:this.previousTargetId});
       this.previousTargetId = parseInt(this.targetColumn.key);
@@ -161,15 +164,18 @@ export class LabelsComponent implements OnInit, OnChanges {
 
   getChoosenCols(){
     var values;
+    var missing_sum = 0;
     var features: ChosenColumn[] = [];
     var label: ChosenColumn | undefined = undefined;
     
     if (this.columns)
     {
       for(let i=0; i<this.columns.length; i++)
+      {
         if (this.checkboxCheckedArray[i]) 
         {
-          if (this.showMissingColumn)
+          missing_sum += this.missing_array[this.columns[i].name];
+          if (this.missing_array[this.columns[i].name])
           {
             if(!this.constantsDisabledArray[i])
             {
@@ -188,14 +194,16 @@ export class LabelsComponent implements OnInit, OnChanges {
           else 
             features.push(new ChosenColumn(this.columns[i].name,this.typeArray[i],this.selectedEncodings[i]));
         }
-      
+        
+      }
+        
 
       if (this.targetColumn) 
       {
         let id = this.targetColumn.key;
         let lblName = this.columns.filter(element => element.key == this.targetColumn.key)[0].name;
         
-        if (this.showMissingColumn)
+        if (this.missing_array[this.columns[id].name])
         {
           if(!this.constantsDisabledArray[id])
             label = new ChosenColumn(
@@ -212,6 +220,8 @@ export class LabelsComponent implements OnInit, OnChanges {
               this.selectedMissingHandler[id]);
         }
         else label = new ChosenColumn(lblName, this.typeArray[id], this.selectedEncodings[id]);
+
+        missing_sum += this.missing_array[this.columns[id].name];
       }
 
       values = {
@@ -220,7 +230,7 @@ export class LabelsComponent implements OnInit, OnChanges {
       }
     }
 
-    return values;
+    return { values, missing_sum } ;
   }
 
   onEncodingChange(index: number, encoding: string) {
@@ -229,24 +239,6 @@ export class LabelsComponent implements OnInit, OnChanges {
     else {
       this.selectedEncodings[index] = encoding;
     }
-  }
-
-  onTypeChange(type:string,i:number)
-  {
-    if(type=="Numerical"){
-      this.encodingDisabledArray[i] = true;
-      this.typeArray[i] = "Numerical";
-      this.selectedEncodings[i] = "None";
-      this.selectedMissingHandler[i] = this.missing_numerical[0].codename;
-    }
-    else
-    {
-      this.encodingDisabledArray[i] = false;
-      this.typeArray[i] = "Categorical";
-      this.selectedEncodings[i] = "OneHot";
-      this.selectedMissingHandler[i] = this.missing_categorical[0].codename;
-    }
-      
   }
 
   onMissingChange(index:number,selectedFillMethod:string)

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
 
 namespace backend.Controllers
 {
@@ -300,7 +301,7 @@ namespace backend.Controllers
 
         [HttpPost]
         [Route("{datasetId:int}/modifyData")]
-        public async Task<ActionResult<Object>> modifyData(int datasetId, [FromBody]ModifiedData data)
+        public async Task<ActionResult<Object>> modifyData(int datasetId, [FromBody] ModifiedData data)
         {
             var dataset = await this.datasetContext.Datasets.FindAsync(datasetId);
 
@@ -309,22 +310,24 @@ namespace backend.Controllers
                 return BadRequest(new { Message = "No dataset with this id" });
             }
             else
-            { 
+            {
                 var microserviceURL = _microserviceBaseURL + "/data-preparation/modify";
 
                 string url = CreateDatasetURL(_configuration, dataset.UserID, dataset.Id, dataset.FileName);
-  
-                string responseString = null;
 
+                string responseString = null;
+                JObject json = null;
                 try
                 {
                     var response = await _client.PutAsJsonAsync(microserviceURL + "?stored_dataset=" + url, data);
                     response.EnsureSuccessStatusCode();
                     responseString = await response.Content.ReadAsStringAsync();
+                    json = JObject.Parse(responseString);
+
                 }
                 catch(HttpRequestException e)
                 {
-                    Console.WriteLine("\nException Caught!");	
+                    Console.WriteLine("\nException Caught!");
                     Console.WriteLine("Message :{0} ", e.Message);
 
                     return BadRequest(new ResponseToRequest(false, "TODO", "An error occured while modifying dataset", "datasetModify_UnknownError"));
@@ -333,8 +336,8 @@ namespace backend.Controllers
                 StreamWriter f = new(dataset.Path);
                 f.Write(responseString);
                 f.Close();
-
-                return Ok(new { Message = "OK" } );
+                
+                return Ok(new { basicInfo = json.GetValue("basicInfo").ToString(), missingValues = json.GetValue("missingValues").ToString() });
             }
 
         }

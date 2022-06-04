@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Check, ChosenColumn, ModifiedData, TableIndicator } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
 import { DatasetService } from '../services/dataset.service';
@@ -13,7 +13,6 @@ import { SessionService } from 'src/app/core/services/session.service';
 import { ColumnFillMethodPair } from '../models/dataset_models';
 import { View, DisplayType } from '../../shared/models/navigation_models';
 import { JwtService } from 'src/app/core/services/jwt.service';
-import { UserService } from 'src/app/core/services/user.service';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -36,12 +35,10 @@ export class TrainingViewComponent implements OnInit {
   datasetSource: string = '';
 
   fileName:string = "";
-  basicInfo:string = "";
-  corrMatrixImgSource: any;
   numOfMissingValues:number = 0;
+  numOfMissingArray:any;
   missingIndicator:boolean = false;
   linearStepper:boolean = true;
-  columnEncodings: string[] = [];
   currentPage:number = 1;
 
   dialogTitle:string = "";
@@ -49,8 +46,6 @@ export class TrainingViewComponent implements OnInit {
   errorMessage:string = "";
 
   uploadCompleted:boolean = false;
-
-  metricsArrayToSend: any[] = [];
   
   public form: FormData = new FormData();
   public choosenInAndOutCols:any = undefined;
@@ -66,6 +61,7 @@ export class TrainingViewComponent implements OnInit {
   formPagesModify=new FormGroup({
     currentPageModify:new FormControl('1',[Validators.required])
   })
+
   /* ********************** */
   /* promenljive za display */
   /* ****************************************************** */
@@ -73,18 +69,10 @@ export class TrainingViewComponent implements OnInit {
   loaderMiniDisplay:string = DisplayType.HIDE;
 
   stepperDisplay:string =DisplayType.SHOW_AS_BLOCK;
-  previewDisplay:string = DisplayType.HIDE;
   trainingDisplay:string = DisplayType.HIDE;
-  uploadDisplay:string = DisplayType.SHOW_AS_BLOCK;
-
-  navButtonsDisplay:string = DisplayType.HIDE;
 
   mainContainerDisplay:string = DisplayType.SHOW_AS_FLEX;
-  mainTableDisplay:string = DisplayType.SHOW_AS_BLOCK;
-  statsTableDisplay:string = DisplayType.HIDE;
-  labelsDisplay:string = DisplayType.SHOW_AS_BLOCK;
-
-  deleteButtonDisplay:string = DisplayType.SHOW_AS_INLINE;
+  statsViewDisplay:string = DisplayType.HIDE;
 
   /* ********************** */
   /* promenljive za disabled direktivu */
@@ -108,7 +96,8 @@ export class TrainingViewComponent implements OnInit {
     public dialog: MatDialog,
     private jwtService: JwtService,
     private sessionService: SessionService,
-    private authService: AuthService ) {
+    private authService: AuthService,
+    private cd: ChangeDetectorRef ) {
     }
    
   @ViewChild('upload') private upload!:UploadComponent;
@@ -117,7 +106,6 @@ export class TrainingViewComponent implements OnInit {
   @ViewChild('columnsSelecion') private labels!: LabelsComponent;
   @ViewChild('Stats') private stats!:StatsComponent;
   @ViewChild('modifyModal') private modifyModal!:ModifyDatasetComponent;
-  @ViewChild('modifyTable') private modifyTable!:ModifyDatasetComponent;
 
 
   req : any = {
@@ -199,6 +187,7 @@ export class TrainingViewComponent implements OnInit {
 
       this.labels.onDatasetSelected(headerDataTable);
       this.stats.showInfo([response['basicInfo']]);
+      this.numOfMissingArray = response['missingValues'];
       this.stats.showMissingValues([response['missingValues']]);
 
       this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
@@ -264,7 +253,7 @@ export class TrainingViewComponent implements OnInit {
 
       // TODO proveriti da li ovde treba da se odradi i loading ostalih podataka 
       // na datoj stranici
-
+      /*
       if (this.viewIndicator == View.PREVIEW)
       {
         this.uploadDisplay = DisplayType.HIDE;
@@ -277,7 +266,7 @@ export class TrainingViewComponent implements OnInit {
         this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
         this.nextButtonDisable = false;
         this.backButtonDisable = false;
-      }
+      }*/
     }  
   }
 
@@ -379,61 +368,26 @@ export class TrainingViewComponent implements OnInit {
     }
   }
 
-  toggleTables(event:any){
+  toggleTables(){
+
     if(this.showColumnSelectionPage)
     {
-      event.currentTarget.innerHTML = "Show table";
-      this.statsTableDisplay = DisplayType.SHOW_AS_BLOCK;
+      this.statsViewDisplay = DisplayType.SHOW_AS_BLOCK;
       this.mainContainerDisplay = DisplayType.HIDE;
     }
     else
     {
-      event.currentTarget.innerHTML = "Show stats"
-      this.statsTableDisplay = DisplayType.HIDE;
+      this.statsViewDisplay = DisplayType.HIDE;
       this.mainContainerDisplay = DisplayType.SHOW_AS_FLEX;
     }
-    this.showColumnSelectionPage = !this.showColumnSelectionPage
-  }
-
-  OnNextClick() {
-    if (this.viewIndicator == View.UPLOAD)
-    {
-      if(this.datasetSource == 'link')
-        this.upload.linkClick();
-      else
-        this.upload.uploadClick();
-
-      //this.sessionService.saveData('view',this.viewIndicator.toString());
-      this.backButtonDisable = false;
-    }
-    else if (this.viewIndicator == View.PREVIEW)
-    {
-
-    }
-  }
-
-  OnBackClick(){
-    if (this.viewIndicator == View.PREVIEW)
-    {
-      this.previewDisplay = DisplayType.HIDE;
-      this.uploadDisplay = DisplayType.SHOW_AS_BLOCK;
-      this.backButtonDisable = true;
-      this.viewIndicator = View.UPLOAD;
-      this.sessionService.saveData('view', this.viewIndicator.toString());
-    }
-    else if(this.viewIndicator == View.TRAINING)
-    {
-      this.trainingDisplay = DisplayType.HIDE;
-      this.previewDisplay = DisplayType.SHOW_AS_BLOCK;
-      this.viewIndicator = View.PREVIEW;
-      //this.sessionService.saveData('view', this.viewIndicator.toString());
-    }
-    
+    this.showColumnSelectionPage = !this.showColumnSelectionPage;
   }
 
   changeModifyButtons(value:boolean)
   {
     this.modifyChangeButtons = value;
+
+    this.cd.detectChanges();
   }
   confirmationCancel()
   {
@@ -457,42 +411,63 @@ export class TrainingViewComponent implements OnInit {
 
   OnModalSave()
   {
-    this.modalDisplay = false;
+    var newRowData = this.modifyModal.getRowData();
+    
     this.hideElements();
-    var tempEdited: object[] = [];
-
+    
     let formPagesModifyElement = this.formPagesModify.get('currentPageModify');
     if(formPagesModifyElement) {
       this.currentPage = this.modifyModal.getCurrentPage();
       this.dataTable.setCurrentPage(this.currentPage);
     }
-      
 
     var req:ModifiedData = new ModifiedData(this.modifyModal.getEditedCells(), this.modifyModal.getDeletedRows(), this.modifyModal.getDeletedCols());
-
-    req.edited.forEach(element =>{
-      this.dataTable.rowData[element.row][this.dataTable.headers[element.col].name] = this.modifyModal.modifyTable.rowData[element.row][this.modifyModal.modifyTable.headers[element.col].name];
-      tempEdited.push(this.dataTable.rowData[element.row]);
-    });
-
+    console.log(req)
+ 
+    //const now = new Date().getTime();
     this.datasetService.modifyDataset(this.datasetId, req).subscribe(
       {
         next: (response:any) =>{
+          //const now2 = new Date().getTime();
+          var tempEdited: object[] = [];
           var tempDeleted :object[] = [];
-          req.deletedRows.forEach(element => {
-            tempDeleted.push(this.dataTable.rowData[element])
-            this.dataTable.rowData.splice(element,1);
+          //console.log(now2 - now);
+          
+          req.edited.forEach(element =>{
+            this.dataTable.rowData[element.row][this.dataTable.headers[element.col].name] = newRowData[element.row][this.dataTable.headers[element.col].name];
+            //console.log(this.dataTable.rowData[element.row][this.dataTable.headers[element.col].name]);
+            tempEdited.push(this.dataTable.rowData[element.row]);
           });
           
+          req.deletedRows.forEach(element => {
+            tempDeleted.push(this.dataTable.rowData[element])
+          });
+
           this.dataTable.updateRows(tempEdited);
           this.dataTable.removeRows(tempDeleted);
+          
+          tempDeleted.forEach(element =>
+          {
+            this.dataTable.rowData = this.dataTable.rowData.filter(row => row !== element);
+          });
+          //console.log(this.dataTable.rowData)
 
+          var basicInfo = JSON.parse(response['basicInfo']);
+          var missingValues = JSON.parse(response['missingValues']) 
+          this.numOfMissingValues = basicInfo['missing'];
+          this.numOfMissingArray = missingValues;
+          this.missingIndicator = !this.missingIndicator;
+
+          this.stats.showInfo([basicInfo]);
+          this.stats.showMissingValues([missingValues]);
           this.datasetService.getStatIndicators(this.datasetId).subscribe(this.fetchStatsDataObserver);
           this.datasetService.getCorrMatrix(this.datasetId).subscribe(this.fetchCorrMatrixObserver);
 
+          this.modalDisplay = false;
           this.showElements();
-          
+          /*
           //this.datasetService.getData(this.datasetId).subscribe(this.fetchTableDataObserver); // TODO check
+          */
           },
           error:(err: Error) => {
             console.log(err);
@@ -537,10 +512,12 @@ export class TrainingViewComponent implements OnInit {
 
     if (event.selectedIndex == View.TRAINING)
     {
-      var choosenInAndOutCols = this.labels.getChoosenCols(); 
-      console.log("choosenInAndOutCols")
-      console.log(choosenInAndOutCols)
-      
+      var result = this.labels.getChoosenCols();
+      var choosenInAndOutCols = result['values'];
+      var missing_sum = result['missing_sum'];
+
+      //console.log(choosenInAndOutCols);
+      //console.log(missing_sum);
       if (choosenInAndOutCols?.label !== undefined || choosenInAndOutCols!.features.length > 0)
       {
         if(choosenInAndOutCols!.features.length > 0)
@@ -549,12 +526,22 @@ export class TrainingViewComponent implements OnInit {
           {
             this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
             this.choosenInAndOutCols = choosenInAndOutCols;
+            //this.choosenInAndOutCols = {...InAndOutCols};
+            //this.choosenInAndOutCols.features = this.choosenInAndOutCols?.features.filter((col: ChosenColumn) => col.isChecked == true);
 
-            if(this.numOfMissingValues == 0) {
-              //this.previewDisplay = DisplayType.HIDE;
-              //this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
-            }
-            else {
+            if(missing_sum != 0) 
+            {
+              /*
+              this.dialogTitle = "Confirmation";
+              this.dialogMessage = "Are you sure that you ? This proccess cannot be undone.";
+    
+              const dialogRef = this.dialog.open(DialogComponent,{
+                data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
+              });
+              dialogRef.afterClosed().subscribe(result => {
+                
+              });*/ // TODO dilaog koji ce da proveri sa userom da li sigurno zeli da popuni tako nedostajuce vrednosti 
+                    // i da ga obavesti da nema nazad
               let columnFillMethodPairs: ColumnFillMethodPair[] = []
               
               choosenInAndOutCols?.features.forEach(col => {
@@ -597,8 +584,6 @@ export class TrainingViewComponent implements OnInit {
                   this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
                   this.fileName = this.upload.fileName!;
                   this.sessionService.saveData('file_name',this.fileName);
-                  this.previewDisplay = DisplayType.HIDE;
-                  this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
 
                   this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
                 },
@@ -619,6 +604,7 @@ export class TrainingViewComponent implements OnInit {
               data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
             });
             dialogRef.afterClosed().subscribe(result => {
+              if (!this.showColumnSelectionPage) this.toggleTables();
               this.setView(View.PREVIEW);
               console.log(this.viewIndicator);
             });
@@ -634,6 +620,7 @@ export class TrainingViewComponent implements OnInit {
             data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
           });
           dialogRef.afterClosed().subscribe(result => {
+            if (!this.showColumnSelectionPage) this.toggleTables();
             this.setView(View.PREVIEW);
           });
         }
@@ -647,6 +634,7 @@ export class TrainingViewComponent implements OnInit {
           data: { title: this.dialogTitle, message:this.dialogMessage, input:false },
         });
         dialogRef.afterClosed().subscribe(result => {
+          if (!this.showColumnSelectionPage) this.toggleTables();
           this.setView(View.PREVIEW);
         });
       }
