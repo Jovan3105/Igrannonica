@@ -57,6 +57,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
   numberOfEpochs: number = 1000;
   learningRate: number = 0.1;
   metricsArrayToSend: any[] = [];
+  metricsObjArray: Hyperparameter[]=[];
 
   sliderValueTest: number = 20;
   sliderValueValidation: number = 20;
@@ -198,6 +199,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
     // izdvajanje codename-ova metrika u poseban niz
     this.metricsArrayToSend = this.metricsControl.value.map(
       (item:any)=>item['codename']);
+    this.metricsObjArray=this.metrics.filter(x=>this.metricsArrayToSend.includes(x.codename));
     
     
     if(this.metricsArrayToSend[0] == undefined)
