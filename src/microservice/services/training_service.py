@@ -248,36 +248,40 @@ def train_model(
 
     log(y_pred, 'y_pred')
 
-    score = model.evaluate(
+    # Evaluate model #
+
+    testing_set_metrics = model.evaluate(
         X_test,
         y_test,
         verbose=VERBOSE,
-        callbacks=[callback]
+        return_dict = True
     )
 
     # Inverse scaler or encoder transformation #
 
-    input_actual_values = None 
-    pred_actual_values  = None
+    # input_actual_values = None 
+    # pred_actual_values  = None
 
-    
+    # log(CatColEncoder.NoEncoder.value, "CatColEncoder.NoEncoder.value: ")
 
-    log(CatColEncoder.NoEncoder.value, "CatColEncoder.NoEncoder.value: ")
-
-    if target_encoder == CatColEncoder.NoEncoder.value:
-        used_scaler = cts['labels'].named_transformers_['scaler']
+    # if target_encoder == CatColEncoder.NoEncoder.value:
+    #     used_scaler = cts['labels'].named_transformers_['scaler']
         
-        input_actual_values = used_scaler.inverse_transform(y_test)
-        pred_actual_values  = used_scaler.inverse_transform(y_pred)
-    else:
-        used_encoder = cts['labels'].named_transformers_[target_encoder]
+    #     input_actual_values = used_scaler.inverse_transform(y_test)
+    #     pred_actual_values  = used_scaler.inverse_transform(y_pred)
+    # else:
+    #     used_encoder = cts['labels'].named_transformers_[target_encoder]
 
-        input_actual_values = used_encoder.inverse_transform(y_test)
-        pred_actual_values  = used_encoder.inverse_transform(y_pred)
+    #     input_actual_values = used_encoder.inverse_transform(y_test)
+    #     pred_actual_values  = used_encoder.inverse_transform(y_pred)
 
-    log(list(zip(map(lambda x: x.value, metrics), score)), 'Testing score: ')
 
-    return input_actual_values.ravel(), pred_actual_values.ravel()
+    # Testing set metrics
+
+    log(testing_set_metrics, 'Testing score: ')
+
+    return testing_set_metrics
+    #return input_actual_values.ravel(), pred_actual_values.ravel()
 
 
 #################################################################

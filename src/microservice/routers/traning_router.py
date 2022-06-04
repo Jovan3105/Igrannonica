@@ -7,7 +7,7 @@ from pydantic import AnyHttpUrl
 from constants import ProblemType
 from models.models import NNLayer, Column
 from services.training_service import train_model
-from services.dataprep_service import get_basic_info
+from services.dataprep_service import get_missing_values_for_each_column
 from services.shared_service import log, read_json_data
 from helpers.metric_helper import Metric
 from helpers.optimizer_helper import Optimizer
@@ -69,10 +69,22 @@ async def begin_training(
 
         dataset_headers = list(cont_cols_set | cat_cols_set)
 
-        # Check if dataset has missing values #
+        # Check if features or labels have missing values #
 
-        if get_basic_info(df)['missing values count'] != 0:
-            raise HTTPException(status_code=400, detail=f"Dataset has missing values")
+        chosen_cols = [ col.name for col in features ]
+        chosen_cols += [ col.name for col in labels ]
+
+        missing_data = get_missing_values_for_each_column(df)
+        has_missing_values = False
+        chosen_cols_with_missing = []
+
+        for column_name in chosen_cols:
+            if missing_data[column_name] != 0:
+                has_missing_values = True
+                chosen_cols_with_missing = column_name
+
+        if has_missing_values:
+            raise HTTPException(status_code=400, detail=f"Chosen columns cannot have missing values. Columns with missing values: {chosen_cols_with_missing}")
 
         # Validate problem type #
 
@@ -125,7 +137,8 @@ async def begin_training(
 
         # begin training #
         
-        true, pred = train_model(
+        metrics_on_testing_set = train_model(
+        #true, pred = train_model(
             df=df,
             problem_type=problem_type,
             features=features,
@@ -148,4 +161,4 @@ async def begin_training(
 
         log("Elapsed time: {:.4f}s".format(end-start))
 
-        return { "true-pred" : [f"{left} | {right}" for left,right in zip(true,pred) ] }
+        return {'test_metrics' : metrics_on_testing_set} # { "true-pred" : [f"{left} | {right}" for left,right in zip(true,pred) ] }
