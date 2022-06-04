@@ -87,7 +87,7 @@ export class Constants{
       //{name: 'Poisson',                        info: 'Poisson!',                     codename: 'poisson',                        type: 'regression'},
       {name: 'Precision',                      info: 'Precision!',                   codename: 'precision',                      type: 'classification'},
       {name: 'Recall',                         info: 'Recall!',                      codename: 'recall',                         type: 'classification'},
-      {name: 'Root MeanSquared Error',         info: 'RootMeanSquaredError!',        codename: 'root_mean_squared_error',        type: 'regression'},
+      {name: 'Root Mean Squared Error',        info: 'RootMeanSquaredError!',        codename: 'root_mean_squared_error',        type: 'regression'},
       {name: 'Squared Hinge',                  info: 'SquaredHinge!',                codename: 'squared_hinge',                  type: 'classification'},
       {name: 'True Negatives',                 info: 'TrueNegatives!',               codename: 'true_negatives',                 type: 'classification'},
       {name: 'True Positives',                 info: 'TruePositives!',               codename: 'true_positives',                 type: 'classification'},

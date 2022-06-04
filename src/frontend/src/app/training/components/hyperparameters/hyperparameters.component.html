@@ -25,7 +25,8 @@
                 <div class="col-md-10 col-sm-12">
                     <div class="row">
                         <div class=" col-sm-12 justify-content-center d-flex align-items-center">
-                            <div style="display: none;" class="col-md-12 col-sm-12"> <!-- TODO potpuno izbacivanje problem type-a -->
+                            <div style="display: none;" class="col-md-12 col-sm-12">
+                                <!-- TODO potpuno izbacivanje problem type-a -->
                                 <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
                                     <mat-label><b>Problem type</b></mat-label>
                                     <mat-select class="col-md-12 col-sm-12" [(ngModel)]="problemType" name="problemType" (selectionChange)="reset();">
@@ -123,10 +124,12 @@
     </form>
     <div class="row mt-3 mb-3">
         <div class="col-md-3 col-sm-3 col-lg-3" *ngIf="metricsArrayToSend.length>0">
-            <button type="button" class="btn metricsSelect" (click)="changeGraphMetric('loss')">loss</button>
+            <button *ngIf="graph_metric!='loss'" type="button" class="btn p-1 m-1 metricsSelect" (click)="changeGraphMetric('loss')">Loss</button>
+            <button *ngIf="graph_metric=='loss'" type="button" class="btn btn-primary p-1 m-1 metricsSelect" (click)="changeGraphMetric('loss')">Loss</button>
         </div>
-        <div class="col-md-3 col-sm-3 col-lg-3" *ngFor="let metric of metricsArrayToSend">
-            <button type="button" class="btn p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric)">{{metric}}</button>
+        <div class="col-md-3 col-sm-3 col-lg-3" *ngFor="let metric of metricsObjArray">
+            <button *ngIf="metric.codename==graph_metric" type="button" class="btn btn-primary p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric.codename)">{{metric.name}}</button>
+            <button *ngIf="metric.codename!=graph_metric" type="button" class="btn p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric.codename)">{{metric.name}}</button>
         </div>
     </div>
     <app-chart class="row" [started]="started" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>
