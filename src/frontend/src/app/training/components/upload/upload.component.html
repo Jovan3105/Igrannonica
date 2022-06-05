@@ -94,7 +94,15 @@
         <mat-tab label="Private dataset">
             <ng-template matTabContent>
                 <div class="dropzone">
-                    We are working on it!
+                    <div class="dataset row d-flex" *ngFor="let dataset of myDatasets">
+                        <div class="col-md-11 col-sm-11">
+                            <h2>{{dataset.name}}</h2>
+                            <p>{{dataset.description}}</p>
+                        </div>
+                        <div class="col-md-1 col-sm-11 align-self-end">
+                            <button class="btn btn-outline-success" (click)="myDatasetClick(dataset)">Choose</button>
+                        </div>
+                    </div>
                 </div>
             </ng-template>
         </mat-tab>

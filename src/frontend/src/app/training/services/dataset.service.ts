@@ -27,7 +27,7 @@ export class DatasetService {
   }
 
   getpublicDatasets(): Observable<any[]> {
-    return this.http.get<any>(this.datasetAPIUrl + '?p=1').pipe(
+    return this.http.get<any>(this.datasetAPIUrl).pipe(
       tap(_ => console.log(`fetched public data`)),
       catchError(this.handleError)
     );

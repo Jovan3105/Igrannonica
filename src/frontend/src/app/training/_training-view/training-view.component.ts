@@ -179,6 +179,18 @@ export class TrainingViewComponent implements OnInit {
     }
   };
 
+  myDatasetsObserver:any = {
+    next: (response:any) => { 
+      console.log("### next@myDatasetsObserver");
+      console.log(response);
+      this.myDatasets=response;
+    },
+    error: (err: Error) => {
+      console.log("### error@myDatasetsObserver");
+      console.log(err);
+    }
+  };
+
   fetchTableDataObserver:any = {
     next: (response:any) => { 
       if(this.currentPage != 1) {
@@ -279,8 +291,10 @@ export class TrainingViewComponent implements OnInit {
         this.backButtonDisable = false;
       }
     }  
+    this.datasetService.getDatasets().subscribe(this.myDatasetsObserver);
   }
 
+  myDatasets:any[]=[];
   hideElements()
   {
     
@@ -318,6 +332,16 @@ export class TrainingViewComponent implements OnInit {
       this.errorDisplay = false;
     }, 5000);
 
+  }
+
+  chooseMyDataset(dataset:any)
+  {
+    this.datasetId=dataset.id;
+    this.uploadCompleted = true;
+    this.sessionService.saveData('dataset_id',this.datasetId.toString());
+    this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
+    this.fileName =dataset.fileName.split(".")[0]+".csv";
+    this.sessionService.saveData('file_name',this.fileName);
   }
 
   onDatasetSelection(obj: { isSelected: boolean, datasetSource: string }) {
