@@ -27,7 +27,7 @@
         <div id="first">
             <div class="row justify-content-center" style="margin-top: 0.3rem;">
                 <div class="col-sm-4 ms-5">
-                    <h2>Selected dataset: <i>{{fileName}}</i></h2>
+                    <h2>Selected dataset: <i>{{datasetName}}</i></h2>
                 </div>
                 <div class="col-sm ms-5">
                     <button type="button" class="btn btn-secondary" *ngIf="showColumnSelectionPage" (click)="toggleTables()" id="statsButton">Show stats</button>&nbsp;
@@ -81,7 +81,7 @@
     <div class="modal-dialog modal-lg" style="max-width: 80%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="staticBackdropLabel" style="margin-bottom:0px">Modifying dataset: <i>{{fileName}}</i></h2>
+                <h2 class="modal-title" id="staticBackdropLabel" style="margin-bottom:0px">Modifying dataset: <i>{{datasetName}}</i></h2>
                 <button type="button" class="btn-close" style="margin-right: 0.5rem;" *ngIf="modifyChangeButtons" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()" aria-label="Close" id="modal-close"></button>
                 <button type="button" class="btn-close" style="margin-right: 0.5rem;" *ngIf="!modifyChangeButtons" data-bs-dismiss="modal" aria-label="Close" id="modal-close"></button>
             </div>
@@ -95,7 +95,7 @@
                 <button type="button" class="btn btn-secondary" *ngIf="modifyChangeButtons" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationCancel()">Cancel</button>
                 <button type="button" class="btn btn-secondary" *ngIf="!modifyChangeButtons" data-bs-dismiss="modal" (click)="updateCurrentPageFromModify()">Cancel</button>
                 <button type="button" class="btn btn-primary" *ngIf="modifyChangeButtons" data-bs-toggle="modal" data-bs-target="#secondModal" (click)="confirmationSave()">Apply changes</button>
-                <button type="button" class="btn btn-primary" *ngIf="!modifyChangeButtons" data-bs-dismiss="modal">Apply changes</button>
+                <button type="button" class="btn btn-primary" disabled *ngIf="!modifyChangeButtons" data-bs-dismiss="modal">Apply changes</button>
             </div>
         </div>
     </div>

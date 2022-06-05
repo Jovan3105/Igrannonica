@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
@@ -25,6 +25,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
   @Input() datasetId:any;
   
   loaderMiniDisplay:string = DisplayType.HIDE;
+  trainingBool:boolean = false;
   readonly backendSocketUrl = environment.backendSocketUrl;
 
   constructor(private trainingViewComponent:TrainingViewComponent, 
@@ -88,11 +89,26 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   ngOnInit(): void 
   {
-    if(this.sessionService.getData('view') != null && parseInt(this.sessionService.getData('view')!) == View.TRAINING)
+
+    if(this.sessionService.getData('view') != null && this.sessionService.getData('chosen_columns') != null)
     {
       this.choosenInAndOutCols = JSON.parse(this.sessionService.getData('chosen_columns')!);
       this.problemType = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"regression";
       this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
+      if (this.sessionService.getData('layers') != null){
+        this.layers = JSON.parse(this.sessionService.getData('layers')!);
+        this.numberOfEpochs = parseInt(this.sessionService.getData('numberOfEpochs')!);
+
+      }
+      if (this.sessionService.getData('numberOfEpochs') != null) 
+        this.numberOfEpochs = parseInt(this.sessionService.getData('numberOfEpochs')!);
+      if (this.sessionService.getData('learningRate') != null) 
+        this.learningRate = parseFloat(this.sessionService.getData('learningRate')!);
+    }
+    else{
+      this.sessionService.saveData('layers', JSON.stringify(this.layers));
+      this.sessionService.saveData('numberOfEpochs', this.numberOfEpochs.toString());
+      this.sessionService.saveData('learningRate', this.learningRate.toString());
     }
   }
   
@@ -109,6 +125,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
       
     }
   }
+
   layers= [
     { 
       index : 0,
@@ -123,7 +140,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
       activation_function : "ReLu",
     }
   ];
-
+  
   epoches_data:any[]=[];
 
   graph_metric="loss";
@@ -138,10 +155,12 @@ export class HyperparametersComponent implements OnInit, OnChanges
   started:boolean=false;
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
+    this.sessionService.saveData('layers', JSON.stringify(this.layers));
   }
 
   removeLayer(index:number){
     this.layers.splice(index, 1);
+    this.sessionService.saveData('layers', JSON.stringify(this.layers));
   }
   
 
@@ -152,6 +171,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
         weight_initializer  : this.layers.length>0 ? this.layers[this.layers.length-1].weight_initializer : "HeUniform",
         activation_function : this.layers.length>0 ? this.layers[this.layers.length-1].activation_function : "ReLu",
       });
+      this.sessionService.saveData('layers', JSON.stringify(this.layers));
   }
 
   changeGraphMetric(codename:string)
@@ -169,6 +189,8 @@ export class HyperparametersComponent implements OnInit, OnChanges
       this.loaderMiniDisplay = DisplayType.HIDE;
       this.collapse = DisplayType.SHOW_AS_BLOCK;
       this.epoches_arr[this.epoches_arr.length-1] = 0;
+      this.trainingBool = false;
+
     },
     error: (err: Error) => {
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
@@ -181,13 +203,16 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   changeEpoch(value: number): void {
     this.numberOfEpochs = value;
+    this.sessionService.saveData('numberOfEpochs', this.numberOfEpochs.toString());
   }
   changeRate(value: number): void {
     value = +value.toFixed(2)
-    //this.learningRate = value;
+    this.learningRate = value;
+    this.sessionService.saveData('learningRate', this.learningRate.toString());
   }
   
   TrainingClick(){
+    this.trainingBool = true;
     this.loaderMiniDisplay = DisplayType.SHOW_AS_BLOCK;
     let connectionID = "";
     
@@ -269,7 +294,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
       }
     }
 
-    // TODO proveriti da li je potrebno zatvoriti socket sa: subject.locse()
+    // TODO proveriti da li je potrebno zatvoriti socket sa: subject.close()
     subject.onclose = function(evt){
       console.log("Connection is terminated");
     }
@@ -298,5 +323,11 @@ export class HyperparametersComponent implements OnInit, OnChanges
     });
     this.allSelected = newStatus;
   }
+  
+  @HostListener('window:beforeunload', ['$event'])
+  unloadHandler(event: Event) {
+    
+    return !this.trainingBool;
+  }  
 }
 

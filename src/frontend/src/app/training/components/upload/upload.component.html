@@ -44,10 +44,15 @@
                         {{errorMessage}}
                     </div>
                     <br><br>
-                    <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)" (changePublicEvent)="updateDatasetPublic($event)" [filenameFromParent]="linkName"></app-dataset-info>
+                    <app-dataset-info
+                    (changeNameEvent)="updateDatasetLinkName($event)" 
+                    (changeDescriptionEvent)="updateDatasetLinkDescription($event)" 
+                    (changePublicEvent)="updateDatasetLinkPublic($event)" 
+                    [filenameFromParent]="linkName">
+                    </app-dataset-info>
                 </div>
                 <div class="nextButton">
-                    <button id="next" class="btn btn-primary" [disabled]="datasetURL==''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
+                    <button id="next" class="btn btn-primary" [disabled]="datasetURL=='' && linkName == ''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>
                 </div>
             </ng-template>
         </mat-tab>
@@ -87,7 +92,7 @@
                     </div>
                 </div>
                 <div class="nextButton">
-                    <button id="next" class="btn btn-primary" [disabled]="file==null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
+                    <button id="next" class="btn btn-primary" [disabled]="file==null && fileSize == null" (click)="uploadClick()" (keyup.enter)="uploadClick()"><mat-icon>navigate_next</mat-icon></button>
                 </div>
             </ng-template>
         </mat-tab>

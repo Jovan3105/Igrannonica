@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { Check, ChosenColumn, HeaderDict } from '../../models/table_models';
 import { MatDialog } from '@angular/material/dialog';
@@ -56,6 +56,10 @@ export class LabelsComponent implements OnInit, OnChanges {
     this.previousTargetId = null;
     this.targetColumn = null;
 
+    if (this.sessionService.getData('selected_checkboxes') != null)
+    {
+      this.checkboxCheckedArray = JSON.parse(this.sessionService.getData('selected_checkboxes')!);
+    }
     this.resetValues();
   }
 
@@ -130,12 +134,14 @@ export class LabelsComponent implements OnInit, OnChanges {
       this.checkboxCheckedArray[event.target.value] = false;
       this.checkEvent.emit(new Check(event.target.value, false));
     }
+    this.sessionService.saveData('selected_checkboxes', JSON.stringify(this.checkboxCheckedArray));
   }
 
   // poziva se kada se kad se dogodi hideEvent tabele
   changeCheckbox(checkChange:Check)
   {
     this.checkboxCheckedArray[checkChange.id] = !this.checkboxCheckedArray[checkChange.id];
+    this.sessionService.saveData('selected_checkboxes', JSON.stringify(this.checkboxCheckedArray));
   }
 
   onLabelColSelect()
@@ -146,6 +152,7 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
 
     if(this.targetColumn!=null){
+
       this.targetColumnId = this.targetColumn.key;
       if (this.checkboxCheckedArray[this.targetColumn.key]) 
         this.checkboxCheckedArray[this.targetColumn.key] = false;
