@@ -61,6 +61,16 @@ export class ModifiedData {
   }
 }
 
+export class Stats{
+  categorical:any[];
+  continuous:any[];
+
+  constructor(categorical: any[], continuous: any[]) {
+    this.categorical = categorical;
+    this.continuous = continuous;
+  }
+}
+
 export class UndoData{
   type:undoType;
   data:any;

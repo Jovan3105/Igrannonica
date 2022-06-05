@@ -13,7 +13,7 @@ export class UploadComponent implements OnInit {
   file?:File;
   fileName?:string;
   linkName:string = "";
-  name:string = "";
+  datasetId:number = -1;
   datasetName?:string="";
   datasetDescription?:string="";
   isDatasetPublic?:boolean=false;
@@ -71,10 +71,29 @@ export class UploadComponent implements OnInit {
         this.showDragAndDrop = false;
       }
     }
-      
+
+    if (this.sessionService.getData('link_name') != null)
+    {
+      this.linkName = this.sessionService.getData('link_name')!;
+      this.datasetURL = this.sessionService.getData('dataset_url')!;
+    }
+
+    if (this.sessionService.getData('dataset_name') != null)
+    {
+      this.datasetName = this.sessionService.getData('dataset_name')!;
+      this.datasetDescription = this.sessionService.getData('dataset_description')!;
+    }
+
     if(this.sessionService.getData('upload_link') != null)
     {
       this.datasetURL = this.sessionService.getData('upload_link')!;
+    }
+
+    if (this.sessionService.getData('dataset_id') != null)
+    {
+      this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
+      if (this.sessionService.getData('upload_type') == 'link') this.newLinkBool = false;
+      else if (this.sessionService.getData('upload_type') == 'file') this.newFileBool = false;
     }
   }
 
@@ -101,7 +120,7 @@ export class UploadComponent implements OnInit {
     if (fileList && fileList?.length > 0) {
 
     this.file = fileList[0];
-    this.fileName = this.name = this.file.name;
+    this.fileName = this.file.name;
     this.fileSize = this.convertFileSize(this.file.size);
 
     let fileNameToTitle = this.fileName;
@@ -126,7 +145,7 @@ export class UploadComponent implements OnInit {
   onFileDropped(file:File)
   {
     this.file = file;
-    this.fileName = this.name = file.name;
+    this.fileName= file.name;
     this.fileSize = this.convertFileSize(file.size);
     this.showDragAndDrop = false;
     this.newFileBool = true;
@@ -149,11 +168,20 @@ export class UploadComponent implements OnInit {
         public:this.isDatasetPublic
       });
 
-      this.fileName = this.name = this.file?.name!;
+      this.fileName = this.file?.name!;
       this.newFileBool = false;
       this.newLinkBool = true;
+      this.sessionService.clearData();
+      this.sessionService.saveData('upload_type','file');
+      this.sessionService.saveData('tab_index',this.tab_index.toString());
+      this.sessionService.saveData('file_name', this.fileName);
+      this.sessionService.saveData('file_size', this.fileSize!);
+      this.sessionService.saveData('dataset_name',this.datasetName!);
+      this.sessionService.saveData('dataset_description', this.datasetDescription!);
+
     }
     else{
+
       this.uploadEvent.emit({
         file:undefined,
         name:this.datasetName,
@@ -165,6 +193,12 @@ export class UploadComponent implements OnInit {
   
   linkClick()
   {
+    if (this.datasetName == "")
+      {
+        this.datasetName = this.datasetURL.split("/").pop()!;
+      }
+      if (this.datasetDescription == "")
+        this.datasetDescription = "Default";
     if (this.newLinkBool)
     {
       this.linkEvent.emit({
@@ -173,9 +207,16 @@ export class UploadComponent implements OnInit {
         description:this.datasetDescription,
         public:this.isDatasetPublic
       });
-      this.fileName = this.linkName = this.name = this.datasetURL.split("/").pop()!;
+      this.linkName = this.datasetURL.split("/").pop()!;
       this.newLinkBool = false;
       this.newFileBool = true;
+      this.sessionService.clearData();
+      this.sessionService.saveData('upload_type','link');
+      this.sessionService.saveData('tab_index',this.tab_index.toString());
+      this.sessionService.saveData('link_name', this.linkName);
+      this.sessionService.saveData('dataset_url', this.datasetURL);
+      this.sessionService.saveData('dataset_name',this.datasetName!);
+      this.sessionService.saveData('dataset_description', this.datasetDescription!);
     }
     else{
       this.linkEvent.emit({
@@ -192,7 +233,6 @@ export class UploadComponent implements OnInit {
     this.clearSessionStorage();
     this.file = undefined;
     this.fileName="";
-    this.name="";
     this.showDragAndDrop = true;
 
     this.datasetSelectedEvent.emit({ isSelected: false, datasetSource: "local_upload"});
@@ -239,13 +279,17 @@ export class UploadComponent implements OnInit {
   
   publicLinkClick(datasetLink:string)
   {
+    this.newLinkBool = true;
+    this.newFileBool = true;
+    this.datasetName = datasetLink.split("/").pop()!;
     this.linkEvent.emit({
       link:datasetLink,
       name:this.datasetName,
       description:this.datasetDescription,
       public:false
     });
-    this.fileName = this.linkName = this.name = this.datasetURL.split("/").pop()!;
+    this.sessionService.saveData('dataset_name',this.datasetName!);
+    this.sessionService.saveData('dataset_description', this.datasetDescription!);
   }
 
   onUrlInputChange(event:any) {

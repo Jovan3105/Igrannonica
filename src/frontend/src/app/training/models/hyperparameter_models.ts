@@ -79,15 +79,19 @@ export class Constants{
       {name: 'False Positives',                info: 'FalsePositives!',              codename: 'false_positives',                type: 'classification'},
       {name: 'Hinge',                          info: 'Hinge!',                       codename: 'hinge',                          type: 'classification'},
       {name: 'Kullback-Leibler Divergence',    info: 'KLDivergence!',                codename: 'kullback_leibler_divergence',    type: 'classification'},
+
       {name: 'Log Cosh Error',                 info: 'LogCoshError!',                codename: 'logcosh',                        type: 'regression'},
       {name: 'Mean Absolute Error',            info: 'MeanAbsoluteError!',           codename: 'mean_absolute_error',            type: 'regression'},
       {name: 'Mean Absolute Percentage Error', info: 'MeanAbsolutePercentageError!', codename: 'mean_absolute_percentage_error', type: 'regression'},
       {name: 'Mean Squared Error',             info: 'MeanSquaredError!',            codename: 'mean_squared_error',             type: 'regression'},
       {name: 'Mean Squared Logarithmic Error', info: 'MeanSquaredLogarithmicError!', codename: 'mean_squared_logarithmic_error', type: 'regression'},
+
       //{name: 'Poisson',                        info: 'Poisson!',                     codename: 'poisson',                        type: 'regression'},
       {name: 'Precision',                      info: 'Precision!',                   codename: 'precision',                      type: 'classification'},
       {name: 'Recall',                         info: 'Recall!',                      codename: 'recall',                         type: 'classification'},
+
       {name: 'Root MeanSquared Error',         info: 'RootMeanSquaredError!',        codename: 'root_mean_squared_error',        type: 'regression'},
+      
       {name: 'Squared Hinge',                  info: 'SquaredHinge!',                codename: 'squared_hinge',                  type: 'classification'},
       {name: 'True Negatives',                 info: 'TrueNegatives!',               codename: 'true_negatives',                 type: 'classification'},
       {name: 'True Positives',                 info: 'TruePositives!',               codename: 'true_positives',                 type: 'classification'},

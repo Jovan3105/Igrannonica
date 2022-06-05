@@ -56,6 +56,14 @@ export class LabelsComponent implements OnInit, OnChanges {
     this.previousTargetId = null;
     this.targetColumn = null;
 
+    if (this.sessionService.getData('target_column') != null)
+    {
+      this.targetColumn = JSON.parse(this.sessionService.getData('target_column')!);
+    }
+    if (this.sessionService.getData('selected_checkboxes') != null)
+    {
+      this.checkboxCheckedArray = JSON.parse(this.sessionService.getData('selected_checkboxes')!);
+    }
     this.resetValues();
   }
 
@@ -130,12 +138,14 @@ export class LabelsComponent implements OnInit, OnChanges {
       this.checkboxCheckedArray[event.target.value] = false;
       this.checkEvent.emit(new Check(event.target.value, false));
     }
+    this.sessionService.saveData('selected_checkboxes', JSON.stringify(this.checkboxCheckedArray));
   }
 
   // poziva se kada se kad se dogodi hideEvent tabele
   changeCheckbox(checkChange:Check)
   {
     this.checkboxCheckedArray[checkChange.id] = !this.checkboxCheckedArray[checkChange.id];
+    this.sessionService.saveData('selected_checkboxes', JSON.stringify(this.checkboxCheckedArray));
   }
 
   onLabelColSelect()
@@ -146,6 +156,7 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
 
     if(this.targetColumn!=null){
+      this.sessionService.saveData('target_column',JSON.stringify(this.targetColumn));
       this.targetColumnId = this.targetColumn.key;
       if (this.checkboxCheckedArray[this.targetColumn.key]) 
         this.checkboxCheckedArray[this.targetColumn.key] = false;

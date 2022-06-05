@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from '@angular/core';
-import { Check, ChosenColumn, ModifiedData, TableIndicator } from '../models/table_models';
+import { Check, ChosenColumn, ModifiedData, Stats, TableIndicator } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
 import { DatasetService } from '../services/dataset.service';
 import { LabelsComponent } from '../components/labels/labels.component';
@@ -30,16 +30,19 @@ export class TrainingViewComponent implements OnInit {
   datasetId:number = -1;
   datasetURL:string = "";
   userId:number = -1;
+  statsData?:Stats;
 
   viewIndicator:View = View.UPLOAD;
   datasetSource: string = '';
 
   fileName:string = "";
+  datasetName:string = "";
   numOfMissingValues:number = 0;
   numOfMissingArray:any;
   missingIndicator:boolean = false;
   linearStepper:boolean = true;
   currentPage:number = 1;
+  firstPageVisit:boolean = true;
 
   dialogTitle:string = "";
   dialogMessage:string = "";
@@ -124,7 +127,7 @@ export class TrainingViewComponent implements OnInit {
   uploadObserver:any = {
     next: (response:any) => { 
       console.log("### next@uploadObserver")
-      console.log(response)
+      //console.log(response);
 
       this.datasetId = response;
 
@@ -133,18 +136,13 @@ export class TrainingViewComponent implements OnInit {
         this.uploadCompleted = true;
         this.sessionService.saveData('dataset_id',this.datasetId.toString());
         this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-        this.fileName = this.upload.name!;
-        this.sessionService.saveData('file_name',this.fileName);
+        this.datasetName = this.upload.datasetName!;
       }
       else
       {
         this.showUploadErrorMessage("There was problem while fetching data. Please try again later")
       }
-      /*
-      this.sessionService.saveData('file_name',this.upload.fileName!);
-      if (this.upload.fileSize != undefined)
-        this.sessionService.saveData('file_size',this.upload.fileSize!);
-      */
+      
     },
     error: (err: Error) => {
       console.log("### error@uploadObserver")
@@ -156,8 +154,13 @@ export class TrainingViewComponent implements OnInit {
   changeInfoObserver:any = {
     next: (response:any) => { 
       console.log("### next@changeInfoObserver")
-      console.log(response)
-      this.viewIndicator = View.PREVIEW;
+      this.sessionService.saveData('dataset_name', this.datasetName);
+      this.setView(View.PREVIEW);
+      if(this.firstPageVisit){
+        this.hideElements();
+        this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
+        this.firstPageVisit = false;
+      }
       
     },
     error: (err: Error) => {
@@ -169,6 +172,7 @@ export class TrainingViewComponent implements OnInit {
 
   fetchTableDataObserver:any = {
     next: (response:any) => { 
+      
       if(this.currentPage != 1) {
         this.currentPage = 1;
         this.formPages.controls['currentPage']!.setValue(1);
@@ -202,7 +206,7 @@ export class TrainingViewComponent implements OnInit {
   fetchStatsDataObserver:any = {
     next: (response:any) => { 
         console.log("dashboard > DashboardComponent > fetchStatsDataObserver > next:")
-        //console.log(response)
+        this.statsData = new Stats(response['categorical'],response['continuous']);
         this.stats.showTables(response);
    
     },
@@ -239,6 +243,12 @@ export class TrainingViewComponent implements OnInit {
       this.authService.logout('session_expired')
     }
 
+    if (this.sessionService.getData('dataset_id') != null) 
+    {
+      this.uploadCompleted = true;
+      this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
+      this.datasetName = this.sessionService.getData('dataset_name')!;
+    }
     this.userId = userIdTemp;
 
     this.sessionService.saveData('user_id', this.userId.toString());
@@ -249,35 +259,25 @@ export class TrainingViewComponent implements OnInit {
       this.sessionService.saveData('view',this.viewIndicator.toString());
     }
     else  {
-      this.viewIndicator = parseInt(lastVisitedPage);
+      this.setView(parseInt(lastVisitedPage));
+      if (this.viewIndicator == View.PREVIEW || this.viewIndicator == View.TRAINING)
+      {
+        if (this.sessionService.getData('dataset_id') != null) 
+        {
+          this.hideElements();
+          this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
+          this.firstPageVisit = false;
+        }
+        if (this.viewIndicator == View.TRAINING) this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
+      }
 
       // TODO proveriti da li ovde treba da se odradi i loading ostalih podataka 
       // na datoj stranici
-      /*
-      if (this.viewIndicator == View.PREVIEW)
-      {
-        this.uploadDisplay = DisplayType.HIDE;
-        this.showElements();
-      }
-      else if(this.viewIndicator == View.TRAINING)
-      {
-        this.uploadDisplay = DisplayType.HIDE;
-        this.previewDisplay = DisplayType.HIDE;
-        this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
-        this.nextButtonDisable = false;
-        this.backButtonDisable = false;
-      }*/
     }  
   }
 
   hideElements()
   {
-    
-    if (this.viewIndicator == View.UPLOAD) // TODO - cuvanje stanja
-    {
-      //this.viewIndicator = View.PREVIEW;
-      //this.sessionService.saveData('view',this.viewIndicator.toString());
-    }
     this.stepperDisplay = DisplayType.HIDE;
     this.loaderDisplay = DisplayType.SHOW_AS_BLOCK;
   }
@@ -289,8 +289,7 @@ export class TrainingViewComponent implements OnInit {
     this.stepperDisplay = DisplayType.SHOW_AS_BLOCK;
     if (this.viewIndicator == View.UPLOAD) 
     {
-      this.viewIndicator = View.PREVIEW;
-      //this.sessionService.saveData('view',this.viewIndicator.toString());
+      this.setView(View.PREVIEW);
     }
   }
 
@@ -298,9 +297,8 @@ export class TrainingViewComponent implements OnInit {
   {
     this.errorMessage = message;
     this.loaderDisplay = DisplayType.HIDE;
-    this.viewIndicator = View.UPLOAD;
+    this.setView(View.UPLOAD);
     this.stepperDisplay = DisplayType.SHOW_AS_BLOCK;
-    this.sessionService.saveData('view',this.viewIndicator.toString());
 
     this.errorDisplay = true;  
     setTimeout(() => {
@@ -322,12 +320,13 @@ export class TrainingViewComponent implements OnInit {
       Public: $event.public
     });
     if ($event.file == undefined) {
-      this.viewIndicator = View.PREVIEW;
+      this.datasetName = $event.name;
       this.datasetService.updateDataset(this.datasetId,{
         Name: $event.name,
         Description: $event.description,
         Public: $event.public
       }).subscribe(this.changeInfoObserver);
+      
       return;
     }
     this.hideElements();
@@ -348,12 +347,13 @@ export class TrainingViewComponent implements OnInit {
   onShowDataClick($dataset:any) {
 
     if ($dataset.link == undefined) {
-      this.viewIndicator = View.PREVIEW;
+      this.datasetName = $dataset.name;
       this.datasetService.updateDataset(this.datasetId,{
         Name: $dataset.name,
         Description: $dataset.description,
         Public: $dataset.public
       }).subscribe(this.changeInfoObserver);
+
       return;
     }
 
@@ -498,17 +498,10 @@ export class TrainingViewComponent implements OnInit {
     return this.labels.selectedEncodings;
   }
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event:Event) {
-
-    if(this.modalDisplay == true)
-    {
-    }
-  }
-
   setIndex(event:StepperSelectionEvent)
   {
-    this.viewIndicator = event.selectedIndex;
+    this.setView(event.selectedIndex);
+    //console.log(this.viewIndicator);
 
     if (event.selectedIndex == View.TRAINING)
     {
@@ -526,8 +519,18 @@ export class TrainingViewComponent implements OnInit {
           {
             this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
             this.choosenInAndOutCols = choosenInAndOutCols;
-            //this.choosenInAndOutCols = {...InAndOutCols};
-            //this.choosenInAndOutCols.features = this.choosenInAndOutCols?.features.filter((col: ChosenColumn) => col.isChecked == true);
+            this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
+
+            /*
+            if (this.choosenInAndOutCols.label.type == 'Categorical')
+            {
+              var name = this.choosenInAndOutCols.label.name;
+
+              if(this.statsData?.categorical.find(o => o.indicator == "Unique")[name] == 2)
+              {
+                //this.choosenInAndOutCols.label.type = "Binary Categorical";
+              }
+            }*/
 
             if(missing_sum != 0) 
             {
@@ -578,12 +581,11 @@ export class TrainingViewComponent implements OnInit {
               this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
                 next: (response:any) => {
                   console.log("Fill missing value: ", response)
-                  this.viewIndicator = View.TRAINING;
+                  this.setView(View.TRAINING);
                   this.labels.keep_state = true;
                   this.sessionService.saveData('dataset_id',this.datasetId.toString());
                   this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-                  this.fileName = this.upload.fileName!;
-                  this.sessionService.saveData('file_name',this.fileName);
+                  this.datasetName = this.upload.datasetName!;
 
                   this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
                 },
@@ -606,7 +608,6 @@ export class TrainingViewComponent implements OnInit {
             dialogRef.afterClosed().subscribe(result => {
               if (!this.showColumnSelectionPage) this.toggleTables();
               this.setView(View.PREVIEW);
-              console.log(this.viewIndicator);
             });
             
           }
@@ -639,13 +640,12 @@ export class TrainingViewComponent implements OnInit {
         });
       }
     }
-    //this.viewIndicator = index;
-    //this.sessionService.saveData('tab_index',this.tab_index.toString());
   }
 
   setView(view:View)
   {
     this.viewIndicator = view;
+    this.sessionService.saveData('view',this.viewIndicator.toString());
   }
 
   public changePage(event: any){
