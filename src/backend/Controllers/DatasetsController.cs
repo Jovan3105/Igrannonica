@@ -39,24 +39,17 @@ namespace backend.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<List<Dataset>>> fetchAllDatasets(string? p)
+        public async Task<ActionResult<List<Dataset>>> fetchAllDatasets()
         {
+            var userID = Convert.ToInt32(_httpContext.HttpContext.User.Claims.First(i => i.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber").Value);
             List<Dataset> lista = new List<Dataset>();
-            if (p == "1")
-            {
                 lista = await this.datasetContext.Datasets.ToListAsync();
                 //lista = await this.datasetTagContext.Datasets.Include(x => x.DatasetDatasetTags).ToListAsync();
-                lista.Where(x => x.Public == true);
-            }
-            else
-            {
-                lista = await this.datasetContext.Datasets.ToListAsync();
+                lista=lista.Where(x => x.UserID == userID).ToList();
                 //lista = await this.datasetTagContext.Datasets.Include(x=>x.DatasetDatasetTags).ToListAsync();
                 //lista = await this.datasetTagContext.DatasetDatasetTags.Include(x => x.Dataset).Where(entry => entry.DatasetId != 0).Select(entry => entry.Dataset).ToListAsync();
                 //lista = await this.datasetTagContext.Datasets.Include(x=>x.DatasetDatasetTags).ToListAsync();
                 
-            }
-
             return Ok(lista);
         }
         

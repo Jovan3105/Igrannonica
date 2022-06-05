@@ -34,9 +34,11 @@ export class UploadComponent implements OnInit {
   
   @Input() badLinkErrorDisplay: boolean = false;
   @Input() errorMessage: string = '';
+  @Input() myDatasets:any[]=[];
   @Output() linkEvent: EventEmitter<any>; //podizanje event-a kada se salje link
   @Output() uploadEvent: EventEmitter<any>; //podizanje event-a kada se salje file
   @Output() datasetSelectedEvent: EventEmitter<{ isSelected: boolean, datasetSource: string }>;
+  @Output() myDatasetEvent:EventEmitter<any>;
 
   constructor(private authService : AuthService, public sessionService:SessionService) {
     this.fileName = "";
@@ -44,6 +46,7 @@ export class UploadComponent implements OnInit {
     this.linkEvent = new EventEmitter<string>();
     this.uploadEvent = new EventEmitter<File>();
     this.datasetSelectedEvent = new EventEmitter<{ isSelected: boolean, datasetSource: string }>();
+    this.myDatasetEvent = new EventEmitter<any>();
     this.isLoggedIn = this.authService.isLoggedIn();
     this.showDragAndDrop = true;
     this.diamondsURL = "https://raw.githubusercontent.com/tidyverse/ggplot2/main/data-raw/diamonds.csv"
@@ -185,6 +188,11 @@ export class UploadComponent implements OnInit {
         public:this.isDatasetPublic
       });
     }
+  }
+
+  myDatasetClick(dataset:any)
+  {
+    this.myDatasetEvent.emit(dataset);
   }
 
   removeFile()
