@@ -17,13 +17,13 @@
 
 <mat-stepper [linear]="linearStepper" [selectedIndex]="viewIndicator" (selectionChange)="setIndex($event)" #stepper [ngStyle]="{'display': stepperDisplay}">
     <mat-step [completed]="uploadCompleted">
-        <ng-template matStepLabel>Selection</ng-template>
+        <ng-template matStepLabel>Dataset selection</ng-template>
         <div>
             <app-upload #upload [badLinkErrorDisplay]="errorDisplay" [errorMessage]="errorMessage" (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
         </div>
     </mat-step>
     <mat-step>
-        <ng-template matStepLabel>Data preparation</ng-template>
+        <ng-template matStepLabel>Column selection and data preparation</ng-template>
         <div id="first">
             <div class="row justify-content-center" style="margin-top: 0.3rem;">
                 <div class="col-sm-4 ms-5">
@@ -66,7 +66,7 @@
         </div>
     </mat-step>
     <mat-step>
-      <ng-template matStepLabel>Training</ng-template>
+      <ng-template matStepLabel>Training and evaluation</ng-template>
       <div id="second" class="container-flex">
         <app-hyperparameters [choosenInAndOutCols]="choosenInAndOutCols" [datasetId]="datasetId" 
         [ngStyle]="{'display': trainingDisplay}"></app-hyperparameters>

@@ -54,7 +54,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
   problemType: string = "regression";
   selectedNumerical: string = "false";
   selectedCategorical: string = "false"
-  numberOfEpochs: number = 1000;
+  numberOfEpochs: number = 300;
   learningRate: number = 0.1;
   metricsArrayToSend: any[] = [];
   metricsObjArray: Hyperparameter[]=[];

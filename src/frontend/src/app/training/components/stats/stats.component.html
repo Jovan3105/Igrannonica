@@ -22,8 +22,8 @@
         </mat-tab>
         <mat-tab label="Correlation Matrix">
             <div class="tab-container">
+                <p style="color:gray; margin-top: 15px; margin-bottom: -10px;">Click to see closer</p>
                 <img class="corr-img" [src]="corrMatrixImgSource" (click)="openImage()" style="border-color: white;border-width: 2px;border-style: solid;border-radius: 25px;">
-                <p style="color:gray">Click to see closer</p>
                 <div class="preview-img" *ngIf="showImage" (click)="closeImage()">
                     <button class="close-btn" (click)="closeImage()"><mat-icon>close</mat-icon></button>
                     <div class="corr-full-img" *ngIf="previewImage">
