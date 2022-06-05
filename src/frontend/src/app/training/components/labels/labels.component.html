@@ -94,7 +94,7 @@
   <div class="card-body">
     <select [(ngModel)]="targetColumn" #selectLabel class="form-select" aria-label="Odabir izlaza" 
     (change)="onLabelColSelect()"><!-- TODO povecati font za aria-label -->
-      <option [ngValue]="null" disabled></option>
+      <option [ngValue]="null" disabled>--</option>
       <option class="word-wrap" *ngFor="let column of columns;" [ngValue]="column">
         {{column.name}}</option> <!-- TODO postaviti automatski tip -->
     </select>

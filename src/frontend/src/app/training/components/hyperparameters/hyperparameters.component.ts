@@ -168,11 +168,13 @@ export class HyperparametersComponent implements OnInit, OnChanges
       
       this.loaderMiniDisplay = DisplayType.HIDE;
       this.collapse = DisplayType.SHOW_AS_BLOCK;
+      this.epoches_arr[this.epoches_arr.length-1] = 0;
     },
     error: (err: Error) => {
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
       this.collapse = DisplayType.SHOW_AS_BLOCK;
       this.loaderMiniDisplay = DisplayType.HIDE;
+      this.epoches_arr![this.epoches_arr!.length-1] = 0;
       console.log(err)
     }
   };
@@ -295,6 +297,6 @@ export class HyperparametersComponent implements OnInit, OnChanges
       }
     });
     this.allSelected = newStatus;
-  }  
+  }
 }
 

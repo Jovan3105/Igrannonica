@@ -1,4 +1,5 @@
-<h3 style="text-align: center;">Configure hyperparameters</h3>
+<h2 style="text-align: center;">Configure hyperparameters</h2>
+<h4 style="text-align: center; margin-bottom: 2.5rem;">Problem type: <i>{{problemType}}</i></h4>
 <div class="options" style="margin-top: 10px; ">
     <form #formGroup>
         <div [ngStyle]="{'display': collapse}">
@@ -14,12 +15,7 @@
                             </div>
                         </div>
                     </div> -->
-                        <button class="btn btn-primary" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon style="color: white;">play_arrow</mat-icon></button>
-                    </div>
-                    <div class="row justify-content-center d-flex align-items-center">
-                        <div>
-                            <h3>Epoch: {{epoches_arr[epoches_arr.length-1]}}</h3>
-                        </div>
+                        <button class="btn btn-primary mb-3" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon style="color: white;">play_arrow</mat-icon></button>
                     </div>
                 </div>
                 <div class="col-md-10 col-sm-12">
@@ -130,6 +126,11 @@
         <div class="col-md-3 col-sm-3 col-lg-3" *ngFor="let metric of metricsObjArray">
             <button *ngIf="metric.codename==graph_metric" type="button" class="btn btn-primary p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric.codename)">{{metric.name}}</button>
             <button *ngIf="metric.codename!=graph_metric" type="button" class="btn p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric.codename)">{{metric.name}}</button>
+        </div>
+    </div>
+    <div class="row justify-content-center d-flex align-items-center" *ngIf="collapse == 'none'">
+        <div>
+            <h3>Current epoch: {{epoches_arr[epoches_arr.length-1]}} (training ends at {{numberOfEpochs}})</h3>
         </div>
     </div>
     <app-chart class="row" [started]="started" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>

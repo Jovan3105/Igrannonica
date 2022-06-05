@@ -13,9 +13,11 @@
     <div class="d-flex justify-content-center fw-bold mt-2">Loading data...</div>
 </div>
 
+<div class="row justify-content-center d-flex align-items-center" style="margin-top: 10px;color: gray;" *ngIf="stepperDisplay != 'none'">Use stepper below to navigate between steps</div>
+
 <mat-stepper [linear]="linearStepper" [selectedIndex]="viewIndicator" (selectionChange)="setIndex($event)" #stepper [ngStyle]="{'display': stepperDisplay}">
     <mat-step [completed]="uploadCompleted">
-        <ng-template matStepLabel>Dataset</ng-template>
+        <ng-template matStepLabel>Selection</ng-template>
         <div>
             <app-upload #upload [badLinkErrorDisplay]="errorDisplay" [errorMessage]="errorMessage" (linkEvent)="onShowDataClick($event)" (uploadEvent)="onFileSelected($event)"></app-upload>
         </div>
@@ -25,7 +27,7 @@
         <div id="first">
             <div class="row justify-content-center" style="margin-top: 0.3rem;">
                 <div class="col-sm-4 ms-5">
-                    <h2>Choosen dataset: <i>{{fileName}}</i></h2>
+                    <h2>Chosen dataset: <i>{{fileName}}</i></h2>
                 </div>
                 <div class="col-sm ms-5">
                     <button type="button" class="btn btn-secondary" *ngIf="showColumnSelectionPage" (click)="toggleTables()" id="statsButton">Show stats</button>&nbsp;

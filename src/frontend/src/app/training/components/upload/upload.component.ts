@@ -100,15 +100,15 @@ export class UploadComponent implements OnInit {
 
     if (fileList && fileList?.length > 0) {
 
-    this.file = fileList[0];
-    this.fileName = this.name = this.file.name;
-    this.fileSize = this.convertFileSize(this.file.size);
+      this.file = fileList[0];
+      this.fileName = this.name = this.file.name;
+      this.fileSize = this.convertFileSize(this.file.size);
 
-    let fileNameToTitle = this.fileName;
-    fileNameToTitle = fileNameToTitle!.replace(/\.[^/.]+$/, '');
-    fileNameToTitle = fileNameToTitle.charAt(0).toUpperCase() + fileNameToTitle.slice(1);
-    this.datasetDescription = fileNameToTitle;
-    this.datasetName = fileNameToTitle;
+      let fileNameToTitle = this.fileName;
+      fileNameToTitle = fileNameToTitle!.replace(/\.[^/.]+$/, '');
+      fileNameToTitle = fileNameToTitle.charAt(0).toUpperCase() + fileNameToTitle.slice(1);
+      this.datasetDescription = '';
+      this.datasetName = fileNameToTitle;
     }
 
     this.showDragAndDrop = false;
@@ -134,7 +134,7 @@ export class UploadComponent implements OnInit {
     let fileNameToTitle = this.fileName;
     fileNameToTitle = fileNameToTitle!.replace(/\.[^/.]+$/, '');
     fileNameToTitle = fileNameToTitle.charAt(0).toUpperCase() + fileNameToTitle.slice(1);
-    this.datasetDescription = fileNameToTitle;
+    this.datasetDescription = '';
     this.datasetName = fileNameToTitle;
   }
 
@@ -242,7 +242,7 @@ export class UploadComponent implements OnInit {
     this.linkEvent.emit({
       link:datasetLink,
       name:this.datasetURL.split("/").pop()!.split(".")[0],
-      description:this.datasetURL.split("/").pop()!.split(".")[0],
+      description:'',
       public:false
     });
     this.fileName = this.linkName = this.name = this.datasetURL.split("/").pop()!;
