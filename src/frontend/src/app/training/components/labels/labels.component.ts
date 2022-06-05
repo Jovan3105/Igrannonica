@@ -156,7 +156,7 @@ export class LabelsComponent implements OnInit, OnChanges {
     }
 
     if(this.targetColumn!=null){
-      this.sessionService.saveData('target_column',JSON.stringify(this.targetColumn));
+
       this.targetColumnId = this.targetColumn.key;
       if (this.checkboxCheckedArray[this.targetColumn.key]) 
         this.checkboxCheckedArray[this.targetColumn.key] = false;

@@ -15,8 +15,11 @@ export class UploadComponent implements OnInit {
   linkName:string = "";
   datasetId:number = -1;
   datasetName?:string="";
+  datasetLinkName?:string = "";
   datasetDescription?:string="";
+  datasetLinkDescription?:string="";
   isDatasetPublic?:boolean=false;
+  isDatasetLinkPublic?:boolean = false;
   fileSize?:string;
   datasetURL:string = "";
 
@@ -66,7 +69,6 @@ export class UploadComponent implements OnInit {
       //console.log(this.sessionService.getData('file_size'));
       if (this.sessionService.getData('file_size') != null)
       {
-        //console.log("Upadam"); 
         this.fileSize = this.sessionService.getData('file_size')!;
         this.showDragAndDrop = false;
       }
@@ -82,6 +84,10 @@ export class UploadComponent implements OnInit {
     {
       this.datasetName = this.sessionService.getData('dataset_name')!;
       this.datasetDescription = this.sessionService.getData('dataset_description')!;
+    }
+    if (this.sessionService.getData('dataset_link_name') != null){
+      this.datasetLinkName = this.sessionService.getData('dataset_link_name')!;
+      this.datasetLinkDescription = this.sessionService.getData('dataset_link_description')!;
     }
 
     if(this.sessionService.getData('upload_link') != null)
@@ -101,15 +107,27 @@ export class UploadComponent implements OnInit {
   {
     this.datasetName=value;
   }
+  updateDatasetLinkName(value:string)
+  {
+    this.datasetLinkName=value;
+  }
 
   updateDatasetDescription(value:string)
   {
     this.datasetDescription=value;
   }
+  updateDatasetLinkDescription(value:string)
+  {
+    this.datasetLinkDescription=value;
+  }
 
   updateDatasetPublic(value:boolean)
   {
     this.isDatasetPublic=value;
+  }
+  updateDatasetLinkPublic(value:boolean)
+  {
+    this.isDatasetLinkPublic=value;
   }
 
   fileHandler(event:Event)
@@ -171,6 +189,8 @@ export class UploadComponent implements OnInit {
       this.fileName = this.file?.name!;
       this.newFileBool = false;
       this.newLinkBool = true;
+      this.datasetLinkName = "";
+      this.datasetLinkDescription = "";
       this.sessionService.clearData();
       this.sessionService.saveData('upload_type','file');
       this.sessionService.saveData('tab_index',this.tab_index.toString());
@@ -193,19 +213,20 @@ export class UploadComponent implements OnInit {
   
   linkClick()
   {
-    if (this.datasetName == "")
-      {
-        this.datasetName = this.datasetURL.split("/").pop()!;
-      }
-      if (this.datasetDescription == "")
-        this.datasetDescription = "Default";
+    if (!this.datasetLinkName || this.datasetLinkName == "")
+    {
+      this.datasetLinkName = this.datasetURL.split("/").pop()!;
+    }
+    if (!this.datasetLinkDescription || this.datasetLinkDescription == "")
+      this.datasetLinkDescription = "Default";
+
     if (this.newLinkBool)
     {
       this.linkEvent.emit({
         link:this.datasetURL,
-        name:this.datasetName,
-        description:this.datasetDescription,
-        public:this.isDatasetPublic
+        name:this.datasetLinkName,
+        description:this.datasetLinkDescription,
+        public:this.isDatasetLinkPublic
       });
       this.linkName = this.datasetURL.split("/").pop()!;
       this.newLinkBool = false;
@@ -215,15 +236,15 @@ export class UploadComponent implements OnInit {
       this.sessionService.saveData('tab_index',this.tab_index.toString());
       this.sessionService.saveData('link_name', this.linkName);
       this.sessionService.saveData('dataset_url', this.datasetURL);
-      this.sessionService.saveData('dataset_name',this.datasetName!);
-      this.sessionService.saveData('dataset_description', this.datasetDescription!);
+      this.sessionService.saveData('dataset_link_name',this.datasetLinkName!);
+      this.sessionService.saveData('dataset__link_description', this.datasetLinkDescription!);
     }
     else{
       this.linkEvent.emit({
         link:undefined,
-        name:this.datasetName,
-        description:this.datasetDescription,
-        public:this.isDatasetPublic
+        name:this.datasetLinkName,
+        description:this.datasetLinkDescription,
+        public:this.isDatasetLinkPublic
       });
     }
   }
@@ -281,15 +302,18 @@ export class UploadComponent implements OnInit {
   {
     this.newLinkBool = true;
     this.newFileBool = true;
-    this.datasetName = datasetLink.split("/").pop()!;
+    var datasetLinkName = datasetLink.split("/").pop()!;
     this.linkEvent.emit({
       link:datasetLink,
-      name:this.datasetName,
-      description:this.datasetDescription,
+      name: datasetLinkName,
+      description:"Public dataset",
       public:false
     });
-    this.sessionService.saveData('dataset_name',this.datasetName!);
-    this.sessionService.saveData('dataset_description', this.datasetDescription!);
+    this.sessionService.clearData();
+    this.sessionService.saveData('upload_type','public');
+    this.sessionService.saveData('tab_index',this.tab_index.toString());
+    this.sessionService.saveData('dataset_name',datasetLinkName);
+    this.sessionService.saveData('dataset_description', "Public dataset");
   }
 
   onUrlInputChange(event:any) {

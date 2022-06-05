@@ -44,7 +44,7 @@
                         {{errorMessage}}
                     </div>
                     <br><br>
-                    <app-dataset-info (changeNameEvent)="updateDatasetName($event)" (changeDescriptionEvent)="updateDatasetDescription($event)" (changePublicEvent)="updateDatasetPublic($event)" [filenameFromParent]="linkName"></app-dataset-info>
+                    <app-dataset-info (changeNameEvent)="updateDatasetLinkName($event)" (changeDescriptionEvent)="updateDatasetLinkDescription($event)" (changePublicEvent)="updateDatasetLinkPublic($event)" [filenameFromParent]="linkName"></app-dataset-info>
                 </div>
                 <div class="nextButton">
                     <button id="next" class="btn btn-primary" [disabled]="datasetURL=='' && linkName == ''" (click)="linkClick()"><mat-icon>navigate_next</mat-icon></button>

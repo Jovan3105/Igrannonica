@@ -42,7 +42,7 @@ export class TrainingViewComponent implements OnInit {
   missingIndicator:boolean = false;
   linearStepper:boolean = true;
   currentPage:number = 1;
-  firstPageVisit:boolean = true;
+  firstPageView:boolean = true;
 
   dialogTitle:string = "";
   dialogMessage:string = "";
@@ -136,7 +136,6 @@ export class TrainingViewComponent implements OnInit {
         this.uploadCompleted = true;
         this.sessionService.saveData('dataset_id',this.datasetId.toString());
         this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-        this.datasetName = this.upload.datasetName!;
       }
       else
       {
@@ -156,11 +155,6 @@ export class TrainingViewComponent implements OnInit {
       console.log("### next@changeInfoObserver")
       this.sessionService.saveData('dataset_name', this.datasetName);
       this.setView(View.PREVIEW);
-      if(this.firstPageVisit){
-        this.hideElements();
-        this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-        this.firstPageVisit = false;
-      }
       
     },
     error: (err: Error) => {
@@ -181,8 +175,7 @@ export class TrainingViewComponent implements OnInit {
       }
       
       this.showElements();
-      //console.log(response);
-      //this.sessionService.saveData('table_data',JSON.stringify(response));
+
       var headerDataTable = this.headersService.getDataHeader(response['columnTypes']);
       this.dataTable.prepareTable(TableIndicator.PREVIEW,response['parsedDataset'], headerDataTable);
       
@@ -242,16 +235,27 @@ export class TrainingViewComponent implements OnInit {
     if(!userIdTemp) {
       this.authService.logout('session_expired')
     }
+    this.userId = userIdTemp;
+
+    this.sessionService.saveData('user_id', this.userId.toString());
 
     if (this.sessionService.getData('dataset_id') != null) 
     {
       this.uploadCompleted = true;
+      this.firstPageView = false;
       this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
-      this.datasetName = this.sessionService.getData('dataset_name')!;
+      if(this.sessionService.getData('dataset_name') != null)
+      {
+        this.datasetName = this.sessionService.getData('dataset_name')!;
+      }
+      else if (this.sessionService.getData('dataset_link_name') != null)
+      {
+        this.datasetName = this.sessionService.getData('dataset_link_name')!;
+      }
+      this.hideElements();
+      this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
     }
-    this.userId = userIdTemp;
-
-    this.sessionService.saveData('user_id', this.userId.toString());
+    
     
     let lastVisitedPage =  this.sessionService.getData('view');
 
@@ -260,16 +264,8 @@ export class TrainingViewComponent implements OnInit {
     }
     else  {
       this.setView(parseInt(lastVisitedPage));
-      if (this.viewIndicator == View.PREVIEW || this.viewIndicator == View.TRAINING)
-      {
-        if (this.sessionService.getData('dataset_id') != null) 
-        {
-          this.hideElements();
-          this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-          this.firstPageVisit = false;
-        }
-        if (this.viewIndicator == View.TRAINING) this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
-      }
+
+      if (this.viewIndicator == View.TRAINING) this.trainingDisplay = DisplayType.SHOW_AS_BLOCK;
 
       // TODO proveriti da li ovde treba da se odradi i loading ostalih podataka 
       // na datoj stranici
@@ -287,10 +283,11 @@ export class TrainingViewComponent implements OnInit {
 
     this.loaderDisplay = DisplayType.HIDE;
     this.stepperDisplay = DisplayType.SHOW_AS_BLOCK;
-    if (this.viewIndicator == View.UPLOAD) 
+    if (this.viewIndicator == View.UPLOAD && this.firstPageView) 
     {
       this.setView(View.PREVIEW);
     }
+    this.firstPageView = true;
   }
 
   showUploadErrorMessage(message:string)
@@ -314,13 +311,13 @@ export class TrainingViewComponent implements OnInit {
 
   onFileSelected($event:any)
   {
+    this.datasetName = $event.name;
     const datasetInfo = JSON.stringify({
       Name: $event.name,
       Description: $event.description,
       Public: $event.public
     });
     if ($event.file == undefined) {
-      this.datasetName = $event.name;
       this.datasetService.updateDataset(this.datasetId,{
         Name: $event.name,
         Description: $event.description,
@@ -346,8 +343,10 @@ export class TrainingViewComponent implements OnInit {
 
   onShowDataClick($dataset:any) {
 
+    //console.log($dataset.name);
+    this.datasetName = $dataset.name;
+
     if ($dataset.link == undefined) {
-      this.datasetName = $dataset.name;
       this.datasetService.updateDataset(this.datasetId,{
         Name: $dataset.name,
         Description: $dataset.description,
@@ -389,6 +388,7 @@ export class TrainingViewComponent implements OnInit {
 
     this.cd.detectChanges();
   }
+
   confirmationCancel()
   {
     this.confirmation = false;
@@ -400,6 +400,7 @@ export class TrainingViewComponent implements OnInit {
 
   modalOpen(){
     this.currentPage = this.dataTable.getCurrentPage();
+    this.formPagesModify.controls['currentPageModify'].setValue(this.formPages.get('currentPage')!.value);
     this.modalDisplay = true;
   }
 
@@ -407,6 +408,7 @@ export class TrainingViewComponent implements OnInit {
   {
     this.modifyModal.refreshView();
     this.modalDisplay = false;
+    this.formPages.controls['currentPage'].setValue(this.formPagesModify.get('currentPageModify')!.value);
   }
 
   OnModalSave()
@@ -416,6 +418,7 @@ export class TrainingViewComponent implements OnInit {
     this.hideElements();
     
     let formPagesModifyElement = this.formPagesModify.get('currentPageModify');
+    this.formPages.controls['currentPage'].setValue(this.formPagesModify.get('currentPageModify')!.value);
     if(formPagesModifyElement) {
       this.currentPage = this.modifyModal.getCurrentPage();
       this.dataTable.setCurrentPage(this.currentPage);
@@ -580,14 +583,11 @@ export class TrainingViewComponent implements OnInit {
               this.hideElements(); 
               this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
                 next: (response:any) => {
-                  console.log("Fill missing value: ", response)
                   this.setView(View.TRAINING);
                   this.labels.keep_state = true;
-                  this.sessionService.saveData('dataset_id',this.datasetId.toString());
                   this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-                  this.datasetName = this.upload.datasetName!;
-
                   this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
+                  
                 },
                 error: (err: Error) => {
                   console.log(err);
@@ -652,9 +652,9 @@ export class TrainingViewComponent implements OnInit {
     if(event>this.maxPages){
       this.formPages.controls['currentPage'].setValue(this.maxPages);
     }
-    // else if(event<this.minPages){
-    //   this.formPages.controls['currentPage'].setValue(this.minPages);
-    // }
+    else if(event<0){
+      this.formPages.controls['currentPage'].setValue(1);
+   }
 
     this.dataTable.setCurrentPage(this.formPages.get('currentPage')!.value - 1)
   }
@@ -663,9 +663,9 @@ export class TrainingViewComponent implements OnInit {
     if(event>this.maxPagesModiify){
       this.formPagesModify.controls['currentPageModify'].setValue(this.maxPagesModiify);
     }
-    // else if(event<1){
-    //   this.formPagesModify.controls['currentPageModify'].setValue(1);
-    // }
+    else if(event<0){
+      this.formPagesModify.controls['currentPageModify'].setValue(1);
+  }
 
     this.modifyModal.setCurrentPage(this.formPagesModify.get('currentPageModify')!.value-1)
   }
@@ -673,6 +673,7 @@ export class TrainingViewComponent implements OnInit {
   updateCurrentPageFromModify() {
     this.currentPage = this.modifyModal.getCurrentPage();
     this.dataTable.setCurrentPage(this.currentPage);
+    this.formPages.controls['currentPage'].setValue(this.formPagesModify.get('currentPageModify')!.value);
   }
 }
 

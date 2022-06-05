@@ -55,7 +55,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
   problemType: string = "regression";
   selectedNumerical: string = "false";
   selectedCategorical: string = "false"
-  numberOfEpochs: number = 1000;
+  numberOfEpochs: number = 100;
   learningRate: number = 0.1;
   metricsArrayToSend: any[] = [];
 
@@ -89,19 +89,25 @@ export class HyperparametersComponent implements OnInit, OnChanges
   ngOnInit(): void 
   {
 
-    if(this.sessionService.getData('view') != null && parseInt(this.sessionService.getData('view')!) == View.TRAINING)
+    if(this.sessionService.getData('view') != null && this.sessionService.getData('chosen_columns') != null)
     {
       this.choosenInAndOutCols = JSON.parse(this.sessionService.getData('chosen_columns')!);
       this.problemType = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"regression";
       this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
-      this.layers = JSON.parse(this.sessionService.getData('layers')!);
-      this.numberOfEpochs = parseInt(this.sessionService.getData('numberOfEpochs')!);
+      if (this.sessionService.getData('layers') != null){
+        this.layers = JSON.parse(this.sessionService.getData('layers')!);
+        this.numberOfEpochs = parseInt(this.sessionService.getData('numberOfEpochs')!);
 
+      }
+      if (this.sessionService.getData('numberOfEpochs') != null) 
+        this.numberOfEpochs = parseInt(this.sessionService.getData('numberOfEpochs')!);
+      if (this.sessionService.getData('learningRate') != null) 
+        this.learningRate = parseFloat(this.sessionService.getData('learningRate')!);
     }
     else{
       this.sessionService.saveData('layers', JSON.stringify(this.layers));
       this.sessionService.saveData('numberOfEpochs', this.numberOfEpochs.toString());
-
+      this.sessionService.saveData('learningRate', this.learningRate.toString());
     }
   }
   
@@ -118,6 +124,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
       
     }
   }
+
   layers= [
     { 
       index : 0,
@@ -196,7 +203,8 @@ export class HyperparametersComponent implements OnInit, OnChanges
   }
   changeRate(value: number): void {
     value = +value.toFixed(2)
-    //this.learningRate = value;
+    this.learningRate = value;
+    this.sessionService.saveData('learningRate', this.learningRate.toString());
   }
   
   TrainingClick(){
