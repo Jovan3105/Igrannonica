@@ -652,9 +652,9 @@ export class TrainingViewComponent implements OnInit {
     if(event>this.maxPages){
       this.formPages.controls['currentPage'].setValue(this.maxPages);
     }
-    else if(event<this.minPages){
-      this.formPages.controls['currentPage'].setValue(this.minPages);
-    }
+    // else if(event<this.minPages){
+    //   this.formPages.controls['currentPage'].setValue(this.minPages);
+    // }
 
     this.dataTable.setCurrentPage(this.formPages.get('currentPage')!.value - 1)
   }
@@ -663,9 +663,9 @@ export class TrainingViewComponent implements OnInit {
     if(event>this.maxPagesModiify){
       this.formPagesModify.controls['currentPageModify'].setValue(this.maxPagesModiify);
     }
-    else if(event<1){
-      this.formPagesModify.controls['currentPageModify'].setValue(1);
-    }
+    // else if(event<1){
+    //   this.formPagesModify.controls['currentPageModify'].setValue(1);
+    // }
 
     this.modifyModal.setCurrentPage(this.formPagesModify.get('currentPageModify')!.value-1)
   }
