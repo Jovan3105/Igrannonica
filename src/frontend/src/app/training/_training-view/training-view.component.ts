@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Check, ChosenColumn, ModifiedData, Stats, TableIndicator } from '../models/table_models';
 import { HeadersService } from '../services/headers.service';
 import { DatasetService } from '../services/dataset.service';

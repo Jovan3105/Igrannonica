@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { Check, ChosenColumn, HeaderDict } from '../../models/table_models';
 import { MatDialog } from '@angular/material/dialog';
@@ -56,10 +56,6 @@ export class LabelsComponent implements OnInit, OnChanges {
     this.previousTargetId = null;
     this.targetColumn = null;
 
-    if (this.sessionService.getData('target_column') != null)
-    {
-      this.targetColumn = JSON.parse(this.sessionService.getData('target_column')!);
-    }
     if (this.sessionService.getData('selected_checkboxes') != null)
     {
       this.checkboxCheckedArray = JSON.parse(this.sessionService.getData('selected_checkboxes')!);
