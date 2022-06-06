@@ -206,17 +206,17 @@ export class HyperparametersComponent implements OnInit, OnChanges, AfterViewIni
     this.training_arr=this.epoches_data.map(a=>a[this.graph_metric]);
     this.val_arr=this.epoches_data.map(a=>a["val_"+this.graph_metric]);
   }
-  
+  test_arr:any=undefined;
   startTrainingObserver:any = {
     next: (response:any) => { 
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver > next:")
       console.log(response)
-      
+      this.test_arr=response["test_metrics"];
       this.loaderMiniDisplay = DisplayType.HIDE;
       this.collapse = DisplayType.SHOW_AS_BLOCK;
       this.epoches_arr[this.epoches_arr.length-1] = 0;
       this.trainingBool = false;
-
+      this.fillTable();
     },
     error: (err: Error) => {
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
@@ -358,18 +358,22 @@ export class HyperparametersComponent implements OnInit, OnChanges, AfterViewIni
       console.log("Connection is terminated");
     }
   }
-  
+  tabelaFinalna=DisplayType.HIDE;
   fillTable()
   {
     var header:HeaderDict[] = [];
     header.push(new HeaderDict(0,'Metric'));
-    header.push(new HeaderDict(1,'Trening'));
+    header.push(new HeaderDict(1,'Training'));
     header.push(new HeaderDict(2,'Validation'));
     header.push(new HeaderDict(3,'Testing'));
     
-    let arrObjects = [];
+    let arrObjects:any[] = [{Metric:'Loss',Training:this.epoches_data[this.epoches_data.length-1]['loss'],Validation:this.epoches_data[this.epoches_data.length-1]["val_loss"],Testing:this.test_arr['loss']}];
+    this.metricsObjArray.forEach(x => {
+      arrObjects.push({Metric:x.name,Training:this.epoches_data[this.epoches_data.length-1][x.codename],Validation:this.epoches_data[this.epoches_data.length-1]["val_"+x.codename],Testing:this.test_arr[x.codename]});
+    });
 
-    this.finalTable.prepareTable(TableIndicator.OTHER,[{key:'dsads',value:'dsdsads'}],header);
+    this.finalTable.prepareTable(TableIndicator.OTHER,arrObjects,header);
+    this.tabelaFinalna=DisplayType.SHOW_AS_BLOCK;
   }
 
   reset(){
