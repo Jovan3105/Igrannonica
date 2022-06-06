@@ -91,10 +91,33 @@ h6{
     font-weight: 600;
 }
 
-/*
-::ng-deep .mat-step-header .mat-step-icon-selected,
-::ng-deep .mat-step-header .mat-step-icon-state-done,
-::ng-deep .mat-step-header .mat-step-icon-state-edit {
-    background-color: #09f;
-    color: white;
-}*/
+
+::ng-deep .mat-step-header .mat-step-icon-selected{
+    /* animation: breathing 1s ease-out infinite normal; */
+    background-color: #00375c;
+}
+@keyframes breathing {
+    0% {
+      -webkit-transform: scale(0.9);
+      -ms-transform: scale(0.9);
+      transform: scale(0.9);
+    }
+  
+    25% {
+      -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+      transform: scale(1);
+    }
+  
+    60% {
+      -webkit-transform: scale(0.9);
+      -ms-transform: scale(0.9);
+      transform: scale(0.9);
+    }
+  
+    100% {
+      -webkit-transform: scale(0.9);
+      -ms-transform: scale(0.9);
+      transform: scale(0.9);
+    }
+  }
