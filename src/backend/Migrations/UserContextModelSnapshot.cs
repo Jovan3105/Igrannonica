@@ -45,6 +45,10 @@ namespace backend.Migrations
                     b.Property<DateTime>("RefreshTokenExpires")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");

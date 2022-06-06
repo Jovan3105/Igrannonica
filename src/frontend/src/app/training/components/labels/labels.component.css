@@ -1,3 +1,7 @@
+.table{
+    text-align: center;
+    padding: .4rem .4rem;
+}
 .custom-label{
     cursor: pointer;
     z-index: 2;
@@ -15,7 +19,11 @@ input[type="checkbox"] {
 }
 
 tbody select{
-    width: auto;
+    width: 95%;
+    margin:auto;
+}
+tbody td{
+    text-align: center; 
 }
 
 .selectAllButton:hover{
@@ -30,18 +38,17 @@ tbody select{
     color: white;
 }
 
-.missing-handler{
-    text-align: center;
+.missing-handler select, #constant-div{
+    width: 95%;
 }
-
-.missing-handler select{
-    width: 12rem;
+.encoding select{
+    width: 110%;
 }
 
 #constant-div{
     border-radius: 0.2rem;
     color: white;
-    height: 2rem;
+    margin: auto;
 }
 
 #close-icon
@@ -56,8 +63,6 @@ tbody select{
 }
 
 .trim-content {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 50px;
+    hyphens: auto;
+    word-wrap: break-word;
   }

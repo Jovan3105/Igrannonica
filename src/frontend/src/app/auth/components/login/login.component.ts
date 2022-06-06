@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { DisplayType } from 'src/app/shared/models/navigation_models';
 
 @Component({
   selector: 'app-login',
@@ -11,22 +12,39 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 })
 export class LoginComponent implements OnInit {
 
-  loaderDisplay:string = "none";
-  loginErrorDisplay:string = "none";
-  loginSuccessDisplay:string = "none";
-  errorDisplay:string = "none";
+  loaderDisplay:string = DisplayType.HIDE;
+  loginErrorDisplay:string = DisplayType.HIDE;
+  loginSuccessDisplay:string = DisplayType.HIDE;
+  errorDisplay:string = DisplayType.HIDE;
   errorMsg:string = "";
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) 
+  {
+    
+    if (this.router != null) {
+      if(this.router.getCurrentNavigation()?.extras.state)
+      {
+        if (this.router.getCurrentNavigation()?.extras.state!['message'] == "session_expired"){
+          this.errorMsg = "Session expired. Please log in again";
+          this.errorDisplay = "block";
+          setTimeout(() => {
+            this.errorDisplay = "none";
+          }, 5000);
+        }
+
+      }
+    }
+  }
 
   ngOnInit(): void {
+
   }
   onSubmit(f: NgForm) {
-    this.loaderDisplay = "block"; 
+    this.loaderDisplay = DisplayType.SHOW_AS_BLOCK; 
     const loginObserver = {
       next: (x:any) => { 
         console.log('User logged in');
-        this.loaderDisplay = "none"; 
+        this.loaderDisplay = DisplayType.HIDE; 
         this.router.navigateByUrl('/training'); 
       },
       error: (err: any) => {
@@ -52,10 +70,10 @@ export class LoginComponent implements OnInit {
             }
           });
         }
-        this.errorDisplay = "block";
-        this.loaderDisplay = "none";
+        this.errorDisplay = DisplayType.SHOW_AS_BLOCK;
+        this.loaderDisplay = DisplayType.HIDE;
         setTimeout(() => {
-          this.errorDisplay = "none";
+          this.errorDisplay = DisplayType.HIDE;
         }, 3500);
      }
     }

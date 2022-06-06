@@ -22,12 +22,14 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { NgChartsModule } from 'ng2-charts';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { AdminPanelComponent } from './admin-panel/admin-panel.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    AdminPanelComponent
   ],
   imports: [
     BrowserModule,

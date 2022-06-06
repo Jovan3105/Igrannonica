@@ -1,5 +1,6 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellValueChangedEvent, ColumnApi, ColumnVisibleEvent, CsvExportParams, } from 'ag-grid-community';
+import { SessionService } from 'src/app/core/services/session.service';
 import { Check, EditedCell, HeaderDict, TableIndicator, UndoData, undoType } from '../../models/table_models';
 import { TableService } from '../../services/table.service';
 
@@ -24,12 +25,13 @@ export class ShowTableComponent implements OnInit {
   deletedCols:number[];
   undoData : UndoData[] = [];
   
+  @Input() currentPage:number = 0;
   @Output() hideEvent; //Event koji se podize kad se nesto sakrije iz tabele
   @Output() undoEvent; //event koji se dize kada treba dis/enable undo dugme
-  @Output() deleteEvent; //event koji se dize kada treba dis/enable undo deleted dugme
+  @Output() errorEvent; //event koji se dize kada se unese pogresan tip(npr string za int)
 
   columnDefs: ColDef[];
-  rowData: any;
+  rowData: any[];
   public rowSelection;
   public paginationPageSize;
   tableStyle:string;
@@ -42,9 +44,9 @@ export class ShowTableComponent implements OnInit {
   undoRedoCellEditingLimit:number;
   enableCellChangeFlash:boolean ;
   
-  constructor(private tableService:TableService) {
+  constructor(private tableService:TableService, private sessionService:SessionService) {
     this.columnDefs = [];
-    this.rowData = [];
+    this.rowData = new Array();
     this.headers = [];
     this.rowSelection = 'multiple';
     this.paginationPageSize = 10;
@@ -63,17 +65,25 @@ export class ShowTableComponent implements OnInit {
     this.editedCells = [];
     this.hideEvent = new EventEmitter<Check>();
     this.undoEvent = new EventEmitter<boolean>();
-    this.deleteEvent = new EventEmitter<boolean>();
+    this.errorEvent = new EventEmitter<boolean>();
   }
 
   ngOnInit(): void 
   {
-
   }
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.columnApi = params.columnApi;
+
+    if (this.currentPage != 0 || (this.currentPage == 0 && this.getCurrentPage() != 0)) 
+      this.setCurrentPage(this.currentPage);
+  }
+  
+  isReady()
+  {
+    if (this.gridApi) return true;
+    return false;
   }
 
   prepareTable(indicator:TableIndicator, data: any, headers: Array<HeaderDict>) {
@@ -85,33 +95,63 @@ export class ShowTableComponent implements OnInit {
     this.columnDefs = [];
     this.rowData = [];
 
-    if(this.indicator == TableIndicator.DATA_MANIPULATION)
+    this.setColumnDefs(indicator);
+
+    if(indicator == TableIndicator.DATA_MANIPULATION)
     {
       this.deletedRows = [];
       this.deletedCols = [];
       this.editedCells = [];
       this.undoData = [];
-    }
 
-    this.setColumnDefs(indicator);
-    
-    for (let row of data) {
-      this.rowData.push({... row});
+      this.rowData = data;
+      return;
     }
-    if (indicator == TableIndicator.PREVIEW) this.tableService.resetVisibility(this.columnApi,this.colIds);
+    
+    if(indicator === TableIndicator.INFO) {
+      this.rowData.push({...data[0]});
+    }
+    else if(indicator === TableIndicator.PREVIEW || indicator === TableIndicator.STATS) {
+      let columns: Array<string> = data.columns;
+
+      if (columns != undefined)
+      {
+        if(columns.length > 0) {
+          for (let i = 0; i < data.data.length; i++) {
+            let row = {[columns[0]] : data.data[i][0]};
+  
+            for (let j = 1; j < columns.length; j++) {
+              row = {...row, [columns[j]] : data.data[i][j]};
+            }
+            this.rowData.push(row);
+          }
+  
+          if(indicator === TableIndicator.PREVIEW)
+            this.tableService.resetVisibility(this.columnApi,this.colIds);
+          else {
+            for (let i = 0; i < this.rowData.length; i++) {
+              this.rowData[i] = {'Column name' : data.index[i], ...this.rowData[i]};
+            }
+          }
+        }
+
+      }
+      
+    }
   }
 
   onCellValueChanged(params:CellValueChangedEvent)
   {
-    console.log(params);
+    //console.log(params);
     var editedCellIndex; 
-    var row = params.rowIndex!;
+    var row = this.rowData.findIndex((x: any) => x == params.data)
     var colId = parseInt(params.column.getColId());
 
     var newValue = this.tableService.onCellValueChanged(this.gridApi, params,params.data,this.headers);
     //console.log(newValue);
     if (newValue !== undefined)
     {
+      this.errorEvent.emit(false);
       //console.log(newValue);
       this.addUndoElement(new UndoData(undoType.EDIT,params));
       if ((editedCellIndex = this.editedCells.findIndex(element => element.col == colId && element.row == row)) != -1) //ukoliko vec postoji u objektu
@@ -127,6 +167,9 @@ export class ShowTableComponent implements OnInit {
       }
       else 
         this.editedCells.push(new EditedCell(row,colId,newValue? newValue.toString() : ""));
+    }
+    else{
+      this.errorEvent.emit(true);
     }
     
     //console.log(this.editedCells);
@@ -161,6 +204,7 @@ export class ShowTableComponent implements OnInit {
     }
     else if (indicator == TableIndicator.INFO || indicator == TableIndicator.STATS)
     {
+      this.rowSelection = "none";
       if (indicator == TableIndicator.STATS) //postavi indicator kao prvu kolonu
       {
         const index = this.headers.findIndex((element) => element.name == "indicator");
@@ -174,7 +218,6 @@ export class ShowTableComponent implements OnInit {
           flex: 1,
           field: header.name,
           resizable: true,
-          sortable: true,
           minWidth: 50,
           lockPosition:true
         }
@@ -200,17 +243,17 @@ export class ShowTableComponent implements OnInit {
   onRemoveSelected() 
   {
     const selectedData = this.gridApi.getSelectedRows();
-  
     const res = this.removeRows(selectedData);
 
-    this.addUndoElement(new UndoData(undoType.DELETE,res?.remove));
+    if (res?.remove.length! > 0) this.addUndoElement(new UndoData(undoType.DELETE,res?.remove));
 
     for (let sData of res?.remove!) 
     {
-      this.deletedRows.push(sData.childIndex);
+      this.deletedRows.push(this.rowData.findIndex((x: any) => x == sData.data));
     }
 
     this.emitUndoEvent();
+    //console.log(this.deletedRows);
   }
 
   onUndo()
@@ -228,33 +271,32 @@ export class ShowTableComponent implements OnInit {
 
         this.updateRows([data.node.data]);
 
-        var index = this.editedCells.findIndex(x => x.row == data.rowIndex && x.col == data.column.getColId());
+        var rowIndex = this.rowData.findIndex((x: any) => x == data.node.data);
+
+        var index = this.editedCells.findIndex(x => x.row == rowIndex && x.col == data.column.getColId())
         
         if (index != -1) 
         {     
-          if (this.data[data.rowIndex][data.column.colDef.field] == data.oldValue) 
+          if (this.data[this.editedCells[index].row][data.column.colDef.field] == data.oldValue) 
           {
             //ukoliko je vraceno na originalnu vrednost, izbacuje se iz niza
-            this.editedCells.splice(index,1);
+            this.editedCells.splice(index, 1);
           }
           else
             this.editedCells[index].value = data.oldValue.toString();
         }
         else{ //ukoliko se sa originalne vrednosti uradi undo na promenjenu, potrebno je ponovo dodati vrednost u edited niz
-          this.editedCells.push(new EditedCell(data.rowIndex,parseInt(data.column.getColId()),data.oldValue.toString()));
+          this.editedCells.push(new EditedCell(rowIndex,parseInt(data.column.getColId()),data.oldValue.toString()));
         }
       }
       else
       {
         var data = res?.data;
         data.forEach((element: any) => {
-          this.gridApi.applyTransaction({ add: [element.data], addIndex: parseInt(element.childIndex) });
-          var index = this.deletedRows.findIndex(x => x == element.childIndex);
-          this.deletedRows.splice(index,1);
-
+          var res = this.gridApi.applyTransaction({ add: [element.data], addIndex: parseInt(element.childIndex) });
+          this.deletedRows.pop();
         });
       }
-      //console.log(this.editedCells);
       this.emitUndoEvent();
     }
   }
@@ -314,10 +356,19 @@ export class ShowTableComponent implements OnInit {
     this.paginationPageSize = paginationPageSize;
   }
 
-  //Lock-uje kolonu koja je odabrana za label tako da ne moze da se hide-uje iz tabele
-  changeLabelColumn(data:{id:number,pred:number | null })
+  getCurrentPage()
   {
-    if (data.pred != null)
+    return this.gridApi.paginationGetCurrentPage();
+  }
+  setCurrentPage(page:number)
+  {
+    this.gridApi.paginationGoToPage(page);
+  }
+
+  //Lock-uje kolonu koja je odabrana za label tako da ne moze da se hide-uje iz tabele
+  changeLabelColumn(data:{id:number,previousTargetId:number | null })
+  {
+    if (data.previousTargetId != null)
     {
       this.columnDefs.forEach(element=>{
         if (element.colId == data.id.toString())
@@ -325,7 +376,7 @@ export class ShowTableComponent implements OnInit {
           element.lockVisible  = true;
 
         }
-        else if (element.colId == data.pred!.toString()){
+        else if (element.colId == data.previousTargetId!.toString()){
           element.lockVisible  = false;
         }
       });
@@ -346,6 +397,10 @@ export class ShowTableComponent implements OnInit {
   
   downloadFile(){
     this.gridApi.exportDataAsCsv();
+  }
+  
+  paginationGetTotalPages(){
+    return this.gridApi.paginationGetTotalPages();
   }
 }
 

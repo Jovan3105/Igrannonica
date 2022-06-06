@@ -3,10 +3,11 @@ h3
     margin-top: 2%;
     text-align: center;
     color:#38424c;
+    font-weight: 500;
 }
 
 .dataset-container{
-    width: 75%;
+    width: 80%;
     background-color: #e4eae2;
     margin:auto;
     border-radius: 10px;
@@ -37,7 +38,6 @@ h3
 .file-icon{
     border-radius: 1rem;
     background-color:white;
-    display: flex;
 }
 .row{
     hyphens: auto;
@@ -47,7 +47,6 @@ h3
     font-weight: bold;
     font-size: 1em;
 }
-
 
 #delete-button{
     color:white;
@@ -63,9 +62,6 @@ h3
     top: 0;
     left: 0;
     cursor: pointer;
-}
-#dataset-url{
-    border-radius: 10px;
 }
 .link-group{
     text-align: center;
@@ -85,3 +81,23 @@ h3
         height: 14px;
     }
 }*/
+.mat-icon{
+    display: flex;
+}
+.nextButton{
+    text-align: end;
+    text-align: end;
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px 10px;
+}
+.col-sm-1{
+    background: rgba(255, 255, 255, 0.7)
+}
+.col-sm-1:hover{
+    border: 2px dotted #0d6efd;
+}
+.csv-text{
+    font-size: 0.8vw;
+}
+  

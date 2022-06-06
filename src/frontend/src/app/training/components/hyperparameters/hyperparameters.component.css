@@ -29,6 +29,23 @@
     border-radius: 50%;
     animation: rotate 1.5s linear infinite;
 }
+#circle {
+    position: relative;
+    top: -30em;
+    /* left: 30px; */
+    margin: 0 auto;
+    /* transform: translate(-50%,-50%); */
+	width: 150px;
+    height: 150px;	
+}
+.loader {
+    width: calc(100% - 0px);
+	height: calc(100% - 0px);
+	border: 8px solid transparent;
+	border-top: 8px solid #09f;
+	border-radius: 50%;
+	animation: rotate 3s linear infinite;
+}
 
 h4 {
     text-align: center;
@@ -61,4 +78,12 @@ h4 {
     color: white;
     padding: 0px;
 }
-  
+.metricsSelect:not(.btn-primary):hover{
+    color: #314dbf;
+    font-weight: bold;
+}
+
+.metricsSelect:not(.btn-primary):focus{
+    color: #314dbf;
+    font-weight: bold;
+}

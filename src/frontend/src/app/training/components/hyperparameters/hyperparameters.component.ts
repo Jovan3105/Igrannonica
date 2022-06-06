@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
@@ -11,6 +11,8 @@ import { TrainingViewComponent } from '../../_training-view/training-view.compon
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
 import { ChosenColumn } from '../../models/table_models';
+import { SessionService } from 'src/app/core/services/session.service';
+import { View, DisplayType } from '../../../shared/models/navigation_models';
 
 @Component({
   selector: 'app-hyperparameters',
@@ -22,10 +24,15 @@ export class HyperparametersComponent implements OnInit, OnChanges
   @Input() choosenInAndOutCols:{features:ChosenColumn[],label:ChosenColumn} | undefined = undefined;
   @Input() datasetId:any;
   
-  loaderMiniDisplay:string = "none";
+  loaderMiniDisplay:string = DisplayType.HIDE;
+  trainingBool:boolean = false;
   readonly backendSocketUrl = environment.backendSocketUrl;
 
-  constructor(private trainingViewComponent:TrainingViewComponent, private trainingService: TrainingService, private domSanitizer: DomSanitizer, private fb: FormBuilder) { }
+  constructor(private trainingViewComponent:TrainingViewComponent, 
+    private trainingService: TrainingService,
+    private domSanitizer: DomSanitizer,
+    private fb: FormBuilder,
+    private sessionService: SessionService) { }
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -46,12 +53,13 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   allSelected: boolean = false;
   problemType: string = "regression";
+  problemTypeString:string = "Regression";
   selectedNumerical: string = "false";
   selectedCategorical: string = "false"
-  numberOfEpochs: number = 1000;
+  numberOfEpochs: number = 300;
   learningRate: number = 0.1;
-  corrMatrixSource: any;
   metricsArrayToSend: any[] = [];
+  metricsObjArray: Hyperparameter[]=[];
 
   sliderValueTest: number = 20;
   sliderValueValidation: number = 20;
@@ -82,16 +90,60 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   ngOnInit(): void 
   {
-    
-  }
-  ngOnChanges(changes: SimpleChanges): void 
-  { 
-    if (this.choosenInAndOutCols !== undefined && this.choosenInAndOutCols.label !== undefined)
+
+    if(this.sessionService.getData('view') != null && this.sessionService.getData('chosen_columns') != null)
     {
-      this.problemType = this.choosenInAndOutCols.label.type == "Categorical"? "classification":"regression";
-      this.reset();
+      this.choosenInAndOutCols = JSON.parse(this.sessionService.getData('chosen_columns')!);
+      if (this.choosenInAndOutCols!.label.type == "Numerical")
+      {
+        this.problemType = this.problemTypeString = "regression"
+      }
+      else
+      {
+        this.problemType = "classification";
+        this.problemTypeString = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"binary classification";
+      }
+      this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
+      if (this.sessionService.getData('layers') != null){
+        this.layers = JSON.parse(this.sessionService.getData('layers')!);
+        this.numberOfEpochs = parseInt(this.sessionService.getData('numberOfEpochs')!);
+
+      }
+      if (this.sessionService.getData('numberOfEpochs') != null) 
+        this.numberOfEpochs = parseInt(this.sessionService.getData('numberOfEpochs')!);
+      if (this.sessionService.getData('learningRate') != null) 
+        this.learningRate = parseFloat(this.sessionService.getData('learningRate')!);
+    }
+    else{
+      this.sessionService.saveData('layers', JSON.stringify(this.layers));
+      this.sessionService.saveData('numberOfEpochs', this.numberOfEpochs.toString());
+      this.sessionService.saveData('learningRate', this.learningRate.toString());
     }
   }
+  
+  ngOnChanges(changes: SimpleChanges): void 
+  {
+    if (this.choosenInAndOutCols !== undefined && this.choosenInAndOutCols.label !== undefined)
+    {
+      var newProblemType;
+      if (this.choosenInAndOutCols!.label.type == "Numerical")
+      {
+        newProblemType = this.problemTypeString = "regression"
+      }
+      else
+      {
+        newProblemType = "classification";
+        this.problemTypeString = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"binary classification";
+      }
+      if (this.problemType != newProblemType)
+      {
+        this.problemType = newProblemType;
+        this.reset();
+      }
+      
+    }
+  }
+
   layers= [
     { 
       index : 0,
@@ -106,7 +158,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
       activation_function : "ReLu",
     }
   ];
-
+  
   epoches_data:any[]=[];
 
   graph_metric="loss";
@@ -115,26 +167,29 @@ export class HyperparametersComponent implements OnInit, OnChanges
   val_arr:number[]=[];
   epoches_arr:number[]=[0];
 
-  collapse:string="block";
+  collapse:string=DisplayType.SHOW_AS_BLOCK;
 
-  prikaz:string="none";
+  prikaz:string=DisplayType.HIDE;
   started:boolean=false;
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.layers, event.previousIndex, event.currentIndex);
+    this.sessionService.saveData('layers', JSON.stringify(this.layers));
   }
 
   removeLayer(index:number){
     this.layers.splice(index, 1);
+    this.sessionService.saveData('layers', JSON.stringify(this.layers));
   }
   
 
   addLayer(){
-    this.layers.push({ 
-      index : this.layers.length-1,
-      units : 12,
-      weight_initializer  : "HeUniform",
-      activation_function : "ReLu",
-    });
+      this.layers.push({ 
+        index : this.layers.length,
+        units : this.layers.length>0 ? Math.ceil(this.layers[this.layers.length-1].units/2) : 32,
+        weight_initializer  : this.layers.length>0 ? this.layers[this.layers.length-1].weight_initializer : "HeUniform",
+        activation_function : this.layers.length>0 ? this.layers[this.layers.length-1].activation_function : "ReLu",
+      });
+      this.sessionService.saveData('layers', JSON.stringify(this.layers));
   }
 
   changeGraphMetric(codename:string)
@@ -149,24 +204,67 @@ export class HyperparametersComponent implements OnInit, OnChanges
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver > next:")
       console.log(response)
       
-      this.loaderMiniDisplay = 'none'; // TODO 
+      this.loaderMiniDisplay = DisplayType.HIDE;
+      this.collapse = DisplayType.SHOW_AS_BLOCK;
+      this.epoches_arr[this.epoches_arr.length-1] = 0;
+      this.trainingBool = false;
+
     },
     error: (err: Error) => {
       console.log("training > components > hyperparameters > hyperparameters.component.ts > startTrainingObserver >  error:")
+      this.collapse = DisplayType.SHOW_AS_BLOCK;
+      this.loaderMiniDisplay = DisplayType.HIDE;
+      this.epoches_arr![this.epoches_arr!.length-1] = 0;
       console.log(err)
     }
   };
 
   changeEpoch(value: number): void {
     this.numberOfEpochs = value;
+    if (this.numberOfEpochs) this.sessionService.saveData('numberOfEpochs', this.numberOfEpochs.toString());
   }
+
   changeRate(value: number): void {
-    value = +value.toFixed(2)
-    //this.learningRate = value;
+    if(value){
+      value = +value.toFixed(2)
+      this.learningRate = value;
+      if (this.learningRate) this.sessionService.saveData('learningRate', this.learningRate.toString());
+    }
+    
   }
-  
+  ignoreMetric(metric:Hyperparameter)
+  {
+    if (this.problemTypeString == "classification")
+    {
+      var metric_name = metric.name.toLowerCase();
+      if (metric_name.includes('binary')) return true;
+    }
+    if (this.problemTypeString == "binary classification")
+    {
+      var metric_name = metric.name.toLowerCase();
+      if (metric_name.includes('categorical')) return true;
+    }
+
+    return false;
+  }
+  ignoreLoss(loss:Hyperparameter)
+  {
+    if (this.problemTypeString == "classification")
+    {
+      var metric_name = loss.name.toLowerCase();
+      if (metric_name.includes('binary')) return true;
+    }
+    if (this.problemTypeString == "binary classification")
+    {
+      var metric_name = loss.name.toLowerCase();
+      if (metric_name.includes('categorical')) return true;
+    }
+
+    return false;
+  }
   TrainingClick(){
-    this.loaderMiniDisplay = "block";
+    this.trainingBool = true;
+    this.loaderMiniDisplay = DisplayType.SHOW_AS_BLOCK;
     let connectionID = "";
     
     // izdvajanje naziva feature-a u poseban niz
@@ -184,6 +282,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
     // izdvajanje codename-ova metrika u poseban niz
     this.metricsArrayToSend = this.metricsControl.value.map(
       (item:any)=>item['codename']);
+    this.metricsObjArray=this.metrics.filter(x=>this.metricsArrayToSend.includes(x.codename));
     
     
     if(this.metricsArrayToSend[0] == undefined)
@@ -204,12 +303,15 @@ export class HyperparametersComponent implements OnInit, OnChanges
       Optimizer             : this.optimizerFunctionControl.value.codename,
       LearningRate          : this.learningRate
     }
+
     let subject = new WebSocket(this.backendSocketUrl);
     console.log(trainingRequestPayload)
     console.log(this.lossFunctionControl)
+
     subject.onopen = function (evt){
       console.log("Socket connection is established");
     }
+
     let _this = this
     
     subject.onmessage = function (evt) {
@@ -219,30 +321,31 @@ export class HyperparametersComponent implements OnInit, OnChanges
       if(dataArr[0] == "ConnID:") {
         connectionID = dataArr[1];
         trainingRequestPayload["ClientConnID"] = connectionID;
+        _this.collapse = DisplayType.HIDE;
         _this.trainingService.sendDataForTraining(trainingRequestPayload).subscribe(_this.startTrainingObserver);
         console.log(`My connection ID: ${connectionID}`);
-        _this.collapse="none";
-        _this.epoches_data=[];
-        _this.training_arr=[];
-        _this.val_arr=[];
-        _this.prikaz="inline-block";
-        _this.started=true;
+        _this.epoches_data = [];
+        _this.training_arr = [];
+        _this.val_arr = [];
+        _this.prikaz = DisplayType.SHOW_AS_INLINE_BLOCK;
+        _this.started  =true;
       }
       else {
-        // TODO iskoristiti za vizuelizaciju
         let epoch_stats = JSON.parse(evt.data)
+        _this.loaderMiniDisplay = DisplayType.HIDE;
         console.log(epoch_stats);
         _this.epoches_data.push(epoch_stats);
         // TODO srediti da se salje samo element a ne ceo niz
-        _this.training_arr=_this.epoches_data.map(a=>a[_this.graph_metric]);
-        _this.val_arr=_this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
-        _this.epoches_arr=_this.epoches_data.map(a=> a.epoch);
-        if(_this.training_arr.length==_this.numberOfEpochs)
-        _this.collapse="block";
+        _this.training_arr = _this.epoches_data.map(a=>a[_this.graph_metric]);
+        _this.val_arr = _this.epoches_data.map(a=>a["val_"+_this.graph_metric]);
+        _this.epoches_arr = _this.epoches_data.map(a=> a.epoch);
+
+        if(_this.training_arr.length == _this.numberOfEpochs)
+          _this.collapse = DisplayType.SHOW_AS_BLOCK;
       }
     }
 
-    //  subject.close(); //zatvara socket
+    // TODO proveriti da li je potrebno zatvoriti socket sa: subject.close()
     subject.onclose = function(evt){
       console.log("Connection is terminated");
     }
@@ -270,6 +373,12 @@ export class HyperparametersComponent implements OnInit, OnChanges
       }
     });
     this.allSelected = newStatus;
+  }
+  
+  @HostListener('window:beforeunload', ['$event'])
+  unloadHandler(event: Event) {
+    
+    return !this.trainingBool;
   }  
 }
 

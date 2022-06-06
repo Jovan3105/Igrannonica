@@ -1,4 +1,5 @@
-<h3 style="text-align: center;">Configure hyperparameters</h3>
+<h2 style="text-align: center;" [ngStyle]="{'display': collapse}">Configure hyperparameters</h2>
+<h4 style="text-align: center; margin-bottom: 2.5rem;">Problem type: <i>{{problemTypeString}}</i></h4>
 <div class="options" style="margin-top: 10px; ">
     <form #formGroup>
         <div [ngStyle]="{'display': collapse}">
@@ -14,18 +15,14 @@
                             </div>
                         </div>
                     </div> -->
-                        <button class="btn btn-primary" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon style="color: white;">play_arrow</mat-icon></button>
-                    </div>
-                    <div class="row justify-content-center d-flex align-items-center">
-                        <div>
-                            <h3>Epoch: {{epoches_arr[epoches_arr.length-1]}}</h3>
-                        </div>
+                        <button class="btn btn-primary mb-3" (click)="TrainingClick()" [disabled]="lossFunctionControl.invalid || optimizerFunctionControl.invalid || metricsControl.invalid"><mat-icon style="color: white;">play_arrow</mat-icon></button>
                     </div>
                 </div>
                 <div class="col-md-10 col-sm-12">
                     <div class="row">
                         <div class=" col-sm-12 justify-content-center d-flex align-items-center">
-                            <div style="display: none;" class="col-md-12 col-sm-12"> <!-- TODO potpuno izbacivanje problem type-a -->
+                            <div style="display: none;" class="col-md-12 col-sm-12">
+                                <!-- TODO potpuno izbacivanje problem type-a -->
                                 <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
                                     <mat-label><b>Problem type</b></mat-label>
                                     <mat-select class="col-md-12 col-sm-12" [(ngModel)]="problemType" name="problemType" (selectionChange)="reset();">
@@ -52,7 +49,7 @@
                                         <button mat-raised-button class="metricButtons mat-primary fill text-sm w-50 " (click)="toggleAllDeselect()">
                                         Deselect All
                                     </button>
-                                        <mat-option *ngFor="let item of metrics" [value]="item" [hidden]="item.type!=problemType" (click)="optionClick()">
+                                        <mat-option *ngFor="let item of metrics" [value]="item" [hidden]="item.type!=problemType || ignoreMetric(item)" (click)="optionClick()">
                                             {{item.name}}
                                         </mat-option>
                                     </mat-select>
@@ -78,7 +75,7 @@
                                 <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
                                     <mat-label><b>Loss function</b></mat-label>
                                     <mat-select class="col-md-12 col-sm-12" #lossSelect [formControl]="lossFunctionControl" name="lossFunctionControl">
-                                        <mat-option *ngFor="let item of lossFunctions" [value]="item" [hidden]="item.type!=problemType">
+                                        <mat-option *ngFor="let item of lossFunctions" [value]="item" [hidden]="item.type!=problemType || ignoreLoss(item)">
                                             {{item.name}}
                                         </mat-option>
                                     </mat-select>
@@ -102,13 +99,13 @@
                 <div class="col-md-4 mt-3 col-sm-12">
                     <div class="row mt-3 justify-content-center d-flex align-items-center ">
                         <div>
-                            <h5 class="mb-0 ">Number of epochs</h5>
+                            <h4 class="mb-0 ">Number of epochs</h4>
                             <input type="number" class="form-control" (ngModelChange)="changeEpoch($event)" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
                         </div>
                     </div>
                     <div class="row mt-3 justify-content-center d-flex align-items-center ">
                         <div>
-                            <h5 class=" mb-0 ">Learning rate</h5>
+                            <h4 class=" mb-0 ">Learning rate</h4>
                             <input type="number" class="form-control" (ngModelChange)="changeRate($event)" [(ngModel)]="learningRate" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
                         </div>
                     </div>
@@ -116,18 +113,39 @@
             </div>
             <br>
             <div class="row collapse.show justify-content-center d-flex align-items-center ">
-                <h5 class="mb-0 ">Hidden layers</h5>
+                <h3 class="mb-0 ">Hidden layers</h3>
                 <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
             </div>
         </div>
     </form>
-    <div class="row">
+    <div class="row mt-3 mb-3">
         <div class="col-md-3 col-sm-3 col-lg-3" *ngIf="metricsArrayToSend.length>0">
-            <button type="button" class="btn" (click)="changeGraphMetric('loss')">loss</button>
+            <button *ngIf="graph_metric!='loss'" type="button" class="btn p-1 m-1 metricsSelect" (click)="changeGraphMetric('loss')">Loss</button>
+            <button *ngIf="graph_metric=='loss'" type="button" class="btn btn-primary p-1 m-1 metricsSelect" (click)="changeGraphMetric('loss')">Loss</button>
         </div>
-        <div class="col-md-3 col-sm-3 col-lg-3" *ngFor="let metric of metricsArrayToSend">
-            <button type="button" class="btn p-1 m-1" (click)="changeGraphMetric(metric)">{{metric}}</button>
+        <div class="col-md-3 col-sm-3 col-lg-3" *ngFor="let metric of metricsObjArray">
+            <button *ngIf="metric.codename==graph_metric" type="button" class="btn btn-primary p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric.codename)">{{metric.name}}</button>
+            <button *ngIf="metric.codename!=graph_metric" type="button" class="btn p-1 m-1 metricsSelect" (click)="changeGraphMetric(metric.codename)">{{metric.name}}</button>
+        </div>
+    </div>
+    <div class="row justify-content-center d-flex align-items-center" *ngIf="collapse == 'none'">
+        <div>
+            <h3>Current epoch: {{epoches_arr[epoches_arr.length-1]}} (training ends at {{numberOfEpochs}})</h3>
         </div>
     </div>
     <app-chart class="row" [started]="started" [numberOfEpochs]="numberOfEpochs" [prikaz]="prikaz" [epoch]="epoches_arr" [training]="training_arr" [val]="val_arr"></app-chart>
+</div>
+<div id="circle" [ngStyle]="{'display': loaderMiniDisplay}" style="z-index: 1;">
+    <div class="loader">
+        <div class="loader">
+            <div class="loader">
+                <div class="loader">
+                    <div class="loader">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center fw-bold mt-2">Preparing for training</div>
 </div>

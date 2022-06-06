@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Chart, ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { DisplayType } from 'src/app/shared/models/navigation_models';
 
 @Component({
   selector: 'app-chart',
@@ -9,7 +10,7 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class ChartComponent implements OnInit {
 
-  chartDisplay:string = "none";
+  chartDisplay:string = DisplayType.HIDE;
 
   @Input() epoch!:number[];
   @Input() training!:number[];
@@ -43,7 +44,7 @@ export class ChartComponent implements OnInit {
       {
         // data: this.epoches_data.map(a => a.loss),
         data: [],
-        label: 'Training',
+        label: 'Error on training set',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -55,8 +56,8 @@ export class ChartComponent implements OnInit {
       },
       {
         data: [],
-        label: 'Validation',
-        yAxisID: 'y-axis-1',
+        label: 'Error on validation set',
+        //yAxisID: 'y-axis-1',
         backgroundColor: 'rgba(255,0,0,0.3)',
         borderColor: 'red',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -97,14 +98,32 @@ export class ChartComponent implements OnInit {
       'y-axis-0':
         {
           position: 'left',
+          title: {
+            text:'Error',
+            display:true,
+            align:'center',
+            font:{
+              size: 17
+            }
+          }
         },
-      'y-axis-1': {
-        position: 'right',
-        
-        ticks: {
-          color: 'red'
+        x:{
+          title: {
+            text:'Epoch',
+            display:true,
+            align:'center',
+            font:{
+              size: 17
+            }
+          }
         }
-      }
+      // 'y-axis-1': {
+      //   position: 'right',
+        
+        // ticks: {
+        //   color: 'red'
+        // }
+     // }
     },
     
 

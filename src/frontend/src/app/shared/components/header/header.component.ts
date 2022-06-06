@@ -13,29 +13,52 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 export class HeaderComponent implements OnInit {
   
-  user:User | undefined;
-  user$:Observable<User> | undefined;
+  user: User | undefined;
+  user$: Observable<User> | undefined;
   displayLoginElement = false;
+  isAdmin: boolean = false;
+  isLoggedIn: boolean = false;
 
-  constructor(public service: AuthService, public jwtService : JwtService, public userService: UserService) {}
+  constructor(public authService: AuthService, public jwtService : JwtService, public userService: UserService) {}
 
   ngOnInit(): void {
     this.user$ = new Observable<User>();
-    this.service.updatemenu.subscribe(res => {
+    this.authService.updatemenu.subscribe(res => {
       this.MenuDisplay();
     });
 
+    this.user$.subscribe({
+      error(msg) {
+        if (msg == "authorization_problem")
+        {
+          console.log("Session expired! Log in again")
+        }
+      }
+    });
     this.MenuDisplay();
     
   }
 
   MenuDisplay() {
-    if (this.service.isLoggedIn()) {
-        this.displayLoginElement = false;
-        var decodedToken = this.jwtService.getDecodedAccessToken();
-        var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
+    this.isLoggedIn = this.authService.isLoggedIn();
+    if (this.isLoggedIn) {
+      this.displayLoginElement = false;
 
-      this.user$ = this.userService.getUser(id);
+      var decodedToken = this.jwtService.getDecodedAccessToken();
+
+      if(!decodedToken)
+        this.authService.logout('session_expired');
+      else {
+        var id = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/serialnumber'];
+  
+        if(!id) {
+          this.authService.logout('session_expired')
+        }
+  
+        this.user$ = this.userService.getUser(id);
+      }
+      
+      this.isAdmin = this.authService.isAdmin();
 
       /*
       .subscribe({
@@ -52,7 +75,7 @@ export class HeaderComponent implements OnInit {
 
   doLogout()
   {
-    this.service.logout();
+    this.authService.logout();
   }
 
 }

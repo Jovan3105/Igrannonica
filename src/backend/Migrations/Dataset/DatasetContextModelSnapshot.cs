@@ -55,6 +55,53 @@ namespace backend.Migrations.Dataset
 
                     b.ToTable("Datasets");
                 });
+
+            modelBuilder.Entity("backend.Models.DatasetTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DatasetTag");
+                });
+
+            modelBuilder.Entity("DatasetDatasetTag", b =>
+                {
+                    b.Property<int>("DatasetsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("DatasetsId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("DatasetDatasetTag");
+                });
+
+            modelBuilder.Entity("DatasetDatasetTag", b =>
+                {
+                    b.HasOne("backend.Models.Dataset", null)
+                        .WithMany()
+                        .HasForeignKey("DatasetsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.DatasetTag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 #pragma warning restore 612, 618
         }
     }

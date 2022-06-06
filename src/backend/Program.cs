@@ -46,6 +46,11 @@ builder.Services.AddDbContext<DatasetContext>(options => {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+/*builder.Services.AddDbContext<DatasetTagContext>(options => {
+    // Dataset
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});*/
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -72,6 +77,7 @@ builder.Services.AddAuthentication(options =>
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddWebSocketServerConnectionManager();

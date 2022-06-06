@@ -8,13 +8,17 @@ export class User{
     username:string;
     email:string;
     image:string;
+    role:string;
+    verifiedEmail:boolean;
 
-    constructor(id:number,username:string,email:string,image:string)
+    constructor(id: number, username: string, email: string, image: string, role: string, verifiedEmail: boolean)
     {
         this.id = id;
         this.username = username;
         this.email = email;
         this.image = image;
+        this.role = role;
+        this.verifiedEmail = verifiedEmail;
     }
 }
 

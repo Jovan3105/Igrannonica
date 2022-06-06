@@ -1,5 +1,5 @@
 .stats-container{
-    width: 80%;
+    width: 90%;
     background-color: #e4eae2;
     margin:auto;
     border-radius: 10px;
@@ -8,9 +8,12 @@
     padding-bottom:2%;
     text-align: center;
 }
+.missing-heading{
+    margin-top:1.5rem;
+}
 h3,h4
 {
-    margin-top: 2%;
+    margin-top: 0.8rem;
     text-align: center;
     color:#38424c;
 }
@@ -46,4 +49,9 @@ h3,h4
     width: 7%;
     height: 10%;
     z-index: 2;
+}
+.app-show-table{
+    display:block;
+    width: 90%;
+    margin: auto;
 }
