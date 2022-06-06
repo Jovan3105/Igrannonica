@@ -53,6 +53,7 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   allSelected: boolean = false;
   problemType: string = "regression";
+  problemTypeString:string = "Regression";
   selectedNumerical: string = "false";
   selectedCategorical: string = "false"
   numberOfEpochs: number = 300;
@@ -93,7 +94,15 @@ export class HyperparametersComponent implements OnInit, OnChanges
     if(this.sessionService.getData('view') != null && this.sessionService.getData('chosen_columns') != null)
     {
       this.choosenInAndOutCols = JSON.parse(this.sessionService.getData('chosen_columns')!);
-      this.problemType = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"regression";
+      if (this.choosenInAndOutCols!.label.type == "Numerical")
+      {
+        this.problemType = this.problemTypeString = "regression"
+      }
+      else
+      {
+        this.problemType = "classification";
+        this.problemTypeString = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"binary classification";
+      }
       this.datasetId = parseInt(this.sessionService.getData('dataset_id')!);
       if (this.sessionService.getData('layers') != null){
         this.layers = JSON.parse(this.sessionService.getData('layers')!);
@@ -116,7 +125,16 @@ export class HyperparametersComponent implements OnInit, OnChanges
   {
     if (this.choosenInAndOutCols !== undefined && this.choosenInAndOutCols.label !== undefined)
     {
-      var newProblemType = this.choosenInAndOutCols.label.type == "Categorical"? "classification":"regression";
+      var newProblemType;
+      if (this.choosenInAndOutCols!.label.type == "Numerical")
+      {
+        newProblemType = this.problemTypeString = "regression"
+      }
+      else
+      {
+        newProblemType = "classification";
+        this.problemTypeString = this.choosenInAndOutCols!.label.type == "Categorical"? "classification":"binary classification";
+      }
       if (this.problemType != newProblemType)
       {
         this.problemType = newProblemType;
@@ -214,7 +232,36 @@ export class HyperparametersComponent implements OnInit, OnChanges
     }
     
   }
-  
+  ignoreMetric(metric:Hyperparameter)
+  {
+    if (this.problemTypeString == "classification")
+    {
+      var metric_name = metric.name.toLowerCase();
+      if (metric_name.includes('binary')) return true;
+    }
+    if (this.problemTypeString == "binary classification")
+    {
+      var metric_name = metric.name.toLowerCase();
+      if (metric_name.includes('categorical')) return true;
+    }
+
+    return false;
+  }
+  ignoreLoss(loss:Hyperparameter)
+  {
+    if (this.problemTypeString == "classification")
+    {
+      var metric_name = loss.name.toLowerCase();
+      if (metric_name.includes('binary')) return true;
+    }
+    if (this.problemTypeString == "binary classification")
+    {
+      var metric_name = loss.name.toLowerCase();
+      if (metric_name.includes('categorical')) return true;
+    }
+
+    return false;
+  }
   TrainingClick(){
     this.trainingBool = true;
     this.loaderMiniDisplay = DisplayType.SHOW_AS_BLOCK;

@@ -549,17 +549,18 @@ export class TrainingViewComponent implements OnInit {
             this.choosenInAndOutCols = choosenInAndOutCols;
             this.sessionService.saveData('chosen_columns', JSON.stringify(this.choosenInAndOutCols));
 
-            /*
             if (this.choosenInAndOutCols.label.type == 'Categorical')
             {
               var name = this.choosenInAndOutCols.label.name;
-
-              if(this.statsData?.categorical.find(o => o.indicator == "Unique")[name] == 2)
+              var indexOfIndicator:number = this.statsData?.categorical.columns.findIndex(o => o == "unique")!;
+              var indexOfColumn:number = this.statsData?.categorical.index.findIndex(o => o == name)!;
+              //console.log(this.statsData?.categorical.data[indexOfColumn][indexOfIndicator])
+              if(this.statsData?.categorical.data[indexOfColumn][indexOfIndicator] == 2)
               {
-                //this.choosenInAndOutCols.label.type = "Binary Categorical";
+                this.choosenInAndOutCols.label.type = "Binary Categorical";
               }
-            }*/
-
+            }
+            console.log(missing_sum);
             if(missing_sum != 0) 
             {
               /*
@@ -608,6 +609,7 @@ export class TrainingViewComponent implements OnInit {
               this.hideElements(); 
               this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
                 next: (response:any) => {
+                  console.log(response);
                   this.setView(View.TRAINING);
                   this.labels.keep_state = true;
                   this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);

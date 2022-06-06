@@ -1,5 +1,5 @@
 <h2 style="text-align: center;" [ngStyle]="{'display': collapse}">Configure hyperparameters</h2>
-<h4 style="text-align: center; margin-bottom: 2.5rem;">Problem type: <i>{{problemType}}</i></h4>
+<h4 style="text-align: center; margin-bottom: 2.5rem;">Problem type: <i>{{problemTypeString}}</i></h4>
 <div class="options" style="margin-top: 10px; ">
     <form #formGroup>
         <div [ngStyle]="{'display': collapse}">
@@ -49,7 +49,7 @@
                                         <button mat-raised-button class="metricButtons mat-primary fill text-sm w-50 " (click)="toggleAllDeselect()">
                                         Deselect All
                                     </button>
-                                        <mat-option *ngFor="let item of metrics" [value]="item" [hidden]="item.type!=problemType" (click)="optionClick()">
+                                        <mat-option *ngFor="let item of metrics" [value]="item" [hidden]="item.type!=problemType || ignoreMetric(item)" (click)="optionClick()">
                                             {{item.name}}
                                         </mat-option>
                                     </mat-select>
@@ -75,7 +75,7 @@
                                 <mat-form-field class="mat-form col-md-12 col-sm-12" appearance="fill">
                                     <mat-label><b>Loss function</b></mat-label>
                                     <mat-select class="col-md-12 col-sm-12" #lossSelect [formControl]="lossFunctionControl" name="lossFunctionControl">
-                                        <mat-option *ngFor="let item of lossFunctions" [value]="item" [hidden]="item.type!=problemType">
+                                        <mat-option *ngFor="let item of lossFunctions" [value]="item" [hidden]="item.type!=problemType || ignoreLoss(item)">
                                             {{item.name}}
                                         </mat-option>
                                     </mat-select>
