@@ -323,6 +323,7 @@ export class TrainingViewComponent implements OnInit {
     this.datasetId=dataset.id;
     this.uploadCompleted = true;
     this.sessionService.saveData('dataset_id',this.datasetId.toString());
+    this.hideElements();
     this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
     this.fileName =dataset.fileName.split(".")[0]+".csv";
     this.sessionService.saveData('file_name',this.fileName);
