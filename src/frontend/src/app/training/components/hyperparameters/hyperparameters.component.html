@@ -99,13 +99,13 @@
                 <div class="col-md-4 mt-3 col-sm-12">
                     <div class="row mt-3 justify-content-center d-flex align-items-center ">
                         <div>
-                            <h5 class="mb-0 ">Number of epochs</h5>
+                            <h4 class="mb-0 ">Number of epochs</h4>
                             <input type="number" class="form-control" (ngModelChange)="changeEpoch($event)" [(ngModel)]="numberOfEpochs" name="epochs" [value]="numberOfEpochs" [min]="0">
                         </div>
                     </div>
                     <div class="row mt-3 justify-content-center d-flex align-items-center ">
                         <div>
-                            <h5 class=" mb-0 ">Learning rate</h5>
+                            <h4 class=" mb-0 ">Learning rate</h4>
                             <input type="number" class="form-control" (ngModelChange)="changeRate($event)" [(ngModel)]="learningRate" name="rate" [value]="learningRate" [min]="0.1" [step]="0.1">
                         </div>
                     </div>
@@ -113,7 +113,7 @@
             </div>
             <br>
             <div class="row collapse.show justify-content-center d-flex align-items-center ">
-                <h5 class="mb-0 ">Hidden layers</h5>
+                <h3 class="mb-0 ">Hidden layers</h3>
                 <app-drag-and-drop [layers]="layers" [weightInitializers]="weightInitializers" [activationFunctions]="activationFunctions" (addLayerEvent)="addLayer()" (dropLayerEvent)="drop($event)" (removeLayerEvent)="removeLayer($event)"></app-drag-and-drop>
             </div>
         </div>
