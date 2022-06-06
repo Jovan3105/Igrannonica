@@ -62,10 +62,10 @@ export class ModifiedData {
 }
 
 export class Stats{
-  categorical:any[];
-  continuous:any[];
+  categorical:{index:string[],columns:string[], data:any[]};
+  continuous:{index:string[],columns:string[], data:any[]};
 
-  constructor(categorical: any[], continuous: any[]) {
+  constructor(categorical:{index:string[],columns:string[], data:any[]}, continuous: {index:string[],columns:string[], data:any[]}) {
     this.categorical = categorical;
     this.continuous = continuous;
   }
