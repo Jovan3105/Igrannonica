@@ -96,7 +96,7 @@ export class DatasetService {
   }
 
   deleteDataset(id: number): Observable<any[]> {
-    return this.http.delete<any>(this.datasetAPIUrl + `/${id}`).pipe(
+    return this.http.delete<any>(this.datasetAPIUrl + `${id}`).pipe(
       tap(_ => console.log(`deleted data id=${id}`)),
       catchError(this.handleError)
     );
