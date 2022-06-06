@@ -91,5 +91,6 @@ export enum TableIndicator {
   PREVIEW,
   DATA_MANIPULATION,
   INFO,
-  STATS
+  STATS,
+  OTHER
 }
