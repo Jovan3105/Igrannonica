@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Column, Constants, Hyperparameter } from '../../models/hyperparameter_models';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Options } from '@angular-slider/ngx-slider';
@@ -6,23 +6,26 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { TrainingService } from '../../services/training.service';
 import { environment } from 'src/environments/environment';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { throwIfEmpty } from 'rxjs';
 import { TrainingViewComponent } from '../../_training-view/training-view.component';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { ChosenColumn } from '../../models/table_models';
+import { ChosenColumn, HeaderDict, TableIndicator } from '../../models/table_models';
 import { SessionService } from 'src/app/core/services/session.service';
 import { View, DisplayType } from '../../../shared/models/navigation_models';
+import { ShowTableComponent } from '../show-table/show-table.component';
+import { HeadersService } from '../../services/headers.service';
 
 @Component({
   selector: 'app-hyperparameters',
   templateUrl: './hyperparameters.component.html',
   styleUrls: ['./hyperparameters.component.css']
 })
-export class HyperparametersComponent implements OnInit, OnChanges 
+export class HyperparametersComponent implements OnInit, OnChanges, AfterViewInit 
 {
   @Input() choosenInAndOutCols:{features:ChosenColumn[],label:ChosenColumn} | undefined = undefined;
   @Input() datasetId:any;
+
+  @ViewChild('finalTable') private finalTable!: ShowTableComponent;
   
   loaderMiniDisplay:string = DisplayType.HIDE;
   trainingBool:boolean = false;
@@ -32,7 +35,9 @@ export class HyperparametersComponent implements OnInit, OnChanges
     private trainingService: TrainingService,
     private domSanitizer: DomSanitizer,
     private fb: FormBuilder,
-    private sessionService: SessionService) { }
+    private sessionService: SessionService,
+    private headerService:HeadersService,
+    private cd:ChangeDetectorRef) { }
 
   activationFunctions: Hyperparameter[] = Constants.ACTIVATION_FUNCTIONS;
   optimizerFunctions: Hyperparameter[] = Constants.OPTIMIZER_FUNCTIONS;
@@ -90,7 +95,6 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   ngOnInit(): void 
   {
-
     if(this.sessionService.getData('view') != null && this.sessionService.getData('chosen_columns') != null)
     {
       this.choosenInAndOutCols = JSON.parse(this.sessionService.getData('chosen_columns')!);
@@ -142,6 +146,10 @@ export class HyperparametersComponent implements OnInit, OnChanges
       }
       
     }
+  }
+  ngAfterViewInit(): void {
+    this.fillTable();
+    this.cd.detectChanges();
   }
 
   layers= [
@@ -349,6 +357,19 @@ export class HyperparametersComponent implements OnInit, OnChanges
     subject.onclose = function(evt){
       console.log("Connection is terminated");
     }
+  }
+  
+  fillTable()
+  {
+    var header:HeaderDict[] = [];
+    header.push(new HeaderDict(0,'Metric'));
+    header.push(new HeaderDict(1,'Trening'));
+    header.push(new HeaderDict(2,'Validation'));
+    header.push(new HeaderDict(3,'Testing'));
+    
+    let arrObjects = [];
+
+    this.finalTable.prepareTable(TableIndicator.OTHER,[{key:'dsads',value:'dsdsads'}],header);
   }
 
   reset(){

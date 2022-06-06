@@ -609,7 +609,6 @@ export class TrainingViewComponent implements OnInit {
               this.hideElements(); 
               this.datasetService.fillMissingValues(this.datasetId, columnFillMethodPairs).subscribe({
                 next: (response:any) => {
-                  console.log(response);
                   this.setView(View.TRAINING);
                   this.labels.keep_state = true;
                   this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);

@@ -97,7 +97,7 @@ export class ShowTableComponent implements OnInit {
 
     this.setColumnDefs(indicator);
 
-    if(indicator == TableIndicator.DATA_MANIPULATION)
+    if(indicator == TableIndicator.DATA_MANIPULATION || indicator == TableIndicator.OTHER)
     {
       this.deletedRows = [];
       this.deletedCols = [];
@@ -183,7 +183,7 @@ export class ShowTableComponent implements OnInit {
   setColumnDefs(indicator:TableIndicator)
   {
     this.colIds = [];
-    if (indicator == TableIndicator.DATA_MANIPULATION || indicator == TableIndicator.PREVIEW)
+    if (indicator == TableIndicator.DATA_MANIPULATION || indicator == TableIndicator.PREVIEW || indicator == TableIndicator.OTHER)
     {
       for (let header of this.headers) 
       {
