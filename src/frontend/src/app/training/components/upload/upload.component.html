@@ -1,7 +1,7 @@
 <h2 style="text-align: center;">Choose dataset</h2>
 <div class="dataset-container">
     <mat-tab-group class=" pb-3" mat-align-tabs="center" animationDuration="0ms" [(selectedIndex)]="tab_index" (selectedIndexChange)="setIndex($event)">
-        <mat-tab label="Public dataset">
+        <mat-tab label="Predefined dataset">
             <ng-template matTabContent>
                 <div class="container p-3">
                     <div class="row justify-content-center" style="column-gap: 30px;">
@@ -44,11 +44,7 @@
                         {{errorMessage}}
                     </div>
                     <br><br>
-                    <app-dataset-info
-                    (changeNameEvent)="updateDatasetLinkName($event)" 
-                    (changeDescriptionEvent)="updateDatasetLinkDescription($event)" 
-                    (changePublicEvent)="updateDatasetLinkPublic($event)" 
-                    [filenameFromParent]="linkName">
+                    <app-dataset-info (changeNameEvent)="updateDatasetLinkName($event)" (changeDescriptionEvent)="updateDatasetLinkDescription($event)" (changePublicEvent)="updateDatasetLinkPublic($event)" [filenameFromParent]="linkName">
                     </app-dataset-info>
                 </div>
                 <div class="nextButton">
@@ -96,16 +92,26 @@
                 </div>
             </ng-template>
         </mat-tab>
-        <mat-tab label="Private dataset">
+        <mat-tab label="My dataset">
             <ng-template matTabContent>
                 <div class="dropzone">
-                    <div class="dataset row d-flex" *ngFor="let dataset of myDatasets">
-                        <div class="col-md-11 col-sm-11">
-                            <h2>{{dataset.name}}</h2>
-                            <p>{{dataset.description}}</p>
-                        </div>
-                        <div class="col-md-1 col-sm-11 align-self-end">
-                            <button class="btn btn-outline-success" (click)="myDatasetClick(dataset)">Select</button>
+                    <div *ngIf="datasetsList.length == 0">
+                        <!-- TODO -->
+                        You don't have any dataset.
+                    </div>
+                    <div *ngIf="myDatasets.length > 0">
+                        <div class="dataset row" style="border-bottom: solid darkslategray 1px;" *ngFor="let dataset of datasetsList">
+                            <div class="col-md-11 col-sm-11">
+                                <div class="row">
+                                    <h2 class="align-self-start d-flex">{{dataset.name}}</h2>
+                                </div>
+                                <div class="row">
+                                    <p class="align-self-start d-flex">{{dataset.description}}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-1 col-sm-11 align-self-center">
+                                <button class="btn btn-outline-success" (click)="myDatasetClick(dataset)">Select</button>
+                            </div>
                         </div>
                     </div>
                 </div>

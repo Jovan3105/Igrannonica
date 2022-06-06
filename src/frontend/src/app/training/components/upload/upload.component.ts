@@ -43,6 +43,8 @@ export class UploadComponent implements OnInit {
   @Output() datasetSelectedEvent: EventEmitter<{ isSelected: boolean, datasetSource: string }>;
   @Output() myDatasetEvent:EventEmitter<any>;
 
+  datasetsList:any[]=[];
+
   constructor(private authService : AuthService, public sessionService:SessionService) {
     this.fileName = "";
     this.datasetURL = "";
@@ -58,6 +60,7 @@ export class UploadComponent implements OnInit {
     this.covidURL = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv";
     this.browserURL = "https://raw.githubusercontent.com/datasets/browser-stats/master/data.csv";
    }
+
 
   ngOnInit(): void 
   {
@@ -104,6 +107,9 @@ export class UploadComponent implements OnInit {
       if (this.sessionService.getData('upload_type') == 'link') this.newLinkBool = false;
       else if (this.sessionService.getData('upload_type') == 'file') this.newFileBool = false;
     }
+  }
+  ngOnChanges(){
+    this.datasetsList=this.myDatasets.reverse();
   }
 
   updateDatasetName(value:string)

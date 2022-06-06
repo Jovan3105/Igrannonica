@@ -41,21 +41,14 @@
             </div>
             <div class="row mx-auto" id="mainContainer" [ngStyle]="{'display': mainContainerDisplay}">
                 <div class="col-lg" [formGroup]="formPages">
-                    <app-show-table #dataTable id="mainTable" 
-                    (hideEvent)="changeCheckBox($event)">
+                    <app-show-table #dataTable id="mainTable" (hideEvent)="changeCheckBox($event)">
                     </app-show-table><br>
                     <div class="justify-content-sm-end d-flex align-items-center me-1">
                         Jump to page&nbsp;<input matInput type="number" formControlName="currentPage" [min]="minPages" [max]="maxPages" (ngModelChange)="changePage($event)" (keydown.enter)="changePage($event)">
                     </div>
                 </div>
                 <div class="col-lg-4" style="padding:0em 0.3em;">
-                    <app-labels #columnsSelecion id="labelCards"
-                    [missing]="numOfMissingValues"
-                    [missing_array]="numOfMissingArray" 
-                    [missing_incidator]="missingIndicator"
-                    (checkEvent)="changeColomnVisibility($event)" 
-                    (labelEvent)="onTargetColumnSelect($event)"
-                    ></app-labels>
+                    <app-labels #columnsSelecion id="labelCards" [missing]="numOfMissingValues" [missing_array]="numOfMissingArray" [missing_incidator]="missingIndicator" (checkEvent)="changeColomnVisibility($event)" (labelEvent)="onTargetColumnSelect($event)"></app-labels>
                 </div>
             </div>
             <div class="stats-view" [ngStyle]="{'display':statsViewDisplay}">
@@ -65,12 +58,11 @@
         </div>
     </mat-step>
     <mat-step>
-      <ng-template matStepLabel>Training and evaluation</ng-template>
-      <div id="second" class="container-flex">
-        <app-hyperparameters [choosenInAndOutCols]="choosenInAndOutCols" [datasetId]="datasetId" 
-        [ngStyle]="{'display': trainingDisplay}"></app-hyperparameters>
-        <!-- Deo kada se klikne na dugme -->
-        <!-- <div class="options">
+        <ng-template matStepLabel>Training and evaluation</ng-template>
+        <div id="second" class="container-flex">
+            <app-hyperparameters [choosenInAndOutCols]="choosenInAndOutCols" [datasetId]="datasetId" [ngStyle]="{'display': trainingDisplay}"></app-hyperparameters>
+            <!-- Deo kada se klikne na dugme -->
+            <!-- <div class="options">
             <input>
         </div> -->
         </div>

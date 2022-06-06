@@ -84,7 +84,8 @@ export class TrainingViewComponent implements OnInit {
   nextButtonDisable:boolean = true;
   backButtonDisable:boolean = true;
   modifyChangeButtons:boolean = false;
-
+  myDatasets:any[]=[];
+  
   /* ********************** */
   /* promenljive za kontrolu prikaza (ngIF, typescript, ...) */
   /* ****************************************************** */
@@ -250,7 +251,8 @@ export class TrainingViewComponent implements OnInit {
     this.userId = userIdTemp;
 
     this.sessionService.saveData('user_id', this.userId.toString());
-
+    
+    this.datasetService.getDatasets().subscribe(this.myDatasetsObserver);
     if (this.sessionService.getData('dataset_id') != null) 
     {
       this.uploadCompleted = true;
@@ -282,10 +284,8 @@ export class TrainingViewComponent implements OnInit {
       // TODO proveriti da li ovde treba da se odradi i loading ostalih podataka 
       // na datoj stranici
     }  
-    this.datasetService.getDatasets().subscribe(this.myDatasetsObserver);
   }
 
-  myDatasets:any[]=[];
   hideElements()
   {
     this.stepperDisplay = DisplayType.HIDE;
@@ -668,6 +668,8 @@ export class TrainingViewComponent implements OnInit {
 
   setView(view:View)
   {
+    if(view==View.UPLOAD)
+      this.datasetService.getDatasets().subscribe(this.myDatasetsObserver);
     this.viewIndicator = view;
     this.sessionService.saveData('view',this.viewIndicator.toString());
   }
