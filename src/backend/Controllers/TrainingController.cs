@@ -31,25 +31,6 @@ namespace backend.Controllers
             _httpContext = httpContext;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<string>> sendS(string algorithm, string epoha)
-        {
-            var url = _configuration["Addresses:Microservice"] + "/training/start";
-
-            var multipartFormContent = new MultipartFormDataContent();
-
-            StringContent alg = new StringContent(algorithm);
-            multipartFormContent.Add(alg, name: "algorithm");
-
-            StringContent epo = new StringContent(epoha);
-            multipartFormContent.Add(epo, name: "epoha");
-
-            var response = await client.PostAsync(url, multipartFormContent);
-
-            var responseString = await response.Content.ReadAsStringAsync();
-            return Ok(responseString);
-        }
-
         [Authorize]
         [HttpPost]
         [Route("begin_training")]

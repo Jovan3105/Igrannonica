@@ -10,7 +10,6 @@ export class DatasetInfoComponent implements OnInit {
   @Input() filenameFromParent: string | undefined  = '';
   @Output() changeNameEvent = new EventEmitter<string>();
   @Output() changeDescriptionEvent = new EventEmitter<string>();
-  @Output() changePublicEvent = new EventEmitter<boolean>();
 
   fileName?:string;
 
@@ -19,10 +18,6 @@ export class DatasetInfoComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  changePublic(event:any)
-  {
-    this.changePublicEvent.emit(event.checked);
-  }
 
   changeName(event:any)
   {

@@ -1,6 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { DatasetInfoComponent } from '../dataset-info/dataset-info.component';
 import { SessionService } from 'src/app/core/services/session.service';
 
 @Component({
@@ -18,8 +17,6 @@ export class UploadComponent implements OnInit {
   datasetLinkName?:string = "";
   datasetDescription?:string="";
   datasetLinkDescription?:string="";
-  isDatasetPublic?:boolean=false;
-  isDatasetLinkPublic?:boolean = false;
   fileSize?:string;
   datasetURL:string = "";
 
@@ -124,15 +121,6 @@ export class UploadComponent implements OnInit {
     this.datasetLinkDescription=value;
   }
 
-  updateDatasetPublic(value:boolean)
-  {
-    this.isDatasetPublic=value;
-  }
-  updateDatasetLinkPublic(value:boolean)
-  {
-    this.isDatasetLinkPublic=value;
-  }
-
   fileHandler(event:Event)
   {
     const element = event.currentTarget as HTMLInputElement;
@@ -180,13 +168,16 @@ export class UploadComponent implements OnInit {
 
   uploadClick()
   {
+    if (this.datasetDescription == "")
+    {
+      this.datasetDescription = "Generic description";
+    }
     if (this.newFileBool)
     {
       this.uploadEvent.emit({
         file:this.file,
         name:this.datasetName,
         description:this.datasetDescription,
-        public:this.isDatasetPublic
       });
 
       this.fileName = this.file?.name!;
@@ -209,7 +200,6 @@ export class UploadComponent implements OnInit {
         file:undefined,
         name:this.datasetName,
         description:this.datasetDescription,
-        public:this.isDatasetPublic
       });
     }
   }
@@ -229,7 +219,6 @@ export class UploadComponent implements OnInit {
         link:this.datasetURL,
         name:this.datasetLinkName,
         description:this.datasetLinkDescription,
-        public:this.isDatasetLinkPublic
       });
       this.fileName = this.linkName = this.datasetURL.split("/").pop()!;
       this.newLinkBool = false;
@@ -247,13 +236,19 @@ export class UploadComponent implements OnInit {
         link:undefined,
         name:this.datasetLinkName,
         description:this.datasetLinkDescription,
-        public:this.isDatasetLinkPublic
       });
     }
   }
 
   myDatasetClick(dataset:any)
   {
+    this.sessionService.clearData();
+    this.newFileBool = true;
+    this.newLinkBool = true;
+    this.sessionService.saveData('upload_type','private');
+    this.sessionService.saveData('tab_index',this.tab_index.toString());
+    this.sessionService.saveData('dataset_name',this.datasetLinkName!);
+    this.sessionService.saveData('dataset_description', this.datasetLinkDescription!);
     this.myDatasetEvent.emit(dataset);
   }
 
@@ -314,8 +309,7 @@ export class UploadComponent implements OnInit {
     this.linkEvent.emit({
       link:datasetLink,
       name: datasetLinkName,
-      description:"Public dataset",
-      public:false
+      description:"Public dataset"
     });
     this.sessionService.clearData();
     this.sessionService.saveData('upload_type','public');

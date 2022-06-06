@@ -36,7 +36,7 @@ namespace backend.Controllers
             _httpContext = httpContext;/*
             this.datasetTagContext = datasetTagContext;*/
         }
-
+        [Authorize]
         [HttpGet]
         [Route("")]
         public async Task<ActionResult<List<Dataset>>> fetchAllDatasets()

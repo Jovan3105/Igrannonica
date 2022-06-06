@@ -323,9 +323,11 @@ export class TrainingViewComponent implements OnInit {
     this.datasetId=dataset.id;
     this.uploadCompleted = true;
     this.sessionService.saveData('dataset_id',this.datasetId.toString());
+    this.datasetName = dataset.fileName.split(".")[0]+".csv";
+    this.sessionService.saveData('dataset_name',this.datasetName);
+    this.hideElements();
     this.datasetService.getData(this.datasetId, this.userId).subscribe(this.fetchTableDataObserver);
-    this.fileName =dataset.fileName.split(".")[0]+".csv";
-    this.sessionService.saveData('file_name',this.fileName);
+    
   }
 
   onDatasetSelection(obj: { isSelected: boolean, datasetSource: string }) {
@@ -338,14 +340,13 @@ export class TrainingViewComponent implements OnInit {
     this.datasetName = $event.name;
     const datasetInfo = JSON.stringify({
       Name: $event.name,
-      Description: $event.description,
-      Public: $event.public
+      Description: $event.description
     });
     if ($event.file == undefined) {
       this.datasetService.updateDataset(this.datasetId,{
         Name: $event.name,
         Description: $event.description,
-        Public: $event.public
+        Public:false
       }).subscribe(this.changeInfoObserver);
       
       return;
@@ -374,7 +375,7 @@ export class TrainingViewComponent implements OnInit {
       this.datasetService.updateDataset(this.datasetId,{
         Name: $dataset.name,
         Description: $dataset.description,
-        Public: $dataset.public
+        Public: false
       }).subscribe(this.changeInfoObserver);
 
       return;
@@ -691,7 +692,7 @@ export class TrainingViewComponent implements OnInit {
       this.formPagesModify.controls['currentPageModify'].setValue(1);
   }
 
-    this.modifyModal.setCurrentPage(this.formPagesModify.get('currentPageModify')!.value-1)
+    if (this.modifyModal) this.modifyModal.setCurrentPage(this.formPagesModify.get('currentPageModify')!.value-1)
   }
 
   updateCurrentPageFromModify() {

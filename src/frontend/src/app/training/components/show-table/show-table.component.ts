@@ -114,24 +114,29 @@ export class ShowTableComponent implements OnInit {
     else if(indicator === TableIndicator.PREVIEW || indicator === TableIndicator.STATS) {
       let columns: Array<string> = data.columns;
 
-      if(columns.length > 0) {
-        for (let i = 0; i < data.data.length; i++) {
-          let row = {[columns[0]] : data.data[i][0]};
-
-          for (let j = 1; j < columns.length; j++) {
-            row = {...row, [columns[j]] : data.data[i][j]};
+      if (columns != undefined)
+      {
+        if(columns.length > 0) {
+          for (let i = 0; i < data.data.length; i++) {
+            let row = {[columns[0]] : data.data[i][0]};
+  
+            for (let j = 1; j < columns.length; j++) {
+              row = {...row, [columns[j]] : data.data[i][j]};
+            }
+            this.rowData.push(row);
           }
-          this.rowData.push(row);
+  
+          if(indicator === TableIndicator.PREVIEW)
+            this.tableService.resetVisibility(this.columnApi,this.colIds);
+          else {
+            for (let i = 0; i < this.rowData.length; i++) {
+              this.rowData[i] = {'Column name' : data.index[i], ...this.rowData[i]};
+            }
+          }
         }
 
-        if(indicator === TableIndicator.PREVIEW)
-          this.tableService.resetVisibility(this.columnApi,this.colIds);
-        else {
-          for (let i = 0; i < this.rowData.length; i++) {
-            this.rowData[i] = {'Column name' : data.index[i], ...this.rowData[i]};
-          }
-        }
       }
+      
     }
   }
 
