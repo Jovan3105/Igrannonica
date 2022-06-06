@@ -203,12 +203,16 @@ export class HyperparametersComponent implements OnInit, OnChanges
 
   changeEpoch(value: number): void {
     this.numberOfEpochs = value;
-    this.sessionService.saveData('numberOfEpochs', this.numberOfEpochs.toString());
+    if (this.numberOfEpochs) this.sessionService.saveData('numberOfEpochs', this.numberOfEpochs.toString());
   }
+
   changeRate(value: number): void {
-    value = +value.toFixed(2)
-    this.learningRate = value;
-    this.sessionService.saveData('learningRate', this.learningRate.toString());
+    if(value){
+      value = +value.toFixed(2)
+      this.learningRate = value;
+      if (this.learningRate) this.sessionService.saveData('learningRate', this.learningRate.toString());
+    }
+    
   }
   
   TrainingClick(){
